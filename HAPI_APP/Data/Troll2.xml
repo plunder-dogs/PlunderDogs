@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="TrollBothWays.png">
+	<SubTexture name="troll_walk0001.png_0" x="0" y="0" width="270" height="204" SetName="Right" SetOrder="0">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="3" right="246" top="12" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="146.116180" y="100.000000" x="124.000000" />
+			<Circle name="Shield" type="2" radius="28.017851" y="149.000000" x="221.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0002.png_0" x="270" y="0" width="270" height="204" SetName="Right" SetOrder="1">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="3" right="246" top="12" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="146.116180" y="100.000000" x="124.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="150.000000" x="229.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0003.png_0" x="540" y="0" width="270" height="204" SetName="Right" SetOrder="2">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="3" right="240" top="22" bottom="193" />
+			<Circle name="BoundingCircle2" type="0" radius="140.426956" y="107.000000" x="121.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="153.000000" x="219.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0004.png_0" x="810" y="0" width="270" height="204" SetName="Right" SetOrder="3">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="3" right="240" top="22" bottom="193" />
+			<Circle name="BoundingCircle2" type="0" radius="140.426956" y="107.000000" x="121.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="153.000000" x="221.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0005.png_0" x="1080" y="0" width="270" height="204" SetName="Right" SetOrder="4">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="21" right="234" top="14" bottom="184" />
+			<Circle name="BoundingCircle2" type="0" radius="134.371262" y="99.000000" x="127.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="144.000000" x="214.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0006.png_0" x="1350" y="0" width="270" height="204" SetName="Right" SetOrder="5">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="215" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="125.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="141.000000" x="153.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0007.png_0" x="1620" y="0" width="270" height="204" SetName="Right" SetOrder="6">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="215" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="125.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="140.000000" x="154.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0008.png_0" x="1890" y="0" width="270" height="204" SetName="Right" SetOrder="7">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="215" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="125.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="141.000000" x="153.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0009.png_0" x="2160" y="0" width="270" height="204" SetName="Right" SetOrder="8">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="215" top="8" bottom="187" />
+			<Circle name="BoundingCircle2" type="0" radius="105.170380" y="97.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="133.000000" x="77.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0010.png_0" x="2430" y="0" width="270" height="204" SetName="Right" SetOrder="9">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="215" top="8" bottom="187" />
+			<Circle name="BoundingCircle2" type="0" radius="105.170380" y="97.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="133.000000" x="76.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0011.png_0" x="2700" y="0" width="270" height="204" SetName="Right" SetOrder="10">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="40" right="205" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="114.388245" y="105.000000" x="122.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="131.000000" x="63.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0012.png_0" x="2970" y="0" width="270" height="204" SetName="Right" SetOrder="11">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="40" right="205" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="114.388245" y="105.000000" x="122.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="129.000000" x="61.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0013.png_0" x="3240" y="0" width="270" height="204" SetName="Right" SetOrder="12">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="40" right="205" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="114.388245" y="105.000000" x="122.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="131.000000" x="68.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0014.png_0" x="3510" y="0" width="270" height="204" SetName="Right" SetOrder="13">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="56" right="208" top="2" bottom="191" />
+			<Circle name="BoundingCircle2" type="0" radius="106.380104" y="96.000000" x="132.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="95.000000" x="107.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0015.png_0" x="3780" y="0" width="270" height="204" SetName="Right" SetOrder="14">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="56" right="208" top="2" bottom="191" />
+			<Circle name="BoundingCircle2" type="0" radius="106.380104" y="96.000000" x="132.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="93.000000" x="105.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0016.png_0" x="4050" y="0" width="270" height="204" SetName="Right" SetOrder="15">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="233" top="11" bottom="190" />
+			<Circle name="BoundingCircle2" type="0" radius="125.124008" y="100.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="88.000000" x="193.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="troll_walk0017.png_0" x="4320" y="0" width="270" height="204" SetName="Right" SetOrder="16">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="233" top="11" bottom="190" />
+			<Circle name="BoundingCircle2" type="0" radius="125.124008" y="100.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="87.000000" x="191.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0017.png_0" x="0" y="204" width="270" height="204" SetName="Left" SetOrder="16">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="36" right="234" top="11" bottom="190" />
+			<Circle name="BoundingCircle2" type="0" radius="125.124008" y="100.000000" x="135.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="87.000000" x="79.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0016.png_0" x="270" y="204" width="270" height="204" SetName="Left" SetOrder="15">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="36" right="234" top="11" bottom="190" />
+			<Circle name="BoundingCircle2" type="0" radius="125.124008" y="100.000000" x="135.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="88.000000" x="77.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0015.png_0" x="540" y="204" width="270" height="204" SetName="Left" SetOrder="14">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="61" right="213" top="2" bottom="191" />
+			<Circle name="BoundingCircle2" type="0" radius="106.380104" y="96.000000" x="137.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="93.000000" x="165.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0014.png_0" x="810" y="204" width="270" height="204" SetName="Left" SetOrder="13">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="61" right="213" top="2" bottom="191" />
+			<Circle name="BoundingCircle2" type="0" radius="106.380104" y="96.000000" x="137.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="95.000000" x="163.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0013.png_0" x="1080" y="204" width="270" height="204" SetName="Left" SetOrder="12">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="64" right="229" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="113.388245" y="105.000000" x="146.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="131.000000" x="202.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0012.png_0" x="1350" y="204" width="270" height="204" SetName="Left" SetOrder="11">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="64" right="229" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="113.388245" y="105.000000" x="146.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="129.000000" x="209.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0011.png_0" x="1620" y="204" width="270" height="204" SetName="Left" SetOrder="10">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="64" right="229" top="21" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="113.388245" y="105.000000" x="146.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="131.000000" x="207.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0010.png_0" x="1890" y="204" width="270" height="204" SetName="Left" SetOrder="9">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="215" top="8" bottom="187" />
+			<Circle name="BoundingCircle2" type="0" radius="106.170380" y="97.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="133.000000" x="194.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0009.png_0" x="2160" y="204" width="270" height="204" SetName="Left" SetOrder="8">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="215" top="8" bottom="187" />
+			<Circle name="BoundingCircle2" type="0" radius="106.170380" y="97.000000" x="134.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="133.000000" x="193.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0008.png_0" x="2430" y="204" width="270" height="204" SetName="Left" SetOrder="7">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="234" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="144.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="141.000000" x="117.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0007.png_0" x="2700" y="204" width="270" height="204" SetName="Left" SetOrder="6">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="234" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="144.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="140.000000" x="116.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0006.png_0" x="2970" y="204" width="270" height="204" SetName="Left" SetOrder="5">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="54" right="234" top="8" bottom="188" />
+			<Circle name="BoundingCircle2" type="0" radius="119.279221" y="98.000000" x="144.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="141.000000" x="117.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0005.png_0" x="3240" y="204" width="270" height="204" SetName="Left" SetOrder="4">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="35" right="248" top="14" bottom="184" />
+			<Circle name="BoundingCircle2" type="0" radius="135.371262" y="99.000000" x="141.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="144.000000" x="56.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0004.png_0" x="3510" y="204" width="270" height="204" SetName="Left" SetOrder="3">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="29" right="266" top="22" bottom="193" />
+			<Circle name="BoundingCircle2" type="0" radius="141.426956" y="107.000000" x="147.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="153.000000" x="49.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0003.png_0" x="3780" y="204" width="270" height="204" SetName="Left" SetOrder="2">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="29" right="266" top="22" bottom="193" />
+			<Circle name="BoundingCircle2" type="0" radius="141.426956" y="107.000000" x="147.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="153.000000" x="51.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0002.png_0" x="4050" y="204" width="270" height="204" SetName="Left" SetOrder="1">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="23" right="266" top="12" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="147.116180" y="100.000000" x="144.000000" />
+			<Circle name="Shield" type="2" radius="28.000000" y="150.000000" x="41.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="R_troll_walk0001.png_0" x="4320" y="204" width="270" height="204" SetName="Left" SetOrder="0">
+		<Collider>
+			<Rectangle name="BoundingRect1" type="0" left="23" right="266" top="12" bottom="189" />
+			<Circle name="BoundingCircle2" type="0" radius="147.116180" y="100.000000" x="144.000000" />
+			<Circle name="Shield" type="2" radius="28.017851" y="149.000000" x="49.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

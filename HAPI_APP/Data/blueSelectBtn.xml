@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="blueSelectBtn_surface.png">
+	<SubTexture name="Frame0" x="0" y="0" width="167" height="216">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="167" top="0" bottom="216" />
+			<Circle name="BoundingCircle" type="0" radius="136.514648" y="108.000000" x="83.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame1" x="0" y="216" width="167" height="216">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="167" top="0" bottom="216" />
+			<Circle name="BoundingCircle" type="0" radius="136.514648" y="108.000000" x="83.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame2" x="0" y="432" width="167" height="216">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="167" top="0" bottom="216" />
+			<Circle name="BoundingCircle" type="0" radius="136.514648" y="108.000000" x="83.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

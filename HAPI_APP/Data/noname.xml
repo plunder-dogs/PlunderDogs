@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="hex.png">
+	<SubTexture name="Frame0" x="575" y="141" width="159" height="170">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="159" top="0" bottom="170" />
+			<Circle name="BoundingCircle" type="0" radius="116.384064" y="85.000000" x="79.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame1" x="980" y="149" width="159" height="170">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="159" top="0" bottom="170" />
+			<Circle name="BoundingCircle" type="0" radius="116.384064" y="85.000000" x="79.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame2" x="762" y="153" width="159" height="169">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="159" top="0" bottom="169" />
+			<Circle name="BoundingCircle" type="0" radius="116.019394" y="84.000000" x="79.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

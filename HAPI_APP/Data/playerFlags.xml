@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="playerFlags_surface.png">
+	<SubTexture name="Frame0" x="4" y="7" width="67" height="46">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="67" top="0" bottom="46" />
+			<Circle name="BoundingCircle" type="0" radius="40.635574" y="23.000000" x="33.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame1" x="83" y="7" width="67" height="46">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="67" top="0" bottom="46" />
+			<Circle name="BoundingCircle" type="0" radius="40.635574" y="23.000000" x="33.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame2" x="162" y="7" width="67" height="46">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="67" top="0" bottom="46" />
+			<Circle name="BoundingCircle" type="0" radius="40.635574" y="23.000000" x="33.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="Frame3" x="242" y="7" width="66" height="46">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="66" top="0" bottom="46" />
+			<Circle name="BoundingCircle" type="0" radius="40.224369" y="23.000000" x="33.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

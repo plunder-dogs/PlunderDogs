@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="crossHair.png">
+	<SubTexture name="crossHair.png_0" x="0" y="0" width="15" height="15">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="15" top="0" bottom="15" />
+			<Circle name="BoundingCircle" type="0" radius="10.606602" y="7.000000" x="7.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

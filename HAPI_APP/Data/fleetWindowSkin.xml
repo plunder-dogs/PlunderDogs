@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+<SkinFile>
+	<Skin Version="0.1" Name="fleetWindowSkin">
+		<Palette>
+			<BorderPen>
+				<Shader Type="Colour" Colour="180,180,180,255" />
+			</BorderPen>
+			<BorderPenDisabled>
+				<Shader Type="Colour" Colour="100,100,100,255" />
+			</BorderPenDisabled>
+			<BorderPenFocussed>
+				<Shader Type="Colour" Colour="180,180,180,255" />
+			</BorderPenFocussed>
+			<BorderPenPressed>
+				<Shader Type="Colour" Colour="255,255,255,255" />
+			</BorderPenPressed>
+			<CurvedLook>
+				<Shader Type="Gradient" Colour1="156,255,126,255" Colour2="235,235,235,255" Shape="2" Profile="5" Alpha="1.000000">
+					<Control1 X="0.500000" Y="0.500000" />
+					<Control2 X="1.000000" Y="1.000000" />
+				</Shader>
+			</CurvedLook>
+			<GradRange>
+				<Shader Type="Gradient" Colour1="156,2,126,255" Colour2="235,235,235,255" Shape="2" Profile="5" Alpha="1.000000">
+					<Control1 X="0.542969" Y="0.460938" />
+					<Control2 X="0.000000" Y="0.000000" />
+				</Shader>
+			</GradRange>
+			<HorridPink>
+				<Shader Type="Colour" Colour="165,126,92,255" />
+			</HorridPink>
+			<ObjectBackground>
+				<Shader Type="Colour" Colour="0,0,70,255" />
+			</ObjectBackground>
+			<ObjectDisabledBackground>
+				<Shader Type="Colour" Colour="30,30,50,255" />
+			</ObjectDisabledBackground>
+			<ObjectFocusBackground>
+				<Shader Type="Colour" Colour="0,0,170,255" />
+			</ObjectFocusBackground>
+			<ObjectPressedBackground>
+				<Shader Type="Colour" Colour="10,10,255,255" />
+			</ObjectPressedBackground>
+			<Pen>
+				<Shader Type="Colour" Colour="255,255,255,255" />
+			</Pen>
+			<PenDisabled>
+				<Shader Type="Colour" Colour="100,100,100,255" />
+			</PenDisabled>
+			<PenFocussed>
+				<Shader Type="Colour" Colour="255,255,255,255" />
+			</PenFocussed>
+			<PenLinkFocussed>
+				<Shader Type="Colour" Colour="255,165,0,255" />
+			</PenLinkFocussed>
+			<PenLinkNormal>
+				<Shader Type="Colour" Colour="205,115,0,255" />
+			</PenLinkNormal>
+			<PenPressed>
+				<Shader Type="Colour" Colour="255,255,255,255" />
+			</PenPressed>
+			<Pointer>
+				<Shader Type="Gradient" Colour1="156,255,126,255" Colour2="235,235,235,255" Shape="2" Profile="0" Alpha="1.000000">
+					<Control1 X="1.000000" Y="1.000000" />
+					<Control2 X="0.000000" Y="0.000000" />
+				</Shader>
+			</Pointer>
+			<Shadow>
+				<Shader Type="Colour" Colour="0,0,0,100" />
+			</Shadow>
+			<ShapeBackground>
+				<Shader Type="Colour" Colour="10,10,100,255" />
+			</ShapeBackground>
+			<ShapeBorder>
+				<Shader Type="Colour" Colour="20,20,120,255" />
+			</ShapeBorder>
+			<ShapeCaptionPen>
+				<Shader Type="Colour" Colour="255,165,0,255" />
+			</ShapeCaptionPen>
+			<ShapeShadow>
+				<Shader Type="Colour" Colour="0,0,0,200" />
+			</ShapeShadow>
+			<WindowBackground>
+				<Shader Type="Gradient" Colour1="165,126,92,255" Colour2="165,126,92,255" Shape="3" Profile="3" Alpha="1.000000">
+					<Control1 X="0.000000" Y="0.000000" />
+					<Control2 X="1.000000" Y="1.000000" />
+				</Shader>
+			</WindowBackground>
+			<color>
+				<Shader Type="Colour" Colour="160,102,50,255" />
+			</color>
+		</Palette>
+		<SkinSizes textSize="16" textHorizontalGap="4" textVerticalGap="2" objectGapHorizontal="10" objectGapVertical="10" margin="6" shadowWidth="4" markerPercent="3" />
+		<TextStyle StyleName="Master">
+			<Normal textColour="Pen" textColour_Inherited="0" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement_Inherited="0" styleFlags_Inherited="0" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="0" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement_Inherited="0" styleFlags_Inherited="0" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="0" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement_Inherited="0" styleFlags_Inherited="0" />
+			<Alt textColour="PenPressed" textColour_Inherited="0" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement_Inherited="0" styleFlags_Inherited="0" />
+		</TextStyle>
+		<WindowStyle StyleName="Master">
+			<Normal borderShader="BorderPen" borderShader_Inherited="0" backgroundShader="ObjectBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="0" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="0" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="0" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+		</WindowStyle>
+		<TextStyle StyleName="Normal Text">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="0" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Clickable Text">
+			<Normal textColour="PenLinkNormal" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenLinkFocussed" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Heading Text">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="2" textSizeIncrement_Inherited="0" styleFlags="5" styleFlags_Inherited="0" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="2" textSizeIncrement_Inherited="0" styleFlags="5" styleFlags_Inherited="0" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="2" textSizeIncrement_Inherited="0" styleFlags="5" styleFlags_Inherited="0" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="2" textSizeIncrement_Inherited="0" styleFlags="5" styleFlags_Inherited="0" />
+		</TextStyle>
+		<TextStyle StyleName="Button">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="0" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="ButtonSideText">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="0" />
+			<Alt textColour="Pen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Text Entry">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="0" />
+		</TextStyle>
+		<TextStyle StyleName="List Box">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="Pen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags="2" styleFlags_Inherited="0" />
+		</TextStyle>
+		<TextStyle StyleName="Menu">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenPressed" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Canvas">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Dial">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+		</TextStyle>
+		<TextStyle StyleName="Slider">
+			<Normal textColour="Pen" textColour_Inherited="0" textOutlineColour="PenLinkNormal" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags_Inherited="0" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+			<Focussed textColour="HorridPink" textColour_Inherited="0" textOutlineColour="color" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="0" textOutlineThickness_Inherited="0" textSizeIncrement="-3" textSizeIncrement_Inherited="0" styleFlags="1" styleFlags_Inherited="0" />
+		</TextStyle>
+		<TextStyle StyleName="Scroller">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Shape">
+			<Normal textColour="ShapeCaptionPen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-2" textSizeIncrement_Inherited="0" styleFlags_Inherited="1" />
+			<Disabled textColour="ShapeCaptionPen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-2" textSizeIncrement_Inherited="0" styleFlags_Inherited="1" />
+			<Focussed textColour="ShapeCaptionPen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-2" textSizeIncrement_Inherited="0" styleFlags_Inherited="1" />
+			<Alt textColour="ShapeCaptionPen" textColour_Inherited="0" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement="-2" textSizeIncrement_Inherited="0" styleFlags_Inherited="1" />
+		</TextStyle>
+		<TextStyle StyleName="Normal Window">
+			<Normal textColour="Pen" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Disabled textColour="PenDisabled" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Focussed textColour="PenFocussed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+			<Alt textColour="PenPressed" textColour_Inherited="1" textOutlineColour_Inherited="1" textOutlineThickness_Inherited="1" textSizeIncrement_Inherited="1" styleFlags_Inherited="1" />
+		</TextStyle>
+		<WindowStyle StyleName="Normal Text">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Clickable Text">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Heading Text">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Button">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="ButtonSideText">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="1.000000" curvature_Inherited="0" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="1.000000" curvature_Inherited="0" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="1.000000" curvature_Inherited="0" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="1.000000" curvature_Inherited="0" />
+		</WindowStyle>
+		<WindowStyle StyleName="Text Entry">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.100000" curvature_Inherited="0" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.100000" curvature_Inherited="0" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.100000" curvature_Inherited="0" />
+			<Alt borderShader="BorderPen" borderShader_Inherited="0" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.100000" curvature_Inherited="0" />
+		</WindowStyle>
+		<WindowStyle StyleName="List Box">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPen" borderShader_Inherited="0" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Menu">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="Pen" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Canvas">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectDisabledBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="BorderPenFocussed" borderShader_Inherited="1" backgroundShader="ObjectFocusBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Dial">
+			<Normal borderShader="ObjectBackground" borderShader_Inherited="0" backgroundShader="CurvedLook" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="1.000000" curvature_Inherited="0" />
+			<Disabled borderShader="ObjectBackground" borderShader_Inherited="0" backgroundShader="CurvedLook" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="1.000000" curvature_Inherited="0" />
+			<Focussed borderShader="ObjectBackground" borderShader_Inherited="0" backgroundShader="CurvedLook" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="1.000000" curvature_Inherited="0" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="Pointer" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Slider">
+			<Normal borderShader="HorridPink" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="0" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="ObjectBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="0" borderWidth_Inherited="0" curvature="0.100000" curvature_Inherited="0" />
+			<Focussed borderShader="HorridPink" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="0" hasShadow="0" hasShadow_Inherited="0" borderWidth="0" borderWidth_Inherited="0" curvature="0.100000" curvature_Inherited="0" />
+			<Alt borderShader="BorderPenPressed" borderShader_Inherited="1" backgroundShader="color" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="0" borderWidth_Inherited="0" curvature="0.100000" curvature_Inherited="0" />
+		</WindowStyle>
+		<WindowStyle StyleName="Scroller">
+			<Normal borderShader="PenDisabled" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="0" borderWidth="1" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="PenDisabled" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="0" borderWidth="1" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="PenDisabled" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="0" borderWidth="1" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="PenDisabled" borderShader_Inherited="0" backgroundShader="HorridPink" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="0" borderWidth="1" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+		<WindowStyle StyleName="Shape">
+			<Normal borderShader="ShapeBorder" borderShader_Inherited="0" backgroundShader="ShapeBackground" backgroundShader_Inherited="0" shadowShader="ShapeShadow" shadowShader_Inherited="0" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Disabled borderShader="ShapeBorder" borderShader_Inherited="0" backgroundShader="ShapeBackground" backgroundShader_Inherited="0" shadowShader="ShapeShadow" shadowShader_Inherited="0" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Focussed borderShader="ShapeBorder" borderShader_Inherited="0" backgroundShader="ShapeBackground" backgroundShader_Inherited="0" shadowShader="ShapeShadow" shadowShader_Inherited="0" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+			<Alt borderShader="ShapeBorder" borderShader_Inherited="0" backgroundShader="ShapeBackground" backgroundShader_Inherited="0" shadowShader="ShapeShadow" shadowShader_Inherited="0" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="0" />
+		</WindowStyle>
+		<WindowStyle StyleName="Normal Window">
+			<Normal borderShader="BorderPen" borderShader_Inherited="1" backgroundShader="WindowBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Disabled borderShader="BorderPenDisabled" borderShader_Inherited="1" backgroundShader="WindowBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Focussed borderShader="Pen" borderShader_Inherited="0" backgroundShader="WindowBackground" backgroundShader_Inherited="0" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="1" hasShadow_Inherited="0" borderWidth="2" borderWidth_Inherited="1" curvature="0.000000" curvature_Inherited="1" />
+			<Alt borderShader="Pen" borderShader_Inherited="0" backgroundShader="ObjectPressedBackground" backgroundShader_Inherited="1" shadowShader="Shadow" shadowShader_Inherited="1" hasShadow="0" hasShadow_Inherited="1" borderWidth="2" borderWidth_Inherited="0" curvature="0.000000" curvature_Inherited="1" />
+		</WindowStyle>
+	</Skin>
+</SkinFile>
