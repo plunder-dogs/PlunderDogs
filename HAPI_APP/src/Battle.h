@@ -43,10 +43,10 @@ class Battle
 
 		void update(float deltaTime);
 
-		void onYellowShipDestroyed(std::vector<BattlePlayer>& players);
-		void onBlueShipDestroyed(std::vector<BattlePlayer>& players);
-		void onGreenShipDestroyed(std::vector<BattlePlayer>& players);
-		void onRedShipDestroyed(std::vector<BattlePlayer>& players);
+		void onYellowShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
+		void onBlueShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
+		void onGreenShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
+		void onRedShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
 
 	private:
 		int m_yellowShipsDestroyed;
@@ -55,7 +55,7 @@ class Battle
 		int m_redShipsDestroyed;
 		void onReset();
 
-		void checkGameStatus(const std::vector<BattlePlayer>& players);
+		void checkGameStatus(const std::vector<std::unique_ptr<BattlePlayer>>& players);
 		Timer m_winTimer;
 		FactionName m_winningFaction;
 		bool m_gameOver;
@@ -89,7 +89,7 @@ public:
 	void playFireAnimation(BattleEntity& entity, std::pair<int, int> position);
 	void playExplosionAnimation(BattleEntity& entity);
 private:
-	std::vector<BattlePlayer> m_players;
+	std::vector<std::unique_ptr<BattlePlayer>> m_players;
 	int m_currentPlayerTurn;
 	Map m_map;
 	BattlePhase m_currentPhase;
@@ -106,7 +106,7 @@ private:
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
 
-	bool allEntitiesAttacked(std::vector<std::shared_ptr<BattleEntity>>& playerEntities) const;
+	bool allEntitiesAttacked(std::vector<std::unique_ptr<BattleEntity>>& playerEntities) const;
 	BattlePlayer& getPlayer(FactionName factionName);
 
 

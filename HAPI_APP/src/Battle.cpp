@@ -151,7 +151,7 @@ void Battle::handleAIMovementPhaseTimer(float deltaTime)
 	if (m_timeBetweenAIUnits.isExpired())
 	{
 		int i = 0;
-		for (auto& it : m_players[m_currentPlayerTurn].m_entities)
+		for (auto& it : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			if (!it->m_battleProperties.isDead() &&
 				!it->m_battleProperties.isDestinationSet())
@@ -188,7 +188,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	if (m_timeBetweenAIUnits.isExpired())
 	{
 		int i = 0;
-		for (auto& it : m_players[m_currentPlayerTurn].m_entities)
+		for (auto& it : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			if (!it->m_battleProperties.isDead() &&
 				!it->m_battleProperties.isWeaponFired())
@@ -265,7 +265,7 @@ void Battle::start(const std::string & newMapName, const std::vector<Player>& ne
 	for (auto& player : newPlayers)
 	{
 		auto spawnPosition = m_map.getSpawnPosition();
-		m_players.emplace_back(player.m_factionName, spawnPosition, player.m_type);
+		m_players.emplace_back(std::make_unique<BattlePlayer>(player.m_factionName, spawnPosition, player.m_type));
 	}
 	//Cycle through human players
 	m_battleUI.deployHumanPlayers(newPlayers, m_map, *this);
@@ -274,7 +274,7 @@ void Battle::start(const std::string & newMapName, const std::vector<Player>& ne
 	{
 		if (player.m_type == ePlayerType::eAI)
 		{
-			AI::handleDeploymentPhase(*this, m_map, this->getPlayer(player.m_factionName), player);
+			AI::handleDeploymentPhase(*this, m_map, getPlayer(player.m_factionName), player);
 		}
 	}
 	m_battleUI.loadGUI(m_map.getDimensions());
@@ -288,7 +288,7 @@ void Battle::render() const
 
 	for (const auto& player : m_players)
 	{
-		for (const auto& entity : player.m_entities)
+		for (const auto& entity : player->m_entities)
 		{
 			entity->m_battleProperties.renderPath(m_map);
 		}
@@ -296,7 +296,7 @@ void Battle::render() const
 	m_battleUI.renderUI();
 	for (const auto& player : m_players)
 	{
-		for (const auto& entity : player.m_entities)
+		for (const auto& entity : player->m_entities)
 		{
 			entity->m_battleProperties.render(entity->m_entityProperties.m_sprite, m_map);
 		}
@@ -433,7 +433,7 @@ void Battle::nextTurn()
 			//}
 			
 			m_currentPlayerTurn = 0;
-			if (m_players[m_currentPlayerTurn].m_playerType == ePlayerType::eAI)
+			if (m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
 				GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
@@ -441,8 +441,8 @@ void Battle::nextTurn()
 			}
 		}
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
-		currentPlayer = m_players[m_currentPlayerTurn].m_factionName;
-		for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+		currentPlayer = m_players[m_currentPlayerTurn]->m_factionName;
+		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			entity->m_battleProperties.enableAction();
 		}
@@ -453,12 +453,12 @@ void Battle::nextTurn()
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eEnteringAttackPhase);
 
-		for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			entity->m_battleProperties.enableAction();
 		}
 
-		if (!m_players[m_currentPlayerTurn].m_eliminated && m_players[m_currentPlayerTurn].m_playerType == ePlayerType::eAI)
+		if (!m_players[m_currentPlayerTurn]->m_eliminated && m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
@@ -471,25 +471,25 @@ void Battle::nextTurn()
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eEnteringMovementPhase);
 
-		for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			entity->m_battleProperties.disableAction();
 		}
 
 		updateWindDirection();
 		incrementPlayerTurn();
-		for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
 			entity->m_battleProperties.enableAction();
 		}
 
-		if (!m_players[m_currentPlayerTurn].m_eliminated && m_players[m_currentPlayerTurn].m_playerType == ePlayerType::eAI)
+		if (!m_players[m_currentPlayerTurn]->m_eliminated && m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 			m_AITurn = true;
 		}
-		else if (m_players[m_currentPlayerTurn].m_playerType == ePlayerType::eHuman)
+		else if (m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eHuman)
 		{
 			GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
 			m_AITurn = false;
@@ -503,7 +503,7 @@ std::vector<FactionName> Battle::getAllFactions() const
 	std::vector<FactionName> lol;
 	for (auto& player : m_players)
 	{
-		lol.emplace_back(player.m_factionName);
+		lol.emplace_back(player->m_factionName);
 	}
 
 	assert(!lol.empty());
@@ -539,13 +539,13 @@ void Battle::playExplosionAnimation(BattleEntity& entity)
 
 void Battle::updateMovementPhase(float deltaTime)
 {
-	for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
 		if (entity->m_battleProperties.isDead())
 			continue;
 		entity->m_battleProperties.update(deltaTime, m_map, entity->m_entityProperties);
 	}
-	for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
 		if (entity->m_battleProperties.isDead())
 			continue;
@@ -564,13 +564,13 @@ void Battle::updateMovementPhase(float deltaTime)
 
 void Battle::updateAttackPhase()
 {
-	if (allEntitiesAttacked(m_players[m_currentPlayerTurn].m_entities))
+	if (allEntitiesAttacked(m_players[m_currentPlayerTurn]->m_entities))
 	{	
 		nextTurn();
 	}
 }
 
-bool Battle::allEntitiesAttacked(std::vector<std::shared_ptr<BattleEntity>>& playerEntities) const
+bool Battle::allEntitiesAttacked(std::vector<std::unique_ptr<BattleEntity>>& playerEntities) const
 {
 	bool allEntitiesAttacked = true;
 	for (const auto& entity : playerEntities)
@@ -586,9 +586,9 @@ bool Battle::allEntitiesAttacked(std::vector<std::shared_ptr<BattleEntity>>& pla
 
 BattlePlayer& Battle::getPlayer(FactionName factionName)
 {
-	auto cIter = std::find_if(m_players.begin(), m_players.end(), [factionName](const auto& player) { return factionName == player.m_factionName; });
+	auto cIter = std::find_if(m_players.begin(), m_players.end(), [factionName](auto& player) { return factionName == player->m_factionName; });
 	assert(cIter != m_players.end());
-	return *cIter;
+	return *cIter->get();
 }
 
 void Battle::onResetBattle()
@@ -623,14 +623,14 @@ BattlePhase Battle::getCurrentPhase() const
 
 FactionName Battle::getCurrentFaction() const
 {
-	return m_players[m_currentPlayerTurn].m_factionName;
+	return m_players[m_currentPlayerTurn]->m_factionName;
 }
 
 const BattlePlayer & Battle::getPlayer(FactionName factionName) const
 {
-	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [factionName](const auto& player) { return player.m_factionName == factionName; });
+	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [factionName](auto& player) { return player->m_factionName == factionName; });
 	assert(cIter != m_players.cend());
-	return *cIter;
+	return *cIter->get();
 }
 
 bool Battle::isAIPlaying() const
@@ -661,7 +661,7 @@ void Battle::onRedShipDestroyed()
 void Battle::onEndMovementPhaseEarly()
 {
 	bool actionBeingPerformed = false;
-	for (auto& entity : m_players[m_currentPlayerTurn].m_entities)
+	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
 		if (entity->m_battleProperties.isMovingToDestination())
 		{
@@ -730,50 +730,50 @@ void Battle::BattleManager::update(float deltaTime)
 	}
 }
 
-void Battle::BattleManager::onYellowShipDestroyed(std::vector<BattlePlayer>& players)
+void Battle::BattleManager::onYellowShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players)
 {
 	++m_yellowShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](const auto& player) { return player.m_factionName == FactionName::eYellow; });
+	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eYellow; });
 	assert(player != players.end());
-	if (m_yellowShipsDestroyed == static_cast<int>(player->m_entities.size()))
+	if (m_yellowShipsDestroyed == static_cast<int>(player->get()->m_entities.size()))
 	{
-		player->m_eliminated = true;
+		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
 
-void Battle::BattleManager::onBlueShipDestroyed(std::vector<BattlePlayer>& players)
+void Battle::BattleManager::onBlueShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players)
 {
 	++m_blueShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](const auto& player) { return player.m_factionName == FactionName::eBlue; });
+	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eBlue; });
 	assert(player != players.end());
-	if (m_blueShipsDestroyed == static_cast<int>(player->m_entities.size()))
+	if (m_blueShipsDestroyed == static_cast<int>(player->get()->m_entities.size()))
 	{
-		player->m_eliminated = true;
+		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
 
-void Battle::BattleManager::onGreenShipDestroyed(std::vector<BattlePlayer>& players)
+void Battle::BattleManager::onGreenShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players)
 {
 	++m_greenShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](const auto& player) { return player.m_factionName == FactionName::eGreen; });
+	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eGreen; });
 	assert(player != players.end());
-	if (m_greenShipsDestroyed == static_cast<int>(player->m_entities.size()))
+	if (m_greenShipsDestroyed == static_cast<int>(player->get()->m_entities.size()))
 	{
-		player->m_eliminated = true;
+		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
 
-void Battle::BattleManager::onRedShipDestroyed(std::vector<BattlePlayer>& players)
+void Battle::BattleManager::onRedShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players)
 {
 	++m_redShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](const auto& player) { return player.m_factionName == FactionName::eRed; });
+	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eRed; });
 	assert(player != players.end());
-	if (m_redShipsDestroyed == static_cast<int>(player->m_entities.size()))
+	if (m_redShipsDestroyed == static_cast<int>(player->get()->m_entities.size()))
 	{
-		player->m_eliminated = true;
+		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
@@ -789,13 +789,13 @@ void Battle::BattleManager::onReset()
 	m_gameOver = false;
 }
 
-void Battle::BattleManager::checkGameStatus(const std::vector<BattlePlayer>& players)
+void Battle::BattleManager::checkGameStatus(const std::vector<std::unique_ptr<BattlePlayer>>& players)
 {
 	//Check to see if all players have been eliminated
 	int playersEliminated = 0;
 	for (const auto& player : players)
 	{
-		if (player.m_eliminated)
+		if (player->m_eliminated)
 		{
 			++playersEliminated;
 		}
@@ -803,9 +803,9 @@ void Battle::BattleManager::checkGameStatus(const std::vector<BattlePlayer>& pla
 	//Last player standing - Player wins
 	if (playersEliminated == static_cast<int>(players.size()) - 1)
 	{
-		auto player = std::find_if(players.cbegin(), players.cend(), [](const auto& player) { return player.m_eliminated == false; });
+		auto player = std::find_if(players.cbegin(), players.cend(), [](const auto& player) { return player->m_eliminated == false; });
 		assert(player != players.cend());
-		FactionName winningFaction = player->m_factionName;
+		FactionName winningFaction = player->get()->m_factionName;
 		switch (winningFaction)
 		{
 		case FactionName::eYellow:

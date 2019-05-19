@@ -148,9 +148,10 @@ struct BattlePlayer
 {
 	BattlePlayer(FactionName name, std::pair<int, int> spawnPosition, ePlayerType playerType);
 
-	std::vector<std::shared_ptr<BattleEntity>> m_entities;
+	std::vector<std::unique_ptr<BattleEntity>> m_entities;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
 	const std::pair<int, int> m_spawnPosition;
 	bool m_eliminated;
+	std::deque<EntityProperties*> m_shipsToDeploy;
 };

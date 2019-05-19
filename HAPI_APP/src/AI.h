@@ -13,8 +13,8 @@ struct EntityProperties;
 
 namespace AI
 {
-	void handleMovementPhase(const Battle& battle, Map& map, BattlePlayer& player, int currentUnit);
-	void handleShootingPhase(Battle& battle, const Map& map, BattlePlayer& player, int currentUnit);
+	void handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<BattlePlayer>& player, int currentUnit);
+	void handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<BattlePlayer>& player, int currentUnit);
 	void handleDeploymentPhase(Battle& battle, Map& map, BattlePlayer& bPlayer, const Player& player);
 	void handleShipSelection(std::vector<EntityProperties>& shipPool, std::vector<EntityProperties*>& selectedShips);
 };
