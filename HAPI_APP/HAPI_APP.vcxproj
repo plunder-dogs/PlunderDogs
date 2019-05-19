@@ -183,7 +183,6 @@
     <ClCompile Include="src\NewPathfinding.cpp" />
     <ClCompile Include="src\OverWorld.cpp" />
     <ClCompile Include="src\OverWorldGUI.cpp" />
-    <ClCompile Include="src\Pathfinding.cpp" />
     <ClCompile Include="src\Textures.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Utilities\Base64.cpp" />
@@ -207,7 +206,6 @@
     <ClInclude Include="src\NewPathfinding.h" />
     <ClInclude Include="src\OverWorld.h" />
     <ClInclude Include="src\OverWorldGUI.h" />
-    <ClInclude Include="src\Pathfinding.h" />
     <ClInclude Include="src\Textures.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Utilities\Base64.h" />
