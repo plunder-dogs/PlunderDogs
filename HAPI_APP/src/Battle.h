@@ -75,19 +75,19 @@ public:
 	void start(const std::string& newMapName, const std::vector<Player>& newPlayers);
 	void render() const;
 	void update(float deltaTime);
-	void moveEntityToPosition(BattleEntity& entity, const Tile& destination);
-	void moveEntityToPosition(BattleEntity& entity, const Tile& destination, eDirection endDirection);
+	void moveEntityToPosition(Ship& entity, const Tile& destination);
+	void moveEntityToPosition(Ship& entity, const Tile& destination, eDirection endDirection);
 
 	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
-	void insertEntity(std::pair<int, int> startingPosition, eDirection startingDirection, const EntityProperties& entityProperties, FactionName factionName);
+	void insertEntity(std::pair<int, int> startingPosition, eDirection startingDirection, const ShipGlobalProperties& entityProperties, FactionName factionName);
 	void nextTurn();
 
 	std::vector<FactionName> getAllFactions() const;
 	//const BattlePlayer& getPlayer(FactionName faction) const;
 	//std::vector<std::shared_ptr<BattleEntity>>& getFactionShips(FactionName faction);
 	//const std::vector<std::shared_ptr<BattleEntity>>& getFactionShips(FactionName faction) const;
-	void playFireAnimation(BattleEntity& entity, std::pair<int, int> position);
-	void playExplosionAnimation(BattleEntity& entity);
+	void playFireAnimation(Ship& entity, std::pair<int, int> position);
+	void playExplosionAnimation(Ship& entity);
 private:
 	std::vector<std::unique_ptr<BattlePlayer>> m_players;
 	int m_currentPlayerTurn;
@@ -106,7 +106,7 @@ private:
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
 
-	bool allEntitiesAttacked(std::vector<std::unique_ptr<BattleEntity>>& playerEntities) const;
+	bool allEntitiesAttacked(std::vector<std::unique_ptr<Ship>>& playerEntities) const;
 	BattlePlayer& getPlayer(FactionName factionName);
 
 

@@ -8,13 +8,13 @@
 #include <string>
 
 struct Player;
-struct EntityProperties;
+struct ShipGlobalProperties;
 class OverWorld;
 class Battle;
 class OverWorldGUI 
 {
 private:
-	EntityProperties* m_currentlySelected;
+	ShipGlobalProperties* m_currentlySelected;
 	bool m_enitiesAdded;
 
 	//m_enemyTerritoryHexSheet   might need name for replacing
@@ -48,11 +48,11 @@ private:
 	HAPISPACE::VectorI calculateUpgradeObjectScrolledPosition(const std::string& windowName, const std::string& windowSliderName, int objectNumber, size_t vectorSize);
 	bool entityContainsMouse(const std::string& windowName, const std::string& windowObjectName, HAPISPACE::VectorI windowTopLeft, HAPISPACE::VectorI mousePosition) const;
 	bool windowObjectExists(const std::string& windowName, const std::string& windowObjectName) const;
-	void checkShipSelect(bool& selection, const std::string& shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, std::vector<EntityProperties>& entities, const bool vertical = false);
-	void checkShipSelect(bool& selection, const std::string& shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, std::vector<EntityProperties*>& entities, const bool vertical = false);
-	void selectBattleShip(const std::string& shipWindow, const std::string& windowSlider, const std::string& selectedShipWindow, const std::string& selectedWindowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, const HAPISPACE::VectorI& selectedTopLeft, std::vector<EntityProperties>& entities, std::vector<EntityProperties*>& selectedEntities);
-	void deselectBattleShip(const std::string& selectedShipWindow, const std::string& selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<EntityProperties*>& selectedEntities, const HAPISPACE::VectorI& mouseData);
-	void updateSelectedShips(const std::string& shipWindow, const HAPISPACE::VectorI& windowTopLeft, std::vector<EntityProperties>& entities, std::vector<EntityProperties*>& selectedEntities);
+	void checkShipSelect(bool& selection, const std::string& shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, std::vector<ShipGlobalProperties>& entities, const bool vertical = false);
+	void checkShipSelect(bool& selection, const std::string& shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, std::vector<ShipGlobalProperties*>& entities, const bool vertical = false);
+	void selectBattleShip(const std::string& shipWindow, const std::string& windowSlider, const std::string& selectedShipWindow, const std::string& selectedWindowSlider, const HAPISPACE::VectorI& mouseData, const HAPISPACE::VectorI& windowTopLeft, const HAPISPACE::VectorI& selectedTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities);
+	void deselectBattleShip(const std::string& selectedShipWindow, const std::string& selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<ShipGlobalProperties*>& selectedEntities, const HAPISPACE::VectorI& mouseData);
+	void updateSelectedShips(const std::string& shipWindow, const HAPISPACE::VectorI& windowTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities);
 	void onReset();
 
 	HAPISPACE::SliderLayout sliderLayout;
@@ -107,7 +107,7 @@ public:
 	//void onRightClick(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer);
 	void onMouseMove(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer);
 
-	void reset(const std::vector<EntityProperties>& playerEntities);
+	void reset(const std::vector<ShipGlobalProperties>& playerEntities);
 	void clear();
 
 	void render(const Battle& battle) const;

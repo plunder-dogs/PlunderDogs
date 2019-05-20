@@ -399,22 +399,22 @@ bool Map::moveEntity(intPair originalPos, intPair newPos)
 		return false;
 	}
 
-	if (newTile->m_entityOnTile != nullptr || oldTile->m_entityOnTile == nullptr)
+	if (newTile->m_shipOnTile != nullptr || oldTile->m_shipOnTile == nullptr)
 	{
 		return false;
 	}
 
-	newTile->m_entityOnTile = oldTile->m_entityOnTile;
-	oldTile->m_entityOnTile = nullptr;
+	newTile->m_shipOnTile = oldTile->m_shipOnTile;
+	oldTile->m_shipOnTile = nullptr;
 	return true;
 }
 
-void Map::insertEntity(BattleEntity& newEntity)
+void Map::insertEntity(Ship& newEntity)
 {
-	Tile* tile = getTile(newEntity.m_battleProperties.getCurrentPosition());	
-	if (tile && !tile->m_entityOnTile)
+	Tile* tile = getTile(newEntity.getCurrentPosition());	
+	if (tile && !tile->m_shipOnTile)
 	{
-		tile->m_entityOnTile = &newEntity;
+		tile->m_shipOnTile = &newEntity;
 	}
 }
 

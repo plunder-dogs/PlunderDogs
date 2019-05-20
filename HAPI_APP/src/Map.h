@@ -18,12 +18,12 @@ constexpr float DRAW_OFFSET_Y{ 28 };
 ** Detail: surface width does not divide equally by numFrames
 ****
 */
-struct BattleEntity;
+struct Ship;
 struct Tile
 {
 	const enum eTileType m_type;
 	//TODO: Dangerous exposure of raw pointer
-	BattleEntity* m_entityOnTile;
+	Ship* m_shipOnTile;
 	std::unique_ptr<HAPISPACE::Sprite> m_daySprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_aftersprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_eveningSprite;
@@ -36,7 +36,7 @@ struct Tile
 						std::shared_ptr<HAPISPACE::SpriteSheet> nightSpriteSheet,
 						std::pair<int, int> coord) :
 		m_type(type),
-		m_entityOnTile(nullptr),
+		m_shipOnTile(nullptr),
 		m_daySprite(),
 		m_aftersprite(),
 		m_eveningSprite(),
@@ -114,7 +114,7 @@ public:
 	//Moves an entitys position on the map, returns false if the position is already taken
 	bool moveEntity(std::pair<int, int> originalPos, std::pair<int, int> newPos);
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
-	void insertEntity(BattleEntity& newEntity);
+	void insertEntity(Ship& newEntity);
 
 	void drawMap(eLightIntensity lightIntensity) const;
 	std::pair<int, int> getDrawOffset() const { return m_drawOffset; }

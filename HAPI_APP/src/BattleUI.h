@@ -5,7 +5,7 @@
 #include <vector>
 #include <deque>
 
-struct EntityProperties;
+struct ShipGlobalProperties;
 struct Tile;
 class Battle;
 class Map;
@@ -53,11 +53,11 @@ class BattleUI : public IHapiSpritesInputListener
 				m_position()
 			{}
 
-			EntityProperties* m_currentSelectedEntity;
+			ShipGlobalProperties* m_currentSelectedEntity;
 			std::pair<int, int> m_position;
 		};
 	public:
-		DeploymentPhase(std::vector<EntityProperties*> player,
+		DeploymentPhase(std::vector<ShipGlobalProperties*> player,
 			std::pair<int, int> spawnPosition, int range, const Map& map, FactionName factionName);
 
 		std::pair<int, int> getSpawnPosition() const;
@@ -71,7 +71,7 @@ class BattleUI : public IHapiSpritesInputListener
 
 	private:
 		FactionName m_factionName;
-		std::vector<EntityProperties*> m_player;
+		std::vector<ShipGlobalProperties*> m_player;
 		CurrentSelectedEntity m_currentSelectedEntity;
 		std::vector<const Tile*> m_spawnArea;
 		std::vector<std::unique_ptr<Sprite>> m_spawnSprites;

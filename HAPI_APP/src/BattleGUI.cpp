@@ -150,7 +150,7 @@ void BattleGUI::render(BattlePhase currentBattlePhase) const
 	}
 }
 
-void BattleGUI::renderStats(EntityProperties & entityProperties) const
+void BattleGUI::renderStats(ShipGlobalProperties & entityProperties) const
 {
 	m_battleIcons->GetTransformComp().SetPosition({ 510, (800 + static_cast<float>(animationOffset)) });
 	m_battleIcons->Render(SCREEN_SURFACE);

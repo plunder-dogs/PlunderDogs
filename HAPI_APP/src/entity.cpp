@@ -13,32 +13,14 @@ constexpr int UPGRADE_POINTS = 2;
 
 struct PathNode;
 
-//std::pair<int, int> m_currentPosition;
-////std::deque<std::pair<eDirection, std::pair<int, int>>> m_pathToTile;
-////Timer m_movementTimer;
-////MovementPath m_movementPath;
-////int m_movementPathSize;
-////eDirection m_currentDirection;
-////bool m_weaponFired;
-//////bool m_movedToDestination;
-////bool m_isDead;
-////ActionSprite m_actionSprite;
-////bool m_movingToDestination;
-////bool m_destinationSet;
-//
-////ENTITY BATTLE PROPERTIES
-//EntityBattleProperties::EntityBattleProperties(std::pair<int, int> startingPosition, FactionName factionName, eDirection startingDirection)
-//	:  m_currentPosition(startingPosition),
-//=======
-//TODO: Will change
-std::vector<EntityProperties> assignEntities(FactionName name)
+std::vector<ShipGlobalProperties> assignEntities(FactionName name)
 {
-	std::vector<EntityProperties> entities;
+	std::vector<ShipGlobalProperties> entities;
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			EntityProperties newEntity(name, (EntityType)(i));
+			ShipGlobalProperties newEntity(name, (EntityType)(i));
 			entities.push_back(newEntity);
 		}
 	}
@@ -47,71 +29,44 @@ std::vector<EntityProperties> assignEntities(FactionName name)
 }
 
 
-//ENTITY BATTLE PROPERTIES
-EntityBattleProperties::EntityBattleProperties(std::pair<int, int> startingPosition, FactionName factionName, eDirection startingDirection)
-	: m_currentPosition(startingPosition),
-	m_pathToTile(),
-	m_movementTimer(MOVEMENT_ANIMATION_TIME),
-	m_movementPath(),
-	m_movementPathSize(0),
-	m_currentDirection(startingDirection),
-	m_weaponFired(false),
-	m_isDead(false),
-	m_actionSprite(factionName),
-	m_movingToDestination(false),
-	m_destinationSet(false)
-	//m_factionName(factionName),
-	//m_currentPosition(startingPosition),
-	//m_pathToTile(),
-	//m_movementTimer(0.35f),
-	//m_movementPath(),
-	//m_movementPathSize(0),
-	//m_currentDirection(startingDirection),
-	//m_weaponFired(false),
-	//m_isDead(false),
-	//m_actionSprite(factionName)
+FactionName Ship::getFactionName() const
 {
-	GameEventMessenger::getInstance().subscribe(std::bind(&EntityBattleProperties::onNewTurn, this), "EntityBattleProperties", GameEvent::eNewTurn);
+	return m_factionName;
 }
 
-EntityBattleProperties::~EntityBattleProperties()
-{
-	GameEventMessenger::getInstance().unsubscribe("EntityBattleProperties", GameEvent::eNewTurn);
-}
-
-eDirection EntityBattleProperties::getCurrentDirection() const
+eDirection Ship::getCurrentDirection() const
 {
 	return m_currentDirection;
 }
 
-std::pair<int, int> EntityBattleProperties::getCurrentPosition() const
+std::pair<int, int> Ship::getCurrentPosition() const
 {
 	return m_currentPosition;
 }
 
-bool EntityBattleProperties::isWeaponFired() const
+bool Ship::isWeaponFired() const
 {
 	return m_weaponFired;
 }
 
-bool EntityBattleProperties::isDead() const
+bool Ship::isDead() const
 {
 	return m_isDead;
 }
 
 
-bool EntityBattleProperties::isMovingToDestination() const
+bool Ship::isMovingToDestination() const
 {
 	return m_movingToDestination;
 }
 
-bool EntityBattleProperties::isDestinationSet() const
+bool Ship::isDestinationSet() const
 {
 	return m_destinationSet;
 }
 
 //MOVEMENT PATH NODE
-EntityBattleProperties::MovementPath::PathNode::PathNode()
+Ship::MovementPath::PathNode::PathNode()
 	: sprite(std::make_unique<Sprite>(Textures::m_spawnHex)),
 	activate(false)
 {
@@ -122,7 +77,7 @@ EntityBattleProperties::MovementPath::PathNode::PathNode()
 //
 //MOVEMENT PATH
 //
-EntityBattleProperties::MovementPath::MovementPath()
+Ship::MovementPath::MovementPath()
 	: m_movementPath()	
 {
 	m_movementPath.reserve(size_t(MOVEMENT_PATH_SIZE));
@@ -132,7 +87,7 @@ EntityBattleProperties::MovementPath::MovementPath()
 	}
 }
 
-void EntityBattleProperties::MovementPath::render(const Map& map) const
+void Ship::MovementPath::render(const Map& map) const
 {
 	for (const auto& i : m_movementPath)
 	{
@@ -151,18 +106,18 @@ void EntityBattleProperties::MovementPath::render(const Map& map) const
 	}
 }
 
-int EntityBattleProperties::MovementPath::generatePath(const Map& map, const Tile& source, const Tile& destination)
+int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const Tile& destination)
 {
-	posi start = { source.m_tileCoordinate.first, source.m_tileCoordinate.second, source.m_entityOnTile->m_battleProperties.m_currentDirection };
+	posi start = { source.m_tileCoordinate.first, source.m_tileCoordinate.second, source.m_shipOnTile->m_currentDirection };
 	posi end = { destination.m_tileCoordinate.first, destination.m_tileCoordinate.second };
-	std::queue<posi> pathToTile = BFS::findPath(map, start, end, source.m_entityOnTile->m_entityProperties.m_movementPoints);
+	std::queue<posi> pathToTile = BFS::findPath(map, start, end, source.m_shipOnTile->m_entityProperties.m_movementPoints);
 	if (pathToTile.empty())
 	{
 		return 0;
 	}
 	clearPath();
 	//float movementPointsUsed = 0;
-	if (!source.m_entityOnTile)
+	if (!source.m_shipOnTile)
 		return 0;
 	//int prevDir = source.m_entityOnTile->m_battleProperties.m_currentDirection;
 	std::pair<int, int> prevPos = source.m_tileCoordinate;
@@ -205,11 +160,11 @@ int EntityBattleProperties::MovementPath::generatePath(const Map& map, const Til
 		//}
 		pathToTile.pop();
 	}
-	source.m_entityOnTile->m_battleProperties.m_movementPathSize = i - 1;
+	source.m_shipOnTile->m_movementPathSize = i - 1;
 	return i;
 }
 
-void EntityBattleProperties::MovementPath::eraseNode(std::pair<int, int> position, const Map& map)
+void Ship::MovementPath::eraseNode(std::pair<int, int> position, const Map& map)
 {
 	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
 	{
@@ -221,7 +176,7 @@ void EntityBattleProperties::MovementPath::eraseNode(std::pair<int, int> positio
 	}
 }
 
-void EntityBattleProperties::MovementPath::clearPath()
+void Ship::MovementPath::clearPath()
 {
 	for (auto& i : m_movementPath)
 	{
@@ -229,7 +184,7 @@ void EntityBattleProperties::MovementPath::clearPath()
 	}
 }
 
-std::pair<int, int> EntityBattleProperties::MovementPath::getFinalNode() const
+std::pair<int, int> Ship::MovementPath::getFinalNode() const
 {
 	int i = m_movementPath.size() - 1;
 	for (i; i > 0; i--)
@@ -240,28 +195,28 @@ std::pair<int, int> EntityBattleProperties::MovementPath::getFinalNode() const
 	return m_movementPath[i].m_position;
 }
 
-std::vector<posi> EntityBattleProperties::generateMovementArea(const Map& map, float movement) const
+std::vector<posi> Ship::generateMovementArea(const Map& map, float movement) const
 {
 	posi position = posi(m_currentPosition, m_currentDirection);
 	return BFS::findArea(map, position, movement);
 }
 
-int EntityBattleProperties::generateMovementGraph(const Map & map, const Tile & source, const Tile & destination)
+int Ship::generateMovementGraph(const Map & map, const Tile & source, const Tile & destination)
 {
 	return m_movementPath.generatePath(map, source, destination);
 }
 
-void EntityBattleProperties::clearMovementPath()
+void Ship::clearMovementPath()
 {
 	m_movementPath.clearPath();
 }
 
-std::pair<int, int> EntityBattleProperties::getEndOfPath()
+std::pair<int, int> Ship::getEndOfPath()
 {
 	return m_movementPath.getFinalNode();
 }
 
-void EntityBattleProperties::enableAction()
+void Ship::enableAction()
 {
 	if (!m_isDead)
 	{
@@ -269,19 +224,19 @@ void EntityBattleProperties::enableAction()
 	}
 }
 
-void EntityBattleProperties::disableAction()
+void Ship::disableAction()
 {
 	m_actionSprite.active = false;
 }
 
-bool EntityBattleProperties::moveEntity(Map& map, const Tile& tile)
+bool Ship::moveEntity(Map& map, const Tile& tile)
 {
 	if (!m_destinationSet)
 	{
 		posi currentPos = { m_currentPosition, m_currentDirection };
 		posi destination = { tile.m_tileCoordinate.first, tile.m_tileCoordinate.second };
 		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
-		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_entityOnTile->m_entityProperties.m_movementPoints);
+		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_shipOnTile->m_entityProperties.m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			m_pathToTile = pathToTile;
@@ -301,14 +256,14 @@ bool EntityBattleProperties::moveEntity(Map& map, const Tile& tile)
 	return true;
 }
 
-bool EntityBattleProperties::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
+bool Ship::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
 		posi currentPos = { m_currentPosition.first, m_currentPosition.second, m_currentDirection };
 		posi destination = { tile.m_tileCoordinate.first, tile.m_tileCoordinate.second };
 		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
-		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_entityOnTile->m_entityProperties.m_movementPoints);
+		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_shipOnTile->m_entityProperties.m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			pathToTile.emplace(posi(pathToTile.back().pair(), endDirection));
@@ -329,7 +284,7 @@ bool EntityBattleProperties::moveEntity(Map& map, const Tile& tile, eDirection e
 	return true;
 }
  
-void EntityBattleProperties::takeDamage(EntityProperties & entityProperties, int damageAmount, FactionName entityFaction)
+void Ship::takeDamage(ShipGlobalProperties & entityProperties, int damageAmount, FactionName entityFaction)
 {
 	entityProperties.m_currentHealth -= damageAmount;
 	int currentHealth = entityProperties.m_currentHealth;
@@ -374,18 +329,18 @@ void EntityBattleProperties::takeDamage(EntityProperties & entityProperties, int
 	}
 }
 
-void EntityBattleProperties::fireWeapon()
+void Ship::fireWeapon()
 {
 	m_weaponFired = true;
 	m_actionSprite.active = false;
 }
 
-void EntityBattleProperties::setDestination()
+void Ship::setDestination()
 {
 	m_destinationSet = true;
 }
 
-void EntityBattleProperties::onNewTurn()
+void Ship::onNewTurn()
 {
 	//m_movedToDestination = false;
 	m_weaponFired = false;
@@ -393,7 +348,7 @@ void EntityBattleProperties::onNewTurn()
 	m_movingToDestination = false;
 }
 
-void EntityBattleProperties::handleRotation(EntityProperties& entityProperties)
+void Ship::handleRotation(ShipGlobalProperties& entityProperties)
 {
 	int rotationAngle = 60;
 	int directionToTurn = static_cast<int>(m_pathToTile.front().dir);
@@ -402,7 +357,7 @@ void EntityBattleProperties::handleRotation(EntityProperties& entityProperties)
 	m_currentDirection = (eDirection)directionToTurn;
 }
 
-unsigned int EntityBattleProperties::MovementPath::getDirectionCost(int currentDirection, int newDirection)
+unsigned int Ship::MovementPath::getDirectionCost(int currentDirection, int newDirection)
 {
 	unsigned int diff = std::abs(newDirection - currentDirection);
 	if (diff == 0)
@@ -414,7 +369,7 @@ unsigned int EntityBattleProperties::MovementPath::getDirectionCost(int currentD
 }
 
 //ENTITY
-EntityProperties::EntityProperties(FactionName factionName, EntityType entityType) : m_upgradePoints(UPGRADE_POINTS), m_maxUpgradePoints(UPGRADE_POINTS), m_selectedSprite(HAPI_Sprites.MakeSprite(Textures::m_thing))
+ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType entityType) : m_upgradePoints(UPGRADE_POINTS), m_maxUpgradePoints(UPGRADE_POINTS), m_selectedSprite(HAPI_Sprites.MakeSprite(Textures::m_thing))
 {
 	//TODO: Currently not working as intended
 	//UI seems to be resetting the frameNumber somewhere in OverWorldGUI. 
@@ -570,16 +525,32 @@ EntityProperties::EntityProperties(FactionName factionName, EntityType entityTyp
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }
 
-BattleEntity::BattleEntity(std::pair<int, int> startingPosition, const EntityProperties& entityProperties, Map& map, FactionName playerName, eDirection startingDirection)
+Ship::Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName factionName, eDirection startingDirection)
 	: m_entityProperties(entityProperties),
-	m_battleProperties(startingPosition, playerName, startingDirection),
-	m_factionName(playerName)
+	m_factionName(factionName),
+	 m_currentPosition(startingPosition),
+	m_pathToTile(),
+	m_movementTimer(MOVEMENT_ANIMATION_TIME),
+	m_movementPath(),
+	m_movementPathSize(0),
+	m_currentDirection(startingDirection),
+	m_weaponFired(false),
+	m_isDead(false),
+	m_actionSprite(factionName),
+	m_movingToDestination(false),
+	m_destinationSet(false)
 {
 	m_entityProperties.m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
 	map.insertEntity(*this);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 
-void EntityBattleProperties::update(float deltaTime, const Map & map, EntityProperties& entityProperties)
+Ship::~Ship()
+{
+	GameEventMessenger::getInstance().unsubscribe("Ship", GameEvent::eNewTurn);
+}
+
+void Ship::update(float deltaTime, const Map & map, ShipGlobalProperties& entityProperties)
 {	
 	if (!m_pathToTile.empty())
 	{
@@ -602,7 +573,7 @@ void EntityBattleProperties::update(float deltaTime, const Map & map, EntityProp
 	}
 }
 
-void EntityBattleProperties::render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map & map)
+void Ship::render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map & map)
 {
 	//Set sprite position to current position
 	const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentPosition);
@@ -617,7 +588,7 @@ void EntityBattleProperties::render(std::shared_ptr<HAPISPACE::Sprite>& sprite, 
 	m_actionSprite.render(map, m_currentPosition);
 }
 
-void EntityBattleProperties::renderPath(const Map & map)
+void Ship::renderPath(const Map & map)
 {
 	m_movementPath.render(map);
 }
@@ -631,7 +602,7 @@ BattlePlayer::BattlePlayer(FactionName name, std::pair<int, int> spawnPosition, 
 	m_eliminated(false)
 {}
 
-EntityBattleProperties::ActionSprite::ActionSprite(FactionName factionName)
+Ship::ActionSprite::ActionSprite(FactionName factionName)
 	: sprite(),
 	active(false)
 {
@@ -655,7 +626,7 @@ EntityBattleProperties::ActionSprite::ActionSprite(FactionName factionName)
 	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }
 
-void EntityBattleProperties::ActionSprite::render(const Map& map, std::pair<int, int> currentEntityPosition) const
+void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntityPosition) const
 {
 	if (active)
 	{
@@ -667,16 +638,9 @@ void EntityBattleProperties::ActionSprite::render(const Map& map, std::pair<int,
 	}
 }
 
-
 Player::Player(FactionName name, ePlayerType playerType)
 	: m_entities(assignEntities(name)),
 	m_selectedEntities(),
 	m_factionName(name),
 	m_type(playerType)
 {}
-//
-//Player::Player(FactionName name, ePlayerType playerType)
-//	: m_factionName(name),
-//	m_type(playerType)
-//{
-//}

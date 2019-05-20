@@ -899,7 +899,7 @@ void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, Player& current
 	}
 }
 
-void OverWorldGUI::reset(const std::vector<EntityProperties>& playerEntities)
+void OverWorldGUI::reset(const std::vector<ShipGlobalProperties>& playerEntities)
 {
 	m_currentShips = 0;
 	UI.DeleteWindow(FLEET_WINDOW);
@@ -1040,7 +1040,7 @@ bool OverWorldGUI::windowObjectExists(const std::string & windowName, const std:
 	return false;
 }
 
-void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<EntityProperties>& entities, const bool vertical)
+void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties>& entities, const bool vertical)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -1060,7 +1060,7 @@ void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWin
 	}
 }
 
-void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<EntityProperties*>& entities, const bool vertical)
+void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties*>& entities, const bool vertical)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -1080,7 +1080,7 @@ void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWin
 	}
 }
 
-void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::string & windowSlider, const std::string & selectedShipWindow, const std::string & selectedWindowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, const HAPISPACE::VectorI & selectedTopLeft, std::vector<EntityProperties>& entities, std::vector<EntityProperties*>& selectedEntities)
+void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::string & windowSlider, const std::string & selectedShipWindow, const std::string & selectedWindowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, const HAPISPACE::VectorI & selectedTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities)
 {
 	if (m_currentShips < MAX_SHIPS)
 	{
@@ -1117,7 +1117,7 @@ void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::s
 	}
 }
 
-void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, const std::string & selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<EntityProperties*>& selectedEntities, const HAPISPACE::VectorI & mouseData)
+void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, const std::string & selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<ShipGlobalProperties*>& selectedEntities, const HAPISPACE::VectorI & mouseData)
 {
 	for (int i = 0; i < selectedEntities.size(); i++)
 	{
@@ -1141,7 +1141,7 @@ void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, co
 	}
 }
 
-void OverWorldGUI::updateSelectedShips(const std::string & shipWindow, const HAPISPACE::VectorI & windowTopLeft, std::vector<EntityProperties>& entities, std::vector<EntityProperties*>& selectedEntities)
+void OverWorldGUI::updateSelectedShips(const std::string & shipWindow, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{

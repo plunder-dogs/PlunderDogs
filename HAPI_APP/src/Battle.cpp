@@ -153,8 +153,8 @@ void Battle::handleAIMovementPhaseTimer(float deltaTime)
 		int i = 0;
 		for (auto& it : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			if (!it->m_battleProperties.isDead() &&
-				!it->m_battleProperties.isDestinationSet())
+			if (!it->isDead() &&
+				!it->isDestinationSet())
 			{
 				AI::handleMovementPhase(*this, m_map, m_players[m_currentPlayerTurn], i);
 				m_timeBetweenAIUnits.reset();
@@ -190,8 +190,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 		int i = 0;
 		for (auto& it : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			if (!it->m_battleProperties.isDead() &&
-				!it->m_battleProperties.isWeaponFired())
+			if (!it->isDead() && !it->isWeaponFired())
 			{
 				AI::handleShootingPhase(*this, m_map, m_players[m_currentPlayerTurn], i);
 				m_timeBetweenAIUnits.reset();
@@ -290,7 +289,7 @@ void Battle::render() const
 	{
 		for (const auto& entity : player->m_entities)
 		{
-			entity->m_battleProperties.renderPath(m_map);
+			entity->renderPath(m_map);
 		}
 	}
 	m_battleUI.renderUI();
@@ -298,7 +297,7 @@ void Battle::render() const
 	{
 		for (const auto& entity : player->m_entities)
 		{
-			entity->m_battleProperties.render(entity->m_entityProperties.m_sprite, m_map);
+			entity->render(entity->m_entityProperties.m_sprite, m_map);
 		}
 	}
 	m_battleUI.drawTargetArea();
@@ -352,51 +351,51 @@ void Battle::update(float deltaTime)
 	m_battleManager.update(deltaTime);
 }
 
-void Battle::moveEntityToPosition(BattleEntity& entity, const Tile& destination)
+void Battle::moveEntityToPosition(Ship& entity, const Tile& destination)
 {
 	assert(m_currentPhase == BattlePhase::Movement);
-	entity.m_battleProperties.moveEntity(m_map, destination);
+	entity.moveEntity(m_map, destination);
 }
 
-void Battle::moveEntityToPosition(BattleEntity& entity, const Tile& destination, eDirection endDirection)
+void Battle::moveEntityToPosition(Ship& entity, const Tile& destination, eDirection endDirection)
 {
 	assert(m_currentPhase == BattlePhase::Movement);
-	entity.m_battleProperties.moveEntity(m_map, destination, endDirection);
+	entity.moveEntity(m_map, destination, endDirection);
 }
 
 bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea)
 {
 	assert(m_currentPhase == BattlePhase::Attack);
-	assert(tileOnPlayer.m_entityOnTile);
+	assert(tileOnPlayer.m_shipOnTile);
 
-	if (!tileOnPlayer.m_entityOnTile)
+	if (!tileOnPlayer.m_shipOnTile)
 	{
 		return false;
 	}
-	assert(!tileOnPlayer.m_entityOnTile->m_battleProperties.isWeaponFired());
+	assert(!tileOnPlayer.m_shipOnTile->isWeaponFired());
 
 	//Disallow attacking same team
-	if (tileOnAttackPosition.m_entityOnTile && tileOnAttackPosition.m_entityOnTile->m_factionName != getCurrentFaction()
-			&& !tileOnAttackPosition.m_entityOnTile->m_battleProperties.isDead())
+	if (tileOnAttackPosition.m_shipOnTile && tileOnAttackPosition.m_shipOnTile->getFactionName() != getCurrentFaction()
+			&& !tileOnAttackPosition.m_shipOnTile->isDead())
 	{
 		//Find entity 
-		auto tileCoordinate = tileOnAttackPosition.m_entityOnTile->m_battleProperties.getCurrentPosition();
+		auto tileCoordinate = tileOnAttackPosition.m_shipOnTile->getCurrentPosition();
 		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), [tileCoordinate](const auto& tile) { if(tile) return tileCoordinate == tile->m_tileCoordinate; });
 		//Enemy within range of weapon
 		if (cIter != targetArea.cend())
 		{
-			if (tileOnPlayer.m_entityOnTile->m_entityProperties.m_weaponType == eFlamethrower)
+			if (tileOnPlayer.m_shipOnTile->m_entityProperties.m_weaponType == eFlamethrower)
 			{
-				playFireAnimation(*tileOnPlayer.m_entityOnTile, targetArea[0]->m_tileCoordinate);
+				playFireAnimation(*tileOnPlayer.m_shipOnTile, targetArea[0]->m_tileCoordinate);
 			}
 			else
 			{
-				playExplosionAnimation(*tileOnAttackPosition.m_entityOnTile);
+				playExplosionAnimation(*tileOnAttackPosition.m_shipOnTile);
 			}
 
-			tileOnPlayer.m_entityOnTile->m_battleProperties.fireWeapon();
-			auto& enemy = tileOnAttackPosition.m_entityOnTile;
-			enemy->m_battleProperties.takeDamage(enemy->m_entityProperties, tileOnPlayer.m_entityOnTile->m_entityProperties.m_damage, enemy->m_factionName);
+			tileOnPlayer.m_shipOnTile->fireWeapon();
+			auto& enemy = tileOnAttackPosition.m_shipOnTile;
+			enemy->takeDamage(enemy->m_entityProperties, tileOnPlayer.m_shipOnTile->m_entityProperties.m_damage, enemy->getFactionName());
 			
 			return true;
 		}
@@ -405,12 +404,12 @@ bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& ti
 	return false;
 }
 
-void Battle::insertEntity(std::pair<int, int> startingPosition, eDirection startingDirection, const EntityProperties& entityProperties, FactionName factionName)
+void Battle::insertEntity(std::pair<int, int> startingPosition, eDirection startingDirection, const ShipGlobalProperties& entityProperties, FactionName factionName)
 {
 	assert(m_currentPhase == BattlePhase::Deployment);
 
 	auto& player = getPlayer(factionName);
-	player.m_entities.push_back(std::make_unique<BattleEntity>(startingPosition, entityProperties, m_map, factionName, startingDirection));
+	player.m_entities.push_back(std::make_unique<Ship>(startingPosition, entityProperties, m_map, factionName, startingDirection));
 }
 
 void Battle::nextTurn()
@@ -444,7 +443,7 @@ void Battle::nextTurn()
 		currentPlayer = m_players[m_currentPlayerTurn]->m_factionName;
 		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			entity->m_battleProperties.enableAction();
+			entity->enableAction();
 		}
 		break;
 	case BattlePhase::Movement :
@@ -455,7 +454,7 @@ void Battle::nextTurn()
 
 		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			entity->m_battleProperties.enableAction();
+			entity->enableAction();
 		}
 
 		if (!m_players[m_currentPlayerTurn]->m_eliminated && m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
@@ -473,14 +472,14 @@ void Battle::nextTurn()
 
 		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			entity->m_battleProperties.disableAction();
+			entity->disableAction();
 		}
 
 		updateWindDirection();
 		incrementPlayerTurn();
 		for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 		{
-			entity->m_battleProperties.enableAction();
+			entity->enableAction();
 		}
 
 		if (!m_players[m_currentPlayerTurn]->m_eliminated && m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
@@ -510,13 +509,13 @@ std::vector<FactionName> Battle::getAllFactions() const
 	return lol;
 }
 
-void Battle::playFireAnimation(BattleEntity& entity, std::pair<int, int> position)
+void Battle::playFireAnimation(Ship& entity, std::pair<int, int> position)
 {
 	for (auto& it : m_fireParticles)
 	{
 		if (!it.m_isEmitting)
 		{
-			it.orient(entity.m_battleProperties.getCurrentDirection());
+			it.orient(entity.getCurrentDirection());
 			it.setPosition(position);
 			it.m_isEmitting = true;
 			return;
@@ -524,13 +523,13 @@ void Battle::playFireAnimation(BattleEntity& entity, std::pair<int, int> positio
 	}
 }
 
-void Battle::playExplosionAnimation(BattleEntity& entity)
+void Battle::playExplosionAnimation(Ship& entity)
 {
 	for (auto& it : m_explosionParticles)
 	{
 		if (!it.m_isEmitting)
 		{
-			it.setPosition(entity.m_battleProperties.getCurrentPosition());
+			it.setPosition(entity.getCurrentPosition());
 			it.m_isEmitting = true;
 			return;
 		}
@@ -541,19 +540,19 @@ void Battle::updateMovementPhase(float deltaTime)
 {
 	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
-		if (entity->m_battleProperties.isDead())
+		if (entity->isDead())
 			continue;
-		entity->m_battleProperties.update(deltaTime, m_map, entity->m_entityProperties);
+		entity->update(deltaTime, m_map, entity->m_entityProperties);
 	}
 	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
-		if (entity->m_battleProperties.isDead())
+		if (entity->isDead())
 			continue;
-		if (!entity->m_battleProperties.isDestinationSet())
+		if (!entity->isDestinationSet())
 		{
 			return;
 		}
-		if (entity->m_battleProperties.isMovingToDestination())
+		if (entity->isMovingToDestination())
 		{
 			return;
 		}
@@ -570,12 +569,12 @@ void Battle::updateAttackPhase()
 	}
 }
 
-bool Battle::allEntitiesAttacked(std::vector<std::unique_ptr<BattleEntity>>& playerEntities) const
+bool Battle::allEntitiesAttacked(std::vector<std::unique_ptr<Ship>>& playerEntities) const
 {
 	bool allEntitiesAttacked = true;
 	for (const auto& entity : playerEntities)
 	{
-		if (!entity->m_battleProperties.isDead() && !entity->m_battleProperties.isWeaponFired())
+		if (!entity->isDead() && !entity->isWeaponFired())
 		{
 			allEntitiesAttacked = false;
 		}
@@ -663,7 +662,7 @@ void Battle::onEndMovementPhaseEarly()
 	bool actionBeingPerformed = false;
 	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{
-		if (entity->m_battleProperties.isMovingToDestination())
+		if (entity->isMovingToDestination())
 		{
 			actionBeingPerformed = true;
 		}
