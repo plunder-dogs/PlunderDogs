@@ -410,6 +410,7 @@ void Battle::insertEntity(std::pair<int, int> startingPosition, eDirection start
 	assert(m_currentPhase == BattlePhase::Deployment);
 
 	auto& player = getPlayer(factionName);
+
 	player.m_entities.push_back(std::make_unique<BattleEntity>(startingPosition, entityProperties, m_map, factionName, startingDirection));
 }
 
