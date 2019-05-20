@@ -32,8 +32,8 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Bat
 		map,
 		enemyPosition,
 		map.getTile(ships[currentUnit]->getCurrentPosition()),
-		static_cast<eWeaponType>(ships[currentUnit]->m_entityProperties.m_weaponType),
-		ships[currentUnit]->m_entityProperties.m_range) };
+		static_cast<eWeaponType>(ships[currentUnit]->getProperties().m_weaponType),
+		ships[currentUnit]->getProperties().m_range) };
 
 	//move as far as possible on the path to the chosen position
 	attemptMove(map, ships[currentUnit], firingPosition);
@@ -54,8 +54,8 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Bat
 	//		map, 
 	//		enemyPosition, 
 	//		map.getTile(ships[i]->m_battleProperties.getCurrentPosition()), 
-	//		static_cast<eWeaponType>(ships[i]->m_entityProperties.m_weaponType), 
-	//		ships[i]->m_entityProperties.m_range) };
+	//		static_cast<eWeaponType>(ships[i]->getProperties().m_weaponType), 
+	//		ships[i]->getProperties().m_range) };
 
 	//	//move as far as possible on the path to the chosen position
 	//	attemptMove(map, ships[i], firingPosition);
@@ -354,7 +354,7 @@ void attemptMove(Map& map, std::unique_ptr<Ship>& currentShip, std::pair<const T
 	auto availableTiles = BFS::findArea(
 		map,
 		posi(currentShip->getCurrentPosition(), currentShip->getCurrentDirection()),
-		static_cast<float>(currentShip->m_entityProperties.m_movementPoints));
+		static_cast<float>(currentShip->getProperties().m_movementPoints));
 	//Loop to find the closest tile to the target tile
 	std::pair<int, int> targetPos = targetTile.first->m_tileCoordinate;
 	std::pair<int, int> currentPos = currentShip->getCurrentPosition();
@@ -384,11 +384,11 @@ void attemptMove(Map& map, std::unique_ptr<Ship>& currentShip, std::pair<const T
 void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingShip)
 {
 	std::vector< const Tile*> firingArea;
-	switch (firingShip->m_entityProperties.m_weaponType)
+	switch (firingShip->getProperties().m_weaponType)
 	{
 	case eSideCannons:
 	{
-		firingArea = map.cGetTileCone(firingShip->getCurrentPosition(), firingShip->m_entityProperties.m_range, firingShip->getCurrentDirection());
+		firingArea = map.cGetTileCone(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, firingShip->getCurrentDirection());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -402,7 +402,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 	}
 	case eStraightShot:
 	{
-		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->m_entityProperties.m_range, firingShip->getCurrentDirection(), true);
+		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, firingShip->getCurrentDirection(), true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -418,7 +418,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 	}
 	case eShotgun:
 	{
-		firingArea = map.cGetTileRadius(firingShip->getCurrentPosition(), firingShip->m_entityProperties.m_range);
+		firingArea = map.cGetTileRadius(firingShip->getCurrentPosition(), firingShip->getProperties().m_range);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -451,7 +451,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 			break;
 		}
 			
-		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->m_entityProperties.m_range, backwardsDirection, true);
+		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, backwardsDirection, true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;

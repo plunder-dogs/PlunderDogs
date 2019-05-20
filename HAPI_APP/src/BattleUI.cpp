@@ -116,7 +116,7 @@ void BattleUI::renderGUI() const
 
 	if (m_selectedTile.m_tile  != nullptr && m_selectedTile.m_tile->m_shipOnTile != nullptr)
 	{
-		m_gui.renderStats(m_selectedTile.m_tile->m_shipOnTile->m_entityProperties);
+		m_gui.renderStats(m_selectedTile.m_tile->m_shipOnTile->getProperties());
 	}
 }
 
@@ -787,30 +787,30 @@ void BattleUI::TargetArea::render(const Map& map) const
 void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & source, BattlePhase phase)
 {
 	//TODO: Why isn't this a switch case?
-	if (source.m_shipOnTile->m_entityProperties.m_weaponType == eSideCannons)
+	if (source.m_shipOnTile->getProperties().m_weaponType == eSideCannons)
 	{
 		m_targetArea = map.cGetTileCone(source.m_tileCoordinate,
-			source.m_shipOnTile->m_entityProperties.m_range, 
+			source.m_shipOnTile->getProperties().m_range, 
 			source.m_shipOnTile->getCurrentDirection(), true);
 	
 	}
 
-	else if (source.m_shipOnTile->m_entityProperties.m_weaponType == eStraightShot)
+	else if (source.m_shipOnTile->getProperties().m_weaponType == eStraightShot)
 	{
 		m_targetArea = map.cGetTileLine(source.m_tileCoordinate, 
-			source.m_shipOnTile->m_entityProperties.m_range, 
+			source.m_shipOnTile->getProperties().m_range, 
 			source.m_shipOnTile->getCurrentDirection(), true);
 
 	}
 
-	else if (source.m_shipOnTile->m_entityProperties.m_weaponType == eShotgun)
+	else if (source.m_shipOnTile->getProperties().m_weaponType == eShotgun)
 	{
 		// make so where ever the place presses get radius called talk adrais about size of that
 		m_targetArea = map.cGetTileRadius(source.m_tileCoordinate, 
-			source.m_shipOnTile->m_entityProperties.m_range, true);
+			source.m_shipOnTile->getProperties().m_range, true);
 	}
 
-	else if (source.m_shipOnTile->m_entityProperties.m_weaponType == eFlamethrower)
+	else if (source.m_shipOnTile->getProperties().m_weaponType == eFlamethrower)
 	{
 		eDirection directionOfFire = eNorth;
 		switch (source.m_shipOnTile->getCurrentDirection() )
@@ -835,7 +835,7 @@ void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & sour
 			break;
 		}
 		m_targetArea = map.cGetTileLine(source.m_tileCoordinate,
-			source.m_shipOnTile->m_entityProperties.m_range, directionOfFire, true);
+			source.m_shipOnTile->getProperties().m_range, directionOfFire, true);
 	}
 	
 	if (m_targetArea.empty())

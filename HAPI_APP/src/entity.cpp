@@ -20,7 +20,7 @@ std::vector<ShipGlobalProperties> assignEntities(FactionName name)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			ShipGlobalProperties newEntity(name, (EntityType)(i));
+			ShipGlobalProperties newEntity(name, (ShipType)(i));
 			entities.push_back(newEntity);
 		}
 	}
@@ -28,6 +28,11 @@ std::vector<ShipGlobalProperties> assignEntities(FactionName name)
 	return entities;
 }
 
+
+ShipGlobalProperties & Ship::getProperties()
+{
+	return m_entityProperties;
+}
 
 FactionName Ship::getFactionName() const
 {
@@ -369,13 +374,13 @@ unsigned int Ship::MovementPath::getDirectionCost(int currentDirection, int newD
 }
 
 //ENTITY
-ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType entityType) : m_upgradePoints(UPGRADE_POINTS), m_maxUpgradePoints(UPGRADE_POINTS), m_selectedSprite(HAPI_Sprites.MakeSprite(Textures::m_thing))
+ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, ShipType entityType) : m_upgradePoints(UPGRADE_POINTS), m_maxUpgradePoints(UPGRADE_POINTS), m_selectedSprite(HAPI_Sprites.MakeSprite(Textures::m_thing))
 {
 	//TODO: Currently not working as intended
 	//UI seems to be resetting the frameNumber somewhere in OverWorldGUI. 
 	switch (entityType)
 	{
-	case EntityType::eFrigate:
+	case ShipType::eFrigate:
 		m_originalHealth = 12;
 		m_originalDamage = 4;
 		m_originalMovement = 8;
@@ -388,7 +393,7 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 		m_damage = m_originalDamage;
 		m_weaponType = eWeaponType::eSideCannons;
 		break;
-	case EntityType::eTurtle:
+	case ShipType::eTurtle:
 		m_originalHealth = 20;
 		m_originalDamage = 2;
 		m_originalMovement = 8;
@@ -401,7 +406,7 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 		m_damage = m_originalDamage;
 		m_weaponType = eWeaponType::eShotgun;
 		break;
-	case EntityType::eFire:
+	case ShipType::eFire:
 		m_originalHealth = 8;
 		m_originalDamage = 6;
 		m_originalMovement = 10;
@@ -414,7 +419,7 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 		m_damage = m_originalDamage;
 		m_weaponType = eWeaponType::eFlamethrower;
 		break;
-	case EntityType::eSniper:
+	case ShipType::eSniper:
 		m_originalHealth = 8;
 		m_originalDamage = 4;
 		m_originalMovement = 6;
@@ -434,18 +439,18 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 	case FactionName::eYellow:
 		switch (entityType)
 		{
-		case EntityType::eFrigate:
+		case ShipType::eFrigate:
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSideCannons));
 			break;
-		case EntityType::eTurtle:
+		case ShipType::eTurtle:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipBomb));
 			break;
-		case EntityType::eFire:
+		case ShipType::eFire:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipMelee));
 			break;
-		case EntityType::eSniper:
+		case ShipType::eSniper:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSnipe));
 			break;
@@ -456,19 +461,19 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 	case FactionName::eBlue:
 		switch (entityType)
 		{
-		case EntityType::eFrigate:
+		case ShipType::eFrigate:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSideCannons));
 			break;
-		case EntityType::eTurtle:
+		case ShipType::eTurtle:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipBomb));
 			break;
-		case EntityType::eFire:
+		case ShipType::eFire:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipMelee));
 			break;
-		case EntityType::eSniper:
+		case ShipType::eSniper:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSnipe));
 			break;
@@ -478,19 +483,19 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 	case FactionName::eRed:
 		switch (entityType)
 		{
-		case EntityType::eFrigate:
+		case ShipType::eFrigate:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSideCannons));
 			break;
-		case EntityType::eTurtle:
+		case ShipType::eTurtle:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipBomb));
 			break;
-		case EntityType::eFire:
+		case ShipType::eFire:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipMelee));
 			break;
-		case EntityType::eSniper:
+		case ShipType::eSniper:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSnipe));
 			break;
@@ -502,19 +507,19 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 	case FactionName::eGreen:
 		switch (entityType)
 		{
-		case EntityType::eFrigate:
+		case ShipType::eFrigate:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSideCannons));
 			break;
-		case EntityType::eTurtle:
+		case ShipType::eTurtle:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipBomb));
 			break;
-		case EntityType::eFire:
+		case ShipType::eFire:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipMelee));
 			break;
-		case EntityType::eSniper:
+		case ShipType::eSniper:
 
 			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSnipe));
 			break;
@@ -526,9 +531,9 @@ ShipGlobalProperties::ShipGlobalProperties(FactionName factionName, EntityType e
 }
 
 Ship::Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName factionName, eDirection startingDirection)
-	: m_entityProperties(entityProperties),
-	m_factionName(factionName),
-	 m_currentPosition(startingPosition),
+	: m_factionName(factionName),
+	m_entityProperties(entityProperties),
+	m_currentPosition(startingPosition),
 	m_pathToTile(),
 	m_movementTimer(MOVEMENT_ANIMATION_TIME),
 	m_movementPath(),

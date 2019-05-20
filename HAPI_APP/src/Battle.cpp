@@ -297,7 +297,7 @@ void Battle::render() const
 	{
 		for (const auto& entity : player->m_entities)
 		{
-			entity->render(entity->m_entityProperties.m_sprite, m_map);
+			entity->render(entity->getProperties().m_sprite, m_map);
 		}
 	}
 	m_battleUI.drawTargetArea();
@@ -384,7 +384,7 @@ bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& ti
 		//Enemy within range of weapon
 		if (cIter != targetArea.cend())
 		{
-			if (tileOnPlayer.m_shipOnTile->m_entityProperties.m_weaponType == eFlamethrower)
+			if (tileOnPlayer.m_shipOnTile->getProperties().m_weaponType == eFlamethrower)
 			{
 				playFireAnimation(*tileOnPlayer.m_shipOnTile, targetArea[0]->m_tileCoordinate);
 			}
@@ -395,7 +395,7 @@ bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& ti
 
 			tileOnPlayer.m_shipOnTile->fireWeapon();
 			auto& enemy = tileOnAttackPosition.m_shipOnTile;
-			enemy->takeDamage(enemy->m_entityProperties, tileOnPlayer.m_shipOnTile->m_entityProperties.m_damage, enemy->getFactionName());
+			enemy->takeDamage(enemy->getProperties(), tileOnPlayer.m_shipOnTile->getProperties().m_damage, enemy->getFactionName());
 			
 			return true;
 		}
@@ -542,7 +542,7 @@ void Battle::updateMovementPhase(float deltaTime)
 	{
 		if (entity->isDead())
 			continue;
-		entity->update(deltaTime, m_map, entity->m_entityProperties);
+		entity->update(deltaTime, m_map, entity->getProperties());
 	}
 	for (auto& entity : m_players[m_currentPlayerTurn]->m_entities)
 	{

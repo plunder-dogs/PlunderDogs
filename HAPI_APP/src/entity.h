@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "Global.h"
 
-enum class EntityType
+enum class ShipType
 {
 	eFrigate,
 	eTurtle,
@@ -19,7 +19,7 @@ struct Weapons;
 class Map;
 struct ShipGlobalProperties
 {
-	ShipGlobalProperties(FactionName factionName, EntityType entityType);
+	ShipGlobalProperties(FactionName factionName, ShipType entityType);
 	ShipGlobalProperties() {};
 
 	std::shared_ptr<HAPISPACE::Sprite> m_sprite;
@@ -80,6 +80,7 @@ public:
 	Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName playerName, eDirection startingDirection = eNorth);
 	~Ship();
 
+	ShipGlobalProperties& getProperties();
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
 	std::pair<int, int> getCurrentPosition() const;
@@ -103,13 +104,13 @@ public:
 	void fireWeapon();
 	void setDestination();
 	void onNewTurn();
-	ShipGlobalProperties m_entityProperties;
+	
 	void enableAction();
 	void disableAction();
 
 private:
 	const FactionName m_factionName;
-	
+	ShipGlobalProperties m_entityProperties;
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
