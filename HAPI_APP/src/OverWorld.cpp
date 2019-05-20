@@ -3,6 +3,168 @@
 #include "GameEventMessenger.h"
 #include "AI.h"
 
+constexpr int UPGRADE_POINTS = 2;
+//ENTITY
+ShipProperties::ShipProperties(FactionName factionName, ShipType entityType) 
+	: 
+	m_upgradePoints(UPGRADE_POINTS), 
+	m_maxUpgradePoints(UPGRADE_POINTS), 
+	m_selectedSprite(HAPI_Sprites.MakeSprite(Textures::m_thing))
+{
+	//TODO: Currently not working as intended
+	//UI seems to be resetting the frameNumber somewhere in OverWorldGUI. 
+	switch (entityType)
+	{
+	case ShipType::eFrigate:
+		m_originalHealth = 12;
+		m_originalDamage = 4;
+		m_originalMovement = 8;
+		m_originalRange = 4;
+
+		m_movementPoints = m_originalMovement;
+		m_healthMax = m_originalHealth;
+		m_currentHealth = m_healthMax;
+		m_range = m_originalRange;
+		m_damage = m_originalDamage;
+		m_weaponType = eWeaponType::eSideCannons;
+		break;
+	case ShipType::eTurtle:
+		m_originalHealth = 20;
+		m_originalDamage = 2;
+		m_originalMovement = 8;
+		m_originalRange = 1;
+
+		m_movementPoints = m_originalMovement;
+		m_healthMax = m_originalHealth;
+		m_currentHealth = m_healthMax;
+		m_range = m_originalRange;
+		m_damage = m_originalDamage;
+		m_weaponType = eWeaponType::eShotgun;
+		break;
+	case ShipType::eFire:
+		m_originalHealth = 8;
+		m_originalDamage = 6;
+		m_originalMovement = 10;
+		m_originalRange = 2;
+
+		m_movementPoints = m_originalMovement;
+		m_healthMax = m_originalHealth;
+		m_currentHealth = m_healthMax;
+		m_range = m_originalRange;
+		m_damage = m_originalDamage;
+		m_weaponType = eWeaponType::eFlamethrower;
+		break;
+	case ShipType::eSniper:
+		m_originalHealth = 8;
+		m_originalDamage = 4;
+		m_originalMovement = 6;
+		m_originalRange = 10;
+
+		m_movementPoints = m_originalMovement;
+		m_healthMax = m_originalHealth;
+		m_currentHealth = m_healthMax;
+		m_range = m_originalRange;
+		m_damage = m_originalDamage;
+		m_weaponType = eWeaponType::eStraightShot;
+		break;
+	}
+
+	switch (factionName)
+	{
+	case FactionName::eYellow:
+		switch (entityType)
+		{
+		case ShipType::eFrigate:
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSideCannons));
+			break;
+		case ShipType::eTurtle:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipBomb));
+			break;
+		case ShipType::eFire:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipMelee));
+			break;
+		case ShipType::eSniper:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSnipe));
+			break;
+		}
+
+		break;
+
+	case FactionName::eBlue:
+		switch (entityType)
+		{
+		case ShipType::eFrigate:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSideCannons));
+			break;
+		case ShipType::eTurtle:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipBomb));
+			break;
+		case ShipType::eFire:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipMelee));
+			break;
+		case ShipType::eSniper:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSnipe));
+			break;
+		}
+
+		break;
+	case FactionName::eRed:
+		switch (entityType)
+		{
+		case ShipType::eFrigate:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSideCannons));
+			break;
+		case ShipType::eTurtle:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipBomb));
+			break;
+		case ShipType::eFire:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipMelee));
+			break;
+		case ShipType::eSniper:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSnipe));
+			break;
+		default:
+			break;
+		}
+
+		break;
+	case FactionName::eGreen:
+		switch (entityType)
+		{
+		case ShipType::eFrigate:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSideCannons));
+			break;
+		case ShipType::eTurtle:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipBomb));
+			break;
+		case ShipType::eFire:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipMelee));
+			break;
+		case ShipType::eSniper:
+
+			m_sprite = std::shared_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSnipe));
+			break;
+		}
+		break;
+	}
+	m_sprite->SetFrameNumber(eShipSpriteFrame::eMaxHealth);
+	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+}
+
 OverWorld::OverWorld()
 	: m_currentPlayer(0),
 	m_selectNextPlayer(false),

@@ -17,26 +17,6 @@ enum class ShipType
 struct Tile;
 struct Weapons;
 class Map;
-struct ShipGlobalProperties
-{
-	ShipGlobalProperties(FactionName factionName, ShipType entityType);
-	ShipGlobalProperties() {};
-
-	std::shared_ptr<HAPISPACE::Sprite> m_sprite;
-	std::shared_ptr<HAPISPACE::Sprite> m_selectedSprite;
-	int m_movementPoints;
-	int m_originalMovement;
-	int m_healthMax;
-	int m_originalHealth;
-	int m_currentHealth;
-	int m_range;
-	int m_originalRange;
-	int m_damage;
-	int m_originalDamage;
-	int m_weaponType;
-	int m_upgradePoints;
-	int m_maxUpgradePoints;
-};
 
 struct Ship
 {
@@ -76,8 +56,13 @@ struct Ship
 		unsigned int getDirectionCost(int currentDirection, int newDirection);
 	};
 
+	int m_health;
+	int m_damage;
+	int m_range;
+	eWeaponType m_weaponType;
 public:
-	Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName playerName, eDirection startingDirection = eNorth);
+	Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName playerName, 
+		eDirection startingDirection = eNorth, int health, int damage, int range, eWeaponType weaponType);
 	~Ship();
 
 	ShipGlobalProperties& getProperties();
@@ -110,7 +95,7 @@ public:
 
 private:
 	const FactionName m_factionName;
-	ShipGlobalProperties m_entityProperties;
+	ShipProperties m_entityProperties;
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
@@ -123,19 +108,24 @@ private:
 	ActionSprite m_actionSprite;
 	bool m_movingToDestination;
 	bool m_destinationSet;
+	int m_health;
+	int m_damage;
+	int m_range;
+	eWeaponType m_weaponType;
+	std::unique_ptr<Sprite> m_sprite;
 
 	void handleRotation(ShipGlobalProperties& entityProperties);
 };
 
-struct Player
-{
-	Player(FactionName name, ePlayerType playerType);
-
-	std::vector<ShipGlobalProperties> m_entities;
-	std::vector<ShipGlobalProperties*> m_selectedEntities;
-	FactionName m_factionName;
-	ePlayerType m_type;
-};
+//struct Player
+//{
+//	Player(FactionName name, ePlayerType playerType);
+//
+//	std::vector<ShipGlobalProperties> m_entities;
+//	std::vector<ShipGlobalProperties*> m_selectedEntities;
+//	FactionName m_factionName;
+//	ePlayerType m_type;
+//};
 
 struct BattlePlayer
 {

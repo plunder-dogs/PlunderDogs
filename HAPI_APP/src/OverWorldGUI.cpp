@@ -489,180 +489,180 @@ void OverWorldGUI::onLeftClick(const HAPI_TMouseData& mouseData, Player& current
 		}
 		case OverWorldWindow::eUpgrade:
 		{
-			if (m_upgradeBackButton->GetSpritesheet()->GetFrameRect(0).Translated(m_upgradeBackButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				CURRENT_WINDOW = OverWorldWindow::eShipSelection;
-				UI.CloseWindow(UPGRADE_FLEET_WINDOW);
-				UI.OpenWindow(FLEET_WINDOW);
-				UI.OpenWindow(BATTLE_FLEET_WINDOW);
-			}
-			else if (m_addHealthButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addHealthButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//health+
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalHealth * UPGRADE_POWER;
-					//If increase is non zero and there are points to spend
-					if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
-					{
-						m_currentlySelected->m_upgradePoints--;
-						m_currentlySelected->m_healthMax += increase;
-						m_currentlySelected->m_currentHealth += increase;
-					}
-					//If you have at least two upgrade points
-					else if (m_currentlySelected->m_upgradePoints > 1)
-					{
-						m_currentlySelected->m_upgradePoints -= 2;
-						m_currentlySelected->m_healthMax++;
-						m_currentlySelected->m_currentHealth++;
-					}
-				}
-			}
-			else if (m_addMovementButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addMovementButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//movement+
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalMovement * UPGRADE_POWER;
-					//If increase is non zero and there are points to spend
-					if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
-					{
-						m_currentlySelected->m_upgradePoints--;
-						m_currentlySelected->m_movementPoints += increase;
-					}
-					//If you have at least two upgrade points 
-					else if (m_currentlySelected->m_upgradePoints > 1)
-					{
-						m_currentlySelected->m_upgradePoints -= 2;
-						m_currentlySelected->m_movementPoints++;
-					}
-				}
-			}
-			else if (m_addDamageButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addDamageButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//damage+
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalDamage * UPGRADE_POWER;
-					//If increase is non zero and there are points to spend
-					if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
-					{
-						m_currentlySelected->m_upgradePoints--;
-						m_currentlySelected->m_damage += increase;
-					}
-					//If you have at least two upgrade points
-					else if (m_currentlySelected->m_upgradePoints > 1)
-					{
-						m_currentlySelected->m_upgradePoints -= 2;
-						m_currentlySelected->m_damage++;
-					}
-				}
-			}
-			else if (m_addRangeButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addRangeButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//range+
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalRange * UPGRADE_POWER;
-					//If increase is non zero and there are points to spend
-					if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
-					{
-						m_currentlySelected->m_upgradePoints--;
-						m_currentlySelected->m_range += increase;
-					}
-					//If you have at least two upgrade points 
-					else if (m_currentlySelected->m_upgradePoints > 1)
-					{
-						m_currentlySelected->m_upgradePoints -= 2;
-						m_currentlySelected->m_range++;
-					}
-				}
-			}
-			else if (m_removeHealthButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeHealthButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//health-
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalHealth * UPGRADE_POWER;
-					//If increase is non zero and below max points
-					if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_healthMax > m_currentlySelected->m_originalHealth)
-					{
-						m_currentlySelected->m_upgradePoints++;
-						m_currentlySelected->m_healthMax -= increase;
-						m_currentlySelected->m_currentHealth -= increase;
-					}
-					//If you have at least two upgrade points blow max
-					else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_healthMax > m_currentlySelected->m_originalHealth)
-					{
-						m_currentlySelected->m_upgradePoints += 2;
-						m_currentlySelected->m_healthMax--;
-						m_currentlySelected->m_currentHealth--;
-					}
-				}
-			}
-			else if (m_removeMovementButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeMovementButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//movement-
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalMovement * UPGRADE_POWER;
-					//If increase is non zero and below max points
-					if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_movementPoints > m_currentlySelected->m_originalMovement)
-					{
-						m_currentlySelected->m_upgradePoints++;
-						m_currentlySelected->m_movementPoints -= increase;
-					}
-					//If you have at least two upgrade points blow max
-					else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_movementPoints > m_currentlySelected->m_originalMovement)
-					{
-						m_currentlySelected->m_upgradePoints += 2;
-						m_currentlySelected->m_movementPoints--;
-					}
-				}
-			}
-			else if (m_removeDamageButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeDamageButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//damage-
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalDamage * UPGRADE_POWER;
-					//If increase is non zero and below max points
-					if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_damage > m_currentlySelected->m_originalDamage)
-					{
-						m_currentlySelected->m_upgradePoints++;
-						m_currentlySelected->m_damage -= increase;
-					}
-					//If you have at least two upgrade points blow max
-					else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_damage > m_currentlySelected->m_originalDamage)
-					{
-						m_currentlySelected->m_upgradePoints += 2;
-						m_currentlySelected->m_damage--;
-					}
-				}
-			}
-			else if (m_removeRangeButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeRangeButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
-			{
-				//range-
-				if (m_currentlySelected)
-				{
-					int increase = m_currentlySelected->m_originalRange * UPGRADE_POWER;
-					//If increase is non zero and below max points
-					if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_range > m_currentlySelected->m_originalRange)
-					{
-						m_currentlySelected->m_upgradePoints++;
-						m_currentlySelected->m_range -= increase;
-					}
-					//If you have at least two upgrade points blow max
-					else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_range > m_currentlySelected->m_originalRange)
-					{
-						m_currentlySelected->m_upgradePoints += 2;
-						m_currentlySelected->m_range--;
-					}
-				}
-			}
-			bool selection = false;
-			checkShipSelect(selection, UPGRADE_FLEET_WINDOW, UPGRADE_FLEET_SCROLLBAR, HAPISPACE::VectorI(mouseData.x, mouseData.y), m_upgradeFleetWindowTopLeft, currentSelectedPlayer.m_entities, true);
-			break;
+			//if (m_upgradeBackButton->GetSpritesheet()->GetFrameRect(0).Translated(m_upgradeBackButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	CURRENT_WINDOW = OverWorldWindow::eShipSelection;
+			//	UI.CloseWindow(UPGRADE_FLEET_WINDOW);
+			//	UI.OpenWindow(FLEET_WINDOW);
+			//	UI.OpenWindow(BATTLE_FLEET_WINDOW);
+			//}
+			//else if (m_addHealthButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addHealthButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//health+
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalHealth * UPGRADE_POWER;
+			//		//If increase is non zero and there are points to spend
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
+			//		{
+			//			m_currentlySelected->m_upgradePoints--;
+			//			m_currentlySelected->m_healthMax += increase;
+			//			m_currentlySelected->m_currentHealth += increase;
+			//		}
+			//		//If you have at least two upgrade points
+			//		else if (m_currentlySelected->m_upgradePoints > 1)
+			//		{
+			//			m_currentlySelected->m_upgradePoints -= 2;
+			//			m_currentlySelected->m_healthMax++;
+			//			m_currentlySelected->m_currentHealth++;
+			//		}
+			//	}
+			//}
+			//else if (m_addMovementButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addMovementButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//movement+
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalMovement * UPGRADE_POWER;
+			//		//If increase is non zero and there are points to spend
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
+			//		{
+			//			m_currentlySelected->m_upgradePoints--;
+			//			m_currentlySelected->m_movementPoints += increase;
+			//		}
+			//		//If you have at least two upgrade points 
+			//		else if (m_currentlySelected->m_upgradePoints > 1)
+			//		{
+			//			m_currentlySelected->m_upgradePoints -= 2;
+			//			m_currentlySelected->m_movementPoints++;
+			//		}
+			//	}
+			//}
+			//else if (m_addDamageButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addDamageButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//damage+
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalDamage * UPGRADE_POWER;
+			//		//If increase is non zero and there are points to spend
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
+			//		{
+			//			m_currentlySelected->m_upgradePoints--;
+			//			m_currentlySelected->m_damage += increase;
+			//		}
+			//		//If you have at least two upgrade points
+			//		else if (m_currentlySelected->m_upgradePoints > 1)
+			//		{
+			//			m_currentlySelected->m_upgradePoints -= 2;
+			//			m_currentlySelected->m_damage++;
+			//		}
+			//	}
+			//}
+			//else if (m_addRangeButton->GetSpritesheet()->GetFrameRect(0).Translated(m_addRangeButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//range+
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalRange * UPGRADE_POWER;
+			//		//If increase is non zero and there are points to spend
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints > 0)
+			//		{
+			//			m_currentlySelected->m_upgradePoints--;
+			//			m_currentlySelected->m_range += increase;
+			//		}
+			//		//If you have at least two upgrade points 
+			//		else if (m_currentlySelected->m_upgradePoints > 1)
+			//		{
+			//			m_currentlySelected->m_upgradePoints -= 2;
+			//			m_currentlySelected->m_range++;
+			//		}
+			//	}
+			//}
+			//else if (m_removeHealthButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeHealthButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//health-
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalHealth * UPGRADE_POWER;
+			//		//If increase is non zero and below max points
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_healthMax > m_currentlySelected->m_originalHealth)
+			//		{
+			//			m_currentlySelected->m_upgradePoints++;
+			//			m_currentlySelected->m_healthMax -= increase;
+			//			m_currentlySelected->m_currentHealth -= increase;
+			//		}
+			//		//If you have at least two upgrade points blow max
+			//		else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_healthMax > m_currentlySelected->m_originalHealth)
+			//		{
+			//			m_currentlySelected->m_upgradePoints += 2;
+			//			m_currentlySelected->m_healthMax--;
+			//			m_currentlySelected->m_currentHealth--;
+			//		}
+			//	}
+			//}
+			//else if (m_removeMovementButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeMovementButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//movement-
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalMovement * UPGRADE_POWER;
+			//		//If increase is non zero and below max points
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_movementPoints > m_currentlySelected->m_originalMovement)
+			//		{
+			//			m_currentlySelected->m_upgradePoints++;
+			//			m_currentlySelected->m_movementPoints -= increase;
+			//		}
+			//		//If you have at least two upgrade points blow max
+			//		else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_movementPoints > m_currentlySelected->m_originalMovement)
+			//		{
+			//			m_currentlySelected->m_upgradePoints += 2;
+			//			m_currentlySelected->m_movementPoints--;
+			//		}
+			//	}
+			//}
+			//else if (m_removeDamageButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeDamageButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//damage-
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalDamage * UPGRADE_POWER;
+			//		//If increase is non zero and below max points
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_damage > m_currentlySelected->m_originalDamage)
+			//		{
+			//			m_currentlySelected->m_upgradePoints++;
+			//			m_currentlySelected->m_damage -= increase;
+			//		}
+			//		//If you have at least two upgrade points blow max
+			//		else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_damage > m_currentlySelected->m_originalDamage)
+			//		{
+			//			m_currentlySelected->m_upgradePoints += 2;
+			//			m_currentlySelected->m_damage--;
+			//		}
+			//	}
+			//}
+			//else if (m_removeRangeButton->GetSpritesheet()->GetFrameRect(0).Translated(m_removeRangeButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))
+			//{
+			//	//range-
+			//	if (m_currentlySelected)
+			//	{
+			//		int increase = m_currentlySelected->m_originalRange * UPGRADE_POWER;
+			//		//If increase is non zero and below max points
+			//		if (increase > 0 && m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints && m_currentlySelected->m_range > m_currentlySelected->m_originalRange)
+			//		{
+			//			m_currentlySelected->m_upgradePoints++;
+			//			m_currentlySelected->m_range -= increase;
+			//		}
+			//		//If you have at least two upgrade points blow max
+			//		else if (m_currentlySelected->m_upgradePoints < m_currentlySelected->m_maxUpgradePoints - 1 && m_currentlySelected->m_range > m_currentlySelected->m_originalRange)
+			//		{
+			//			m_currentlySelected->m_upgradePoints += 2;
+			//			m_currentlySelected->m_range--;
+			//		}
+			//	}
+			//}
+			//bool selection = false;
+			//checkShipSelect(selection, UPGRADE_FLEET_WINDOW, UPGRADE_FLEET_SCROLLBAR, HAPISPACE::VectorI(mouseData.x, mouseData.y), m_upgradeFleetWindowTopLeft, currentSelectedPlayer.m_entities, true);
+			//break;
 		}
 	}
 }
@@ -899,7 +899,7 @@ void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, Player& current
 	}
 }
 
-void OverWorldGUI::reset(const std::vector<ShipGlobalProperties>& playerEntities)
+void OverWorldGUI::reset(const std::vector<ShipProperties>& playerEntities)
 {
 	m_currentShips = 0;
 	UI.DeleteWindow(FLEET_WINDOW);
@@ -1040,7 +1040,7 @@ bool OverWorldGUI::windowObjectExists(const std::string & windowName, const std:
 	return false;
 }
 
-void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties>& entities, const bool vertical)
+void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipProperties>& entities, const bool vertical)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -1060,7 +1060,7 @@ void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWin
 	}
 }
 
-void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties*>& entities, const bool vertical)
+void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWindow, const std::string& windowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipProperties*>& entities, const bool vertical)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{
@@ -1080,7 +1080,7 @@ void OverWorldGUI::checkShipSelect(bool & selection, const std::string & shipWin
 	}
 }
 
-void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::string & windowSlider, const std::string & selectedShipWindow, const std::string & selectedWindowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, const HAPISPACE::VectorI & selectedTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities)
+void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::string & windowSlider, const std::string & selectedShipWindow, const std::string & selectedWindowSlider, const HAPISPACE::VectorI & mouseData, const HAPISPACE::VectorI & windowTopLeft, const HAPISPACE::VectorI & selectedTopLeft, std::vector<ShipProperties>& entities, std::vector<ShipProperties*>& selectedEntities)
 {
 	if (m_currentShips < MAX_SHIPS)
 	{
@@ -1117,7 +1117,7 @@ void OverWorldGUI::selectBattleShip(const std::string & shipWindow, const std::s
 	}
 }
 
-void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, const std::string & selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<ShipGlobalProperties*>& selectedEntities, const HAPISPACE::VectorI & mouseData)
+void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, const std::string & selectedShipSlider, const HAPISPACE::VectorI& selectedWindowTopLeft, std::vector<ShipProperties*>& selectedEntities, const HAPISPACE::VectorI & mouseData)
 {
 	for (int i = 0; i < selectedEntities.size(); i++)
 	{
@@ -1141,7 +1141,7 @@ void OverWorldGUI::deselectBattleShip(const std::string & selectedShipWindow, co
 	}
 }
 
-void OverWorldGUI::updateSelectedShips(const std::string & shipWindow, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipGlobalProperties>& entities, std::vector<ShipGlobalProperties*>& selectedEntities)
+void OverWorldGUI::updateSelectedShips(const std::string & shipWindow, const HAPISPACE::VectorI & windowTopLeft, std::vector<ShipProperties>& entities, std::vector<ShipProperties*>& selectedEntities)
 {
 	for (int i = 0; i < entities.size(); i++)
 	{

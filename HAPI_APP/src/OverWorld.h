@@ -8,6 +8,35 @@
 using namespace HAPI_UI_SPACE;
 using namespace HAPISPACE;
 
+struct ShipProperties
+{
+	ShipProperties(FactionName factionName, ShipType entityType);
+	ShipProperties() {};
+
+	std::shared_ptr<HAPISPACE::Sprite> m_sprite;
+	std::shared_ptr<HAPISPACE::Sprite> m_selectedSprite;
+	int m_movementPoints;
+	int m_originalMovement;
+	int m_healthMax;
+	int m_originalHealth;
+	int m_currentHealth;
+	int m_range;
+	int m_originalRange;
+	int m_damage;
+	int m_originalDamage;
+	int m_weaponType;
+	int m_upgradePoints;
+	int m_maxUpgradePoints;
+};
+
+struct PlayerDetails
+{
+	std::vector<ShipProperties> m_selectedEntities;
+
+	FactionName m_factionName;
+	ePlayerType m_type;
+};
+
 class OverWorld : public IHapiSpritesInputListener
 {
 public:
