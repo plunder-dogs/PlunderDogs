@@ -180,7 +180,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MouseSelection.cpp" />
-    <ClCompile Include="src\NewPathfinding.cpp" />
+    <ClCompile Include="src\BFS.cpp" />
     <ClCompile Include="src\OverWorld.cpp" />
     <ClCompile Include="src\OverWorldGUI.cpp" />
     <ClCompile Include="src\Textures.cpp" />
@@ -203,7 +203,7 @@
     <ClInclude Include="src\HAPIWrapper.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\MouseSelection.h" />
-    <ClInclude Include="src\NewPathfinding.h" />
+    <ClInclude Include="src\BFS.h" />
     <ClInclude Include="src\OverWorld.h" />
     <ClInclude Include="src\OverWorldGUI.h" />
     <ClInclude Include="src\Textures.h" />

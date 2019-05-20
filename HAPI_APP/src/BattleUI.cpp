@@ -1,6 +1,6 @@
 #include "BattleUI.h"
 #include "Battle.h"
-#include "Pathfinding.h"
+#include "BFS.h"
 #include "OverWorld.h"
 #include "Textures.h"
 #include "MouseSelection.h"

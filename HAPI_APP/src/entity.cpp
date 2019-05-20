@@ -1,6 +1,6 @@
 #include "entity.h"
 #include "Map.h"
-#include "NewPathfinding.h"
+#include "BFS.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
 

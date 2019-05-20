@@ -1,7 +1,7 @@
 #include <vector>
 #include "AI.h"
 #include "MouseSelection.h"
-#include "NewPathfinding.h"
+#include "BFS.h"
 #include "Battle.h"
 #include "Map.h"
 #include "entity.h"

@@ -1,4 +1,4 @@
-#include "NewPathfinding.h"
+#include "BFS.h"
 #include "Map.h"
 #include <vector>
 #include <algorithm>
