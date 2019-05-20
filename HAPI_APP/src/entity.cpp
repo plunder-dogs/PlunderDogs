@@ -240,7 +240,7 @@ bool Ship::moveEntity(Map& map, const Tile& tile)
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			m_pathToTile = pathToTile;
-			map.moveEntity(m_currentPosition, pathToTile.back().pair());
+			map.updateTileNewShipPosition(m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.active = false;
@@ -268,7 +268,7 @@ bool Ship::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
 		{
 			pathToTile.emplace(posi(pathToTile.back().pair(), endDirection));
 			m_pathToTile = pathToTile;
-			map.moveEntity(m_currentPosition, pathToTile.back().pair());
+			map.updateTileNewShipPosition(m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.active = false;
@@ -541,7 +541,7 @@ Ship::Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& ent
 	m_destinationSet(false)
 {
 	m_entityProperties.m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
-	map.insertEntity(*this);
+	map.assignTileToShip(*this);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 

@@ -82,11 +82,9 @@ public:
 
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
-	//bool isMovedToDestination() const;
 	std::pair<int, int> getCurrentPosition() const;
 	bool isWeaponFired() const;
 	bool isDead() const;
-	//bool isMoving() const;
 	bool isMovingToDestination() const;
 	bool isDestinationSet() const;
 

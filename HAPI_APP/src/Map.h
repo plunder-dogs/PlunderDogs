@@ -112,9 +112,9 @@ public:
 	std::pair<int, int> getMouseClickCoord(std::pair<int, int> mouseCoord) const;
 
 	//Moves an entitys position on the map, returns false if the position is already taken
-	bool moveEntity(std::pair<int, int> originalPos, std::pair<int, int> newPos);
+	bool updateTileNewShipPosition(std::pair<int, int> originalPos, std::pair<int, int> newPos);
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
-	void insertEntity(Ship& newEntity);
+	void assignTileToShip(Ship& newEntity);
 
 	void drawMap(eLightIntensity lightIntensity) const;
 	std::pair<int, int> getDrawOffset() const { return m_drawOffset; }

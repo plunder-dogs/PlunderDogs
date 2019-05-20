@@ -389,7 +389,7 @@ std::vector<const Tile*> Map::cGetTileCone(intPair coord, int range, eDirection 
 	return tileStore;
 }
 
-bool Map::moveEntity(intPair originalPos, intPair newPos)
+bool Map::updateTileNewShipPosition(intPair originalPos, intPair newPos)
 {
 	Tile* oldTile = getTile(originalPos);
 	Tile* newTile = getTile(newPos);
@@ -409,7 +409,7 @@ bool Map::moveEntity(intPair originalPos, intPair newPos)
 	return true;
 }
 
-void Map::insertEntity(Ship& newEntity)
+void Map::assignTileToShip(Ship& newEntity)
 {
 	Tile* tile = getTile(newEntity.getCurrentPosition());	
 	if (tile && !tile->m_shipOnTile)
