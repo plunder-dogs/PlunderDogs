@@ -7,10 +7,11 @@
 #include "Global.h"
 #include <string>
 
-struct Player;
+struct PlayerDetails;
 struct ShipProperties;
 class OverWorld;
 class Battle;
+enum class ShipType;
 class OverWorldGUI 
 {
 private:
@@ -95,7 +96,7 @@ private:
 
 public:
 
-	void setActivePlayers(std::vector<Player>&players);
+	void setActivePlayers(std::vector<PlayerDetails>&players);
 	void setShipSelectionTrigger(bool trigger);
 	std::string getSelectedMap();
 	static OverWorldWindow CURRENT_WINDOW;
@@ -103,11 +104,11 @@ public:
 	~OverWorldGUI();
 	bool getLeftPlayerSelectionTrig();
 	void setLeftPlayerSelectionTrig(bool trigger);
-	void onLeftClick(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer, bool& selectNextPlayer,bool& resetPlayer);
+	void onLeftClick(const HAPI_TMouseData& mouseData, PlayerDetails& currentSelectedPlayer, bool& selectNextPlayer,bool& resetPlayer);
 	//void onRightClick(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer);
-	void onMouseMove(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer);
+	void onMouseMove(const HAPI_TMouseData& mouseData, PlayerDetails& currentSelectedPlayer);
 
-	void reset(const std::vector<ShipProperties>& playerEntities);
+	void reset(const std::vector<std::pair<ShipType, std::unique_ptr<Sprite>>>& shipsToSelect);
 	void clear();
 
 	void render(const Battle& battle) const;

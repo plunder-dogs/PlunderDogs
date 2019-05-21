@@ -56,10 +56,6 @@ struct Ship
 		unsigned int getDirectionCost(int currentDirection, int newDirection);
 	};
 
-	int m_health;
-	int m_damage;
-	int m_range;
-	eWeaponType m_weaponType;
 public:
 	Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName playerName, 
 		eDirection startingDirection = eNorth, int health, int damage, int range, eWeaponType weaponType);

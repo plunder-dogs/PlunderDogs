@@ -193,7 +193,7 @@ void OverWorldGUI::render(const Battle& battle) const
 			SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(550, 100), HAPISPACE::Colour255::BLACK, selectedMapName, 100);
 			if (m_currentlySelected)
 			{
-				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1600, 360), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_currentHealth), 50);
+				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1600, 360), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_health), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1600, 445), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_damage), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1600, 535), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_movementPoints), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1600, 625), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_range), 50);
@@ -228,11 +228,11 @@ void OverWorldGUI::render(const Battle& battle) const
 			//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1270, 405), HAPISPACE::Colour255::BLACK, "SHIPS", 50);
 			if (m_currentlySelected)
 			{
-				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(870, 240), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_currentHealth), 50);
+				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(870, 240), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_health), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(870, 370), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_movementPoints), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(870, 500), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_damage), 50);
 				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(870, 630), HAPISPACE::Colour255::BLACK, std::to_string(m_currentlySelected->m_range), 50);
-				SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(800, 760), HAPISPACE::Colour255::BLACK, "UPGRADES: " + std::to_string(m_currentlySelected->m_upgradePoints), 50);
+				//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(800, 760), HAPISPACE::Colour255::BLACK, "UPGRADES: " + std::to_string(m_currentlySelected->m_upgradePoints), 50);
 			}
 			else
 			{
@@ -252,26 +252,26 @@ void OverWorldGUI::render(const Battle& battle) const
 			//Draw upgrades cost text
 			if (m_currentlySelected)
 			{
-				int healthUp = static_cast<int>(m_currentlySelected->m_originalHealth * UPGRADE_POWER);
-				int moveUp = static_cast<int>(m_currentlySelected->m_originalMovement * UPGRADE_POWER);
-				int damageUp = static_cast<int>(m_currentlySelected->m_originalDamage * UPGRADE_POWER);
-				int rangeUp = static_cast<int>(m_currentlySelected->m_originalRange * UPGRADE_POWER);
-				if (healthUp)
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 240), HAPISPACE::Colour255::BLACK, std::to_string(healthUp), 50);
-				else
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 240), HAPISPACE::Colour255::BLACK, "0.5", 50);
-				if (moveUp)
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 370), HAPISPACE::Colour255::BLACK, std::to_string(moveUp), 50);
-				else
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 370), HAPISPACE::Colour255::BLACK, "0.5", 50);
-				if (damageUp)
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 500), HAPISPACE::Colour255::BLACK, std::to_string(damageUp), 50);
-				else
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 500), HAPISPACE::Colour255::BLACK, "0.5", 50);
-				if (rangeUp)
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 630), HAPISPACE::Colour255::BLACK, std::to_string(rangeUp), 50);
-				else
-					SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 630), HAPISPACE::Colour255::BLACK, "0.5", 50);
+				//int healthUp = static_cast<int>(m_currentlySelected->m_originalHealth * UPGRADE_POWER);
+				//int moveUp = static_cast<int>(m_currentlySelected->m_originalMovement * UPGRADE_POWER);
+				//int damageUp = static_cast<int>(m_currentlySelected->m_originalDamage * UPGRADE_POWER);
+				//int rangeUp = static_cast<int>(m_currentlySelected->m_originalRange * UPGRADE_POWER);
+				//if (healthUp)
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 240), HAPISPACE::Colour255::BLACK, std::to_string(healthUp), 50);
+				//else
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 240), HAPISPACE::Colour255::BLACK, "0.5", 50);
+				//if (moveUp)
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 370), HAPISPACE::Colour255::BLACK, std::to_string(moveUp), 50);
+				//else
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 370), HAPISPACE::Colour255::BLACK, "0.5", 50);
+				//if (damageUp)
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 500), HAPISPACE::Colour255::BLACK, std::to_string(damageUp), 50);
+				//else
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 500), HAPISPACE::Colour255::BLACK, "0.5", 50);
+				//if (rangeUp)
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1125, 630), HAPISPACE::Colour255::BLACK, std::to_string(rangeUp), 50);
+				//else
+				//	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1108, 630), HAPISPACE::Colour255::BLACK, "0.5", 50);
 			}
 			break;
 		}
@@ -667,7 +667,7 @@ void OverWorldGUI::onLeftClick(const HAPI_TMouseData& mouseData, Player& current
 	}
 }
 
-void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer)
+void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, PlayerDetails& currentSelectedPlayer)
 {
 	switch (CURRENT_WINDOW)
 	{
@@ -899,7 +899,7 @@ void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, Player& current
 	}
 }
 
-void OverWorldGUI::reset(const std::vector<ShipProperties>& playerEntities)
+void OverWorldGUI::reset(const std::vector<std::pair<ShipType, std::unique_ptr<Sprite>>>& shipsToSelect)
 {
 	m_currentShips = 0;
 	UI.DeleteWindow(FLEET_WINDOW);
@@ -932,21 +932,21 @@ void OverWorldGUI::reset(const std::vector<ShipProperties>& playerEntities)
 	
 	//adding the windows and sliders, also populates the fleet window with all current entities
 	UI.AddWindow(FLEET_WINDOW, HAPISPACE::RectangleI(m_fleetWindowTopLeft.x, m_fleetWindowTopLeft.x + WINDOW_WIDTH, m_fleetWindowTopLeft.y, m_fleetWindowTopLeft.y + WINDOW_HEIGHT), fleetWindowSkinName);
-	for (int i = 0; i < playerEntities.size(); i++)
+	for (int i = 0; i < shipsToSelect.size(); i++)
 	{
-		UI.GetWindow(FLEET_WINDOW)->AddCanvas(ENTITY + std::to_string(i), calculateObjectWindowPosition(i), playerEntities[i].m_sprite);
+		UI.GetWindow(FLEET_WINDOW)->AddCanvas(ENTITY + std::to_string(i), calculateObjectWindowPosition(i), shipsToSelect[i].second);
 	}
 
 	UI.GetWindow(FLEET_WINDOW)->AddSlider(FLEET_SLIDER, HAPISPACE::RectangleI(0, WINDOW_WIDTH, 160, WINDOW_HEIGHT), sliderLayout);
 	UI.AddWindow(BATTLE_FLEET_WINDOW, HAPISPACE::RectangleI(m_battleFleetWindowTopLeft.x, m_battleFleetWindowTopLeft.x + WINDOW_WIDTH, m_battleFleetWindowTopLeft.y, m_battleFleetWindowTopLeft.y + WINDOW_HEIGHT), fleetWindowSkinName);
 	UI.GetWindow(BATTLE_FLEET_WINDOW)->AddSlider(BATTLE_FLEET_SLIDER, HAPISPACE::RectangleI(0, WINDOW_WIDTH, 160, WINDOW_HEIGHT), sliderLayout);
-	UI.AddWindow(UPGRADE_FLEET_WINDOW, HAPISPACE::RectangleI(m_upgradeFleetWindowTopLeft.x, m_upgradeFleetWindowTopLeft.x + UPGRADE_WINDOW_WIDTH, m_upgradeFleetWindowTopLeft.y, m_upgradeFleetWindowTopLeft.y + UPGRADE_WINDOW_HEIGHT));
-	for (int i = 0; i < playerEntities.size(); i++)
-	{
-		UI.GetWindow(UPGRADE_FLEET_WINDOW)->AddCanvas(ENTITY + std::to_string(i), calculateUpgradeObjectWindowPosition(i), playerEntities[i].m_sprite);
-	}
-	UI.GetWindow(UPGRADE_FLEET_WINDOW)->AddScrollbar(UPGRADE_FLEET_SCROLLBAR);
-	UI.GetWindow(UPGRADE_FLEET_WINDOW)->GetObject(UPGRADE_FLEET_SCROLLBAR)->SetValue(1.0f);
+	//UI.AddWindow(UPGRADE_FLEET_WINDOW, HAPISPACE::RectangleI(m_upgradeFleetWindowTopLeft.x, m_upgradeFleetWindowTopLeft.x + UPGRADE_WINDOW_WIDTH, m_upgradeFleetWindowTopLeft.y, m_upgradeFleetWindowTopLeft.y + UPGRADE_WINDOW_HEIGHT));
+	//for (int i = 0; i < shipsToSelect.size(); i++)
+	//{
+	//	UI.GetWindow(UPGRADE_FLEET_WINDOW)->AddCanvas(ENTITY + std::to_string(i), calculateUpgradeObjectWindowPosition(i), shipsToSelect[i].second);
+	//}
+	//UI.GetWindow(UPGRADE_FLEET_WINDOW)->AddScrollbar(UPGRADE_FLEET_SCROLLBAR);
+	//UI.GetWindow(UPGRADE_FLEET_WINDOW)->GetObject(UPGRADE_FLEET_SCROLLBAR)->SetValue(1.0f);
 
 	//upgrade buttons positions
 	HAPI_Wrapper::setPosition(m_upgradesScreenBackground, { 345, 140 });
