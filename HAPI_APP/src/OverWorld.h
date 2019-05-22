@@ -25,8 +25,11 @@ struct ShipProperties
 
 struct PlayerDetails
 {
-	std::vector<ShipProperties> m_ships;
+	PlayerDetails();
 
+	void addShip(ShipType shipType);
+
+	std::vector<ShipProperties> m_ships;
 	FactionName m_factionName;
 	ePlayerType m_type;
 };
@@ -50,7 +53,7 @@ public:
 	void startBattle();
 
 private:
-	std::vector<std::pair<ShipType, std::unique_ptr<Sprite>>> m_shipsToSelect;
+	std::vector<std::pair<ShipType, std::shared_ptr<Sprite>>> m_shipsToSelect;
 	int m_currentPlayer;
 	bool m_selectNextPlayer;
 	std::vector<PlayerDetails> m_players;

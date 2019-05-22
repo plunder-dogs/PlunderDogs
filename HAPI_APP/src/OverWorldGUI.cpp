@@ -278,7 +278,7 @@ void OverWorldGUI::render(const Battle& battle) const
 	}
 }
 
-void OverWorldGUI::onLeftClick(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer, bool& selectNextPlayer, bool& resetPlayer)
+void OverWorldGUI::onLeftClick(const HAPI_TMouseData& mouseData, PlayerDetails& currentSelectedPlayer, bool& selectNextPlayer, bool& resetPlayer)
 {
 	switch (CURRENT_WINDOW)
 	{
@@ -454,7 +454,7 @@ void OverWorldGUI::onLeftClick(const HAPI_TMouseData& mouseData, Player& current
 			}
 			if (HAPI_Wrapper::isTranslated(m_done, mouseData, 0))
 			{
-				if (!currentSelectedPlayer.m_selectedEntities.empty())
+				if (!currentSelectedPlayer.m_ships.empty())
 				{
 					//CURRENT_WINDOW = OverWorldWindow::eLevelSelection;
 					selectNextPlayer = true;
@@ -899,7 +899,7 @@ void OverWorldGUI::onMouseMove(const HAPI_TMouseData& mouseData, PlayerDetails& 
 	}
 }
 
-void OverWorldGUI::reset(const std::vector<std::pair<ShipType, std::unique_ptr<Sprite>>>& shipsToSelect)
+void OverWorldGUI::reset(const std::vector<std::pair<ShipType, std::shared_ptr<Sprite>>>& shipsToSelect)
 {
 	m_currentShips = 0;
 	UI.DeleteWindow(FLEET_WINDOW);

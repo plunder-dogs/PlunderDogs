@@ -15,9 +15,9 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const T
 void attemptMove(Map& map, std::unique_ptr<Ship>& currentShip, std::pair<const Tile*, eDirection> targetTile);
 void attemptShot(Battle& battle, const Map& mapPtr, std::unique_ptr<Ship>& firingShip);
 
-void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<BattlePlayer>& battlePlayer, int currentUnit)
+void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Player>& battlePlayer, int currentUnit)
 {
-	auto& ships = battlePlayer->m_entities;
+	auto& ships = battlePlayer->m_ships;
 
 	//if (ships[currentUnit]->m_battleProperties.isDead()) return;
 	//find the nearest enemy ship
@@ -62,11 +62,11 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Bat
 	//}
 }
 
-void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<BattlePlayer>& player, int currentUnit)
+void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Player>& player, int currentUnit)
 {
 	//if (player.m_entities[i]->m_battleProperties.isDead()) continue;
 	//check if the ship is able to fire upon any enemies and fire if possible
-	attemptShot(battle, map, player->m_entities[currentUnit]);
+	attemptShot(battle, map, player->m_ships[currentUnit]);
 
 	//loop through all the ships in the faction
 	//for (int i = 0; i < player.m_entities.size(); i++)
@@ -77,7 +77,7 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Bat
 	//}
 }
 
-void AI::handleDeploymentPhase(Battle& battle, Map& map, BattlePlayer& bPlayer, const Player& player)
+void AI::handleDeploymentPhase(Battle& battle, Map& map, Player& bPlayer, const Player& player)
 {
 	std::vector<Tile*> spawnArea{ map.getTileRadius(bPlayer.m_spawnPosition,3,true,true) };
 	assert(spawnArea.size() > 6);
@@ -193,7 +193,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 		if (i == static_cast<int>(ourFaction))
 			continue;
 
-		const auto& factionShips = battle.getPlayer(static_cast<FactionName>(i)).m_entities;
+		const auto& factionShips = battle.getPlayer(static_cast<FactionName>(i)).m_ships;
 
 		for (int j = 0; j < factionShips.size(); j++)
 		{

@@ -57,10 +57,7 @@ class BattleUI : public IHapiSpritesInputListener
 			std::pair<int, int> m_position;
 		};
 	public:
-		DeploymentPhase(std::vector<ShipGlobalProperties*> player,
-			std::pair<int, int> spawnPosition, int range, const Map& map, FactionName factionName);
-
-		std::pair<int, int> getSpawnPosition() const;
+		DeploymentPhase(const Player& playerToDeploy, const Map& map);
 
 		bool isCompleted() const;
 		void render(const InvalidPosition& invalidPosition, const Map& map) const;
@@ -70,12 +67,10 @@ class BattleUI : public IHapiSpritesInputListener
 		void onLeftClick(InvalidPosition& invalidPosition, eDirection startingDirection, const Tile* currectTileSelected, Battle& battle);
 
 	private:
-		FactionName m_factionName;
-		std::vector<ShipGlobalProperties*> m_player;
-		CurrentSelectedEntity m_currentSelectedEntity;
+		const Player& m_playerToDeploy;
+		Ship* m_shipToDeploy;
 		std::vector<const Tile*> m_spawnArea;
 		std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
-		std::pair<int, int> m_spawnPosition;
 	};
 
 	struct CurrentSelectedTile

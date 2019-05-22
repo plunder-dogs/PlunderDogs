@@ -5,6 +5,21 @@
 #include "BattleUI.h"
 #include "entity.h"
 
+class DeployPlayer
+{
+public:
+	DeployPlayer();
+
+	void onNewLocation(std::pair<int, int> position, const Map& map);
+	void onShipDeployment(Battle& battle, std::pair<int, int> startingPosition, eDirection startingDirection);
+
+private:
+	const Player& m_playerToDeploy;
+	Ship* m_shipToDeploy;
+	std::vector<const Tile*> m_spawnArea;
+	std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
+};
+
 class Battle
 {
 	struct LightIntensity
@@ -43,10 +58,10 @@ class Battle
 
 		void update(float deltaTime);
 
-		void onYellowShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
-		void onBlueShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
-		void onGreenShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
-		void onRedShipDestroyed(std::vector<std::unique_ptr<BattlePlayer>>& players);
+		void onYellowShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+		void onBlueShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+		void onGreenShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+		void onRedShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
 
 	private:
 		int m_yellowShipsDestroyed;
@@ -55,7 +70,7 @@ class Battle
 		int m_redShipsDestroyed;
 		void onReset();
 
-		void checkGameStatus(const std::vector<std::unique_ptr<BattlePlayer>>& players);
+		void checkGameStatus(const std::vector<std::unique_ptr<Player>>& players);
 		Timer m_winTimer;
 		FactionName m_winningFaction;
 		bool m_gameOver;
@@ -69,10 +84,10 @@ public:
 	BattlePhase getCurrentPhase() const;
 
 	FactionName getCurrentFaction() const;
-	const BattlePlayer& getPlayer(FactionName name) const;
+	const Player& getPlayer(FactionName name) const;
 	bool isAIPlaying() const;
 
-	void start(const std::string& newMapName, const std::vector<Player>& newPlayers);
+	void start(const std::string& newMapName, std::vector<std::unique_ptr<Player>>& newPlayers);
 	void render() const;
 	void update(float deltaTime);
 	void moveEntityToPosition(Ship& entity, const Tile& destination);
@@ -89,7 +104,8 @@ public:
 	void playFireAnimation(Ship& entity, std::pair<int, int> position);
 	void playExplosionAnimation(Ship& entity);
 private:
-	std::vector<std::unique_ptr<BattlePlayer>> m_players;
+	std::vector<std::unique_ptr<Player>> m_players;
+
 	int m_currentPlayerTurn;
 	Map m_map;
 	BattlePhase m_currentPhase;
@@ -107,7 +123,7 @@ private:
 	void updateAttackPhase();
 
 	bool allEntitiesAttacked(std::vector<std::unique_ptr<Ship>>& playerEntities) const;
-	BattlePlayer& getPlayer(FactionName factionName);
+	Player& getPlayer(FactionName factionName);
 
 
 	void incrementPlayerTurn();

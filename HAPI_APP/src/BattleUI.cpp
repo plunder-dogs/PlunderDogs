@@ -787,30 +787,30 @@ void BattleUI::TargetArea::render(const Map& map) const
 void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & source, BattlePhase phase)
 {
 	//TODO: Why isn't this a switch case?
-	if (source.m_shipOnTile->getProperties().m_weaponType == eSideCannons)
+	if (source.m_shipOnTile->getWeaponType() == eSideCannons)
 	{
 		m_targetArea = map.cGetTileCone(source.m_tileCoordinate,
-			source.m_shipOnTile->getProperties().m_range, 
+			source.m_shipOnTile->getRange(), 
 			source.m_shipOnTile->getCurrentDirection(), true);
 	
 	}
 
-	else if (source.m_shipOnTile->getProperties().m_weaponType == eStraightShot)
+	else if (source.m_shipOnTile->getWeaponType() == eStraightShot)
 	{
 		m_targetArea = map.cGetTileLine(source.m_tileCoordinate, 
-			source.m_shipOnTile->getProperties().m_range, 
+			source.m_shipOnTile->getRange(), 
 			source.m_shipOnTile->getCurrentDirection(), true);
 
 	}
 
-	else if (source.m_shipOnTile->getProperties().m_weaponType == eShotgun)
+	else if (source.m_shipOnTile->getWeaponType() == eShotgun)
 	{
 		// make so where ever the place presses get radius called talk adrais about size of that
 		m_targetArea = map.cGetTileRadius(source.m_tileCoordinate, 
-			source.m_shipOnTile->getProperties().m_range, true);
+			source.m_shipOnTile->getRange(), true);
 	}
 
-	else if (source.m_shipOnTile->getProperties().m_weaponType == eFlamethrower)
+	else if (source.m_shipOnTile->getWeaponType() == eFlamethrower)
 	{
 		eDirection directionOfFire = eNorth;
 		switch (source.m_shipOnTile->getCurrentDirection() )
@@ -835,7 +835,7 @@ void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & sour
 			break;
 		}
 		m_targetArea = map.cGetTileLine(source.m_tileCoordinate,
-			source.m_shipOnTile->getProperties().m_range, directionOfFire, true);
+			source.m_shipOnTile->getRange(), directionOfFire, true);
 	}
 	
 	if (m_targetArea.empty())
@@ -884,22 +884,19 @@ BattleUI::TargetArea::HighlightNode::HighlightNode()
 	sprite->GetTransformComp().SetScaling({ 0.75f, 0.75f });
 }
 
-BattleUI::DeploymentPhase::DeploymentPhase(std::vector<ShipGlobalProperties*> player, 
-	std::pair<int, int> spawnPosition, int range, const Map& map, FactionName factionName)
-	: m_factionName(factionName),
-	m_player(player),
-	m_currentSelectedEntity(),
+BattleUI::DeploymentPhase::DeploymentPhase(const Player& playerToDeploy, const Map& map)
+	: m_playerToDeploy(playerToDeploy),
+	m_shipToDeploy(nullptr),
 	m_spawnArea(),
-	m_spawnSprites(),
-	m_spawnPosition(spawnPosition)
+	m_spawnSprites()
 {
 	//Might change this - for now its two containers but looks confusing
-	m_spawnArea = map.cGetTileRadius(spawnPosition, range, true, true);
+	m_spawnArea = map.cGetTileRadius(playerToDeploy.m_spawnPosition, 6, true, true);
 	m_spawnSprites.reserve(m_spawnArea.size());
 	for (int i = 0; i < m_spawnArea.size(); ++i)
 	{
 		std::unique_ptr<Sprite> sprite;
-		switch (factionName)
+		switch (playerToDeploy.m_factionName)
 		{
 		case eYellow:
 			sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
@@ -941,7 +938,9 @@ BattleUI::DeploymentPhase::DeploymentPhase(std::vector<ShipGlobalProperties*> pl
 		m_spawnSprites[i]->GetTransformComp().SetScaling({ 2.f, 2.f });
 	}*/
 
-	m_currentSelectedEntity.m_currentSelectedEntity = m_player.back();
+	//Deploy the first ship as start
+	assert(!m_playerToDeploy.m_ships[0]->isDeployed());
+	m_shipToDeploy = m_playerToDeploy.m_ships[0].get();
 }
 
 bool BattleUI::DeploymentPhase::isCompleted() const
@@ -951,15 +950,15 @@ bool BattleUI::DeploymentPhase::isCompleted() const
 
 void BattleUI::DeploymentPhase::render(const InvalidPosition& invalidPosition, const Map& map) const
 {
-	if (m_currentSelectedEntity.m_currentSelectedEntity && !invalidPosition.m_activate)
+	if (m_shipToDeploy && !invalidPosition.m_activate)
 	{
-		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentSelectedEntity.m_position);
+		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_shipToDeploy->getCurrentPosition());
 
-		m_currentSelectedEntity.m_currentSelectedEntity->m_sprite->GetTransformComp().SetPosition({
+		m_shipToDeploy->getSprite()->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
 
-		m_currentSelectedEntity.m_currentSelectedEntity->m_sprite->Render(SCREEN_SURFACE);
+		m_shipToDeploy->getSprite()->Render(SCREEN_SURFACE);
 	}
 
 	for (int i = 0; i < m_spawnSprites.size(); ++i)
@@ -1046,7 +1045,8 @@ void BattleUI::DeploymentPhase::onLeftClick(InvalidPosition& invalidPosition, eD
 	}
 	if (!invalidPosition.m_activate && !currentTileSelected->m_shipOnTile)
 	{
-		battle.insertEntity(currentTileSelected->m_tileCoordinate, startingDirection, *m_currentSelectedEntity.m_currentSelectedEntity, m_factionName);
+		assert(m_shipToDeploy);
+		m_shipToDeploy->setDeploymentPosition(currentTileSelected->m_tileCoordinate, startingDirection);
 		//invalidPosition.m_activate = true;
 		invalidPosition.m_position = currentTileSelected->m_tileCoordinate;
 		//Change ordering around to pop front with different container
@@ -1084,9 +1084,4 @@ void BattleUI::CurrentSelectedTile::render(const Map & map) const
 
 		m_sprite->Render(SCREEN_SURFACE);
 	}
-}
-
-std::pair<int, int> BattleUI::DeploymentPhase::getSpawnPosition() const
-{
-	return m_spawnPosition;
 }

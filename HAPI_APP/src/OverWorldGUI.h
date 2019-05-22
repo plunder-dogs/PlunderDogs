@@ -108,7 +108,7 @@ public:
 	//void onRightClick(const HAPI_TMouseData& mouseData, Player& currentSelectedPlayer);
 	void onMouseMove(const HAPI_TMouseData& mouseData, PlayerDetails& currentSelectedPlayer);
 
-	void reset(const std::vector<std::pair<ShipType, std::unique_ptr<Sprite>>>& shipsToSelect);
+	void reset(const std::vector<std::pair<ShipType, std::shared_ptr<Sprite>>>& shipsToSelect);
 	void clear();
 
 	void render(const Battle& battle) const;

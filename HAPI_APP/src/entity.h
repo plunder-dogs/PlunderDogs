@@ -57,22 +57,26 @@ struct Ship
 	};
 
 public:
-	Ship(std::pair<int, int> startingPosition, const ShipGlobalProperties& entityProperties, Map& map, FactionName playerName, 
-		eDirection startingDirection = eNorth, int health, int damage, int range, eWeaponType weaponType);
+	Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType, eDirection startingDirection = eNorth);
 	~Ship();
 
-	ShipGlobalProperties& getProperties();
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
+	eWeaponType getWeaponType() const;
 	std::pair<int, int> getCurrentPosition() const;
 	bool isWeaponFired() const;
 	bool isDead() const;
 	bool isMovingToDestination() const;
 	bool isDestinationSet() const;
+	bool isDeployed() const;
+	int getMovementPoints() const;
+	int getRange() const;
+	std::unique_ptr<Sprite>& getSprite();
 
-	void update(float deltaTime, const Map& map, ShipGlobalProperties& entityProperties);
+	void update(float deltaTime, const Map& map);
 	void render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map& map);
 	void renderPath(const Map & map);
+	void setDeploymentPosition(std::pair<int, int> position, eDirection startingDirection = eDirection::eNorth);
 
 	std::vector<posi> generateMovementArea(const Map& map, float movement) const;
 	int generateMovementGraph(const Map& map, const Tile& source, const Tile& destination);
@@ -81,7 +85,7 @@ public:
 
 	bool moveEntity(Map& map, const Tile& tile);
 	bool moveEntity(Map& map, const Tile& tile, eDirection endDirection);
-	void takeDamage(ShipGlobalProperties& entityProperties, int damageAmount, FactionName entityFaction);
+	void takeDamage(int damageAmount, FactionName entityFaction);
 	void fireWeapon();
 	void setDestination();
 	void onNewTurn();
@@ -91,7 +95,7 @@ public:
 
 private:
 	const FactionName m_factionName;
-	ShipProperties m_entityProperties;
+	const ShipType m_shipType;
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
@@ -99,38 +103,29 @@ private:
 	int m_movementPathSize;
 	eDirection m_currentDirection;
 	bool m_weaponFired;
-	//bool m_movedToDestination;
 	bool m_isDead;
 	ActionSprite m_actionSprite;
 	bool m_movingToDestination;
 	bool m_destinationSet;
+	int m_maxHealth;
 	int m_health;
 	int m_damage;
 	int m_range;
+	int m_movementPoints;
 	eWeaponType m_weaponType;
 	std::unique_ptr<Sprite> m_sprite;
+	bool m_deployed;
 
-	void handleRotation(ShipGlobalProperties& entityProperties);
+	void handleRotation();
 };
 
-//struct Player
-//{
-//	Player(FactionName name, ePlayerType playerType);
-//
-//	std::vector<ShipGlobalProperties> m_entities;
-//	std::vector<ShipGlobalProperties*> m_selectedEntities;
-//	FactionName m_factionName;
-//	ePlayerType m_type;
-//};
-
-struct BattlePlayer
+struct Player
 {
-	BattlePlayer(FactionName name, std::pair<int, int> spawnPosition, ePlayerType playerType);
+	Player(FactionName name, ePlayerType playerType);
 
-	std::vector<std::unique_ptr<Ship>> m_entities;
+	std::vector<std::unique_ptr<Ship>> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
-	const std::pair<int, int> m_spawnPosition;
+	std::pair<int, int> m_spawnPosition;
 	bool m_eliminated;
-	std::deque<ShipGlobalProperties*> m_shipsToDeploy;
 };

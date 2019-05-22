@@ -751,7 +751,6 @@ std::vector<const Tile*> Map::cGetTileRing(std::pair<int, int> coord, int range)
 
 std::pair<int, int> Map::getSpawnPosition()
 {
-	std::cout << "Hit\n";
 	//Make sure all spawn positions aren't in use
 	assert(std::find_if(m_spawnPositions.cbegin(), m_spawnPositions.cend(),
 		[](const auto& spawnPosition) { return spawnPosition.inUse == false; }) != m_spawnPositions.cend());
