@@ -629,7 +629,20 @@ BattlePlayer::BattlePlayer(FactionName name, std::pair<int, int> spawnPosition, 
 	m_playerType(playerType),
 	m_spawnPosition(spawnPosition),
 	m_eliminated(false)
-{}
+{
+	m_entiti
+}
+
+void BattlePlayer::addEntity()
+{
+	for (auto& entity : m_entities)
+	{
+		if (!entity)
+		{
+			
+		}
+	}
+}
 
 EntityBattleProperties::ActionSprite::ActionSprite(FactionName factionName)
 	: sprite(),

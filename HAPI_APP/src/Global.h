@@ -1,6 +1,8 @@
 #pragma once
 #include <utility>
 
+const size_t TOTAL_SHIPS = 6;
+
 enum FactionName
 {
 	eYellow = 0,
