@@ -44,7 +44,7 @@ class BattleUI : public IHapiSpritesInputListener
 		std::pair<int, int> m_position;
 	};
 
-	class DeploymentPhase
+	/*class DeploymentPhase
 	{
 		struct CurrentSelectedEntity
 		{
@@ -72,7 +72,7 @@ class BattleUI : public IHapiSpritesInputListener
 		std::vector<const Tile*> m_spawnArea;
 		std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
 	};
-
+*/
 	struct CurrentSelectedTile
 	{
 		CurrentSelectedTile();
@@ -121,13 +121,18 @@ private:
 	const Tile* m_mouseDownTile;
 	BattleGUI m_gui;
 	InvalidPosition m_invalidPosition;
-	std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
+	//std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
 	//Directional arrow
 	std::pair<int, int> m_lastMouseData;
 	bool m_arrowActive;
 	std::unique_ptr<Sprite> m_arrowSprite;
 
 	void renderArrow() const;
+
+	//Deployment Phase
+	void onMouseMoveDeploymentPhase();
+	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+
 	//Movement Phase
 	void onMouseMoveMovementPhase();
 	void onLeftClickMovementPhase();

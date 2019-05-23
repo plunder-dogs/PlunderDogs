@@ -139,5 +139,9 @@ public:
 	const std::vector<Tile>& getData()const { return m_data; }
 
 	Map();
+	Map(const Map&) = delete;
+	Map& operator=(const Map&) = delete;
+	Map(Map&&) = delete;
+	Map&& operator=(Map&&) = delete;
 	~Map();
 };

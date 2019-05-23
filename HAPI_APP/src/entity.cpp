@@ -3,6 +3,7 @@
 #include "BFS.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
+#include "Battle.h"
 
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr size_t MOVEMENT_PATH_SIZE{ 32 };
@@ -554,21 +555,64 @@ void Ship::renderPath(const Map & map)
 	m_movementPath.render(map);
 }
 
-void Ship::setDeploymentPosition(std::pair<int, int> position)
+void Ship::setDeploymentPosition(std::pair<int, int> position, const Battle & battle)
 {
-	assert(m_deployed);
+	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
+	m_currentPosition = position;
+}
+
+void Ship::deployAtPosition(std::pair<int, int> position, Battle & battle, eDirection startingDirection)
+{
+	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
 	m_currentPosition = position;
 	m_deployed = true;
+
+
 }
 
 //BATTLE PLAYER
-Player::Player(FactionName name, ePlayerType playerType)
+Player::Player(FactionName name, ePlayerType playerType, const Map& map)
 	: m_ships(),
 	m_factionName(name),
 	m_playerType(playerType),
 	m_spawnPosition(),
 	m_eliminated(false)
-{}
+{
+	//Might change this - for now its two containers but looks confusing
+	std::vector<const Tile*> tileRadius = map.cGetTileRadius(m_spawnPosition, 6, true, true);
+	m_spawnArea.reserve(tileRadius.size());
+	for (const auto& i : tileRadius)
+	{
+		m_spawnArea.emplace_back(m_factionName, i->m_tileCoordinate, map);
+	}
+
+	//for (int i = 0; i < m_spawnArea.size(); ++i)
+	//{
+	//	std::unique_ptr<Sprite> sprite;
+	//	switch (playerToDeploy.m_factionName)
+	//	{
+	//	case eYellow:
+	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
+	//		break;
+	//	case eBlue:
+	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
+	//		break;
+	//	case eGreen:
+	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
+	//		break;
+	//	case eRed:
+	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
+	//		break;
+	//	};
+	//	auto screenPosition = map.getTileScreenPos(m_spawnArea[i]->m_tileCoordinate);
+	//	sprite->GetTransformComp().SetPosition({
+	//		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
+	//		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+	//	sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	//	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
+	//	m_spawnSprites.push_back(std::move(sprite));
+	//}
+}
 
 Ship::ActionSprite::ActionSprite(FactionName factionName)
 	: sprite(),
@@ -604,4 +648,30 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
 		sprite->Render(SCREEN_SURFACE);
 	}
+}
+
+SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+{
+	switch (factionName)
+	{
+	case eYellow:
+		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
+		break;
+	case eBlue:
+		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
+		break;
+	case eGreen:
+		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
+		break;
+	case eRed:
+		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
+		break;
+	};
+
+	auto screenPosition = map.getTileScreenPos(position);
+	m_sprite->GetTransformComp().SetPosition({
+		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
+		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }

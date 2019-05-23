@@ -17,7 +17,7 @@ enum class ShipType
 struct Tile;
 struct Weapons;
 class Map;
-
+class Battle;
 struct Ship
 {
 	struct ActionSprite
@@ -77,7 +77,8 @@ public:
 	void render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map& map);
 	void renderPath(const Map & map);
 
-	void setDeploymentPosition(std::pair<int, int> position, eDirection startingDirection = eDirection::eNorth);
+	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
+	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
 
 	std::vector<posi> generateMovementArea(const Map& map, float movement) const;
 	int generateMovementGraph(const Map& map, const Tile& source, const Tile& destination);
@@ -120,13 +121,28 @@ private:
 	void handleRotation();
 };
 
+struct SpawnNode
+{
+	SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
+
+	const Tile* m_spawnTile;
+	std::unique_ptr<Sprite> m_sprite;
+};
+
 struct Player
 {
-	Player(FactionName name, ePlayerType playerType);
-
+	Player(FactionName name, ePlayerType playerType, const Map& map);
+	
 	std::vector<std::unique_ptr<Ship>> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
 	std::pair<int, int> m_spawnPosition;
 	bool m_eliminated;
+
+	Ship* m_shipToDeploy;
+	std::vector<SpawnNode> m_spawnArea;
+
+	/*
+	std::vector<const Tile*> m_spawnArea;
+	std::vector<std::unique_ptr<Sprite>> m_spawnSprites;*/
 };

@@ -258,7 +258,7 @@ void Battle::start(const std::string & newMapName, std::vector<std::unique_ptr<P
 	{
 		if (player->m_playerType == ePlayerType::eHuman)
 		{
-			
+			m_humanPlayersToDeploy.emplace_back()
 		}
 	}
 	
@@ -360,6 +360,20 @@ void Battle::moveEntityToPosition(Ship& entity, const Tile& destination, eDirect
 {
 	assert(m_currentPhase == BattlePhase::Movement);
 	entity.moveEntity(m_map, destination, endDirection);
+}
+
+void Battle::deployShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection)
+{
+	assert(m_currentPhase == BattlePhase::Deployment);
+	assert(m_players[m_currentPlayerTurn]->m_shipToDeploy);
+	m_players[m_currentPlayerTurn]->m_shipToDeploy->deployAtPosition(startingPosition, *this, startingDirection);
+}
+
+bool Battle::setShipDeploymentAtPosition(std::pair<int, int> position)
+{
+	assert(m_currentPhase == BattlePhase::Deployment);
+	assert(m_players[m_currentPlayerTurn]->m_shipToDeploy);
+	m_players[m_currentPlayerTurn]->m_shipToDeploy->setDeploymentPosition(position, *this);
 }
 
 bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea)
@@ -533,6 +547,15 @@ void Battle::playExplosionAnimation(Ship& entity)
 			return;
 		}
 	}
+}
+
+void Battle::updateDeploymentPhase()
+{
+	//Handle Human Deployment
+	
+
+	//Handle AI Deployment
+	
 }
 
 void Battle::updateMovementPhase(float deltaTime)
@@ -900,26 +923,46 @@ DeployPlayer::DeployPlayer(const Map& map, const Player& playerToDeploy)
 		m_spawnSprites[i]->GetTransformComp().SetOriginToCentreOfFrame();
 		m_spawnSprites[i]->GetTransformComp().SetScaling({ 2.f, 2.f });
 	}*/
-	
-
 }
 
-void DeployPlayer::onNewLocation(std::pair<int, int> position, const Map & map)
+bool DeployPlayer::isDeployedAllShips() const
 {
+	bool deployedAllShips = true;
+	for (const auto& ship : m_playerToDeploy.m_ships)
+	{
+		if (!ship->isDeployed())
+		{
+			deployedAllShips = false;
+		}
+	}
 
+	return deployedAllShips;
+}
+
+void DeployPlayer::setSelectedShipToNewPosition(std::pair<int, int> position, const Map & map)
+{
 	const std::pair<int, int> tileTransform = map.getTileScreenPos(position);
 	assert(m_shipToDeploy);
-	m_shipToDeploy->getSprite().
-	m_currentSelectedEntity.m_currentSelectedEntity->m_sprite->GetTransformComp().SetPosition({
+	m_shipToDeploy->getSprite()->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
-	m_currentSelectedEntity.m_position = tileOnMouse->m_tileCoordinate;
-
-	invalidPosition.m_activate = false;
+	m_shipToDeploy->setDeploymentPosition(position);
 }
 
-void DeployPlayer::onShipDeployment(Battle & battle, std::pair<int, int> startingPosition, eDirection startingDirection)
+void DeployPlayer::deploySelectedShip(Battle & battle, std::pair<int, int> startingPosition, eDirection startingDirection)
 {
+	assert(m_shipToDeploy);
+	m_shipToDeploy->deployAtPosition(startingPosition, startingDirection);
+	
+	//Select next ship to deploy
+	for (const auto& ship : m_playerToDeploy.m_ships)
+	{
+		if (!ship->isDeployed())
+		{
+			m_shipToDeploy = ship.get();
+			break;
+		}
+	}
 }
 
 void DeployPlayer::render(const Map & map)
