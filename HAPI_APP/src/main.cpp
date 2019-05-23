@@ -25,6 +25,7 @@ void HAPI_Sprites_Main()
 
 	int lastFrameStart = HAPI_Sprites.GetTime();
 	Player player1(FactionName::eYellow, ePlayerType::eAI);
+	player1.m_ships.emplace_back()
 
 
 

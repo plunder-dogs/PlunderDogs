@@ -57,7 +57,7 @@ struct Ship
 	};
 
 public:
-	Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType, eDirection startingDirection = eNorth);
+	Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType);
 	~Ship();
 
 	FactionName getFactionName() const;
@@ -76,6 +76,7 @@ public:
 	void update(float deltaTime, const Map& map);
 	void render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map& map);
 	void renderPath(const Map & map);
+
 	void setDeploymentPosition(std::pair<int, int> position, eDirection startingDirection = eDirection::eNorth);
 
 	std::vector<posi> generateMovementArea(const Map& map, float movement) const;

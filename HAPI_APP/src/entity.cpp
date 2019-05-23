@@ -371,7 +371,7 @@ unsigned int Ship::MovementPath::getDirectionCost(int currentDirection, int newD
 	return (static_cast<int>(eDirection::Max) % diff) + 1;
 }
 
-Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType, eDirection startingDirection = eNorth)
+Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType)
 	: m_factionName(factionName),
 	m_shipType(shipType),
 	m_currentPosition(),

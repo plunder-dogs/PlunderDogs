@@ -847,3 +847,81 @@ void Battle::LightIntensity::update(float deltaTime)
 		}
 	}
 }
+
+DeployPlayer::DeployPlayer(const Map& map, const Player& playerToDeploy)
+	: m_playerToDeploy(playerToDeploy),
+	m_spawnArea(),
+	m_spawnSprites()
+{
+	//Might change this - for now its two containers but looks confusing
+	m_spawnArea = map.cGetTileRadius(playerToDeploy.m_spawnPosition, 6, true, true);
+	m_spawnSprites.reserve(m_spawnArea.size());
+	for (int i = 0; i < m_spawnArea.size(); ++i)
+	{
+		std::unique_ptr<Sprite> sprite;
+		switch (playerToDeploy.m_factionName)
+		{
+		case eYellow:
+			sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
+			break;
+		case eBlue:
+			sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
+			break;
+		case eGreen:
+			sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
+			break;
+		case eRed:
+			sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
+			break;
+		};
+
+		auto screenPosition = map.getTileScreenPos(m_spawnArea[i]->m_tileCoordinate);
+		sprite->GetTransformComp().SetPosition({
+			(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
+			(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+		sprite->GetTransformComp().SetOriginToCentreOfFrame();
+		sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
+
+		m_spawnSprites.push_back(std::move(sprite));
+	}
+	/*
+	for (int i = 0; i < m_spawnArea.size(); ++i)
+	{
+		//const std::pair<int, int> tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
+
+		//m_sprite->GetTransformComp().SetPosition({
+		//static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
+		//static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
+
+		auto screenPosition = map.getTileScreenPos(m_spawnArea[i]->m_tileCoordinate);
+		m_spawnSprites[i]->GetTransformComp().SetPosition({
+			(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
+			(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+		m_spawnSprites[i]->GetTransformComp().SetOriginToCentreOfFrame();
+		m_spawnSprites[i]->GetTransformComp().SetScaling({ 2.f, 2.f });
+	}*/
+	
+
+}
+
+void DeployPlayer::onNewLocation(std::pair<int, int> position, const Map & map)
+{
+
+	const std::pair<int, int> tileTransform = map.getTileScreenPos(position);
+	assert(m_shipToDeploy);
+	m_shipToDeploy->getSprite().
+	m_currentSelectedEntity.m_currentSelectedEntity->m_sprite->GetTransformComp().SetPosition({
+		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
+		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
+	m_currentSelectedEntity.m_position = tileOnMouse->m_tileCoordinate;
+
+	invalidPosition.m_activate = false;
+}
+
+void DeployPlayer::onShipDeployment(Battle & battle, std::pair<int, int> startingPosition, eDirection startingDirection)
+{
+}
+
+void DeployPlayer::render(const Map & map)
+{
+}

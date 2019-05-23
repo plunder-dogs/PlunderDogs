@@ -8,10 +8,11 @@
 class DeployPlayer
 {
 public:
-	DeployPlayer();
+	DeployPlayer(const Map& map, const Player& playerToDeploy);
 
 	void onNewLocation(std::pair<int, int> position, const Map& map);
 	void onShipDeployment(Battle& battle, std::pair<int, int> startingPosition, eDirection startingDirection);
+	void render(const Map& map);
 
 private:
 	const Player& m_playerToDeploy;
