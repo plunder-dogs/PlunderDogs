@@ -507,7 +507,7 @@ Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, i
 	m_sprite->SetFrameNumber(eShipSpriteFrame::eMaxHealth);
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	m_sprite->GetTransformComp().SetScaling({ 1, 1 }); // Might not need
-	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
+	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(eDirection::eNorth * 60 % 360));
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 

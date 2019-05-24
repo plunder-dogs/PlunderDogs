@@ -471,13 +471,12 @@ void Battle::nextTurn()
 		{
 			for (int i = 0; i < m_players.size(); ++i)
 			{
-				if (m_currentDeploymentState == eDeploymentState::DeployHuman)
+
+				if (m_players[i]->m_playerType != ePlayerType::eHuman)
 				{
-					if (m_players[i]->m_playerType != ePlayerType::eHuman)
-					{
-						continue;
-					}
+					continue;
 				}
+
 				else if (m_currentDeploymentState == eDeploymentState::DeployAI)
 				{
 					if (m_players[i]->m_playerType != ePlayerType::eAI)
