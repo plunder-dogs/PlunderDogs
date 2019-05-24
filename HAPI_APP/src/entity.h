@@ -71,6 +71,8 @@ public:
 	bool isDeployed() const;
 	int getMovementPoints() const;
 	int getRange() const;
+	int getDamage() const;
+	int getHealth() const;
 	std::unique_ptr<Sprite>& getSprite();
 
 	void update(float deltaTime, const Map& map);

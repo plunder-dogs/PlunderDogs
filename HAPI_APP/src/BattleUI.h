@@ -89,7 +89,6 @@ public:
 	~BattleUI();
 
 	std::pair<int, int> getCameraPositionOffset() const;
-	int isHumanDeploymentCompleted() const;
 
 	void renderUI() const;
 	void renderGUI() const;
@@ -101,7 +100,6 @@ public:
 
 	void clearSelectedTile();
 	void FactionUpdateGUI(FactionName faction);
-	void deployHumanPlayers(const std::vector<Player>& newPlayers, Map& map, const Battle& battle);
 
 	void OnKeyEvent(EKeyEvent keyEvent, BYTE keyCode) override final {}
 	void OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData& mouseData) override final;

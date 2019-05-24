@@ -17,6 +17,7 @@ enum BattleWindow
 	ePostBattle
 };
 
+class Ship;
 class BattleGUI
 {
 public:
@@ -26,7 +27,7 @@ public:
 	std::pair<int, int> getCameraPositionOffset() const;
 
 	void render(BattlePhase currentBattlePhase) const;
-	void renderStats(ShipGlobalProperties& entityProperties) const;
+	void renderStats(const Ship& ship) const;
 	void update(eDirection windDirection);
 	void updateFactionToken(int factionName);
 	void OnMouseLeftClick(const HAPI_TMouseData& mouseData, BattlePhase currentBattlePhase);

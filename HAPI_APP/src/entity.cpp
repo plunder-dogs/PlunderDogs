@@ -68,6 +68,16 @@ int Ship::getRange() const
 	return m_range;
 }
 
+int Ship::getDamage() const
+{
+	return m_damage;
+}
+
+int Ship::getHealth() const
+{
+	return m_health;
+}
+
 std::unique_ptr<Sprite>& Ship::getSprite()
 {
 	assert(!m_deployed);

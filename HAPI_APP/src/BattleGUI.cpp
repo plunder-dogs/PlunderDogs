@@ -150,15 +150,15 @@ void BattleGUI::render(BattlePhase currentBattlePhase) const
 	}
 }
 
-void BattleGUI::renderStats(ShipGlobalProperties & entityProperties) const
+void BattleGUI::renderStats(const Ship& ship) const
 {
 	m_battleIcons->GetTransformComp().SetPosition({ 510, (800 + static_cast<float>(animationOffset)) });
 	m_battleIcons->Render(SCREEN_SURFACE);
 
-	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(600, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, "  "+std::to_string(entityProperties.m_currentHealth) , 44);
-	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(860, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(entityProperties.m_range), 44);
-	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1060, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(entityProperties.m_movementPoints), 44);
-	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1295, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(entityProperties.m_damage), 44);
+	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(600, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, "  "+std::to_string(ship.getHealth()) , 44);
+	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(860, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(ship.getRange()), 44);
+	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1060, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(ship.getMovementPoints()), 44);
+	SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(1295, (815 + animationOffset)), HAPISPACE::Colour255::BLACK, std::to_string(ship.getDamage()), 44);
 
 }
 

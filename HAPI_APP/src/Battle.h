@@ -23,18 +23,10 @@
 //	std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
 //};
 
+//https://en.wikipedia.org/wiki/Builder_pattern#C.2B.2B_Example
+
 class Battle
 {
-	struct LightIntensity
-	{
-		LightIntensity();
-
-		void update(float deltaTime);
-
-		Timer m_timer;
-		eLightIntensity m_lightIntensity;
-	};
-
 	struct Particle
 	{
 		std::pair<float, float> m_position;
@@ -51,33 +43,33 @@ class Battle
 		void orient(eDirection direction);
 	};
 
-	class BattleManager
-	{
-	public:
-		BattleManager();
-		~BattleManager();
-	
-		bool isGameOver() const;
+	class WinningFactionHandler;
+	//{
+	//public:
+	//	WinningFactionHandler();
+	//	~WinningFactionHandler();
+	//
+	//	bool isGameOver() const;
 
-		void update(float deltaTime);
+	//	void update(float deltaTime);
 
-		void onYellowShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onBlueShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onGreenShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onRedShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+	//	void onYellowShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+	//	void onBlueShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+	//	void onGreenShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+	//	void onRedShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
 
-	private:
-		int m_yellowShipsDestroyed;
-		int m_blueShipsDestroyed;
-		int m_greenShipsDestroyed;
-		int m_redShipsDestroyed;
-		void onReset();
+	//private:
+	//	int m_yellowShipsDestroyed;
+	//	int m_blueShipsDestroyed;
+	//	int m_greenShipsDestroyed;
+	//	int m_redShipsDestroyed;
+	//	void onReset();
 
-		void checkGameStatus(const std::vector<std::unique_ptr<Player>>& players);
-		Timer m_winTimer;
-		FactionName m_winningFaction;
-		bool m_gameOver;
-	};
+	//	void checkGameStatus(const std::vector<std::unique_ptr<Player>>& players);
+	//	Timer m_winTimer;
+	//	FactionName m_winningFaction;
+	//	bool m_gameOver;
+	//};
 
 public:
 	Battle();
@@ -102,7 +94,6 @@ public:
 
 	//Deploy Phase
 	void deployShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection);
-
 	bool setShipDeploymentAtPosition(std::pair<int, int> position);
 	//Movement Phase
 	void moveEntityToPosition(Ship& entity, const Tile& destination);
@@ -122,21 +113,26 @@ private:
 	Map m_map;
 	BattlePhase m_currentPhase;
 	BattleUI m_battleUI;
-	BattleManager m_battleManager;
+	WinningFactionHandler m_winningFactionHandler;
 	std::vector<Particle> m_explosionParticles;
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
 	Timer m_timeBetweenAIUnits;
 	
 	bool m_AITurn;
-	LightIntensity m_lightIntensity;
-	
+	//Light Intensity
+	Timer m_lightIntensityTimer;
+	eLightIntensity m_currentLightIntensity;
+	void updateLightIntensity(float deltaTime);
+
 	void updateDeploymentPhase();
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
 
+
 	bool allEntitiesAttacked(std::vector<std::unique_ptr<Ship>>& playerEntities) const;
 	Player& getPlayer(FactionName factionName);
+	std::unique_ptr<Player>& getCurrentPlayer();
 
 	void incrementPlayerTurn();
 	void updateWindDirection();
