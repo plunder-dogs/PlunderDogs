@@ -32,8 +32,8 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Pla
 		map,
 		enemyPosition,
 		map.getTile(ships[currentUnit]->getCurrentPosition()),
-		static_cast<eWeaponType>(ships[currentUnit]->getProperties().m_weaponType),
-		ships[currentUnit]->getProperties().m_range) };
+		static_cast<eWeaponType>(ships[currentUnit]->getWeaponType()),
+		ships[currentUnit]->getRange())};
 
 	//move as far as possible on the path to the chosen position
 	attemptMove(map, ships[currentUnit], firingPosition);
@@ -84,103 +84,103 @@ void AI::handleDeploymentPhase(Battle& battle, Map& map, Player& bPlayer, const 
 	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));
 	int spawnPoint{ location };
 	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
-	for (int i = 0; i < player.m_selectedEntities.size(); i++)
+	for (int i = 0; i < player.m_ships.size(); i++)
 	{
-		battle.insertEntity(spawnArea[spawnPoint]->m_tileCoordinate, randomDir, *player.m_selectedEntities[i], player.m_factionName);
+		//battle.insertEntity(spawnArea[spawnPoint]->m_tileCoordinate, randomDir, *player.m_s[i], player.m_factionName);
 		spawnPoint++;
 	}
 }
 
-void AI::handleShipSelection(std::vector<ShipGlobalProperties>& shipPool, std::vector<ShipGlobalProperties*>& selectedShips)
-{
-	int randomNumber{ std::rand() % 8 };
-	int numSideCannons{ 0 };
-	int numOfAddedSideCannons{ 0 };
-	int numTurtle{ 0 };
-	int numOfAddedTurtle{ 0 };
-	int numFlame{ 0 };
-	int numOfAddedFlame{ 0 };
-	int numSniper{ 0 };
-	int numOfAddedSniper{ 0 };
-
-	switch (randomNumber)
-	{
-	case 0:
-		numFlame = 4;
-		numSideCannons = 2;
-		break;
-	case 1:
-		numTurtle = 2;
-		numSideCannons = 2;
-		numSniper = 2;
-		break;
-	case 2:
-		numTurtle = 3;
-		numSideCannons = 3;
-		break;
-	case 3:
-		numFlame = 2;
-		numSideCannons = 2;
-		numTurtle = 2;
-		break;
-	case 4:
-		numSniper = 4;
-		numSideCannons = 2;
-		break;
-	case 5:
-		numFlame = 3;
-		numSideCannons = 3;
-		break;
-	case 6:
-		numSideCannons = 2;
-		numTurtle = 1;
-		numFlame = 2;
-		numSniper = 1;
-		break;
-	case 7:
-		numFlame = 4;
-		numSniper = 2;
-		break;
-	}
-
-	assert(numSideCannons + numTurtle + numFlame + numSniper < 7);
-	for (unsigned int i = 0; i < shipPool.size() && numOfAddedFlame < numFlame; i++)
-	{
-		if (shipPool[i].m_weaponType == eFlamethrower)
-		{
-			ShipGlobalProperties* tmp{ &shipPool[i] };
-			selectedShips.push_back(tmp);
-			numOfAddedFlame++;
-		}
-	}
-	for (unsigned int i = 0; i < shipPool.size() && numOfAddedSideCannons < numSideCannons; i++)
-	{
-		if (shipPool[i].m_weaponType == eSideCannons)
-		{
-			ShipGlobalProperties* tmp{ &shipPool[i] };
-			selectedShips.push_back(tmp);
-			numOfAddedSideCannons++;
-		}
-	}
-	for (unsigned int i = 0; i < shipPool.size() && numOfAddedTurtle < numTurtle; i++)
-	{
-		if (shipPool[i].m_weaponType == eShotgun)
-		{
-			ShipGlobalProperties* tmp{ &shipPool[i] };
-			selectedShips.push_back(tmp);
-			numOfAddedTurtle++;
-		}
-	}
-	for (unsigned int i = 0; i < shipPool.size() && numOfAddedSniper < numSniper; i++)
-	{
-		if (shipPool[i].m_weaponType == eStraightShot)
-		{
-			ShipGlobalProperties* tmp{ &shipPool[i] };
-			selectedShips.push_back(tmp);
-			numOfAddedSniper++;
-		}
-	}
-}
+//void AI::handleShipSelection(std::vector<ShipGlobalProperties>& shipPool, std::vector<ShipGlobalProperties*>& selectedShips)
+//{
+//	int randomNumber{ std::rand() % 8 };
+//	int numSideCannons{ 0 };
+//	int numOfAddedSideCannons{ 0 };
+//	int numTurtle{ 0 };
+//	int numOfAddedTurtle{ 0 };
+//	int numFlame{ 0 };
+//	int numOfAddedFlame{ 0 };
+//	int numSniper{ 0 };
+//	int numOfAddedSniper{ 0 };
+//
+//	switch (randomNumber)
+//	{
+//	case 0:
+//		numFlame = 4;
+//		numSideCannons = 2;
+//		break;
+//	case 1:
+//		numTurtle = 2;
+//		numSideCannons = 2;
+//		numSniper = 2;
+//		break;
+//	case 2:
+//		numTurtle = 3;
+//		numSideCannons = 3;
+//		break;
+//	case 3:
+//		numFlame = 2;
+//		numSideCannons = 2;
+//		numTurtle = 2;
+//		break;
+//	case 4:
+//		numSniper = 4;
+//		numSideCannons = 2;
+//		break;
+//	case 5:
+//		numFlame = 3;
+//		numSideCannons = 3;
+//		break;
+//	case 6:
+//		numSideCannons = 2;
+//		numTurtle = 1;
+//		numFlame = 2;
+//		numSniper = 1;
+//		break;
+//	case 7:
+//		numFlame = 4;
+//		numSniper = 2;
+//		break;
+//	}
+//
+//	assert(numSideCannons + numTurtle + numFlame + numSniper < 7);
+//	for (unsigned int i = 0; i < shipPool.size() && numOfAddedFlame < numFlame; i++)
+//	{
+//		if (shipPool[i].m_weaponType == eFlamethrower)
+//		{
+//			ShipGlobalProperties* tmp{ &shipPool[i] };
+//			selectedShips.push_back(tmp);
+//			numOfAddedFlame++;
+//		}
+//	}
+//	for (unsigned int i = 0; i < shipPool.size() && numOfAddedSideCannons < numSideCannons; i++)
+//	{
+//		if (shipPool[i].m_weaponType == eSideCannons)
+//		{
+//			ShipGlobalProperties* tmp{ &shipPool[i] };
+//			selectedShips.push_back(tmp);
+//			numOfAddedSideCannons++;
+//		}
+//	}
+//	for (unsigned int i = 0; i < shipPool.size() && numOfAddedTurtle < numTurtle; i++)
+//	{
+//		if (shipPool[i].m_weaponType == eShotgun)
+//		{
+//			ShipGlobalProperties* tmp{ &shipPool[i] };
+//			selectedShips.push_back(tmp);
+//			numOfAddedTurtle++;
+//		}
+//	}
+//	for (unsigned int i = 0; i < shipPool.size() && numOfAddedSniper < numSniper; i++)
+//	{
+//		if (shipPool[i].m_weaponType == eStraightShot)
+//		{
+//			ShipGlobalProperties* tmp{ &shipPool[i] };
+//			selectedShips.push_back(tmp);
+//			numOfAddedSniper++;
+//		}
+//	}
+//}
 
 const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName ourFaction)
 {
@@ -354,7 +354,7 @@ void attemptMove(Map& map, std::unique_ptr<Ship>& currentShip, std::pair<const T
 	auto availableTiles = BFS::findArea(
 		map,
 		posi(currentShip->getCurrentPosition(), currentShip->getCurrentDirection()),
-		static_cast<float>(currentShip->getProperties().m_movementPoints));
+		static_cast<float>(currentShip->getMovementPoints()));
 	//Loop to find the closest tile to the target tile
 	std::pair<int, int> targetPos = targetTile.first->m_tileCoordinate;
 	std::pair<int, int> currentPos = currentShip->getCurrentPosition();
@@ -384,11 +384,11 @@ void attemptMove(Map& map, std::unique_ptr<Ship>& currentShip, std::pair<const T
 void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingShip)
 {
 	std::vector< const Tile*> firingArea;
-	switch (firingShip->getProperties().m_weaponType)
+	switch (firingShip->getWeaponType())
 	{
 	case eSideCannons:
 	{
-		firingArea = map.cGetTileCone(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, firingShip->getCurrentDirection());
+		firingArea = map.cGetTileCone(firingShip->getCurrentPosition(), firingShip->getRange(), firingShip->getCurrentDirection());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -402,7 +402,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 	}
 	case eStraightShot:
 	{
-		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, firingShip->getCurrentDirection(), true);
+		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getRange(), firingShip->getCurrentDirection(), true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -418,7 +418,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 	}
 	case eShotgun:
 	{
-		firingArea = map.cGetTileRadius(firingShip->getCurrentPosition(), firingShip->getProperties().m_range);
+		firingArea = map.cGetTileRadius(firingShip->getCurrentPosition(), firingShip->getRange());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -451,7 +451,7 @@ void attemptShot(Battle& battle, const Map& map, std::unique_ptr<Ship>& firingSh
 			break;
 		}
 			
-		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getProperties().m_range, backwardsDirection, true);
+		firingArea = map.cGetTileLine(firingShip->getCurrentPosition(), firingShip->getRange(), backwardsDirection, true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;

@@ -73,10 +73,9 @@ public:
 	int getRange() const;
 	int getDamage() const;
 	int getHealth() const;
-	std::unique_ptr<Sprite>& getSprite();
 
 	void update(float deltaTime, const Map& map);
-	void render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map& map);
+	void render(const Map& map);
 	void renderPath(const Map & map);
 
 	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
@@ -123,18 +122,21 @@ private:
 	void handleRotation();
 };
 
-struct SpawnNode
-{
-	SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
-
-	const Tile* m_spawnTile;
-	std::unique_ptr<Sprite> m_sprite;
-};
-
 struct Player
 {
+	struct SpawnNode
+	{
+		SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
+
+		void render(const Map& map) const;
+
+		std::pair<int, int> m_position;
+		std::unique_ptr<Sprite> m_sprite;
+	};
+
 	Player(FactionName name, ePlayerType playerType, const Map& map);
 	
+
 	std::vector<std::unique_ptr<Ship>> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;

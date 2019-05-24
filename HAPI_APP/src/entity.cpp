@@ -78,12 +78,6 @@ int Ship::getHealth() const
 	return m_health;
 }
 
-std::unique_ptr<Sprite>& Ship::getSprite()
-{
-	assert(!m_deployed);
-	return m_sprite;
-}
-
 //MOVEMENT PATH NODE
 Ship::MovementPath::PathNode::PathNode()
 	: sprite(std::make_unique<Sprite>(Textures::m_spawnHex)),
@@ -390,7 +384,7 @@ Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, i
 	m_movementTimer(MOVEMENT_ANIMATION_TIME),
 	m_movementPath(),
 	m_movementPathSize(0),
-	m_currentDirection(startingDirection),
+	m_currentDirection(),
 	m_weaponFired(false),
 	m_isDead(false),
 	m_actionSprite(factionName),
@@ -545,18 +539,18 @@ void Ship::update(float deltaTime, const Map & map)
 	}
 }
 
-void Ship::render(std::shared_ptr<HAPISPACE::Sprite>& sprite, const Map & map)
+void Ship::render(const Map & map)
 {
 	//Set sprite position to current position
 	const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
 
-	sprite->GetTransformComp().SetPosition({
+	m_sprite->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
 		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
-	sprite->GetTransformComp().SetScaling({ scale / 2, scale / 2 });
+	m_sprite->GetTransformComp().SetScaling({ scale / 2, scale / 2 });
 
-	sprite->Render(SCREEN_SURFACE);
+	m_sprite->Render(SCREEN_SURFACE);
 	m_actionSprite.render(map, m_currentPosition);
 }
 
@@ -591,10 +585,12 @@ Player::Player(FactionName name, ePlayerType playerType, const Map& map)
 	//Might change this - for now its two containers but looks confusing
 	std::vector<const Tile*> tileRadius = map.cGetTileRadius(m_spawnPosition, 6, true, true);
 	m_spawnArea.reserve(tileRadius.size());
-	for (const auto& i : tileRadius)
+	for (const auto& tile : tileRadius)
 	{
-		m_spawnArea.emplace_back(m_factionName, i->m_tileCoordinate, map);
+		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate, map);
 	}
+
+	GameEventMessenger::getInstance().subscribe()
 
 	//for (int i = 0; i < m_spawnArea.size(); ++i)
 	//{
@@ -660,7 +656,7 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 	}
 }
 
-SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
 {
 	switch (factionName)
 	{
@@ -677,11 +673,20 @@ SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, cons
 		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
 		break;
 	};
-
+	
 	auto screenPosition = map.getTileScreenPos(position);
 	m_sprite->GetTransformComp().SetPosition({
 		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
 		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
+}
+
+void Player::SpawnNode::render(const Map & map) const
+{
+	auto screenPosition = map.getTileScreenPos(m_position);
+	m_sprite->GetTransformComp().SetPosition({
+	(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale() ,
+	(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+	m_sprite->Render(SCREEN_SURFACE);
 }
