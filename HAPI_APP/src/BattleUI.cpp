@@ -432,7 +432,7 @@ void BattleUI::onMouseMoveMovementPhase()
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 
-	if (m_battle.isAIPlaying())
+	if (m_battle.isCurrentPlayerAI())
 	{
 		return;
 	}
@@ -485,7 +485,7 @@ void BattleUI::onLeftClickMovementPhase()
 	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile)
 	{
 		m_selectedTile.m_tile = tileOnMouse;
-		if (!m_battle.isAIPlaying())
+		if (!m_battle.isCurrentPlayerAI())
 		{
 			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
 			//TODO: Trigger movement area showing
@@ -494,7 +494,7 @@ void BattleUI::onLeftClickMovementPhase()
 	}
 
 	//AI is in play
-	if (m_battle.isAIPlaying())
+	if (m_battle.isCurrentPlayerAI())
 	{
 		return;
 	}
@@ -629,7 +629,7 @@ void BattleUI::onLeftClickAttackPhase()
 	}
 
 	//AI in play
-	if (m_battle.isAIPlaying())
+	if (m_battle.isCurrentPlayerAI())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		return;

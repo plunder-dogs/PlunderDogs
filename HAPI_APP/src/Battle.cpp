@@ -665,9 +665,10 @@ void Battle::onResetBattle()
 
 void Battle::incrementPlayerTurn()
 {
-	++m_currentPlayerTurn;
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
+	
+	++m_currentPlayerTurn;
 	if (m_currentPlayerTurn == static_cast<int>(m_players.size()))
 	{
 		m_currentPlayerTurn = 0;
@@ -696,7 +697,7 @@ const Player & Battle::getPlayer(FactionName factionName) const
 	return *cIter->get();
 }
 
-bool Battle::isAIPlaying() const
+bool Battle::isCurrentPlayerAI() const
 {
 	return m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI;
 }

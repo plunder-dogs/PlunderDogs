@@ -72,7 +72,7 @@ public:
 	FactionName getCurrentFaction() const;
 	std::vector<FactionName> getAllFactions() const;
 	const Player& getPlayer(FactionName name) const;
-	bool isAIPlaying() const;
+	bool isCurrentPlayerAI() const;
 
 	void start(const std::string& newMapName);
 	void render() const;
