@@ -243,6 +243,8 @@ void Battle::start(const std::string & newMapName)
 		player->createSpawnArea(m_map);
 	}
 
+
+
 	//Set initial deployment state
 	bool humanPlayerFound = false;
 	for (const auto& player : m_players)
@@ -362,6 +364,7 @@ void Battle::deployShipAtPosition(std::pair<int, int> startingPosition, eDirecti
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 	assert(m_players[m_currentPlayerTurn]->m_shipToDeploy);
 	m_players[m_currentPlayerTurn]->m_shipToDeploy->deployAtPosition(startingPosition, *this, startingDirection);
+	m_map.assignTileToShip(*m_players[m_currentPlayerTurn]->m_shipToDeploy);
 	
 	bool playersShipsAllDeployed = true;
 	for (const auto& ship : m_players[m_currentPlayerTurn]->m_ships)
@@ -450,7 +453,7 @@ void Battle::nextTurn()
 {
 	if (m_currentBattlePhase == BattlePhase::Deployment)
 	{
-		bool playerToDeploy = false;
+		bool allPlayersDeployed = true;
 		if (m_currentDeploymentState == eDeploymentState::DeployHuman)
 		{
 			for (int i = 0; i < m_players.size(); ++i)
@@ -465,20 +468,20 @@ void Battle::nextTurn()
 				if (!m_players[i]->m_ships[0]->isDeployed())
 				{
 					m_currentPlayerTurn = i;
-					playerToDeploy = true;
+					allPlayersDeployed = false;
 					break;
 				}
 			}
 		}
 
-		if (!playerToDeploy)
+		if (allPlayersDeployed)
 		{
 			m_currentBattlePhase = BattlePhase::Movement;
 			m_currentPlayerTurn = 0;
 			GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
-			for (auto& entity : m_players[m_currentPlayerTurn]->m_ships)
+			for (auto& ship : m_players[m_currentPlayerTurn]->m_ships)
 			{
-				entity->enableAction();
+				ship->enableAction();
 			}
 
 			for (auto& player : m_players)

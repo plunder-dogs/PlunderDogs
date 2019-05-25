@@ -75,7 +75,7 @@ public:
 	int getHealth() const;
 
 	void update(float deltaTime, const Map& map);
-	void render(const Map& map);
+	void render(const Map& map) const;
 
 	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
 	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
@@ -121,18 +121,18 @@ private:
 	void handleRotation();
 };
 
-struct SpawnNode
-{
-	SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
-
-	void render(const Map& map) const;
-
-	std::pair<int, int> m_position;
-	std::unique_ptr<Sprite> m_sprite;
-};
-
 struct Player
 {
+	struct SpawnNode
+	{
+		SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
+
+		void render(const Map& map) const;
+
+		std::pair<int, int> m_position;
+		std::unique_ptr<Sprite> m_sprite;
+	};
+
 	Player(FactionName name, ePlayerType playerType);
 	
 	void render(const Map& map) const;

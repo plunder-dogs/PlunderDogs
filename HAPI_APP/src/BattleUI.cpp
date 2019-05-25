@@ -488,7 +488,6 @@ void BattleUI::onLeftClickMovementPhase()
 		if (!m_battle.isCurrentPlayerAI())
 		{
 			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
-			//TODO: Trigger movement area showing
 		}
 		return;
 	}

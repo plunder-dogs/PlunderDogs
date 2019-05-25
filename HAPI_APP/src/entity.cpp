@@ -392,6 +392,7 @@ Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, i
 	m_health(0),
 	m_damage(0),
 	m_range(0),
+	m_movementPoints(0),
 	m_weaponType(),
 	m_sprite(),
 	m_deployed(false)
@@ -538,7 +539,7 @@ void Ship::update(float deltaTime, const Map & map)
 	}
 }
 
-void Ship::render(const Map & map)
+void Ship::render(const Map & map) const
 {
 	m_movementPath.render(map);
 
@@ -670,7 +671,7 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 	}
 }
 
-SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
 	: m_position(position),
 	m_sprite()
 {
@@ -698,7 +699,7 @@ SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, cons
 	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }
 
-void SpawnNode::render(const Map & map) const
+void Player::SpawnNode::render(const Map & map) const
 {
 	auto screenPosition = map.getTileScreenPos(m_position);
 	m_sprite->GetTransformComp().SetPosition({
