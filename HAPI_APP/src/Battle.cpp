@@ -133,12 +133,6 @@ void Battle::updateWindDirection()
 
 void Battle::handleAIMovementPhaseTimer(float deltaTime)
 {
-	if (!m_AITurn)
-	{
-		m_timeUntilAITurn.reset();
-		m_timeBetweenAIUnits.reset();
-		return;
-	}
 	m_timeUntilAITurn.update(deltaTime);
 	if (m_timeUntilAITurn.isExpired())
 	{
@@ -169,12 +163,6 @@ void Battle::handleAIMovementPhaseTimer(float deltaTime)
 
 void Battle::handleAIAttackPhaseTimer(float deltaTime)
 {
-	if (!m_AITurn)
-	{
-		m_timeUntilAITurn.reset();
-		m_timeBetweenAIUnits.reset();
-		return;
-	}
 	m_timeUntilAITurn.update(deltaTime);
 	if (m_timeUntilAITurn.isExpired())
 	{
@@ -212,7 +200,6 @@ Battle::Battle(std::vector<std::unique_ptr<Player>>& players)
 	m_fireParticles(),
 	m_timeUntilAITurn(1.5f, false),
 	m_timeBetweenAIUnits(0.3f, false),
-	m_AITurn(false),
 	m_lightIntensityTimer(30.0f),
 	m_currentLightIntensity(eLightIntensity::eMaximum)
 {
@@ -340,12 +327,18 @@ void Battle::update(float deltaTime)
 		if (m_currentBattlePhase == BattlePhase::Movement)
 		{
 			updateMovementPhase(deltaTime);
-			handleAIMovementPhaseTimer(deltaTime);
+			if (m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
+			{
+				handleAIMovementPhaseTimer(deltaTime);
+			}			
 		}
 		else if (m_currentBattlePhase == BattlePhase::Attack)
 		{
 			updateAttackPhase();
-			handleAIAttackPhaseTimer(deltaTime);
+			if (m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI)
+			{
+				handleAIAttackPhaseTimer(deltaTime);
+			}
 		}
 	}
 
@@ -497,7 +490,6 @@ void Battle::nextTurn()
 			{
 				m_timeUntilAITurn.setActive(true);
 				GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
-				m_AITurn = true;
 			}
 		}
 	}
@@ -516,7 +508,6 @@ void Battle::nextTurn()
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
-			m_AITurn = true;
 		}
 	}
 	else if (m_currentBattlePhase == BattlePhase::Attack)
@@ -541,12 +532,10 @@ void Battle::nextTurn()
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
-			m_AITurn = true;
 		}
 		else if (m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eHuman)
 		{
 			GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
-			m_AITurn = false;
 		}
 	}
 }
@@ -709,7 +698,7 @@ const Player & Battle::getPlayer(FactionName factionName) const
 
 bool Battle::isAIPlaying() const
 {
-	return m_AITurn;
+	return m_players[m_currentPlayerTurn]->m_playerType == ePlayerType::eAI;
 }
 
 void Battle::onYellowShipDestroyed()
