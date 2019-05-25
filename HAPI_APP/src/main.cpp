@@ -27,19 +27,19 @@ void HAPI_Sprites_Main()
 	std::vector<std::unique_ptr<Player>> players;
 
 	std::unique_ptr<Player> player1 = std::make_unique<Player>(FactionName::eYellow, ePlayerType::eHuman);
-	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player1->m_shipToDeploy = player1->m_ships.back().get();
-	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player1->m_ships.emplace_back(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player1->m_shipToDeploy = &player1->m_ships.back();
+	player1->m_ships.emplace_back(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player1->m_ships.emplace_back(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player1->m_ships.emplace_back(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
 	players.push_back(std::move(player1));
 
 	std::unique_ptr<Player> player2 = std::make_unique<Player>(FactionName::eRed, ePlayerType::eHuman);
-	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player2->m_shipToDeploy = player2->m_ships.back().get();
-	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
-	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player2->m_ships.emplace_back(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player2->m_shipToDeploy = &player2->m_ships.back();
+	player2->m_ships.emplace_back(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player2->m_ships.emplace_back(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
+	player2->m_ships.emplace_back(FactionName::eRed, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons);
 	players.push_back(std::move(player2));
 
 	Battle battle(players);

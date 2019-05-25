@@ -5,7 +5,7 @@
 #include "GameEventMessenger.h"
 #include "Battle.h"
 
-constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
+
 constexpr size_t MOVEMENT_PATH_SIZE{ 32 };
 constexpr size_t WEAPON_HIGHLIGHT_SIZE{ 200 };
 constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
@@ -84,6 +84,12 @@ Ship::MovementPath::PathNode::PathNode()
 {
 	sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
+}
+
+Ship::MovementPath::PathNode::PathNode(PathNode & orig)
+	: activate(false)
+{
+	sprite.swap(orig.sprite);
 }
 
 //
@@ -511,6 +517,31 @@ Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, i
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 
+Ship::Ship(Ship & orig)
+	: m_factionName(orig.m_factionName),
+	m_shipType(orig.m_shipType),
+	m_currentPosition(),
+	m_pathToTile(),
+	m_movementTimer(MOVEMENT_ANIMATION_TIME),
+	m_movementPath(),
+	m_movementPathSize(0),
+	m_currentDirection(),
+	m_weaponFired(false),
+	m_isDead(false),
+	m_actionSprite(orig.m_factionName),
+	m_movingToDestination(false),
+	m_destinationSet(false),
+	m_health(0),
+	m_damage(0),
+	m_range(0),
+	m_movementPoints(0),
+	m_weaponType(),
+	m_sprite(),
+	m_deployed(false)
+{
+	m_sprite.swap(orig.m_sprite);
+}
+
 Ship::~Ship()
 {
 	GameEventMessenger::getInstance().unsubscribe("Ship", GameEvent::eNewTurn);
@@ -579,32 +610,7 @@ Player::Player(FactionName name, ePlayerType playerType)
 	m_shipToDeploy(nullptr),
 	m_spawnArea()
 {
-	//for (int i = 0; i < m_spawnArea.size(); ++i)
-	//{
-	//	std::unique_ptr<Sprite> sprite;
-	//	switch (playerToDeploy.m_factionName)
-	//	{
-	//	case eYellow:
-	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
-	//		break;
-	//	case eBlue:
-	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
-	//		break;
-	//	case eGreen:
-	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
-	//		break;
-	//	case eRed:
-	//		sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
-	//		break;
-	//	};
-	//	auto screenPosition = map.getTileScreenPos(m_spawnArea[i]->m_tileCoordinate);
-	//	sprite->GetTransformComp().SetPosition({
-	//		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
-	//		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
-	//	sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	//	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
-	//	m_spawnSprites.push_back(std::move(sprite));
-	//}
+	m_ships.reserve(size_t(6));
 }
 
 void Player::render(const Map & map) const
@@ -616,9 +622,9 @@ void Player::render(const Map & map) const
 
 	for (const auto& ship : m_ships)
 	{
-		if (ship->isDeployed())
+		if (ship.isDeployed())
 		{
-			ship->render(map);
+			ship.render(map);
 		}
 	}
 
@@ -657,6 +663,12 @@ Ship::ActionSprite::ActionSprite(FactionName factionName)
 
 	sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
+}
+
+Ship::ActionSprite::ActionSprite(ActionSprite & orig)
+	: active(false)
+{
+	sprite.swap(orig.sprite);
 }
 
 void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntityPosition) const

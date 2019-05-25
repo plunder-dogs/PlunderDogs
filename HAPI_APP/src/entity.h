@@ -6,6 +6,8 @@
 #include "Timer.h"
 #include "Global.h"
 
+constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
+
 enum class ShipType
 {
 	eFrigate,
@@ -23,6 +25,7 @@ class Ship
 	struct ActionSprite
 	{
 		ActionSprite(FactionName factionName);
+		ActionSprite(ActionSprite& orig);
 
 		void render(const Map& map, std::pair<int, int> currentEntityPosition) const;
 
@@ -35,6 +38,7 @@ class Ship
 		struct PathNode
 		{
 			PathNode();
+			PathNode(PathNode& orig);
 
 			std::unique_ptr<Sprite> sprite;
 			bool activate;
@@ -58,6 +62,7 @@ class Ship
 
 public:
 	Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType);
+	Ship(Ship& orig);
 	~Ship();
 
 	FactionName getFactionName() const;
@@ -138,7 +143,7 @@ struct Player
 	void render(const Map& map) const;
 	void createSpawnArea(Map& map);
 
-	std::vector<std::unique_ptr<Ship>> m_ships;
+	std::vector<Ship> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
 	bool m_eliminated;
