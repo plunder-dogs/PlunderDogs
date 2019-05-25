@@ -41,7 +41,7 @@ void HAPI_Sprites_Main()
 	players.push_back(std::move(player2));
 	Battle battle(players);
 
-	battle.start("Level1");
+	battle.start("Level1.tmx");
 
 	while (HAPI_Sprites.Update())
 	{
