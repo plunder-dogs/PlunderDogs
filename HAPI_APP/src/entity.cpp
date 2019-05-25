@@ -42,7 +42,6 @@ bool Ship::isDead() const
 	return m_isDead;
 }
 
-
 bool Ship::isMovingToDestination() const
 {
 	return m_movingToDestination;
@@ -541,6 +540,8 @@ void Ship::update(float deltaTime, const Map & map)
 
 void Ship::render(const Map & map)
 {
+	m_movementPath.render(map);
+
 	//Set sprite position to current position
 	const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
@@ -554,11 +555,6 @@ void Ship::render(const Map & map)
 	m_actionSprite.render(map, m_currentPosition);
 }
 
-void Ship::renderPath(const Map & map)
-{
-	m_movementPath.render(map);
-}
-
 void Ship::setDeploymentPosition(std::pair<int, int> position, const Battle & battle)
 {
 	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
@@ -570,7 +566,7 @@ void Ship::deployAtPosition(std::pair<int, int> position, Battle & battle, eDire
 	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
 	m_currentPosition = position;
 	m_deployed = true;
-	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(eDirection::eNorth * 60 % 360));
+	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
 }
 
 //BATTLE PLAYER
@@ -582,8 +578,6 @@ Player::Player(FactionName name, ePlayerType playerType)
 	m_shipToDeploy(nullptr),
 	m_spawnArea()
 {
-
-
 	//for (int i = 0; i < m_spawnArea.size(); ++i)
 	//{
 	//	std::unique_ptr<Sprite> sprite;
@@ -612,10 +606,27 @@ Player::Player(FactionName name, ePlayerType playerType)
 	//}
 }
 
+void Player::render(const Map & map) const
+{
+	for (const auto& spawnArea : m_spawnArea)
+	{
+		spawnArea.render(map);
+	}
+
+	for (const auto& ship : m_ships)
+	{
+		if (ship->isDeployed())
+		{
+			ship->render(map);
+		}
+	}
+
+	m_shipToDeploy->render(map);
+}
+
 void Player::createSpawnArea(Map & map)
 {
-	//Might change this - for now its two containers but looks confusing
-	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 6, true, true);
+	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 3, true, true);
 	m_spawnArea.reserve(tileRadius.size());
 	for (const auto& tile : tileRadius)
 	{
@@ -660,6 +671,8 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 }
 
 SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+	: m_position(position),
+	m_sprite()
 {
 	switch (factionName)
 	{
@@ -689,7 +702,7 @@ void SpawnNode::render(const Map & map) const
 {
 	auto screenPosition = map.getTileScreenPos(m_position);
 	m_sprite->GetTransformComp().SetPosition({
-	(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale() ,
+	(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
 	(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
 	m_sprite->Render(SCREEN_SURFACE);
 }

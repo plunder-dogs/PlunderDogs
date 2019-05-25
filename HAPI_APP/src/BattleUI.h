@@ -73,9 +73,9 @@ class BattleUI : public IHapiSpritesInputListener
 		std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
 	};
 */
-	struct CurrentSelectedTile
+	struct SelectedTile
 	{
-		CurrentSelectedTile();
+		SelectedTile();
 
 		void render(const Map& map) const;
 
@@ -86,6 +86,10 @@ class BattleUI : public IHapiSpritesInputListener
 
 public:
 	BattleUI(Battle& battles);
+	BattleUI(const BattleUI&) = delete;
+	BattleUI& operator=(const BattleUI&) = delete;
+	BattleUI(BattleUI&&) = delete;
+	BattleUI&& operator=(BattleUI&&) = delete;
 	~BattleUI();
 
 	std::pair<int, int> getCameraPositionOffset() const;
@@ -109,7 +113,7 @@ public:
 
 private:
 	Battle& m_battle;
-	CurrentSelectedTile m_selectedTile;
+	SelectedTile m_selectedTile;
 	//This stores the position at which the mouse event "eLeftMouseButtonDown" last occured while giving an entity a move command, 
 	//it's used to calculate what direction the mouse moved during that input.
 	std::pair<int, int> m_leftMouseDownPosition;

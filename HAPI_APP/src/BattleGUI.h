@@ -9,7 +9,6 @@
 using namespace HAPI_UI_SPACE;
 using namespace HAPISPACE;
 
-
 enum BattleWindow
 {
 	eCombat = 0,

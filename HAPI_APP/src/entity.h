@@ -76,7 +76,6 @@ public:
 
 	void update(float deltaTime, const Map& map);
 	void render(const Map& map);
-	void renderPath(const Map & map);
 
 	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
 	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
@@ -136,6 +135,7 @@ struct Player
 {
 	Player(FactionName name, ePlayerType playerType);
 	
+	void render(const Map& map) const;
 	void createSpawnArea(Map& map);
 
 	std::vector<std::unique_ptr<Ship>> m_ships;
@@ -144,8 +144,4 @@ struct Player
 	bool m_eliminated;
 	Ship* m_shipToDeploy;
 	std::vector<SpawnNode> m_spawnArea;
-
-	/*
-	std::vector<const Tile*> m_spawnArea;
-	std::vector<std::unique_ptr<Sprite>> m_spawnSprites;*/
 };

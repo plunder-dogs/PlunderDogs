@@ -413,7 +413,6 @@ void BattleUI::onMouseMoveDeploymentPhase()
 			m_invalidPosition.setPosition(tileOnMouse->m_tileCoordinate, map);
 			m_invalidPosition.m_activate = true;
 		}
-
 	}
 }
 
@@ -423,8 +422,8 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 	{
 		if (!m_invalidPosition.m_activate && !m_selectedTile.m_tile->m_shipOnTile)
 		{
-			m_battle.deployShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
 			m_invalidPosition.m_position = m_selectedTile.m_tile->m_tileCoordinate;
+			m_battle.deployShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
 		}
 	}
 }
@@ -566,8 +565,8 @@ void BattleUI::onLeftClickMovementPhase()
 			auto test = m_selectedTile.m_tile->m_shipOnTile->getEndOfPath();
 			if (m_selectedTile.m_tile->m_shipOnTile->getEndOfPath() == tileOnMouse->m_tileCoordinate)
 				m_arrowActive = true;
-			//m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_entityOnTile, *tileOnMouse);
-			//m_selectedTile.m_tile = nullptr;
+			m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_shipOnTile, *tileOnMouse);
+			m_selectedTile.m_tile = nullptr;
 		}
 	}
 	else
@@ -1037,7 +1036,7 @@ BattleUI::TargetArea::HighlightNode::HighlightNode()
 //}
 
 //Current Selected Tile
-BattleUI::CurrentSelectedTile::CurrentSelectedTile()
+BattleUI::SelectedTile::SelectedTile()
 	: m_sprite(std::make_unique<Sprite>(Textures::m_selectedHex)),
 	m_tile(nullptr),
 	m_position()
@@ -1046,7 +1045,7 @@ BattleUI::CurrentSelectedTile::CurrentSelectedTile()
 	m_sprite->GetTransformComp().SetScaling({ 1.9f, 1.9f });
 }
 
-void BattleUI::CurrentSelectedTile::render(const Map & map) const
+void BattleUI::SelectedTile::render(const Map & map) const
 {
 	if (m_tile && (m_tile->m_type == eTileType::eSea || m_tile->m_type == eTileType::eOcean))
 	{

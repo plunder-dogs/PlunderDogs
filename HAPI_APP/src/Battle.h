@@ -105,7 +105,6 @@ private:
 	bool m_AITurn;
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
-
 	
 	Player& getPlayer(FactionName factionName);
 	std::unique_ptr<Player>& getCurrentPlayer();
@@ -118,7 +117,6 @@ private:
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
-	//void resetAITimers();
 
 	void onResetBattle();
 	void onYellowShipDestroyed();
