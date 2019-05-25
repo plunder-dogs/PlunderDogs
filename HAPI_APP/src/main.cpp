@@ -22,12 +22,26 @@ void HAPI_Sprites_Main()
 
 	HAPI_Sprites.SetShowFPS(true);
 	HAPI_Sprites.LimitFrameRate(150);
-
 	int lastFrameStart = HAPI_Sprites.GetTime();
-	Player player1(FactionName::eYellow, ePlayerType::eAI);
-	player1.m_ships.emplace_back()
+	
+	std::vector<std::unique_ptr<Player>> players;
 
+	std::unique_ptr<Player> player1 = std::make_unique<Player>(FactionName::eYellow, ePlayerType::eHuman);
+	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player1->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	players.push_back(std::move(player1));
 
+	std::unique_ptr<Player> player2 = std::make_unique<Player>(FactionName::eRed, ePlayerType::eHuman);
+	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	player2->m_ships.emplace_back(std::make_unique<Ship>(FactionName::eYellow, ShipType::eFrigate, 5, 5, 5, eWeaponType::eSideCannons));
+	players.push_back(std::move(player2));
+	Battle battle(players);
+
+	battle.start("Level1");
 
 	while (HAPI_Sprites.Update())
 	{

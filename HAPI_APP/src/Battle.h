@@ -60,7 +60,7 @@ class Battle
 	};
 
 public:
-	Battle();
+	Battle(std::vector<std::unique_ptr<Player>>& players);
 	Battle(const Battle&) = delete;
 	Battle& operator=(const Battle&) = delete;
 	Battle(Battle&&) = delete;
@@ -74,10 +74,9 @@ public:
 	const Player& getPlayer(FactionName name) const;
 	bool isAIPlaying() const;
 
-	void start(const std::string& newMapName, std::vector<std::unique_ptr<Player>>& newPlayers);
+	void start(const std::string& newMapName);
 	void render() const;
 	void update(float deltaTime);
-	void insertEntity(std::pair<int, int> startingPosition, eDirection startingDirection, const ShipGlobalProperties& entityProperties, FactionName factionName);
 	void nextTurn();
 
 	//Deploy Phase
@@ -92,7 +91,7 @@ public:
 	void playExplosionAnimation(Ship& entity);
 
 private:
-	std::vector<std::unique_ptr<Player>> m_players;
+	std::vector<std::unique_ptr<Player>>& m_players;
 	int m_currentPlayerTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
@@ -103,19 +102,17 @@ private:
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
 	Timer m_timeBetweenAIUnits;
-	
 	bool m_AITurn;
-	//Light Intensity
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
-	void updateLightIntensity(float deltaTime);
 
-	void updateMovementPhase(float deltaTime);
-	void updateAttackPhase();
-
+	
 	Player& getPlayer(FactionName factionName);
 	std::unique_ptr<Player>& getCurrentPlayer();
 
+	void updateLightIntensity(float deltaTime);
+	void updateMovementPhase(float deltaTime);
+	void updateAttackPhase();
 	void incrementPlayerTurn();
 	void updateWindDirection();
 

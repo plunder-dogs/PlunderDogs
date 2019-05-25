@@ -174,10 +174,7 @@ void BattleUI::FactionUpdateGUI(FactionName faction)
 void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mouseData)
 {
 	m_lastMouseData = { mouseData.x , mouseData.y };
-	if (OverWorldGUI::CURRENT_WINDOW != OverWorldWindow::eBattle)
-	{
-		return;
-	}
+
 	if (mouseEvent == EMouseEvent::eLeftButtonDown)
 	{
 		m_gui.OnMouseLeftClick(mouseData, m_battle.getCurrentPhase());
@@ -310,10 +307,7 @@ void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mous
 void BattleUI::OnMouseMove(const HAPI_TMouseData & mouseData)
 {
 	m_lastMouseData = { mouseData.x , mouseData.y };
-	if (OverWorldGUI::CURRENT_WINDOW != OverWorldWindow::eBattle)
-	{
-		return;
-	}
+
 
 	m_gui.OnMouseMove(mouseData, m_battle.getCurrentPhase());
 

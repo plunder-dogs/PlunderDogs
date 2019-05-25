@@ -507,7 +507,7 @@ Ship::Ship(FactionName factionName, ShipType shipType, int health, int damage, i
 	m_sprite->SetFrameNumber(eShipSpriteFrame::eMaxHealth);
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	m_sprite->GetTransformComp().SetScaling({ 1, 1 }); // Might not need
-	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(eDirection::eNorth * 60 % 360));
+	
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 
@@ -570,27 +570,19 @@ void Ship::deployAtPosition(std::pair<int, int> position, Battle & battle, eDire
 	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
 	m_currentPosition = position;
 	m_deployed = true;
-
-
+	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(eDirection::eNorth * 60 % 360));
 }
 
 //BATTLE PLAYER
-Player::Player(FactionName name, ePlayerType playerType, const Map& map)
+Player::Player(FactionName name, ePlayerType playerType)
 	: m_ships(),
 	m_factionName(name),
 	m_playerType(playerType),
-	m_spawnPosition(),
-	m_eliminated(false)
+	m_eliminated(false),
+	m_shipToDeploy(nullptr),
+	m_spawnArea()
 {
-	//Might change this - for now its two containers but looks confusing
-	std::vector<const Tile*> tileRadius = map.cGetTileRadius(m_spawnPosition, 6, true, true);
-	m_spawnArea.reserve(tileRadius.size());
-	for (const auto& tile : tileRadius)
-	{
-		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate, map);
-	}
 
-	GameEventMessenger::getInstance().subscribe()
 
 	//for (int i = 0; i < m_spawnArea.size(); ++i)
 	//{
@@ -618,6 +610,17 @@ Player::Player(FactionName name, ePlayerType playerType, const Map& map)
 	//	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 	//	m_spawnSprites.push_back(std::move(sprite));
 	//}
+}
+
+void Player::createSpawnArea(Map & map)
+{
+	//Might change this - for now its two containers but looks confusing
+	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 6, true, true);
+	m_spawnArea.reserve(tileRadius.size());
+	for (const auto& tile : tileRadius)
+	{
+		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate, map);
+	}
 }
 
 Ship::ActionSprite::ActionSprite(FactionName factionName)
@@ -656,7 +659,7 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 	}
 }
 
-Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
 {
 	switch (factionName)
 	{
@@ -682,7 +685,7 @@ Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> positi
 	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }
 
-void Player::SpawnNode::render(const Map & map) const
+void SpawnNode::render(const Map & map) const
 {
 	auto screenPosition = map.getTileScreenPos(m_position);
 	m_sprite->GetTransformComp().SetPosition({

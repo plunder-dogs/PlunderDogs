@@ -77,19 +77,19 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Pla
 	//}
 }
 
-void AI::handleDeploymentPhase(Battle& battle, Map& map, Player& bPlayer, const Player& player)
-{
-	std::vector<Tile*> spawnArea{ map.getTileRadius(bPlayer.m_spawnPosition,3,true,true) };
-	assert(spawnArea.size() > 6);
-	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));
-	int spawnPoint{ location };
-	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
-	for (int i = 0; i < player.m_ships.size(); i++)
-	{
-		//battle.insertEntity(spawnArea[spawnPoint]->m_tileCoordinate, randomDir, *player.m_s[i], player.m_factionName);
-		spawnPoint++;
-	}
-}
+//void AI::handleDeploymentPhase(Battle& battle, Map& map, Player& bPlayer, const Player& player)
+//{
+//	std::vector<Tile*> spawnArea{ map.getTileRadius(bPlayer,3,true,true) };
+//	assert(spawnArea.size() > 6);
+//	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));
+//	int spawnPoint{ location };
+//	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
+//	for (int i = 0; i < player.m_ships.size(); i++)
+//	{
+//		//battle.insertEntity(spawnArea[spawnPoint]->m_tileCoordinate, randomDir, *player.m_s[i], player.m_factionName);
+//		spawnPoint++;
+//	}
+//}
 
 //void AI::handleShipSelection(std::vector<ShipGlobalProperties>& shipPool, std::vector<ShipGlobalProperties*>& selectedShips)
 //{

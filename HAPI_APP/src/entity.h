@@ -18,7 +18,7 @@ struct Tile;
 struct Weapons;
 class Map;
 class Battle;
-struct Ship
+class Ship
 {
 	struct ActionSprite
 	{
@@ -122,27 +122,26 @@ private:
 	void handleRotation();
 };
 
+struct SpawnNode
+{
+	SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
+
+	void render(const Map& map) const;
+
+	std::pair<int, int> m_position;
+	std::unique_ptr<Sprite> m_sprite;
+};
+
 struct Player
 {
-	struct SpawnNode
-	{
-		SpawnNode(FactionName factionName, std::pair<int, int> position, const Map& map);
-
-		void render(const Map& map) const;
-
-		std::pair<int, int> m_position;
-		std::unique_ptr<Sprite> m_sprite;
-	};
-
-	Player(FactionName name, ePlayerType playerType, const Map& map);
+	Player(FactionName name, ePlayerType playerType);
 	
+	void createSpawnArea(Map& map);
 
 	std::vector<std::unique_ptr<Ship>> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
-	std::pair<int, int> m_spawnPosition;
 	bool m_eliminated;
-
 	Ship* m_shipToDeploy;
 	std::vector<SpawnNode> m_spawnArea;
 
