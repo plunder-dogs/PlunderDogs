@@ -540,16 +540,17 @@ void Battle::nextTurn()
 	}
 }
 
-std::vector<FactionName> Battle::getAllFactions() const
+std::vector<FactionName> Battle::getAllFactionsInPlay() const
 {
-	std::vector<FactionName> lol;
-	for (auto& player : m_players)
+	std::vector<FactionName> allFactionsInPlay;
+	allFactionsInPlay.reserve(m_players.size());
+	for (const auto& player : m_players)
 	{
-		lol.emplace_back(player->m_factionName);
+		allFactionsInPlay.push_back(player->m_factionName);
 	}
 
-	assert(!lol.empty());
-	return lol;
+	assert(!allFactionsInPlay.empty());
+	return allFactionsInPlay;
 }
 
 void Battle::playFireAnimation(Ship& entity, std::pair<int, int> position)

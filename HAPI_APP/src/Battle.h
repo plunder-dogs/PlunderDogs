@@ -70,7 +70,7 @@ public:
 	const Map& getMap() const;
 	BattlePhase getCurrentPhase() const;
 	FactionName getCurrentFaction() const;
-	std::vector<FactionName> getAllFactions() const;
+	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Player& getPlayer(FactionName name) const;
 	bool isCurrentPlayerAI() const;
 

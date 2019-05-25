@@ -187,7 +187,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 	const Tile* closestEnemy{ nullptr };
 	int closestDistance{ INT_MAX };
 	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShipPosition) };
-	auto activeFactions = battle.getAllFactions();
+	auto activeFactions = battle.getAllFactionsInPlay();
 	for (FactionName i : activeFactions)
 	{
 		if (i == static_cast<int>(ourFaction))
