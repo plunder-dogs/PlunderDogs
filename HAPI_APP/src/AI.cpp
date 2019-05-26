@@ -359,7 +359,7 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	//If a tile is found
 	if (bestTile != posi(-1, -1, eNorth))
 	{
-		currentShip.generateMovementGraph(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
+		currentShip.generateMovementPath(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
 		currentShip.moveEntity(map, *map.getTile(bestTile.pair()), targetTile.second);
 	}
 	currentShip.setDestination();

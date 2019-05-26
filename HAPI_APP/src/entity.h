@@ -5,6 +5,7 @@
 #include <memory>
 #include "Timer.h"
 #include "Global.h"
+#include "SpriteToggleVisibility.h"
 
 //TODO: temp
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
@@ -15,29 +16,8 @@ class Map;
 class Battle;
 class Ship
 {
-	struct ActionSprite
-	{
-		ActionSprite(FactionName factionName);
-		ActionSprite(ActionSprite& orig);
-
-		void render(const Map& map, std::pair<int, int> currentEntityPosition) const;
-
-		std::unique_ptr<Sprite> sprite;
-		bool active;
-	};
-
 	class MovementPath
 	{
-		struct PathNode
-		{
-			PathNode();
-			PathNode(PathNode& orig);
-
-			std::unique_ptr<Sprite> sprite;
-			bool activate;
-			std::pair<int, int> m_position;
-		};
-
 	public:
 		MovementPath();
 
@@ -49,14 +29,13 @@ class Ship
 
 		std::pair<int, int> getFinalNode() const;
 	private:
-		std::vector<PathNode> m_movementPath;
+		
 		unsigned int getDirectionCost(int currentDirection, int newDirection);
 	};
 
 public:
 	Ship(FactionName playerName, eShipType shipType);
 	Ship(Ship& orig);
-	~Ship();
 
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
@@ -79,7 +58,7 @@ public:
 	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
 
 	std::vector<posi> generateMovementArea(const Map& map, float movement) const;
-	int generateMovementGraph(const Map& map, const Tile& source, const Tile& destination);
+	int generateMovementPath(const Map& map, const Tile& source, const Tile& destination);
 	void clearMovementPath();
 	std::pair<int, int> getEndOfPath();
 
@@ -96,15 +75,16 @@ public:
 private:
 	const FactionName m_factionName;
 	const eShipType m_shipType;
+
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
-	MovementPath m_movementPath;
+	//MovementPath m_movementPath;
 	int m_movementPathSize;
 	eDirection m_currentDirection;
 	bool m_weaponFired;
 	bool m_isDead;
-	ActionSprite m_actionSprite;
+	SpriteToggleVisibility m_actionSprite;
 	bool m_movingToDestination;
 	bool m_destinationSet;
 	int m_maxHealth;
@@ -114,6 +94,16 @@ private:
 	int m_movementPoints;
 	std::unique_ptr<Sprite> m_sprite;
 	bool m_deployed;
+	std::vector<SpriteToggleVisibility> m_movementPath;
+
+	void render(const Map& map) const;
+	void eraseMovementPathNode(std::pair<int, int> position, const Map& map); 
+	void setMovementPathNodePosition(int i, std::pair<int, int> newPosition) { m_movementPath[i].m_position = newPosition; }
+	std::pair<int, int> getMovementPathEndPosition() const;
+
+private:
+
+	unsigned int getDirectionCost(int currentDirection, int newDirection);
 
 	void handleRotation();
 };
@@ -134,6 +124,7 @@ struct Player
 	
 	void render(const Map& map) const;
 	void createSpawnArea(Map& map);
+	void onNewTurn();
 
 	std::vector<Ship> m_ships;
 	const FactionName m_factionName;

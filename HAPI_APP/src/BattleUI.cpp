@@ -476,7 +476,7 @@ void BattleUI::onMouseMoveMovementPhase()
 			}
 			else
 			{
-				m_selectedTile.m_tile->m_shipOnTile->generateMovementGraph(m_battle.getMap(), *m_selectedTile.m_tile, *tile);
+				m_selectedTile.m_tile->m_shipOnTile->generateMovementPath(m_battle.getMap(), *m_selectedTile.m_tile, *tile);
 				m_invalidPosition.m_activate = false;
 			}
 		}

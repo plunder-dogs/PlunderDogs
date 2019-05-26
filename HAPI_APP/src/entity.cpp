@@ -77,21 +77,6 @@ int Ship::getHealth() const
 	return m_health;
 }
 
-//MOVEMENT PATH NODE
-Ship::MovementPath::PathNode::PathNode()
-	: sprite(std::make_unique<Sprite>(Textures::m_spawnHex)),
-	activate(false)
-{
-	sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
-}
-
-Ship::MovementPath::PathNode::PathNode(PathNode & orig)
-	: activate(false)
-{
-	sprite.swap(orig.sprite);
-}
-
 //
 //MOVEMENT PATH
 //
@@ -101,7 +86,7 @@ Ship::MovementPath::MovementPath()
 	m_movementPath.reserve(size_t(MOVEMENT_PATH_SIZE));
 	for (int i = 0; i < MOVEMENT_PATH_SIZE; ++i)
 	{
-		m_movementPath.push_back({});
+		m_movementPath.emplace_back(Textures::m_NodHex, 0.5f, 0.5f);
 	}
 }
 
@@ -109,17 +94,17 @@ void Ship::MovementPath::render(const Map& map) const
 {
 	for (const auto& i : m_movementPath)
 	{
-		if (i.activate)
+		if (i.m_active)
 		{
 			const std::pair<int, int> tileTransform = map.getTileScreenPos(i.m_position);
 			float scale = map.getDrawScale();
 
-			i.sprite->GetTransformComp().SetPosition({
+			i.m_sprite->GetTransformComp().SetPosition({
 				static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
 				static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
-			i.sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
+			i.m_sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
 
-			i.sprite->Render(SCREEN_SURFACE);
+			i.m_sprite->Render(SCREEN_SURFACE);
 		}	
 	}
 }
@@ -165,10 +150,10 @@ int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const T
 		//if ((static_cast<float>(source.m_entityOnTile->m_entityProperties.m_movementPoints) - movementPointsUsed) >= 0)
 		{
 			auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
-			m_movementPath[i].sprite->GetTransformComp().SetPosition({
+			m_movementPath[i].m_sprite->GetTransformComp().SetPosition({
 				static_cast<float>(tileScreenPosition.first + DRAW_OFFSET_X * map.getDrawScale()),
 				static_cast<float>(tileScreenPosition.second + DRAW_OFFSET_Y * map.getDrawScale()) });
-			m_movementPath[i].activate = true;
+			m_movementPath[i].m_active = true;
 			m_movementPath[i].m_position = pathToTile.front().pair();
 		}
 		//else
@@ -186,10 +171,10 @@ void Ship::MovementPath::eraseNode(std::pair<int, int> position, const Map& map)
 {
 	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
 	{
-		auto i = map.getMouseClickCoord({ iter->sprite->GetTransformComp().GetPosition().x, iter->sprite->GetTransformComp().GetPosition().y });
+		auto i = map.getMouseClickCoord({ iter->m_sprite->GetTransformComp().GetPosition().x, iter->m_sprite->GetTransformComp().GetPosition().y });
 		if (i == position)
 		{
-			iter->activate = false;
+			iter->m_active = false;
 		}
 	}
 }
@@ -198,7 +183,7 @@ void Ship::MovementPath::clearPath()
 {
 	for (auto& i : m_movementPath)
 	{
-		i.activate = false;
+		i.m_active = false;
 	}
 }
 
@@ -207,7 +192,7 @@ std::pair<int, int> Ship::MovementPath::getFinalNode() const
 	int i = m_movementPath.size() - 1;
 	for (i; i > 0; i--)
 	{
-		if (m_movementPath[i].activate)
+		if (m_movementPath[i].m_active)
 			break;
 	}
 	return m_movementPath[i].m_position;
@@ -219,7 +204,7 @@ std::vector<posi> Ship::generateMovementArea(const Map& map, float movement) con
 	return BFS::findArea(map, position, movement);
 }
 
-int Ship::generateMovementGraph(const Map & map, const Tile & source, const Tile & destination)
+int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile & destination)
 {
 	return m_movementPath.generatePath(map, source, destination);
 }
@@ -238,13 +223,13 @@ void Ship::enableAction()
 {
 	if (!m_isDead)
 	{
-		m_actionSprite.active = true;
+		m_actionSprite.m_active = true;
 	}
 }
 
 void Ship::disableAction()
 {
-	m_actionSprite.active = false;
+	m_actionSprite.m_active = false;
 }
 
 bool Ship::moveEntity(Map& map, const Tile& tile)
@@ -261,7 +246,7 @@ bool Ship::moveEntity(Map& map, const Tile& tile)
 			map.updateTileNewShipPosition(m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
-			m_actionSprite.active = false;
+			m_actionSprite.m_active = false;
 			return true;
 		}
 		else
@@ -289,7 +274,7 @@ bool Ship::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
 			map.updateTileNewShipPosition(m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
-			m_actionSprite.active = false;
+			m_actionSprite.m_active = false;
 			return true;
 		}
 		else
@@ -323,7 +308,7 @@ void Ship::takeDamage(int damageAmount, FactionName entityFaction)
 		m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
 		m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 		m_isDead = true;
-		m_actionSprite.active = false;
+		m_actionSprite.m_active = false;
 		m_movementPath.clearPath();
 		switch (entityFaction)
 		{
@@ -346,7 +331,7 @@ void Ship::takeDamage(int damageAmount, FactionName entityFaction)
 void Ship::fireWeapon()
 {
 	m_weaponFired = true;
-	m_actionSprite.active = false;
+	m_actionSprite.m_active = false;
 }
 
 void Ship::setDestination()
@@ -392,7 +377,7 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 	m_currentDirection(),
 	m_weaponFired(false),
 	m_isDead(false),
-	m_actionSprite(factionName),
+	m_actionSprite(factionName, 2.f, 2.f),
 	m_movingToDestination(false),
 	m_destinationSet(false),
 	m_health(0),
@@ -508,8 +493,6 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 	m_sprite->SetFrameNumber(eShipSpriteFrame::eMaxHealth);
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	m_sprite->GetTransformComp().SetScaling({ 1, 1 }); // Might not need
-	
-	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewTurn, this), "Ship", GameEvent::eNewTurn);
 }
 
 Ship::Ship(Ship & orig)
@@ -523,7 +506,7 @@ Ship::Ship(Ship & orig)
 	m_currentDirection(orig.m_currentDirection),
 	m_weaponFired(false),
 	m_isDead(false),
-	m_actionSprite(orig.m_factionName),
+	m_actionSprite(orig.m_actionSprite),
 	m_movingToDestination(false),
 	m_destinationSet(false),
 	m_health(orig.m_health),
@@ -536,10 +519,6 @@ Ship::Ship(Ship & orig)
 	m_sprite.swap(orig.m_sprite);
 }
 
-Ship::~Ship()
-{
-	GameEventMessenger::getInstance().unsubscribe("Ship", GameEvent::eNewTurn);
-}
 
 void Ship::update(float deltaTime, const Map & map)
 {	
@@ -639,45 +618,11 @@ void Player::createSpawnArea(Map & map)
 	}
 }
 
-Ship::ActionSprite::ActionSprite(FactionName factionName)
-	: sprite(),
-	active(false)
+void Player::onNewTurn()
 {
-	switch (factionName)
+	for (auto& ship : m_ships)
 	{
-	case FactionName::eYellow :
-		sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
-		break;
-	case FactionName::eBlue :
-		sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
-		break;
-	case FactionName::eGreen :
-		sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
-		break;
-	case FactionName::eRed :
-		sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
-		break;
-	}
-
-	sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
-}
-
-Ship::ActionSprite::ActionSprite(ActionSprite & orig)
-	: active(false)
-{
-	sprite.swap(orig.sprite);
-}
-
-void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntityPosition) const
-{
-	if (active)
-	{
-		auto screenPosition = map.getTileScreenPos(currentEntityPosition);
-		sprite->GetTransformComp().SetPosition({
-		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale() ,
-		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
-		sprite->Render(SCREEN_SURFACE);
+		ship.onNewTurn();
 	}
 }
 
@@ -701,10 +646,6 @@ SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, cons
 		break;
 	};
 	
-	auto screenPosition = map.getTileScreenPos(position);
-	m_sprite->GetTransformComp().SetPosition({
-		(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
-		(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }

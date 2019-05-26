@@ -552,6 +552,14 @@ void Battle::nextTurn()
 	}
 }
 
+void Battle::notifyPlayersOnNewTurn()
+{
+	for (auto& player : m_players)
+	{
+		player->onNewTurn();
+	}
+}
+
 std::vector<FactionName> Battle::getAllFactionsInPlay() const
 {
 	std::vector<FactionName> allFactionsInPlay;

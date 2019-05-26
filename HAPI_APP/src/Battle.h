@@ -103,11 +103,33 @@ private:
 	Timer m_timeBetweenAIUnits;
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
-	
+
+
 	Player& getPlayer(FactionName factionName);
 	std::unique_ptr<Player>& getCurrentPlayer();
 
+	struct TargetArea
+	{
+		struct HighlightNode
+		{
+			HighlightNode();
+			std::unique_ptr<Sprite> sprite;
+			bool activate;
+			std::pair<int, int> position;
+		};
+
+		TargetArea();
+		void render(const Map& map) const;
+		void generateTargetArea(const Map& map, const Tile& source, BattlePhase phase = BattlePhase::Attack);
+		void clearTargetArea();
+		void onReset();
+
+		std::vector<HighlightNode> m_targetAreaSprites;
+		std::vector<const Tile*> m_targetArea;
+	};
+
 	void nextTurn();
+	void notifyPlayersOnNewTurn();
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
