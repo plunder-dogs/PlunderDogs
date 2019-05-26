@@ -18,7 +18,7 @@ constexpr float DRAW_OFFSET_Y{ 28 };
 ** Detail: surface width does not divide equally by numFrames
 ****
 */
-struct Ship;
+class Ship;
 struct Tile
 {
 	const enum eTileType m_type;
@@ -102,7 +102,7 @@ public:
 	std::vector<Tile*> getTileRing(std::pair<int, int> coord, int range);
 	std::vector<const Tile*> cGetTileRing(std::pair<int, int> coord, int range)const;
 
-	std::pair<int, int> getSpawnPosition();
+	std::pair<int, int> getRandomSpawnPosition();
 	//For finding the location on the screen a given tile is being drawn
 	std::pair<int, int> getTileScreenPos(std::pair<int, int> coord) const;
 

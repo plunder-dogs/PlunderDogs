@@ -749,7 +749,7 @@ std::vector<const Tile*> Map::cGetTileRing(std::pair<int, int> coord, int range)
 	return tileStore;
 }
 
-std::pair<int, int> Map::getSpawnPosition()
+std::pair<int, int> Map::getRandomSpawnPosition()
 {
 	//Make sure all spawn positions aren't in use
 	assert(std::find_if(m_spawnPositions.cbegin(), m_spawnPositions.cend(),

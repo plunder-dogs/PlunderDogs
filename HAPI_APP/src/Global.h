@@ -101,12 +101,12 @@ enum eShipSpriteFrame
 	eDead
 };
 
-enum eWeaponType
+enum class eShipType
 {
-	eSideCannons = 0,
-	eStraightShot,
-	eShotgun, 
-	eFlamethrower
+	eFrigate,
+	eTurtle,
+	eFire,
+	eSniper
 };
 
 enum eLightIntensity

@@ -1,5 +1,6 @@
 #include "Textures.h"
 #include "Battle.h"
+#include "AI.h"
 
 using namespace HAPISPACE;
 
@@ -22,18 +23,33 @@ void HAPI_Sprites_Main()
 
 	HAPI_Sprites.SetShowFPS(true);
 	HAPI_Sprites.LimitFrameRate(150);
-
 	int lastFrameStart = HAPI_Sprites.GetTime();
-	Player player1(FactionName::eYellow, ePlayerType::eAI);
-	player1.m_ships.emplace_back()
+	
+	std::vector<std::unique_ptr<Player>> players;
 
+	std::unique_ptr<Player> player1 = std::make_unique<Player>(FactionName::eYellow, ePlayerType::eHuman);
+	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
+	player1->m_shipToDeploy = &player1->m_ships.back();
+	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
+	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
+	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
+	players.push_back(std::move(player1));
 
+	players.emplace_back(std::make_unique<Player>(FactionName::eRed, ePlayerType::eAI));
+	AI::loadInPlayerShips(*players.back().get());
+
+	Battle battle(players);
+
+	battle.start("Level1.tmx");
 
 	while (HAPI_Sprites.Update())
 	{
 		int frameStart = HAPI_Sprites.GetTime();
 
 		SCREEN_SURFACE->Clear();
+
+		battle.update(getDeltaTime(frameStart, lastFrameStart));
+		battle.render();
 		
 		lastFrameStart = frameStart;
 	}
