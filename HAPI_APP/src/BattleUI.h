@@ -11,6 +11,7 @@ class Battle;
 class Map;
 class BattleUI : public IHapiSpritesInputListener
 {
+	struct MovementArea;
 	struct TargetArea
 	{
 		struct HighlightNode
@@ -147,4 +148,10 @@ private:
 	void onResetBattle();
 	void onNewTurn();
 	void clearTargetArea();
+};
+
+struct BattleUI::MovementArea
+{
+	bool display;
+	std::vector<>
 };

@@ -984,7 +984,7 @@ void BattleUI::DeploymentPhase::onReset()
 	m_spawnPosition = std::pair<int, int>(0, 0);
 }
 
-const Tile* BattleUI::DeploymentPhase::getTileOnMouse(InvalidPosition& invalidPosition, const Tile* currentTileSelected, const Map& map, Battle& battle)
+const Tile* BattleUI::DeploymentPhase::getTileOnMouse(InvalidPosition& invalidPosition, const Tile* currentTileSelected, const Map& map)
 {
 	const Tile* tileOnMouse = map.getTile(map.getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
 	if (!tileOnMouse)

@@ -150,7 +150,6 @@ struct BattlePlayer
 	BattlePlayer(FactionName name, std::pair<int, int> spawnPosition, ePlayerType playerType);
 
 	//startingPosition, entityProperties, m_map, factionName, startingDirection));
-	void addEntity();
 
 	std::vector<std::unique_ptr<BattleEntity>> m_entities;
 	//std::array<std::unique_ptr<BattleEntity>, TOTAL_SHIPS> m_entities;
