@@ -282,8 +282,8 @@ void BattleGUI::OnMouseLeftClick(const HAPI_TMouseData& mouseData, BattlePhase c
 		else if (m_quitButton->GetSpritesheet()->GetFrameRect(0).Translated(
 			m_quitButton->GetTransformComp().GetPosition()).Contains(HAPISPACE::RectangleI(mouseData.x, mouseData.x, mouseData.y, mouseData.y)))//if you press the resume button
 		{
-
-			GameEventMessenger::getInstance().broadcast(GameEvent::eResetBattle);
+			HAPI_Sprites.Close();
+			//GameEventMessenger::getInstance().broadcast(GameEvent::eResetBattle);
 			//m_currentBattleWindow = BattleWindow::ePostBattle;//disables the pause menu
 		}
 		break;

@@ -130,7 +130,6 @@ struct SpawnNode
 
 struct Player
 {
-
 	Player(FactionName name, ePlayerType playerType);
 	
 	void render(const Map& map) const;

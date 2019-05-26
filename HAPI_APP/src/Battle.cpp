@@ -479,10 +479,6 @@ void Battle::nextTurn()
 					allPlayersDeployed = false;
 					break;
 				}
-				//if (!m_players[i]->m_ships[0].isDeployed())
-				//{
-				//
-				//}
 			}
 		}
 
