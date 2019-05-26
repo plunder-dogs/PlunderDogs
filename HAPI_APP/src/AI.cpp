@@ -96,17 +96,13 @@ void AI::handleDeploymentPhase(Battle& battle, Map& map, const Player& currentPl
 	}
 }
 
-void AI::handleShipSelection(Player& player)
+void AI::loadInPlayerShips(Player& player)
 {
 	int randomNumber{ std::rand() % 8 };
 	int numSideCannons{ 0 };
-	int numOfAddedSideCannons{ 0 };
 	int numTurtle{ 0 };
-	int numOfAddedTurtle{ 0 };
 	int numFlame{ 0 };
-	int numOfAddedFlame{ 0 };
 	int numSniper{ 0 };
-	int numOfAddedSniper{ 0 };
 
 	switch (randomNumber)
 	{
@@ -150,22 +146,24 @@ void AI::handleShipSelection(Player& player)
 
 	//Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType);
 	assert(numSideCannons + numTurtle + numFlame + numSniper < 7);
-	for (int i = 0; i < numOfAddedFlame; ++i)
+	for (int i = 0; i < numFlame; ++i)
 	{
 		player.m_ships.emplace_back(player.m_factionName, eShipType::eFire);
 	}
-	for (int i = 0; i < numOfAddedSideCannons; ++i)
+	for (int i = 0; i < numSideCannons; ++i)
 	{
 		player.m_ships.emplace_back(player.m_factionName, eShipType::eFrigate);
 	}
-	for (int i = 0; i < numOfAddedTurtle; ++i)
+	for (int i = 0; i < numTurtle; ++i)
 	{
 		player.m_ships.emplace_back(player.m_factionName, eShipType::eTurtle);
 	}
-	for (int i = 0; i < numOfAddedSniper; ++i)
+	for (int i = 0; i < numSniper; ++i)
 	{
 		player.m_ships.emplace_back(player.m_factionName, eShipType::eSniper);
 	}
+
+	player.m_shipToDeploy = &player.m_ships.front();
 }
 
 const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName ourFaction)

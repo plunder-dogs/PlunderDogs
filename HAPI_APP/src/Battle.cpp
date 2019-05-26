@@ -434,6 +434,7 @@ void Battle::nextTurn()
 	if (m_currentBattlePhase == BattlePhase::Deployment)
 	{
 		bool allPlayersDeployed = true;
+		bool allHumansDeployed = true;
 		if (m_currentDeploymentState == eDeploymentState::DeployHuman)
 		{
 			for (int i = 0; i < m_players.size(); ++i)
@@ -449,11 +450,12 @@ void Battle::nextTurn()
 				{
 					m_currentPlayerTurn = i;
 					allPlayersDeployed = false;
+					allHumansDeployed = false;
 					break;
 				}
 			}
 
-			if (allPlayersDeployed)
+			if (allHumansDeployed)
 			{
 				m_currentDeploymentState = eDeploymentState::DeployAI;
 			}
@@ -477,6 +479,10 @@ void Battle::nextTurn()
 					allPlayersDeployed = false;
 					break;
 				}
+				//if (!m_players[i]->m_ships[0].isDeployed())
+				//{
+				//
+				//}
 			}
 		}
 

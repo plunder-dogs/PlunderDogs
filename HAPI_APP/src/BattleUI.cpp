@@ -377,6 +377,12 @@ void BattleUI::renderArrow() const
 
 void BattleUI::onMouseMoveDeploymentPhase()
 {
+	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	{
+		return;
+	}
+
+
 	const Map& map = m_battle.getMap();
 	const Tile* tileOnMouse = map.getTile(map.getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
 	if (!tileOnMouse)
@@ -418,6 +424,11 @@ void BattleUI::onMouseMoveDeploymentPhase()
 
 void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 {
+	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	{
+		return;
+	}
+
 	if (m_selectedTile.m_tile && (m_selectedTile.m_tile->m_type == eTileType::eSea || m_selectedTile.m_tile->m_type == eTileType::eOcean))
 	{
 		if (!m_invalidPosition.m_activate && !m_selectedTile.m_tile->m_shipOnTile)

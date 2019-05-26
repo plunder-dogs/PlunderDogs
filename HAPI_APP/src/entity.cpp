@@ -622,7 +622,11 @@ void Player::render(const Map & map) const
 		}
 	}
 
-	m_shipToDeploy->render(map);
+	if (m_shipToDeploy)
+	{
+		m_shipToDeploy->render(map);
+	}
+	
 }
 
 void Player::createSpawnArea(Map & map)

@@ -1,5 +1,6 @@
 #include "Textures.h"
 #include "Battle.h"
+#include "AI.h"
 
 using namespace HAPISPACE;
 
@@ -34,13 +35,8 @@ void HAPI_Sprites_Main()
 	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
 	players.push_back(std::move(player1));
 
-	std::unique_ptr<Player> player2 = std::make_unique<Player>(FactionName::eRed, ePlayerType::eAI);
-	player2->m_ships.emplace_back(FactionName::eRed, eShipType::eFrigate);
-	player2->m_shipToDeploy = &player2->m_ships.back();
-	player2->m_ships.emplace_back(FactionName::eRed, eShipType::eFrigate);
-	player2->m_ships.emplace_back(FactionName::eRed, eShipType::eFrigate);
-	player2->m_ships.emplace_back(FactionName::eRed, eShipType::eFrigate);
-	players.push_back(std::move(player2));
+	players.emplace_back(std::make_unique<Player>(FactionName::eRed, ePlayerType::eAI));
+	AI::loadInPlayerShips(*players.back().get());
 
 	Battle battle(players);
 
