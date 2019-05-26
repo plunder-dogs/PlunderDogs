@@ -80,7 +80,7 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Pla
 
 void AI::handleDeploymentPhase(Battle& battle, Map& map, const Player& currentPlayer)
 {
-	std::vector<const Tile*> spawnArea{ map.cGetTileRadius(map.getRandomSpawnPosition(), 3, true, true) };
+	std::vector<const Tile*> spawnArea{ map.cGetTileRadius(currentPlayer.m_spawnArea.begin()->m_position, 3, true, true) };
 	assert(spawnArea.size() > 6);
 	
 	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));

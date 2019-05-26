@@ -452,6 +452,7 @@ void Battle::nextTurn()
 					break;
 				}
 			}
+
 			if (allPlayersDeployed)
 			{
 				m_currentDeploymentState = eDeploymentState::DeployAI;

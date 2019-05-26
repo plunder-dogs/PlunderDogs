@@ -677,7 +677,7 @@ void Ship::ActionSprite::render(const Map& map, std::pair<int, int> currentEntit
 	}
 }
 
-Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
+SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)
 	: m_position(position),
 	m_sprite()
 {
@@ -705,7 +705,7 @@ Player::SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> positi
 	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
 }
 
-void Player::SpawnNode::render(const Map & map) const
+void SpawnNode::render(const Map & map) const
 {
 	auto screenPosition = map.getTileScreenPos(m_position);
 	m_sprite->GetTransformComp().SetPosition({
