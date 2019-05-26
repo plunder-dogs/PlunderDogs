@@ -44,6 +44,14 @@ enum ePlayerType
 	eAI
 };
 
+enum ShipType
+{
+	eFrigate,
+	eTurtle,
+	eFire,
+	eSniper
+};
+
 enum eTileType
 {
 	eGrass = 0,

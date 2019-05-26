@@ -6,14 +6,6 @@
 #include "Timer.h"
 #include "Global.h"
 
-enum class ShipType
-{
-	eFrigate,
-	eTurtle,
-	eFire,
-	eSniper
-};
-
 struct Tile;
 struct Weapons;
 class Map;
