@@ -351,7 +351,8 @@ void Battle::deployShipAtPosition(std::pair<int, int> startingPosition, eDirecti
 
 	m_players[m_currentPlayerTurn]->m_shipToDeploy->deployAtPosition(startingPosition, *this, startingDirection);
 	m_map.assignTileToShip(*m_players[m_currentPlayerTurn]->m_shipToDeploy);
-	
+	m_players[m_currentPlayerTurn]->m_shipToDeploy = nullptr;
+
 	bool allShipsDeployed = true;
 	for (auto& ship : m_players[m_currentPlayerTurn]->m_ships)
 	{
