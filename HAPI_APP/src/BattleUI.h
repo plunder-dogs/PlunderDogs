@@ -43,36 +43,6 @@ class BattleUI : public IHapiSpritesInputListener
 		bool m_activate;
 		std::pair<int, int> m_position;
 	};
-
-	/*class DeploymentPhase
-	{
-		struct CurrentSelectedEntity
-		{
-			CurrentSelectedEntity()
-				: m_currentSelectedEntity(nullptr),
-				m_position()
-			{}
-
-			ShipGlobalProperties* m_currentSelectedEntity;
-			std::pair<int, int> m_position;
-		};
-	public:
-		DeploymentPhase(const Player& playerToDeploy, const Map& map);
-
-		bool isCompleted() const;
-		void render(const InvalidPosition& invalidPosition, const Map& map) const;
-		void onReset();
-
-		const Tile* getTileOnMouse(InvalidPosition& invalidPosition, const Tile* currentTileSelected, const Map& map);
-		void onLeftClick(InvalidPosition& invalidPosition, eDirection startingDirection, const Tile* currectTileSelected, Battle& battle);
-
-	private:
-		const Player& m_playerToDeploy;
-		Ship* m_shipToDeploy;
-		std::vector<const Tile*> m_spawnArea;
-		std::vector<std::unique_ptr<Sprite>> m_spawnSprites;
-	};
-*/
 	struct SelectedTile
 	{
 		SelectedTile();

@@ -356,7 +356,7 @@ void BattleUI::clearSelectedTile()
 {
 	m_arrowActive = false;
 	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
-		m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+		m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 	m_selectedTile.m_tile = nullptr;
 }
 
@@ -472,7 +472,7 @@ void BattleUI::onMouseMoveMovementPhase()
 			{
 				m_invalidPosition.setPosition(tile->m_tileCoordinate, m_battle.getMap());
 				m_invalidPosition.m_activate = true;
-				m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+				m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 			}
 			else
 			{
@@ -498,7 +498,7 @@ void BattleUI::onLeftClickMovementPhase()
 		m_selectedTile.m_tile = tileOnMouse;
 		if (m_battle.getCurrentPlayerType() != ePlayerType::eAI)
 		{
-			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 		}
 		return;
 	}
@@ -520,7 +520,7 @@ void BattleUI::onLeftClickMovementPhase()
 	{
 		if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
 		{
-			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 		}
 		return;
 	}
@@ -546,7 +546,7 @@ void BattleUI::onLeftClickMovementPhase()
 		//Cancel movement if clicked on same entity
 		if (m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
 		{
-			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 			//TODO: Drop info box
 			m_selectedTile.m_tile = nullptr;
 		}
@@ -555,12 +555,12 @@ void BattleUI::onLeftClickMovementPhase()
 		//Disallow movement to tile occupied by other player
 		else if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
 		{
-			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 			m_selectedTile.m_tile = tileOnMouse;
 		}
 		else if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction())
 		{
-			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 			m_selectedTile.m_tile = tileOnMouse;
 		}
 
@@ -571,8 +571,8 @@ void BattleUI::onLeftClickMovementPhase()
 			assert(m_selectedTile.m_tile->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction());
 			m_mouseDownTile = tileOnMouse;
 			m_isMovingEntity = true;
-			auto test = m_selectedTile.m_tile->m_shipOnTile->getEndOfPath();
-			if (m_selectedTile.m_tile->m_shipOnTile->getEndOfPath() == tileOnMouse->m_tileCoordinate)
+			auto test = m_selectedTile.m_tile->m_shipOnTile->getEndOfMovementPath();
+			if (m_selectedTile.m_tile->m_shipOnTile->getEndOfMovementPath() == tileOnMouse->m_tileCoordinate)
 				m_arrowActive = true;
 			m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_shipOnTile, *tileOnMouse);
 			m_selectedTile.m_tile = nullptr;
@@ -608,7 +608,7 @@ void BattleUI::onRightClickMovementPhase()
 	//Cancel selected Entity
 	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
 	{
-		m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
+		m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
 		m_invalidPosition.m_activate = false;
 	}
 	//TODO: Drop info box

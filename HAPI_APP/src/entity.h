@@ -16,23 +16,6 @@ class Map;
 class Battle;
 class Ship
 {
-	class MovementPath
-	{
-	public:
-		MovementPath();
-
-		void render(const Map& map) const;
-		int generatePath(const Map& map, const Tile& source, const Tile& destination);
-		void eraseNode(std::pair<int, int> position, const Map& map);
-		void clearPath();
-		void setNodePosition(int i, std::pair<int, int> newPosition) { m_movementPath[i].m_position = newPosition; }
-
-		std::pair<int, int> getFinalNode() const;
-	private:
-		
-		unsigned int getDirectionCost(int currentDirection, int newDirection);
-	};
-
 public:
 	Ship(FactionName playerName, eShipType shipType);
 	Ship(Ship& orig);
@@ -57,10 +40,9 @@ public:
 	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
 	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
 
-	std::vector<posi> generateMovementArea(const Map& map, float movement) const;
 	int generateMovementPath(const Map& map, const Tile& source, const Tile& destination);
-	void clearMovementPath();
-	std::pair<int, int> getEndOfPath();
+	std::pair<int, int> getEndOfMovementPath();
+	void disableMovementPath();
 
 	bool moveEntity(Map& map, const Tile& tile);
 	bool moveEntity(Map& map, const Tile& tile, eDirection endDirection);
@@ -75,11 +57,9 @@ public:
 private:
 	const FactionName m_factionName;
 	const eShipType m_shipType;
-
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
-	//MovementPath m_movementPath;
 	int m_movementPathSize;
 	eDirection m_currentDirection;
 	bool m_weaponFired;
@@ -96,15 +76,9 @@ private:
 	bool m_deployed;
 	std::vector<SpriteToggleVisibility> m_movementPath;
 
-	void render(const Map& map) const;
-	void eraseMovementPathNode(std::pair<int, int> position, const Map& map); 
 	void setMovementPathNodePosition(int i, std::pair<int, int> newPosition) { m_movementPath[i].m_position = newPosition; }
-	std::pair<int, int> getMovementPathEndPosition() const;
-
-private:
-
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
-
+	void disableMovementPathNode(std::pair<int, int> position, const Map& map);
 	void handleRotation();
 };
 

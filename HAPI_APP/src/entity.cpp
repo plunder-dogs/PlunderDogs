@@ -77,39 +77,7 @@ int Ship::getHealth() const
 	return m_health;
 }
 
-//
-//MOVEMENT PATH
-//
-Ship::MovementPath::MovementPath()
-	: m_movementPath()	
-{
-	m_movementPath.reserve(size_t(MOVEMENT_PATH_SIZE));
-	for (int i = 0; i < MOVEMENT_PATH_SIZE; ++i)
-	{
-		m_movementPath.emplace_back(Textures::m_NodHex, 0.5f, 0.5f);
-	}
-}
-
-void Ship::MovementPath::render(const Map& map) const
-{
-	for (const auto& i : m_movementPath)
-	{
-		if (i.m_active)
-		{
-			const std::pair<int, int> tileTransform = map.getTileScreenPos(i.m_position);
-			float scale = map.getDrawScale();
-
-			i.m_sprite->GetTransformComp().SetPosition({
-				static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
-				static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
-			i.m_sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
-
-			i.m_sprite->Render(SCREEN_SURFACE);
-		}	
-	}
-}
-
-int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const Tile& destination)
+int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile & destination)
 {
 	posi start = { source.m_tileCoordinate.first, source.m_tileCoordinate.second, source.m_shipOnTile->m_currentDirection };
 	posi end = { destination.m_tileCoordinate.first, destination.m_tileCoordinate.second };
@@ -118,7 +86,7 @@ int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const T
 	{
 		return 0;
 	}
-	clearPath();
+	disableMovementPath();
 	//float movementPointsUsed = 0;
 	if (!source.m_shipOnTile)
 		return 0;
@@ -129,7 +97,7 @@ int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const T
 	//Don't interact with path from source.
 	int i = 0;
 	int queueSize = pathToTile.size();
-	for (i ; i < queueSize; ++i)
+	for (i; i < queueSize; ++i)
 	{
 		/*
 		//If moved from prev position handle forward cost
@@ -167,19 +135,7 @@ int Ship::MovementPath::generatePath(const Map& map, const Tile& source, const T
 	return i;
 }
 
-void Ship::MovementPath::eraseNode(std::pair<int, int> position, const Map& map)
-{
-	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
-	{
-		auto i = map.getMouseClickCoord({ iter->m_sprite->GetTransformComp().GetPosition().x, iter->m_sprite->GetTransformComp().GetPosition().y });
-		if (i == position)
-		{
-			iter->m_active = false;
-		}
-	}
-}
-
-void Ship::MovementPath::clearPath()
+void Ship::disableMovementPath()
 {
 	for (auto& i : m_movementPath)
 	{
@@ -187,7 +143,7 @@ void Ship::MovementPath::clearPath()
 	}
 }
 
-std::pair<int, int> Ship::MovementPath::getFinalNode() const
+std::pair<int, int> Ship::getEndOfMovementPath()
 {
 	int i = m_movementPath.size() - 1;
 	for (i; i > 0; i--)
@@ -196,27 +152,6 @@ std::pair<int, int> Ship::MovementPath::getFinalNode() const
 			break;
 	}
 	return m_movementPath[i].m_position;
-}
-
-std::vector<posi> Ship::generateMovementArea(const Map& map, float movement) const
-{
-	posi position = posi(m_currentPosition, m_currentDirection);
-	return BFS::findArea(map, position, movement);
-}
-
-int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile & destination)
-{
-	return m_movementPath.generatePath(map, source, destination);
-}
-
-void Ship::clearMovementPath()
-{
-	m_movementPath.clearPath();
-}
-
-std::pair<int, int> Ship::getEndOfPath()
-{
-	return m_movementPath.getFinalNode();
 }
 
 void Ship::enableAction()
@@ -251,11 +186,11 @@ bool Ship::moveEntity(Map& map, const Tile& tile)
 		}
 		else
 		{
-			clearMovementPath();
+			disableMovementPath();
 			return false;
 		}
 	}
-	clearMovementPath();
+	disableMovementPath();
 	return true;
 }
 
@@ -279,11 +214,11 @@ bool Ship::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
 		}
 		else
 		{
-			clearMovementPath();
+			disableMovementPath();
 			return false;
 		}
 	}
-	clearMovementPath();
+	disableMovementPath();
 	return true;
 }
  
@@ -309,7 +244,7 @@ void Ship::takeDamage(int damageAmount, FactionName entityFaction)
 		m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 		m_isDead = true;
 		m_actionSprite.m_active = false;
-		m_movementPath.clearPath();
+		disableMovementPath();
 		switch (entityFaction)
 		{
 		case FactionName::eYellow :
@@ -347,6 +282,18 @@ void Ship::onNewTurn()
 	m_movingToDestination = false;
 }
 
+void Ship::disableMovementPathNode(std::pair<int, int> position, const Map & map)
+{
+	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
+	{
+		auto i = map.getMouseClickCoord({ iter->m_sprite->GetTransformComp().GetPosition().x, iter->m_sprite->GetTransformComp().GetPosition().y });
+		if (i == position)
+		{
+			iter->m_active = false;
+		}
+	}
+}
+
 void Ship::handleRotation()
 {
 	int rotationAngle = 60;
@@ -355,7 +302,7 @@ void Ship::handleRotation()
 	m_currentDirection = (eDirection)directionToTurn;
 }
 
-unsigned int Ship::MovementPath::getDirectionCost(int currentDirection, int newDirection)
+unsigned int Ship::getDirectionCost(int currentDirection, int newDirection)
 {
 	unsigned int diff = std::abs(newDirection - currentDirection);
 	if (diff == 0)
@@ -372,7 +319,6 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 	m_currentPosition(),
 	m_pathToTile(),
 	m_movementTimer(MOVEMENT_ANIMATION_TIME),
-	m_movementPath(),
 	m_movementPathSize(0),
 	m_currentDirection(),
 	m_weaponFired(false),
@@ -385,8 +331,17 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 	m_range(0),
 	m_movementPoints(0),
 	m_sprite(),
-	m_deployed(false)
+	m_deployed(false),
+	m_movementPath()
 {
+	//Initialize Movement Path
+	m_movementPath.reserve(size_t(MOVEMENT_PATH_SIZE));
+	for (int i = 0; i < MOVEMENT_PATH_SIZE; ++i)
+	{
+		m_movementPath.emplace_back(Textures::m_spawnHex, 0.5f, 0.5f);
+	}
+
+	//Initialize Ship
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
@@ -519,7 +474,6 @@ Ship::Ship(Ship & orig)
 	m_sprite.swap(orig.m_sprite);
 }
 
-
 void Ship::update(float deltaTime, const Map & map)
 {	
 	if (!m_pathToTile.empty())
@@ -529,7 +483,7 @@ void Ship::update(float deltaTime, const Map & map)
 		{
 			m_movementTimer.reset();
 			m_currentPosition = m_pathToTile.front().pair();
-			m_movementPath.eraseNode(m_currentPosition, map);
+			disableMovementPathNode(m_currentPosition, map);
 
 			handleRotation();
 			m_pathToTile.pop();
@@ -537,7 +491,7 @@ void Ship::update(float deltaTime, const Map & map)
 			if (m_pathToTile.empty())
 			{
 				m_movingToDestination = false;
-				clearMovementPath();
+				disableMovementPath();
 			}
 		}
 	}
@@ -545,7 +499,21 @@ void Ship::update(float deltaTime, const Map & map)
 
 void Ship::render(const Map & map) const
 {
-	m_movementPath.render(map);
+	for (const auto& i : m_movementPath)
+	{
+		if (i.m_active)
+		{
+			const std::pair<int, int> tileTransform = map.getTileScreenPos(i.m_position);
+			float scale = map.getDrawScale();
+
+			i.m_sprite->GetTransformComp().SetPosition({
+				static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
+				static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
+			i.m_sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
+
+			i.m_sprite->Render(SCREEN_SURFACE);
+		}
+	}
 
 	//Set sprite position to current position
 	const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentPosition);

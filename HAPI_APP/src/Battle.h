@@ -104,7 +104,6 @@ private:
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
 
-
 	Player& getPlayer(FactionName factionName);
 	std::unique_ptr<Player>& getCurrentPlayer();
 
