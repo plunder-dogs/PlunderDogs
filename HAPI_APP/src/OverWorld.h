@@ -10,12 +10,12 @@ using namespace HAPISPACE;
 
 struct ShipProperties
 {
-	ShipProperties(FactionName factionName, ShipType entityType);
+	ShipProperties(FactionName factionName, eShipType entityType);
 	ShipProperties() {};
 
 	std::unique_ptr<HAPISPACE::Sprite> m_sprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_selectedSprite;
-	ShipType m_type;
+	eShipType m_type;
 	int m_movementPoints;
 	int m_health;
 	int m_range;
@@ -27,7 +27,7 @@ struct PlayerDetails
 {
 	PlayerDetails();
 
-	void addShip(ShipType shipType);
+	void addShip(eShipType shipType);
 
 	std::vector<ShipProperties> m_ships;
 	FactionName m_factionName;
@@ -53,7 +53,7 @@ public:
 	void startBattle();
 
 private:
-	std::vector<std::pair<ShipType, std::shared_ptr<Sprite>>> m_shipsToSelect;
+	std::vector<std::pair<eShipType, std::shared_ptr<Sprite>>> m_shipsToSelect;
 	int m_currentPlayer;
 	bool m_selectNextPlayer;
 	std::vector<PlayerDetails> m_players;

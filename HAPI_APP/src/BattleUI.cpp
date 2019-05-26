@@ -432,7 +432,7 @@ void BattleUI::onMouseMoveMovementPhase()
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 
-	if (m_battle.isCurrentPlayerAI())
+	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
 		return;
 	}
@@ -485,7 +485,7 @@ void BattleUI::onLeftClickMovementPhase()
 	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile)
 	{
 		m_selectedTile.m_tile = tileOnMouse;
-		if (!m_battle.isCurrentPlayerAI())
+		if (m_battle.getCurrentPlayerType() != ePlayerType::eAI)
 		{
 			m_selectedTile.m_tile->m_shipOnTile->clearMovementPath();
 		}
@@ -493,7 +493,7 @@ void BattleUI::onLeftClickMovementPhase()
 	}
 
 	//AI is in play
-	if (m_battle.isCurrentPlayerAI())
+	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
 		return;
 	}
@@ -627,8 +627,7 @@ void BattleUI::onLeftClickAttackPhase()
 		return;
 	}
 
-	//AI in play
-	if (m_battle.isCurrentPlayerAI())
+	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		return;
@@ -828,7 +827,7 @@ void BattleUI::TargetArea::render(const Map& map) const
 void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & source, BattlePhase phase)
 {
 	//TODO: Why isn't this a switch case?
-	if (source.m_shipOnTile->getWeaponType() == eSideCannons)
+	if (source.m_shipOnTile->getShipType() == eShipType::eFrigate)
 	{
 		m_targetArea = map.cGetTileCone(source.m_tileCoordinate,
 			source.m_shipOnTile->getRange(), 
@@ -836,7 +835,7 @@ void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & sour
 	
 	}
 
-	else if (source.m_shipOnTile->getWeaponType() == eStraightShot)
+	else if (source.m_shipOnTile->getShipType() == eShipType::eSniper)
 	{
 		m_targetArea = map.cGetTileLine(source.m_tileCoordinate, 
 			source.m_shipOnTile->getRange(), 
@@ -844,14 +843,14 @@ void BattleUI::TargetArea::generateTargetArea(const Map & map, const Tile & sour
 
 	}
 
-	else if (source.m_shipOnTile->getWeaponType() == eShotgun)
+	else if (source.m_shipOnTile->getShipType() == eShipType::eTurtle)
 	{
 		// make so where ever the place presses get radius called talk adrais about size of that
 		m_targetArea = map.cGetTileRadius(source.m_tileCoordinate, 
 			source.m_shipOnTile->getRange(), true);
 	}
 
-	else if (source.m_shipOnTile->getWeaponType() == eFlamethrower)
+	else if (source.m_shipOnTile->getShipType() == eShipType::eFire)
 	{
 		eDirection directionOfFire = eNorth;
 		switch (source.m_shipOnTile->getCurrentDirection() )

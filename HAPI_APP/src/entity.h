@@ -6,15 +6,8 @@
 #include "Timer.h"
 #include "Global.h"
 
+//TODO: temp
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
-
-enum class ShipType
-{
-	eFrigate,
-	eTurtle,
-	eFire,
-	eSniper
-};
 
 struct Tile;
 struct Weapons;
@@ -61,13 +54,13 @@ class Ship
 	};
 
 public:
-	Ship(FactionName playerName, ShipType shipType, int health, int damage, int range, eWeaponType weaponType);
+	Ship(FactionName playerName, eShipType shipType);
 	Ship(Ship& orig);
 	~Ship();
 
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
-	eWeaponType getWeaponType() const;
+	eShipType getShipType() const;
 	std::pair<int, int> getCurrentPosition() const;
 	bool isWeaponFired() const;
 	bool isDead() const;
@@ -102,7 +95,7 @@ public:
 
 private:
 	const FactionName m_factionName;
-	const ShipType m_shipType;
+	const eShipType m_shipType;
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
@@ -119,7 +112,6 @@ private:
 	int m_damage;
 	int m_range;
 	int m_movementPoints;
-	eWeaponType m_weaponType;
 	std::unique_ptr<Sprite> m_sprite;
 	bool m_deployed;
 

@@ -70,15 +70,14 @@ public:
 	const Map& getMap() const;
 	BattlePhase getCurrentPhase() const;
 	FactionName getCurrentFaction() const;
+	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Player& getPlayer(FactionName name) const;
-	bool isCurrentPlayerAI() const;
 
 	void start(const std::string& newMapName);
 	void render() const;
 	void update(float deltaTime);
-	void nextTurn();
-
+	
 	//Deploy Phase
 	void deployShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection);
 	bool setShipDeploymentAtPosition(std::pair<int, int> position);
@@ -108,6 +107,7 @@ private:
 	Player& getPlayer(FactionName factionName);
 	std::unique_ptr<Player>& getCurrentPlayer();
 
+	void nextTurn();
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
