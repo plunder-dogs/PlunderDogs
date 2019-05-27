@@ -512,6 +512,10 @@ void BattleUI::onLeftClickMovementPhase()
 		{
 			m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.clearMovementPath();
 			m_selectedTile.m_tile = tileOnMouse;
+			if (tileOnMouse->m_entityOnTile->m_factionName == m_battle.getCurrentFaction() && !m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.isDestinationSet())
+			{
+				m_movementArea.newArea(m_battle, *m_selectedTile.m_tile->m_entityOnTile);
+			}
 		}
 
 		//Store data so Entity can move to new location
@@ -524,8 +528,6 @@ void BattleUI::onLeftClickMovementPhase()
 			auto test = m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.getEndOfPath();
 			if (m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.getEndOfPath() == tileOnMouse->m_tileCoordinate)
 				m_arrowActive = true;
-			//m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_entityOnTile, *tileOnMouse);
-			//m_selectedTile.m_tile = nullptr;
 		}
 	}
 	else
@@ -539,15 +541,16 @@ void BattleUI::onLeftClickMovementPhase()
 		//Do not select tile that contains wrong player's entity
 		if (tileOnMouse->m_entityOnTile)
 		{
+			//Selecting a different faction's ship
 			if (tileOnMouse->m_entityOnTile->m_factionName != m_battle.getCurrentFaction())
 			{
 				//TODO: Drop info box
 				m_selectedTile.m_tile = nullptr;
 				m_movementArea.clear();
 			}
+			//Selecting another ship you own
 			else
 			{
-				//TODO: Raise info box
 				m_selectedTile.m_tile = tileOnMouse;
 			}
 		}
