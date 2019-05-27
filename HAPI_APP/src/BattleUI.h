@@ -11,7 +11,30 @@ class Battle;
 class Map;
 class BattleUI : public IHapiSpritesInputListener
 {
-	struct MovementArea;
+	struct MovementArea
+	{
+		bool display;
+		int displaySize;
+		std::vector<std::unique_ptr<HAPISPACE::Sprite>> tileOverlays;
+		void newArea(Battle& battle, BattleEntity& ship)
+		{
+			std::vector<posi> area = BFS::findArea(battle.getMap(),
+				ship.m_battleProperties.getCurrentPosition(),
+				ship.m_entityProperties.m_movementPoints);
+			displaySize = area.size();
+			for (int i = 0; i < displaySize; i++)
+			{
+				posi pos = battle.getMap().getTileScreenPos(area[i].pair());
+				tileOverlays[i]->GetTransformComp().SetPosition({ pos.x, pos.y });
+			}
+			display = true;
+		}
+		void clear()
+		{
+			display = false;
+			displaySize = 0;
+		}
+	};
 	struct TargetArea
 	{
 		struct HighlightNode
@@ -148,10 +171,4 @@ private:
 	void onResetBattle();
 	void onNewTurn();
 	void clearTargetArea();
-};
-
-struct BattleUI::MovementArea
-{
-	bool display;
-	std::vector<>
 };
