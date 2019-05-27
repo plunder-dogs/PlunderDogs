@@ -1,6 +1,7 @@
 #include "Textures.h"
 #include "Battle.h"
 #include "AI.h"
+#include <array>
 
 using namespace HAPISPACE;
 
@@ -25,18 +26,30 @@ void HAPI_Sprites_Main()
 	HAPI_Sprites.LimitFrameRate(150);
 	int lastFrameStart = HAPI_Sprites.GetTime();
 	
-	std::vector<std::unique_ptr<Player>> players;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
 
-	std::unique_ptr<Player> player1 = std::make_unique<Player>(FactionName::eYellow, ePlayerType::eHuman);
-	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
-	player1->m_shipToDeploy = &player1->m_ships.back();
-	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
-	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
-	player1->m_ships.emplace_back(FactionName::eYellow, eShipType::eFrigate);
-	players.push_back(std::move(player1));
+	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
 
-	players.emplace_back(std::make_unique<Player>(FactionName::eRed, ePlayerType::eAI));
+	players[static_cast<int>(FactionName::eRed)] = std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI);
 	AI::loadInPlayerShips(*players.back().get());
+	//std::vector<std::unique_ptr<Faction>> players;
+	//std::unique_ptr<Faction> player1 = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
+	//players.push_back(std::move(player1));
+
+	//players.emplace_back(std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI));
+	
 
 	Battle battle(players);
 

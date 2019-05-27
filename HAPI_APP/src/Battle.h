@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "BattleUI.h"
 #include "entity.h"
+#include <array>
 
 //https://en.wikipedia.org/wiki/Builder_pattern#C.2B.2B_Example
 
@@ -41,10 +42,10 @@ class Battle
 
 		void update(float deltaTime);
 
-		void onYellowShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onBlueShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onGreenShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
-		void onRedShipDestroyed(std::vector<std::unique_ptr<Player>>& players);
+		void onYellowShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
+		void onBlueShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
+		void onGreenShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
+		void onRedShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
 
 	private:
 		int m_yellowShipsDestroyed;
@@ -53,14 +54,14 @@ class Battle
 		int m_redShipsDestroyed;
 		void onReset();
 
-		void checkGameStatus(const std::vector<std::unique_ptr<Player>>& players);
+		void checkGameStatus(const std::vector<std::unique_ptr<Faction>>& players);
 		Timer m_winTimer;
 		FactionName m_winningFaction;
 		bool m_gameOver;
 	};
 
 public:
-	Battle(std::vector<std::unique_ptr<Player>>& players);
+	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
 	Battle(const Battle&) = delete;
 	Battle& operator=(const Battle&) = delete;
 	Battle(Battle&&) = delete;
@@ -72,8 +73,8 @@ public:
 	FactionName getCurrentFaction() const;
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
-	const Player& getPlayer(FactionName name) const;
-
+	const Faction& getPlayer(FactionName name) const;
+	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
 	void start(const std::string& newMapName);
 	void render() const;
 	void update(float deltaTime);
@@ -86,11 +87,11 @@ public:
 	void moveEntityToPosition(Ship& entity, const Tile& destination, eDirection endDirection);
 	//Attack Phase
 	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
-	void playFireAnimation(Ship& entity, std::pair<int, int> position);
-	void playExplosionAnimation(Ship& entity);
+	void playFireAnimation(const Ship& entity, std::pair<int, int> position);
+	void playExplosionAnimation(const Ship& entity);
 
 private:
-	std::vector<std::unique_ptr<Player>>& m_players;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_players;
 	int m_currentPlayerTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
@@ -104,28 +105,8 @@ private:
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
 
-	Player& getPlayer(FactionName factionName);
-	std::unique_ptr<Player>& getCurrentPlayer();
-
-	struct TargetArea
-	{
-		struct HighlightNode
-		{
-			HighlightNode();
-			std::unique_ptr<Sprite> sprite;
-			bool activate;
-			std::pair<int, int> position;
-		};
-
-		TargetArea();
-		void render(const Map& map) const;
-		void generateTargetArea(const Map& map, const Tile& source, BattlePhase phase = BattlePhase::Attack);
-		void clearTargetArea();
-		void onReset();
-
-		std::vector<HighlightNode> m_targetAreaSprites;
-		std::vector<const Tile*> m_targetArea;
-	};
+	Faction& getPlayer(FactionName factionName);
+	std::unique_ptr<Faction>& getCurrentPlayer();
 
 	void nextTurn();
 	void notifyPlayersOnNewTurn();

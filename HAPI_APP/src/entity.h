@@ -17,7 +17,7 @@ class Battle;
 class Ship
 {
 public:
-	Ship(FactionName playerName, eShipType shipType);
+	Ship(FactionName playerName, eShipType shipType, int ID);
 	Ship(Ship& orig);
 
 	FactionName getFactionName() const;
@@ -33,6 +33,7 @@ public:
 	int getRange() const;
 	int getDamage() const;
 	int getHealth() const;
+	int getID() const;
 
 	void update(float deltaTime, const Map& map);
 	void render(const Map& map) const;
@@ -57,6 +58,7 @@ public:
 private:
 	const FactionName m_factionName;
 	const eShipType m_shipType;
+	const int m_ID;
 	std::pair<int, int> m_currentPosition;
 	std::queue<posi> m_pathToTile;
 	Timer m_movementTimer;
@@ -76,7 +78,6 @@ private:
 	bool m_deployed;
 	std::vector<SpriteToggleVisibility> m_movementPath;
 
-	void setMovementPathNodePosition(int i, std::pair<int, int> newPosition) { m_movementPath[i].m_position = newPosition; }
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementPathNode(std::pair<int, int> position, const Map& map);
 	void handleRotation();
@@ -92,13 +93,15 @@ struct SpawnNode
 	std::unique_ptr<Sprite> m_sprite;
 };
 
-struct Player
+struct Faction
 {
-	Player(FactionName name, ePlayerType playerType);
+	Faction(FactionName name, ePlayerType playerType);
 	
 	void render(const Map& map) const;
+	void addShip(FactionName factionName, eShipType shipType);
 	void createSpawnArea(Map& map);
 	void onNewTurn();
+	void fireShipAtPosition(int shipID, )
 
 	std::vector<Ship> m_ships;
 	const FactionName m_factionName;

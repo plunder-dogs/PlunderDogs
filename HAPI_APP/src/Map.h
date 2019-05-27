@@ -18,12 +18,30 @@ constexpr float DRAW_OFFSET_Y{ 28 };
 ** Detail: surface width does not divide equally by numFrames
 ****
 */
+
+struct ShipOnTile
+{
+	ShipOnTile()
+		: factionName(FactionName::Invalid),
+		shipID(INVALID_SHIP_ID)
+	{}
+
+	bool isValid() const
+	{
+		return (factionName != FactionName::Invalid && shipID != INVALID_SHIP_ID);
+	}
+
+	FactionName factionName;
+	int shipID;
+};
+
 class Ship;
 struct Tile
 {
 	const enum eTileType m_type;
 	//TODO: Dangerous exposure of raw pointer
-	Ship* m_shipOnTile;
+	ShipOnTile m_shipOnTile;
+	FactionName m_shipOnTileFaction;
 	std::unique_ptr<HAPISPACE::Sprite> m_daySprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_aftersprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_eveningSprite;
@@ -36,7 +54,7 @@ struct Tile
 						std::shared_ptr<HAPISPACE::SpriteSheet> nightSpriteSheet,
 						std::pair<int, int> coord) :
 		m_type(type),
-		m_shipOnTile(nullptr),
+		m_shipOnTile(),
 		m_daySprite(),
 		m_aftersprite(),
 		m_eveningSprite(),

@@ -190,7 +190,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	}
 }
 
-Battle::Battle(std::vector<std::unique_ptr<Player>>& players)
+Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
 	: m_players(players),
 	m_currentPlayerTurn(0),
 	m_map(),
@@ -240,14 +240,17 @@ void Battle::start(const std::string & newMapName)
 	//Assign Spawn Position
 	for (auto& player : m_players)
 	{
-		player->createSpawnArea(m_map);
+		if (player)
+		{
+			player->createSpawnArea(m_map);
+		}
 	}
 
 	//Set initial deployment state
 	bool humanPlayerFound = false;
 	for (const auto& player : m_players)
 	{
-		if (player->m_playerType == ePlayerType::eHuman)
+		if (player && player->m_playerType == ePlayerType::eHuman)
 		{
 			humanPlayerFound = true;
 		}
@@ -271,7 +274,10 @@ void Battle::render() const
 
 	for (const auto& player : m_players)
 	{
-		player->render(m_map);
+		if (player)
+		{
+			player->render(m_map);
+		}
 	}
 
 	m_battleUI.drawTargetArea();
@@ -392,34 +398,34 @@ bool Battle::setShipDeploymentAtPosition(std::pair<int, int> position)
 bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea)
 {
 	assert(m_currentBattlePhase == BattlePhase::Attack);
-	assert(tileOnPlayer.m_shipOnTile);
-
-	if (!tileOnPlayer.m_shipOnTile)
+	assert(tileOnPlayer.m_shipOnTile.isValid());
+	assert(!getFactionShip(tileOnPlayer.m_shipOnTile).isWeaponFired());
+	
+	if (!tileOnPlayer.m_shipOnTile.isValid())
 	{
 		return false;
 	}
-	assert(!tileOnPlayer.m_shipOnTile->isWeaponFired());
 
 	//Disallow attacking same team
-	if (tileOnAttackPosition.m_shipOnTile && tileOnAttackPosition.m_shipOnTile->getFactionName() != getCurrentFaction()
-			&& !tileOnAttackPosition.m_shipOnTile->isDead())
+	if (tileOnAttackPosition.m_shipOnTile.factionName != getCurrentFaction()
+			&& !getFactionShip(tileOnAttackPosition.m_shipOnTile).isDead())
 	{
 		//Find entity 
-		auto tileCoordinate = tileOnAttackPosition.m_shipOnTile->getCurrentPosition();
+		auto tileCoordinate =  getFactionShip(tileOnAttackPosition.m_shipOnTile).getCurrentPosition();
 		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), [tileCoordinate](const auto& tile) { if(tile) return tileCoordinate == tile->m_tileCoordinate; });
 		//Enemy within range of weapon
 		if (cIter != targetArea.cend())
 		{
-			if (tileOnPlayer.m_shipOnTile->getShipType() == eShipType::eFire)
+			if (getFactionShip(tileOnPlayer.m_shipOnTile).getShipType() == eShipType::eFire)
 			{
-				playFireAnimation(*tileOnPlayer.m_shipOnTile, targetArea[0]->m_tileCoordinate);
+				playFireAnimation(getFactionShip(tileOnPlayer.m_shipOnTile), targetArea[0]->m_tileCoordinate);
 			}
 			else
 			{
-				playExplosionAnimation(*tileOnAttackPosition.m_shipOnTile);
+				playExplosionAnimation(getFactionShip(tileOnAttackPosition.m_shipOnTile));
 			}
 
-			tileOnPlayer.m_shipOnTile->fireWeapon();
+			m_players[static_cast<int>(tileOnPlayer.m_shipOnTile.factionName)]->fire fireWeapon();
 			auto& enemy = tileOnAttackPosition.m_shipOnTile;
 			enemy->takeDamage(tileOnPlayer.m_shipOnTile->getDamage(), enemy->getFactionName());
 			
@@ -440,6 +446,11 @@ void Battle::nextTurn()
 		{
 			for (int i = 0; i < m_players.size(); ++i)
 			{
+				if (!m_players[i])
+				{
+					continue;
+				}
+
 				if (m_players[i]->m_playerType != ePlayerType::eHuman)
 				{
 					continue;
@@ -466,6 +477,11 @@ void Battle::nextTurn()
 		{
 			for (int i = 0; i < m_players.size(); ++i)
 			{
+				for (!m_players[i])
+				{
+					continue;
+				}
+
 				if (m_players[i]->m_playerType != ePlayerType::eAI)
 				{
 					continue;
@@ -573,7 +589,7 @@ std::vector<FactionName> Battle::getAllFactionsInPlay() const
 	return allFactionsInPlay;
 }
 
-void Battle::playFireAnimation(Ship& entity, std::pair<int, int> position)
+void Battle::playFireAnimation(const Ship& entity, std::pair<int, int> position)
 {
 	for (auto& it : m_fireParticles)
 	{
@@ -587,7 +603,7 @@ void Battle::playFireAnimation(Ship& entity, std::pair<int, int> position)
 	}
 }
 
-void Battle::playExplosionAnimation(Ship& entity)
+void Battle::playExplosionAnimation(const Ship& entity)
 {
 	for (auto& it : m_explosionParticles)
 	{
@@ -662,14 +678,17 @@ void Battle::updateAttackPhase()
 	}
 }
 
-Player& Battle::getPlayer(FactionName factionName)
+Faction& Battle::getPlayer(FactionName factionName)
 {
+	assert(m_players[static_cast<int>(factionName)]);
+	return m_players[static_cast<int>(factionName)].get
+	;
 	auto cIter = std::find_if(m_players.begin(), m_players.end(), [factionName](auto& player) { return factionName == player->m_factionName; });
 	assert(cIter != m_players.end());
 	return *cIter->get();
 }
 
-std::unique_ptr<Player>& Battle::getCurrentPlayer()
+std::unique_ptr<Faction>& Battle::getCurrentPlayer()
 {
 	assert(m_players[m_currentPlayerTurn].get());
 	return m_players[m_currentPlayerTurn];
@@ -717,11 +736,22 @@ ePlayerType Battle::getCurrentPlayerType() const
 	return m_players[m_currentPlayerTurn]->m_playerType;
 }
 
-const Player & Battle::getPlayer(FactionName factionName) const
+const Faction & Battle::getPlayer(FactionName factionName) const
 {
 	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [factionName](auto& player) { return player->m_factionName == factionName; });
 	assert(cIter != m_players.cend());
 	return *cIter->get();
+}
+
+const Ship & Battle::getFactionShip(ShipOnTile shipOnTile) const
+{
+	assert(shipOnTile.factionName != FactionName::Invalid);
+	assert(shipOnTile.shipID != INVALID_SHIP_ID);
+
+	FactionName factionName = shipOnTile.factionName;
+	auto player = std::find_if(m_players.cbegin(), m_players.cend(), [factionName](auto& player) { return player->m_factionName == factionName; });
+	assert(player != m_players.cend());
+	player->get()->m_ships[shipOnTile.shipID];
 }
 
 void Battle::onYellowShipDestroyed()
@@ -816,7 +846,7 @@ void Battle::WinningFactionHandler::update(float deltaTime)
 	}
 }
 
-void Battle::WinningFactionHandler::onYellowShipDestroyed(std::vector<std::unique_ptr<Player>>& players)
+void Battle::WinningFactionHandler::onYellowShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
 {
 	++m_yellowShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eYellow; });
@@ -828,7 +858,7 @@ void Battle::WinningFactionHandler::onYellowShipDestroyed(std::vector<std::uniqu
 	}
 }
 
-void Battle::WinningFactionHandler::onBlueShipDestroyed(std::vector<std::unique_ptr<Player>>& players)
+void Battle::WinningFactionHandler::onBlueShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
 {
 	++m_blueShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eBlue; });
@@ -840,7 +870,7 @@ void Battle::WinningFactionHandler::onBlueShipDestroyed(std::vector<std::unique_
 	}
 }
 
-void Battle::WinningFactionHandler::onGreenShipDestroyed(std::vector<std::unique_ptr<Player>>& players)
+void Battle::WinningFactionHandler::onGreenShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
 {
 	++m_greenShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eGreen; });
@@ -852,7 +882,7 @@ void Battle::WinningFactionHandler::onGreenShipDestroyed(std::vector<std::unique
 	}
 }
 
-void Battle::WinningFactionHandler::onRedShipDestroyed(std::vector<std::unique_ptr<Player>>& players)
+void Battle::WinningFactionHandler::onRedShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
 {
 	++m_redShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eRed; });
@@ -875,7 +905,7 @@ void Battle::WinningFactionHandler::onReset()
 	m_gameOver = false;
 }
 
-void Battle::WinningFactionHandler::checkGameStatus(const std::vector<std::unique_ptr<Player>>& players)
+void Battle::WinningFactionHandler::checkGameStatus(const std::vector<std::unique_ptr<Faction>>& players)
 {
 	//Check to see if all players have been eliminated
 	int playersEliminated = 0;

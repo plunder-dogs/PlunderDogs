@@ -1,12 +1,16 @@
 #pragma once
 #include <utility>
 
+constexpr int INVALID_SHIP_ID = -1;
+
 enum FactionName
 {
+	Invalid = -1,
 	eYellow = 0,
 	eBlue,
 	eGreen,
-	eRed
+	eRed,
+	MAX = 4
 };
 
 enum eDirection

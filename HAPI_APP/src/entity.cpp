@@ -77,6 +77,11 @@ int Ship::getHealth() const
 	return m_health;
 }
 
+int Ship::getID() const
+{
+	return m_ID;
+}
+
 int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile & destination)
 {
 	posi start = { source.m_tileCoordinate.first, source.m_tileCoordinate.second, source.m_shipOnTile->m_currentDirection };
@@ -87,48 +92,21 @@ int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile 
 		return 0;
 	}
 	disableMovementPath();
-	//float movementPointsUsed = 0;
+
 	if (!source.m_shipOnTile)
 		return 0;
-	//int prevDir = source.m_entityOnTile->m_battleProperties.m_currentDirection;
-	std::pair<int, int> prevPos = source.m_tileCoordinate;
-	//float windStrength = map.getWindStrength();
-	//int windDirection = static_cast<int>(map.getWindDirection());
-	//Don't interact with path from source.
+
 	int i = 0;
 	int queueSize = pathToTile.size();
 	for (i; i < queueSize; ++i)
 	{
-		/*
-		//If moved from prev position handle forward cost
-		if (pathToTile.front().pair() != prevPos)
-		{
-			movementPointsUsed += 1;
-			if (prevDir == windDirection)
-			{
-				movementPointsUsed -= windStrength;
-			}
-		}
-		//Turning cost handling
-		int pathDir = pathToTile.front().dir;
-		movementPointsUsed += static_cast<float>(getDirectionCost(prevDir, pathDir));
-		prevDir = pathDir;
-
-		*/
-		//if ((static_cast<float>(source.m_entityOnTile->m_entityProperties.m_movementPoints) - movementPointsUsed) >= 0)
-		{
-			auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
-			m_movementPath[i].m_sprite->GetTransformComp().SetPosition({
-				static_cast<float>(tileScreenPosition.first + DRAW_OFFSET_X * map.getDrawScale()),
-				static_cast<float>(tileScreenPosition.second + DRAW_OFFSET_Y * map.getDrawScale()) });
-			m_movementPath[i].m_active = true;
-			m_movementPath[i].m_position = pathToTile.front().pair();
-		}
-		//else
-		//{
-		//	source.m_entityOnTile->m_battleProperties.m_movementPathSize = i - 1;
-		//	return i;
-		//}
+		auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
+		m_movementPath[i].m_sprite->GetTransformComp().SetPosition({
+			static_cast<float>(tileScreenPosition.first + DRAW_OFFSET_X * map.getDrawScale()),
+			static_cast<float>(tileScreenPosition.second + DRAW_OFFSET_Y * map.getDrawScale()) });
+		m_movementPath[i].m_active = true;
+		m_movementPath[i].m_position = pathToTile.front().pair();
+		
 		pathToTile.pop();
 	}
 	source.m_shipOnTile->m_movementPathSize = i - 1;
@@ -543,7 +521,7 @@ void Ship::deployAtPosition(std::pair<int, int> position, Battle & battle, eDire
 }
 
 //BATTLE PLAYER
-Player::Player(FactionName name, ePlayerType playerType)
+Faction::Faction(FactionName name, ePlayerType playerType)
 	: m_ships(),
 	m_factionName(name),
 	m_playerType(playerType),
@@ -554,7 +532,7 @@ Player::Player(FactionName name, ePlayerType playerType)
 	m_ships.reserve(size_t(6));
 }
 
-void Player::render(const Map & map) const
+void Faction::render(const Map & map) const
 {
 	for (const auto& spawnArea : m_spawnArea)
 	{
@@ -573,10 +551,21 @@ void Player::render(const Map & map) const
 	{
 		m_shipToDeploy->render(map);
 	}
-	
 }
 
-void Player::createSpawnArea(Map & map)
+void Faction::addShip(FactionName factionName, eShipType shipType)
+{
+	assert(m_ships.size() >= size_t(6));
+	int shipID = static_cast<int>(m_ships.size());
+	m_ships.emplace_back(factionName, shipType, shipID);
+	
+	if (!m_shipToDeploy)
+	{
+		m_shipToDeploy = &m_ships.back();
+	}
+}
+
+void Faction::createSpawnArea(Map & map)
 {
 	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 3, true, true);
 	m_spawnArea.reserve(tileRadius.size());
@@ -586,7 +575,7 @@ void Player::createSpawnArea(Map & map)
 	}
 }
 
-void Player::onNewTurn()
+void Faction::onNewTurn()
 {
 	for (auto& ship : m_ships)
 	{
