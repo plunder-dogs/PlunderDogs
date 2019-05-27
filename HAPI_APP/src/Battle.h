@@ -3,7 +3,7 @@
 #include "Global.h"
 #include "Map.h"
 #include "BattleUI.h"
-#include "entity.h"
+#include "Faction.h"
 #include <array>
 
 //https://en.wikipedia.org/wiki/Builder_pattern#C.2B.2B_Example
@@ -75,6 +75,7 @@ public:
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Faction& getPlayer(FactionName name) const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
+
 	void start(const std::string& newMapName);
 	void render() const;
 	void update(float deltaTime);
@@ -86,7 +87,7 @@ public:
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination, eDirection endDirection);
 	void disableFactionShipMovementPath(ShipOnTile shipOnTile);
-	void generateFactionShipMovementPath(ShipOnTile& shipOnTile, std::pair<int, int> destination);
+	void generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination);
 	//Attack Phase
 	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
 	void playFireAnimation(const Ship& entity, std::pair<int, int> position);
@@ -107,7 +108,7 @@ private:
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
 
-	Faction& getPlayer(FactionName factionName);
+	std::unique_ptr<Faction>& getFaction(FactionName factionName);
 	std::unique_ptr<Faction>& getCurrentPlayer();
 
 	void nextTurn();

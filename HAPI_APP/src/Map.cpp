@@ -389,32 +389,30 @@ std::vector<const Tile*> Map::cGetTileCone(intPair coord, int range, eDirection 
 	return tileStore;
 }
 
-bool Map::updateTileNewShipPosition(intPair originalPos, intPair newPos)
+bool Map::updateShipOnTile(ShipOnTile ship, std::pair<int, int> currentPosition, std::pair<int, int> newPosition)
 {
-	Tile* oldTile = getTile(originalPos);
-	Tile* newTile = getTile(newPos);
-	
-	if (!oldTile || !newTile)
+	Tile* currentTile = getTile(currentPosition);
+	assert(currentTile);
+	Tile* newTile = getTile(newPosition);
+	assert(newTile);
+
+	if (newTile->m_shipOnTile.isValid() || !currentTile->m_shipOnTile.isValid())
 	{
 		return false;
 	}
 
-	if (newTile->m_shipOnTile != nullptr || oldTile->m_shipOnTile == nullptr)
-	{
-		return false;
-	}
-
-	newTile->m_shipOnTile = oldTile->m_shipOnTile;
-	oldTile->m_shipOnTile = nullptr;
+	newTile->m_shipOnTile = currentTile->m_shipOnTile;
+	currentTile->m_shipOnTile.reset();
 	return true;
 }
 
-void Map::assignTileToShip(Ship& newEntity)
+void Map::setShipOnTile(ShipOnTile ship, std::pair<int, int> shipPosition)
 {
-	Tile* tile = getTile(newEntity.getCurrentPosition());	
-	if (tile && !tile->m_shipOnTile)
+	Tile* tile = getTile(shipPosition);	
+	assert(tile);
+	if (!tile->m_shipOnTile.isValid())
 	{
-		tile->m_shipOnTile = &newEntity;
+		tile->m_shipOnTile = ship;
 	}
 }
 

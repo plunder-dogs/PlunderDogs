@@ -170,12 +170,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Faction.cpp" />
+    <ClCompile Include="src\Ship.cpp" />
     <ClCompile Include="src\SpriteToggleVisibility.cpp" />
     <ClCompile Include="src\AI.cpp" />
     <ClCompile Include="src\BattleGUI.cpp" />
     <ClCompile Include="src\Battle.cpp" />
     <ClCompile Include="src\BattleUI.cpp" />
-    <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\GameEventMessenger.cpp" />
     <ClCompile Include="src\HAPIWrapper.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -192,12 +193,13 @@
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Faction.h" />
+    <ClInclude Include="src\Ship.h" />
     <ClInclude Include="src\SpriteToggleVisibility.h" />
     <ClInclude Include="src\AI.h" />
     <ClInclude Include="src\BattleGUI.h" />
     <ClInclude Include="src\Battle.h" />
     <ClInclude Include="src\BattleUI.h" />
-    <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\HAPIWrapper.h" />

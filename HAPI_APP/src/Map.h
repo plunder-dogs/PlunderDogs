@@ -25,10 +25,20 @@ struct ShipOnTile
 		: factionName(FactionName::Invalid),
 		shipID(INVALID_SHIP_ID)
 	{}
+	ShipOnTile(FactionName factionName, int shipID)
+		: factionName(factionName),
+		shipID(shipID)
+	{}
 
 	bool isValid() const
 	{
 		return (factionName != FactionName::Invalid && shipID != INVALID_SHIP_ID);
+	}
+
+	void reset()
+	{
+		factionName = FactionName::Invalid;
+		shipID = INVALID_SHIP_ID;
 	}
 
 	FactionName factionName;
@@ -130,9 +140,9 @@ public:
 	std::pair<int, int> getMouseClickCoord(std::pair<int, int> mouseCoord) const;
 
 	//Moves an entitys position on the map, returns false if the position is already taken
-	bool updateTileNewShipPosition(std::pair<int, int> originalPos, std::pair<int, int> newPos);
+	bool updateShipOnTile(ShipOnTile ship, std::pair<int, int> currentPosition, std::pair<int, int> newPosition);
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
-	void assignTileToShip(Ship& newEntity);
+	void setShipOnTile(ShipOnTile ship, std::pair<int, int> shipPosition);
 
 	void drawMap(eLightIntensity lightIntensity) const;
 	std::pair<int, int> getDrawOffset() const { return m_drawOffset; }

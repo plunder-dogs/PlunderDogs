@@ -341,47 +341,33 @@ void Battle::update(float deltaTime)
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	assert(m_factions[static_cast<int>(shipOnTile.factionName)].get());
-	m_factions[static_cast<int>(shipOnTile.factionName)]->moveShipToPosition(m_map, shipOnTile.shipID, destination);
+	getFaction(shipOnTile.factionName)->moveShipToPosition(m_map, shipOnTile.shipID, destination);
 }
 
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	assert(m_factions[static_cast<int>(shipOnTile.factionName)].get());
-	m_factions[static_cast<int>(shipOnTile.factionName)]->moveShipToPosition(m_map, shipOnTile.shipID, destination, endDirection);
+	getFaction(shipOnTile.factionName)->moveShipToPosition(m_map, shipOnTile.shipID, destination, endDirection);
 }
 
 void Battle::disableFactionShipMovementPath(ShipOnTile shipOnTile)
 {
+	assert(m_currentBattlePhase == BattlePhase::Movement);
+	getFaction(shipOnTile.factionName)->disableShipMovementPath(shipOnTile.shipID);
 }
 
 void Battle::generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination)
 {
-	assert(m_factions[static_cast<int>(shipOnTile.factionName)].get());
-	m_factions[static_cast<int>(shipOnTile.factionName)]->generateShipMovementPath(m_map, shipOnTile.shipID, destination);
+	assert(m_currentBattlePhase == BattlePhase::Movement);
+	getFaction(shipOnTile.factionName)->generateShipMovementPath(m_map, shipOnTile.shipID, destination);
 }
 
 void Battle::deployFactionShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
-	assert(m_factions[m_currentFactionTurn]->m_shipToDeploy);
+	m_factions[m_currentFactionTurn]->deployShipAtPosition(m_map, startingPosition, startingDirection);
 
-	m_factions[m_currentFactionTurn]->m_shipToDeploy->deployAtPosition(startingPosition, *this, startingDirection);
-	m_map.assignTileToShip(*m_factions[m_currentFactionTurn]->m_shipToDeploy);
-	m_factions[m_currentFactionTurn]->m_shipToDeploy = nullptr;
-
-	bool allShipsDeployed = true;
-	for (auto& ship : m_factions[m_currentFactionTurn]->m_ships)
-	{
-		if (!ship.isDeployed())
-		{
-			m_factions[m_currentFactionTurn]->m_shipToDeploy = &ship;
-			allShipsDeployed = false;
-		}
-	}
-
-	if (allShipsDeployed)
+	if (m_factions[m_currentFactionTurn]->isAllShipsDeployed())
 	{
 		nextTurn();
 	}
@@ -390,21 +376,20 @@ void Battle::deployFactionShipAtPosition(std::pair<int, int> startingPosition, e
 bool Battle::setShipDeploymentAtPosition(std::pair<int, int> position)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
-	auto& currentPlayer = getCurrentPlayer();
-	assert(getCurrentPlayer()->m_shipToDeploy);
+	m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position);
 
-	auto iter = std::find_if(currentPlayer->m_spawnArea.cbegin(), currentPlayer->m_spawnArea.cend(), 
-		[position](const auto& spawnArea) { return position == spawnArea.m_position; });
-	if (iter != currentPlayer->m_spawnArea.cend())
-	{
-		currentPlayer->m_shipToDeploy->setDeploymentPosition(position, *this);
-		return true;
-	}
-	else
-	{
-		currentPlayer->m_shipToDeploy->setDeploymentPosition(position, *this);
-		return false;
-	}
+	//auto iter = std::find_if(currentPlayer->m_spawnArea.cbegin(), currentPlayer->m_spawnArea.cend(), 
+	//	[position](const auto& spawnArea) { return position == spawnArea.m_position; });
+	//if (iter != currentPlayer->m_spawnArea.cend())
+	//{
+	//	currentPlayer->m_shipToDeploy->setDeploymentPosition(position, *this);
+	//	return true;
+	//}
+	//else
+	//{
+	//	currentPlayer->m_shipToDeploy->setDeploymentPosition(position, *this);
+	//	return false;
+	//}
 }
 
 bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea)
@@ -699,6 +684,12 @@ Faction& Battle::getPlayer(FactionName factionName)
 	auto cIter = std::find_if(m_factions.begin(), m_factions.end(), [factionName](auto& player) { return factionName == player->m_factionName; });
 	assert(cIter != m_factions.end());
 	return *cIter->get();
+}
+
+std::unique_ptr<Faction>& Battle::getFaction(FactionName factionName)
+{
+	assert(m_factions[static_cast<int>(factionName)].get());
+	return m_factions[static_cast<int>(factionName)];
 }
 
 std::unique_ptr<Faction>& Battle::getCurrentPlayer()
