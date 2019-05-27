@@ -56,7 +56,7 @@ private:
 	std::vector<std::pair<eShipType, std::shared_ptr<Sprite>>> m_shipsToSelect;
 	int m_currentPlayer;
 	bool m_selectNextPlayer;
-	std::vector<PlayerDetails> m_players;
+	std::vector<PlayerDetails> m_factions;
 	OverWorldGUI m_GUI;
 	Battle m_battle;
 	bool m_startBattle;

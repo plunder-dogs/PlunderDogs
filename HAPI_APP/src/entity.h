@@ -34,6 +34,7 @@ public:
 	int getDamage() const;
 	int getHealth() const;
 	int getID() const;
+	std::pair<int, int> getEndOfMovementPath() const;
 
 	void update(float deltaTime, const Map& map);
 	void render(const Map& map) const;
@@ -41,12 +42,11 @@ public:
 	void setDeploymentPosition(std::pair<int, int> position, const Battle& battle);
 	void deployAtPosition(std::pair<int, int> position, Battle& battle, eDirection startingDirection = eDirection::eNorth);
 
-	int generateMovementPath(const Map& map, const Tile& source, const Tile& destination);
-	std::pair<int, int> getEndOfMovementPath();
+	int generateMovementPath(const Map& map, std::pair<int, int> destination);
 	void disableMovementPath();
 
-	bool moveEntity(Map& map, const Tile& tile);
-	bool moveEntity(Map& map, const Tile& tile, eDirection endDirection);
+	bool move(Map& map, std::pair<int, int> destination);
+	bool move(Map& map, std::pair<int, int> destination, eDirection endDirection);
 	void takeDamage(int damageAmount, FactionName entityFaction);
 	void fireWeapon();
 	void setDestination();
@@ -98,11 +98,17 @@ struct Faction
 	Faction(FactionName name, ePlayerType playerType);
 	
 	void render(const Map& map) const;
+	//Deployment Phase
 	void addShip(FactionName factionName, eShipType shipType);
 	void createSpawnArea(Map& map);
 	void onNewTurn();
-	void fireShipAtPosition(int shipID, )
-
+	//Movement Phase
+	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination);
+	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection);
+	void generateShipMovementPath(const Map& map, int shipID, std::pair<int, int> destination);
+	//Attack Phase
+	void shipTakeDamage(int shipID, int damage);
+	
 	std::vector<Ship> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;

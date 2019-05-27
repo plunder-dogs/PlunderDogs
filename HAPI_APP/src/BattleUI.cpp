@@ -64,7 +64,8 @@ BattleUI::BattleUI(Battle & battle)
 	m_mouseDownTile(nullptr),
 	m_arrowActive(false),
 	m_arrowSprite(HAPI_Sprites.MakeSprite(Textures::m_CompassPointer)),
-	m_lastMouseData({0,0})
+	m_lastMouseData({0,0}),
+	m_targetArea()
 {
 	m_arrowSprite->GetTransformComp().SetScaling({ 0.5, 0.5 });
 	m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
@@ -107,7 +108,7 @@ void BattleUI::renderGUI() const
 	m_invalidPosition.render(m_battle.getMap());
 	m_gui.render(m_battle.getCurrentPhase());
 
-	if (m_selectedTile.m_tile  != nullptr && m_selectedTile.m_tile->m_shipOnTile != nullptr)
+	if (m_selectedTile.m_tile != nullptr && m_selectedTile.m_tile->m_shipOnTile.isValid())
 	{
 		m_gui.renderStats(*m_selectedTile.m_tile->m_shipOnTile);
 	}
@@ -285,11 +286,12 @@ void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mous
 				}
 				if (mouseMoveDirection.first > 20)
 				{
-					m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_shipOnTile, *m_mouseDownTile, mouseMoveDirection.second);
+					m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, m_mouseDownTile->m_tileCoordinate, mouseMoveDirection.second);
 				}
 				else
 				{
-					m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_shipOnTile, *m_mouseDownTile);
+					m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, m_mouseDownTile->
+);
 				}
 				m_arrowActive = false;
 				break;
@@ -355,8 +357,11 @@ void BattleUI::clearTargetArea()
 void BattleUI::clearSelectedTile()
 {
 	m_arrowActive = false;
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
-		m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
+	{
+		m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
+	}
+		
 	m_selectedTile.m_tile = nullptr;
 }
 
@@ -402,7 +407,7 @@ void BattleUI::onMouseMoveDeploymentPhase()
 		m_selectedTile.m_tile = tileOnMouse;
 
 		//Cannot place ship on existing ship
-		if (tileOnMouse->m_shipOnTile)
+		if (tileOnMouse->m_shipOnTile.isValid())
 		{
 			m_invalidPosition.setPosition(map.getTileScreenPos(tileOnMouse->m_tileCoordinate), map);
 			m_invalidPosition.m_activate = true;
@@ -431,10 +436,10 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 
 	if (m_selectedTile.m_tile && (m_selectedTile.m_tile->m_type == eTileType::eSea || m_selectedTile.m_tile->m_type == eTileType::eOcean))
 	{
-		if (!m_invalidPosition.m_activate && !m_selectedTile.m_tile->m_shipOnTile)
+		if (!m_invalidPosition.m_activate && !m_selectedTile.m_tile->m_shipOnTile.isValid())
 		{
 			m_invalidPosition.m_position = m_selectedTile.m_tile->m_tileCoordinate;
-			m_battle.deployShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
+			m_battle.deployFactionShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
 		}
 	}
 }
@@ -449,16 +454,16 @@ void BattleUI::onMouseMoveMovementPhase()
 	}
 
 	//Current tile selected does not match the current player in play
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile 
-		&& m_selectedTile.m_tile->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid()
+		&& m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
 		return;
 	}
 
 	//!isMovingToDestination && !reachedDestination
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile &&  
-		!m_selectedTile.m_tile->m_shipOnTile->isMovingToDestination() &&
-		!m_selectedTile.m_tile->m_shipOnTile->isDestinationSet())
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() &&  
+		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isMovingToDestination() &&
+		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isDestinationSet())
 	{
 		const Tile* tile = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
 		if (!tile)
@@ -472,11 +477,11 @@ void BattleUI::onMouseMoveMovementPhase()
 			{
 				m_invalidPosition.setPosition(tile->m_tileCoordinate, m_battle.getMap());
 				m_invalidPosition.m_activate = true;
-				m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+				m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 			}
 			else
 			{
-				m_selectedTile.m_tile->m_shipOnTile->generateMovementPath(m_battle.getMap(), *m_selectedTile.m_tile, *tile);
+				m_battle.generateFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile, tile->m_tileCoordinate);
 				m_invalidPosition.m_activate = false;
 			}
 		}
@@ -493,12 +498,12 @@ void BattleUI::onLeftClickMovementPhase()
 		return;
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile)
+	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		if (m_battle.getCurrentPlayerType() != ePlayerType::eAI)
 		{
-			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 		}
 		return;
 	}
@@ -508,8 +513,8 @@ void BattleUI::onLeftClickMovementPhase()
 		return;
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile &&
-		tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() &&
+		m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		return;
@@ -518,15 +523,15 @@ void BattleUI::onLeftClickMovementPhase()
 	//Invalid Location - Collidable tile
 	if (tileOnMouse->m_type != eTileType::eSea && tileOnMouse->m_type != eTileType::eOcean)
 	{
-		if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
+		if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
 		{
-			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
 		}
 		return;
 	}
 
 	//Do not select killed entity
-	if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->isDead())
+	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
 	{
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
@@ -534,7 +539,7 @@ void BattleUI::onLeftClickMovementPhase()
 	}
 
 	//Clicking to where entity is moving to
-	if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->isDestinationSet())
+	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDestinationSet())
 	{
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
@@ -546,49 +551,49 @@ void BattleUI::onLeftClickMovementPhase()
 		//Cancel movement if clicked on same entity
 		if (m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
 		{
-			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 			//TODO: Drop info box
 			m_selectedTile.m_tile = nullptr;
 		}
 
 		//TODO: TAKE A LONG HARD LOOK AT THIS STATEMENT
 		//Disallow movement to tile occupied by other player
-		else if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+		else if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 		{
-			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 			m_selectedTile.m_tile = tileOnMouse;
 		}
-		else if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction())
+		else if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 		{
-			m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
 			m_selectedTile.m_tile = tileOnMouse;
 		}
 
 		//Store data so Entity can move to new location
-		else if (m_selectedTile.m_tile->m_shipOnTile && (m_selectedTile.m_tile->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
-			&& m_selectedTile.m_tile->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction())
+		else if (m_selectedTile.m_tile->m_shipOnTile.isValid() && (m_selectedTile.m_tile->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
+			&& m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 		{
-			assert(m_selectedTile.m_tile->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction());
+			assert(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction());
 			m_mouseDownTile = tileOnMouse;
 			m_isMovingEntity = true;
-			auto test = m_selectedTile.m_tile->m_shipOnTile->getEndOfMovementPath();
-			if (m_selectedTile.m_tile->m_shipOnTile->getEndOfMovementPath() == tileOnMouse->m_tileCoordinate)
+			auto test = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getEndOfMovementPath();
+			if (m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getEndOfMovementPath() == tileOnMouse->m_tileCoordinate)
 				m_arrowActive = true;
-			m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_shipOnTile, *tileOnMouse);
+			m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, tileOnMouse->m_tileCoordinate);
 			m_selectedTile.m_tile = nullptr;
 		}
 	}
 	else
 	{
-		if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->isDead())
+		if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
 		{
 			//TODO: Drop info box
 			m_selectedTile.m_tile = nullptr;
 		}
 		//Do not select tile that contains wrong players entity
-		if (tileOnMouse->m_shipOnTile)
+		if (tileOnMouse->m_shipOnTile.isValid())
 		{
-			if (tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+			if (m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 			{
 				//TODO: Drop info box
 				m_selectedTile.m_tile = nullptr;
@@ -606,9 +611,9 @@ void BattleUI::onRightClickMovementPhase()
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 	//Cancel selected Entity
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile)
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
 	{
-		m_selectedTile.m_tile->m_shipOnTile->disableMovementPath();
+		m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
 		m_invalidPosition.m_activate = false;
 	}
 	//TODO: Drop info box
@@ -644,10 +649,10 @@ void BattleUI::onLeftClickAttackPhase()
 	}
 
 	//Select new entity that is on same team
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile && tileOnMouse->m_shipOnTile &&
-		(tileOnMouse->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction()))
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && tileOnMouse->m_shipOnTile.isValid() &&
+		(m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()))
 	{
-		if (!tileOnMouse->m_shipOnTile->isWeaponFired())
+		if (!m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isWeaponFired())
 		{
 			m_targetArea.clearTargetArea();
 			m_targetArea.generateTargetArea(m_battle.getMap(), *tileOnMouse);
@@ -656,14 +661,14 @@ void BattleUI::onLeftClickAttackPhase()
 		}
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		return;
 	}
 
 	//Do not fire on destroyed ship
-	if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->isDead())
+	if (tileOnMouse->m_shipOnTile.isValid() && tileOnMouse->m_shipOnTile->isDead())
 	{
 		m_targetArea.clearTargetArea();
 		m_invalidPosition.m_activate = false;
@@ -684,10 +689,12 @@ void BattleUI::onLeftClickAttackPhase()
 
 	//Entity already selected Fire weapon at position
 	//If the selectedTile has an entity on it and that entity hasn't fired
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile && !m_selectedTile.m_tile->m_shipOnTile->isWeaponFired())
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && 
+		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isWeaponFired())
 	{
 		//If there is an entity on the tile you're clicking on and that entity's faction name differs from the one of the ship that's firing
-		if ((tileOnMouse->m_shipOnTile != nullptr) && tileOnMouse->m_shipOnTile->getFactionName() != m_selectedTile.m_tile->m_shipOnTile->getFactionName())
+		if ((tileOnMouse->m_shipOnTile.isValid()) && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != 
+			m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName())
 		{
 			m_battle.fireEntityWeaponAtPosition(*m_selectedTile.m_tile, *tileOnMouse, m_targetArea.m_targetArea);
 		}
@@ -699,7 +706,7 @@ void BattleUI::onLeftClickAttackPhase()
 
 	//Entity Already Selected whilst showing where to fire
 	//Change to different Entity before firing
-	if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction()
+	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()
 		 && m_selectedTile.m_tile && m_targetArea.m_targetArea.size() > 0)
 	{
 		m_targetArea.clearTargetArea();
@@ -711,19 +718,21 @@ void BattleUI::onLeftClickAttackPhase()
 
 	//Click on same
 	//Select new Entity to fire at something
-	if (tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() != m_battle.getCurrentFaction())
+	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		return;
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile && tileOnMouse->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction())
+	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == 
+		m_battle.getCurrentFaction())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 	}
 
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile && !m_selectedTile.m_tile->m_shipOnTile->isWeaponFired() &&
-		m_selectedTile.m_tile->m_shipOnTile->getFactionName() == m_battle.getCurrentFaction())
+	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && 
+		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isWeaponFired() &&
+		m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 	{
 		m_selectedTile.m_tile = tileOnMouse;
 		m_targetArea.generateTargetArea(m_battle.getMap(), *tileOnMouse);

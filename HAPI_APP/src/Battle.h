@@ -27,7 +27,7 @@ class Battle
 
 		Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteSheet> texture, float scale);
 		void setPosition(std::pair<int, int> position);
-		void run(float deltaTime, const Map& map);
+		void update(float deltaTime, const Map& map);
 		void render() const;
 		void orient(eDirection direction);
 	};
@@ -80,19 +80,21 @@ public:
 	void update(float deltaTime);
 	
 	//Deploy Phase
-	void deployShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection);
+	void deployFactionShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection);
 	bool setShipDeploymentAtPosition(std::pair<int, int> position);
 	//Movement Phase
-	void moveEntityToPosition(Ship& entity, const Tile& destination);
-	void moveEntityToPosition(Ship& entity, const Tile& destination, eDirection endDirection);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination, eDirection endDirection);
+	void disableFactionShipMovementPath(ShipOnTile shipOnTile);
+	void generateFactionShipMovementPath(ShipOnTile& shipOnTile, std::pair<int, int> destination);
 	//Attack Phase
 	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
 	void playFireAnimation(const Ship& entity, std::pair<int, int> position);
 	void playExplosionAnimation(const Ship& entity);
 
 private:
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_players;
-	int m_currentPlayerTurn;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_factions;
+	int m_currentFactionTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;

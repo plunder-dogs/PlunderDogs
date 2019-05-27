@@ -82,19 +82,16 @@ int Ship::getID() const
 	return m_ID;
 }
 
-int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile & destination)
+int Ship::generateMovementPath(const Map & map, std::pair<int, int> destination)
 {
-	posi start = { source.m_tileCoordinate.first, source.m_tileCoordinate.second, source.m_shipOnTile->m_currentDirection };
-	posi end = { destination.m_tileCoordinate.first, destination.m_tileCoordinate.second };
-	std::queue<posi> pathToTile = BFS::findPath(map, start, end, source.m_shipOnTile->getMovementPoints());
+	posi start = { m_currentPosition, m_currentDirection };
+	posi end = { destination.first, destination.second };
+	std::queue<posi> pathToTile = BFS::findPath(map, start, end, m_movementPoints);
 	if (pathToTile.empty())
 	{
 		return 0;
 	}
 	disableMovementPath();
-
-	if (!source.m_shipOnTile)
-		return 0;
 
 	int i = 0;
 	int queueSize = pathToTile.size();
@@ -109,7 +106,8 @@ int Ship::generateMovementPath(const Map & map, const Tile & source, const Tile 
 		
 		pathToTile.pop();
 	}
-	source.m_shipOnTile->m_movementPathSize = i - 1;
+	
+	m_movementPathSize = i - 1;
 	return i;
 }
 
@@ -121,7 +119,7 @@ void Ship::disableMovementPath()
 	}
 }
 
-std::pair<int, int> Ship::getEndOfMovementPath()
+std::pair<int, int> Ship::getEndOfMovementPath() const
 {
 	int i = m_movementPath.size() - 1;
 	for (i; i > 0; i--)
@@ -145,14 +143,14 @@ void Ship::disableAction()
 	m_actionSprite.m_active = false;
 }
 
-bool Ship::moveEntity(Map& map, const Tile& tile)
+bool Ship::move(Map& map, std::pair<int, int> destination)
 {
 	if (!m_destinationSet)
 	{
 		posi currentPos = { m_currentPosition, m_currentDirection };
-		posi destination = { tile.m_tileCoordinate.first, tile.m_tileCoordinate.second };
+		posi destinationPos = { destination.first, destination.second };
 		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
-		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_shipOnTile->getMovementPoints());
+		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			m_pathToTile = pathToTile;
@@ -172,14 +170,14 @@ bool Ship::moveEntity(Map& map, const Tile& tile)
 	return true;
 }
 
-bool Ship::moveEntity(Map& map, const Tile& tile, eDirection endDirection)
+bool Ship::move(Map& map, std::pair<int, int> destination, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
 		posi currentPos = { m_currentPosition.first, m_currentPosition.second, m_currentDirection };
-		posi destination = { tile.m_tileCoordinate.first, tile.m_tileCoordinate.second };
+		posi destinationPos = { destination.first, destination.second };
 		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
-		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destination, map.getTile(currentPos)->m_shipOnTile->getMovementPoints());
+		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			pathToTile.emplace(posi(pathToTile.back().pair(), endDirection));
@@ -555,7 +553,7 @@ void Faction::render(const Map & map) const
 
 void Faction::addShip(FactionName factionName, eShipType shipType)
 {
-	assert(m_ships.size() >= size_t(6));
+	assert(m_ships.size() < size_t(6));
 	int shipID = static_cast<int>(m_ships.size());
 	m_ships.emplace_back(factionName, shipType, shipID);
 	
@@ -581,6 +579,29 @@ void Faction::onNewTurn()
 	{
 		ship.onNewTurn();
 	}
+}
+
+void Faction::shipTakeDamage(int shipID, int damage)
+{
+	m_ships[shipID].takeDamage(damage, m_factionName);
+}
+
+bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination)
+{
+	assert(m_ships.size() <= static_cast<size_t>(shipID + 1));
+	return m_ships[shipID].move(map, destination);
+}
+
+bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection)
+{
+	assert(m_ships.size() <= static_cast<size_t>(shipID + 1));
+	return m_ships[shipID].move(map, destination, endDirection);
+}
+
+void Faction::generateShipMovementPath(const Map & map, int shipID, std::pair<int, int> destination)
+{
+	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	m_ships[shipID].generateMovementPath(map, destination);
 }
 
 SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position, const Map & map)

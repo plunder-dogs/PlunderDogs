@@ -91,7 +91,7 @@ void AI::handleDeploymentPhase(Battle& battle, Map& map, const Faction& currentP
 	size_t currentPlayerTotalShips = currentPlayer.m_ships.size();
 	for (int i = 0; i < currentPlayerTotalShips; ++i)
 	{
-		battle.deployShipAtPosition(spawnArea[spawnPoint]->m_tileCoordinate, randomDir);
+		battle.deployFactionShipAtPosition(spawnArea[spawnPoint]->m_tileCoordinate, randomDir);
 		spawnPoint++;
 	}
 }
@@ -357,7 +357,7 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	if (bestTile != posi(-1, -1, eNorth))
 	{
 		currentShip.generateMovementPath(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
-		currentShip.moveEntity(map, *map.getTile(bestTile.pair()), targetTile.second);
+		currentShip.move(map, *map.getTile(bestTile.pair()), targetTile.second);
 	}
 	currentShip.setDestination();
 }
