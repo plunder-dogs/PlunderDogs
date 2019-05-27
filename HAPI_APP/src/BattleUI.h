@@ -5,36 +5,39 @@
 #include <vector>
 #include <deque>
 
+constexpr int MAX_MOVE_AREA{ 700 };
+
 struct EntityProperties;
 struct Tile;
 class Battle;
 class Map;
 class BattleUI : public IHapiSpritesInputListener
 {
+	//For displaying and remembering the location of the movement area of a selected ship
 	struct MovementArea
 	{
-		bool display;
-		int displaySize;
-		std::vector<std::unique_ptr<HAPISPACE::Sprite>> tileOverlays;
-		void newArea(Battle& battle, BattleEntity& ship)
+		bool m_display;
+		int m_displaySize;
+		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
+
+		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet> texturePtr) : m_display(false), m_displaySize(0), m_tileOverlays()
 		{
-			std::vector<posi> area = BFS::findArea(battle.getMap(),
-				ship.m_battleProperties.getCurrentPosition(),
-				ship.m_entityProperties.m_movementPoints);
-			displaySize = area.size();
-			for (int i = 0; i < displaySize; i++)
+			m_tileOverlays.resize(MAX_MOVE_AREA);
+			for (int i = 0; i < MAX_MOVE_AREA; i++)
 			{
-				posi pos = battle.getMap().getTileScreenPos(area[i].pair());
-				tileOverlays[i]->GetTransformComp().SetPosition({ pos.x, pos.y });
+				m_tileOverlays[i].second = std::make_unique<HAPISPACE::Sprite>(texturePtr);
+				m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
 			}
-			display = true;
 		}
+		void render(const Battle& battle) const;
+		void newArea(const Battle& battle, BattleEntity& ship);
 		void clear()
 		{
-			display = false;
-			displaySize = 0;
+			m_display = false;
+			m_displaySize = 0;
 		}
 	};
+
 	struct TargetArea
 	{
 		struct HighlightNode
@@ -161,6 +164,7 @@ private:
 	void onMouseMoveMovementPhase();
 	void onLeftClickMovementPhase();
 	void onRightClickMovementPhase();
+	MovementArea m_movementArea;
 
 	//Attack Phase
 	void onLeftClickAttackPhase();

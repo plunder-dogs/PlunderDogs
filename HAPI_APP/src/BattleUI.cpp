@@ -64,7 +64,9 @@ BattleUI::BattleUI(Battle & battle)
 	m_mouseDownTile(nullptr),
 	m_arrowActive(false),
 	m_arrowSprite(HAPI_Sprites.MakeSprite(Textures::m_CompassPointer)),
-	m_lastMouseData({0,0})
+	m_lastMouseData({ 0,0 }),
+	m_targetArea(),
+	m_movementArea(Textures::m_selectedHex)
 {
 	m_arrowSprite->GetTransformComp().SetScaling({ 0.5, 0.5 });
 	m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
@@ -100,6 +102,7 @@ void BattleUI::renderUI() const
 
 	case BattlePhase::Movement:
 		m_selectedTile.render(m_battle.getMap());
+		m_movementArea.render(m_battle);
 		renderArrow();
 		break;
 	
@@ -299,6 +302,7 @@ void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mous
 					m_battle.moveEntityToPosition(*m_selectedTile.m_tile->m_entityOnTile, *m_mouseDownTile);
 				}
 				m_arrowActive = false;
+				m_movementArea.clear();
 				break;
 			}
 			}
@@ -445,7 +449,11 @@ void BattleUI::onLeftClickMovementPhase()
 		if (!m_battle.isAIPlaying())
 		{
 			m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.clearMovementPath();
-			//TODO: Trigger movement area showing
+			//Display the available movement tiles
+			if (!m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.isDestinationSet())
+			{
+				m_movementArea.newArea(m_battle, *m_selectedTile.m_tile->m_entityOnTile);
+			}
 		}
 		return;
 	}
@@ -478,6 +486,7 @@ void BattleUI::onLeftClickMovementPhase()
 	{
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
+		m_movementArea.clear();
 		return;
 	}
 
@@ -486,6 +495,7 @@ void BattleUI::onLeftClickMovementPhase()
 	{
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
+		m_movementArea.clear();
 		return;
 	}
 
@@ -495,18 +505,10 @@ void BattleUI::onLeftClickMovementPhase()
 		if (m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
 		{
 			m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.clearMovementPath();
-			//TODO: Drop info box
-			m_selectedTile.m_tile = nullptr;
 		}
 
-		//TODO: TAKE A LONG HARD LOOK AT THIS STATEMENT
 		//Disallow movement to tile occupied by other player
-		else if (tileOnMouse->m_entityOnTile && tileOnMouse->m_entityOnTile->m_factionName != m_battle.getCurrentFaction())
-		{
-			m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.clearMovementPath();
-			m_selectedTile.m_tile = tileOnMouse;
-		}
-		else if (tileOnMouse->m_entityOnTile && tileOnMouse->m_entityOnTile->m_factionName == m_battle.getCurrentFaction())
+		else if (tileOnMouse->m_entityOnTile)
 		{
 			m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.clearMovementPath();
 			m_selectedTile.m_tile = tileOnMouse;
@@ -532,14 +534,16 @@ void BattleUI::onLeftClickMovementPhase()
 		{
 			//TODO: Drop info box
 			m_selectedTile.m_tile = nullptr;
+			m_movementArea.clear();
 		}
-		//Do not select tile that contains wrong players entity
+		//Do not select tile that contains wrong player's entity
 		if (tileOnMouse->m_entityOnTile)
 		{
 			if (tileOnMouse->m_entityOnTile->m_factionName != m_battle.getCurrentFaction())
 			{
 				//TODO: Drop info box
 				m_selectedTile.m_tile = nullptr;
+				m_movementArea.clear();
 			}
 			else
 			{
@@ -561,6 +565,7 @@ void BattleUI::onRightClickMovementPhase()
 	}
 	//TODO: Drop info box
 	m_selectedTile.m_tile = nullptr;
+	m_movementArea.clear();
 }
 
 void BattleUI::onLeftClickAttackPhase()
@@ -755,6 +760,7 @@ void BattleUI::onNewTurn()
 	m_invalidPosition.m_activate = false;
 	clearTargetArea();
 	clearSelectedTile();
+	m_movementArea.clear();
 }
 
 //Weapon Graph
@@ -1090,4 +1096,33 @@ void BattleUI::CurrentSelectedTile::render(const Map & map) const
 std::pair<int, int> BattleUI::DeploymentPhase::getSpawnPosition() const
 {
 	return m_spawnPosition;
+}
+
+void BattleUI::MovementArea::render(const Battle& battle) const
+{
+	if (m_display)
+	{
+		float scale = battle.getMap().getDrawScale();
+		for (int i = 0; i < m_displaySize; i++)
+		{
+			posi pos = battle.getMap().getTileScreenPos(m_tileOverlays[i].first);
+			float x = static_cast<float>(pos.x) + 16 * scale;
+			float y = static_cast<float>(pos.y) + 32 * scale;
+			m_tileOverlays[i].second->GetTransformComp().SetPosition({ x, y });
+			m_tileOverlays[i].second->GetTransformComp().SetScaling({ scale, scale });
+			m_tileOverlays[i].second->Render(SCREEN_SURFACE);
+		}
+	}
+}
+
+void BattleUI::MovementArea::newArea(const Battle& battle, BattleEntity& ship)
+{
+	posi startPos = { ship.m_battleProperties.getCurrentPosition(), ship.m_battleProperties.getCurrentDirection() };
+	std::vector<posi> area = BFS::findArea(battle.getMap(), startPos, ship.m_entityProperties.m_movementPoints);
+	m_displaySize = area.size();
+	for (int i = 0; i < m_displaySize; i++)
+	{
+		m_tileOverlays[i].first = area[i].pair();
+	}
+	m_display = true;
 }
