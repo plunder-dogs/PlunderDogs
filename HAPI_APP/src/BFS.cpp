@@ -159,12 +159,13 @@ std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float
 }
 
 //This is the recursive algorithm that hunts for the assigned tile
-int areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queue, const eDirection windDirection, const float windStrength, int count = 1)
+bool areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queue, const eDirection windDirection, const float windStrength)
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
 	float tether = queue.front().second;
 	queue.pop();
+	bool output = false;
 	//Check if there's enough movement to do check other tiles
 	if (tether >= 0.0f)
 	{
@@ -192,7 +193,7 @@ int areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queue
 			!exploreArea.access(queueTile).getDir(queueTile.dir) &&
 			exploreArea.access(queueTile).traversable())
 		{
-			count++;
+			output = true;
 			exploreArea.access(queueTile).setDir(queueTile.dir, true);
 			if (queueTile.dir == windDirection)
 				queue.emplace(queueTile, tether - (1.0f - windStrength));
@@ -201,9 +202,7 @@ int areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queue
 		}
 	}
 	//If queue is not empty run algorithm again
-	if (!queue.empty())
-		count = areaExplorer(exploreArea, queue, windDirection, windStrength, count);
-	return count;
+	return output;
 }
 
 std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovement)
@@ -218,7 +217,14 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 	exploreQueue.emplace(startPos, maxMovement);
 	exploreArea.access(startPos).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
 	//Start recursion
-	int areaSize = areaExplorer(exploreArea, exploreQueue, map.getWindDirection(), map.getWindStrength());
+	int areaSize{ 1 };
+	const eDirection windDir = { map.getWindDirection() };
+	const float windStr = { map.getWindStrength() };
+	while (!exploreQueue.empty())
+	{
+		if (areaExplorer(exploreArea, exploreQueue, windDir, windStr))
+			areaSize++;
+	}
 	//Iterate through exploreArea and pushback to the return vector
 	std::vector<posi> allowedArea;
 	allowedArea.reserve(areaSize);
