@@ -52,7 +52,7 @@ class Battle
 		int m_redShipsDestroyed;
 		void onReset();
 
-		void checkGameStatus(const std::vector<std::unique_ptr<Faction>>& players);
+		void checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
 		Timer m_winTimer;
 		FactionName m_winningFaction;
 		bool m_gameOver;
@@ -128,5 +128,4 @@ private:
 	void onRedShipDestroyed();
 	void onEndMovementPhaseEarly();
 	void onEndAttackPhaseEarly();
-
 };

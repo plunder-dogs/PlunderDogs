@@ -909,23 +909,28 @@ void Battle::WinningFactionHandler::onReset()
 	m_gameOver = false;
 }
 
-void Battle::WinningFactionHandler::checkGameStatus(const std::vector<std::unique_ptr<Faction>>& players)
+void Battle::WinningFactionHandler::checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& factions)
 {
 	//Check to see if all players have been eliminated
 	int playersEliminated = 0;
-	for (const auto& player : players)
+	for (const auto& faction : factions)
 	{
-		if (player->m_eliminated)
+		if (faction && faction->m_eliminated)
 		{
 			++playersEliminated;
 		}
 	}
 	//Last player standing - Player wins
-	if (playersEliminated == static_cast<int>(players.size()) - 1)
+	if (playersEliminated == static_cast<int>(factions.size()) - 1)
 	{
-		auto player = std::find_if(players.cbegin(), players.cend(), [](const auto& player) { return player->m_eliminated == false; });
-		assert(player != players.cend());
-		FactionName winningFaction = player->get()->m_factionName;
+		FactionName winningFaction;
+		for (const auto& faction : factions)
+		{
+			if (faction && !faction->m_eliminated)
+			{
+				winningFaction = faction->m_factionName;
+			}
+		}
 		switch (winningFaction)
 		{
 		case FactionName::eYellow:
