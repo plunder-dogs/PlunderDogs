@@ -200,12 +200,12 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 
 //Support function for AI::findFiringPositions. 
 //Finds the closest tile a specified distance away from a target tile
-const Tile* firePosRadial(const Battle& battle, const Tile* targetShip, const Tile* alliedShip, int range)
+const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* alliedShip, int range)
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
 	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
-	std::vector<const Tile*> availableTiles{ battle.getMap().cGetTileRing(targetShip->m_tileCoordinate, range) };
+	std::vector<const Tile*> availableTiles{ map.cGetTileRing(targetShip->m_tileCoordinate, range) };
 	for (const Tile* it : availableTiles)
 	{
 		//Ensure it's a valid tile, if not skip this one

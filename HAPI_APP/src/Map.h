@@ -6,19 +6,6 @@
 #include <HAPISprites_UI.h>
 #include "global.h"
 
-constexpr float DRAW_OFFSET_X{ 12 };
-constexpr float DRAW_OFFSET_Y{ 28 };
-
-//Info for HAPI_SPRITES - Leave for now. 
-/*
-//	//m_sprite->GetSpritesheet()->GenerateNormals(true);
-**** HAPI Sprites: ERROR Detected
-** Description: H_INVALID_PARAMETER - passed parameter was not valid
-** System: HAPI Sprites
-** Detail: surface width does not divide equally by numFrames
-****
-*/
-
 struct ShipOnTile
 {
 	ShipOnTile()

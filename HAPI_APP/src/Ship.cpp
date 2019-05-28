@@ -10,7 +10,6 @@
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr size_t MOVEMENT_PATH_SIZE{ 32 };
 
-
 FactionName Ship::getFactionName() const
 {
 	return m_factionName;

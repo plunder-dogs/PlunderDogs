@@ -681,7 +681,7 @@ void Battle::updateAttackPhase()
 Faction& Battle::getPlayer(FactionName factionName)
 {
 	assert(m_factions[static_cast<int>(factionName)]);
-	return m_factions[static_cast<int>(factionName)].get;
+	return m_factions[static_cast<int>(factionName)].get();
 	auto cIter = std::find_if(m_factions.begin(), m_factions.end(), [factionName](auto& player) { return factionName == player->m_factionName; });
 	assert(cIter != m_factions.end());
 	return *cIter->get();
