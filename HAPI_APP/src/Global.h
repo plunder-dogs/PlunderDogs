@@ -2,6 +2,8 @@
 #include <utility>
 
 constexpr int INVALID_SHIP_ID = -1;
+constexpr float DRAW_OFFSET_X{ 16 };
+constexpr float DRAW_OFFSET_Y{ 32 };
 
 enum FactionName
 {

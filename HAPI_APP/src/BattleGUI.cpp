@@ -5,8 +5,7 @@
 #include "Battle.h"
 
 BattleGUI::BattleGUI()
-	:
-	m_battleIcons(HAPI_Sprites.MakeSprite(Textures::m_battleIcons)),
+	: m_battleIcons(HAPI_Sprites.MakeSprite(Textures::m_battleIcons)),
 	m_pauseButton(HAPI_Sprites.MakeSprite(Textures::m_pauseButton)),
 	m_chickenButton(HAPI_Sprites.MakeSprite(Textures::m_chickenButton)),
 	m_pauseMenuBackground(HAPI_Sprites.MakeSprite(Textures::m_pauseMenuBackground)),
@@ -23,12 +22,6 @@ BattleGUI::BattleGUI()
 	m_AIInPlay(false)
 {	
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onBattleReset, this), "BattleGUI", GameEvent::eResetBattle);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onRedWin, this), "BattleGUI", GameEvent::eRedWin);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onYellowWin, this), "BattleGUI", GameEvent::eYellowWin);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onBlueWin, this), "BattleGUI", GameEvent::eBlueWin);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onGreenWin, this), "BattleGUI", GameEvent::eGreenWin);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onEnteringMovementPhase, this), "BattleGUI", GameEvent::eEnteringMovementPhase);
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onEnteringAttackPhase, this), "BattleGUI", GameEvent::eEnteringAttackPhase);
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onUnableToSkipPhase, this), "BattleGUI", GameEvent::eUnableToSkipPhase);
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onEnteredAITurn, this), "BattleGUI", GameEvent::eEnteredAITurn);
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleGUI::onLeftAITurn, this), "BattleGUI", GameEvent::eLeftAITurn);
@@ -55,12 +48,6 @@ BattleGUI::BattleGUI()
 BattleGUI::~BattleGUI()
 {
 	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eResetBattle);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eRedWin);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eYellowWin);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eGreenWin);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eBlueWin);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eEnteringMovementPhase);
-	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eEnteringAttackPhase);
 	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eUnableToSkipPhase);
 	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eEnteredAITurn);
 	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eLeftAITurn);

@@ -98,7 +98,6 @@ void Faction::setShipDeploymentAtPosition(std::pair<int, int> startingPosition)
 		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
 	
 	m_shipToDeploy->setDeploymentPosition(startingPosition);
-	return cIter != m_spawnArea.cend();
 }
 
 void Faction::onNewTurn()
@@ -111,6 +110,7 @@ void Faction::onNewTurn()
 
 void Faction::shipTakeDamage(int shipID, int damage)
 {
+	assert(m_ships.size() <= static_cast<size_t>(shipID + 1));
 	m_ships[shipID].takeDamage(damage, m_factionName);
 }
 
@@ -130,6 +130,12 @@ void Faction::generateShipMovementPath(const Map & map, int shipID, std::pair<in
 {
 	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
 	m_ships[shipID].generateMovementPath(map, destination);
+}
+
+void Faction::disableShipMovementPath(int shipID)
+{
+	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	m_ships[shipID].disableMovementPath();
 }
 
 SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position)

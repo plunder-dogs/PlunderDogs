@@ -8,12 +8,10 @@
 #include "SpriteToggleVisibility.h"
 
 //TODO: Temp
-constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 
 struct Tile;
 struct Weapons;
 class Map;
-class Battle;
 class Ship
 {
 public:
@@ -38,22 +36,22 @@ public:
 
 	void update(float deltaTime, const Map& map);
 	void render(const Map& map) const;
-
-	void setDeploymentPosition(std::pair<int, int> position);
-	void deployAtPosition(std::pair<int, int> position, eDirection startingDirection = eDirection::eNorth);
-
-	int generateMovementPath(const Map& map, std::pair<int, int> destination);
-	void disableMovementPath();
-
-	bool move(Map& map, std::pair<int, int> destination);
-	bool move(Map& map, std::pair<int, int> destination, eDirection endDirection);
-	void takeDamage(int damageAmount, FactionName entityFaction);
-	void fireWeapon();
 	void setDestination();
 	void onNewTurn();
-
 	void enableAction();
 	void disableAction();
+
+	//Deployment Phase
+	void setDeploymentPosition(std::pair<int, int> position);
+	void deployAtPosition(std::pair<int, int> position, eDirection startingDirection = eDirection::eNorth);
+	int generateMovementPath(const Map& map, std::pair<int, int> destination);
+	void disableMovementPath();
+	//Movement Phase
+	bool move(Map& map, std::pair<int, int> destination);
+	bool move(Map& map, std::pair<int, int> destination, eDirection endDirection);
+	//Attack Phase
+	void takeDamage(int damageAmount, FactionName entityFaction);
+	void fireWeapon();
 
 private:
 	const FactionName m_factionName;

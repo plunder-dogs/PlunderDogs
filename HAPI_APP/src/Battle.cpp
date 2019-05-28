@@ -4,8 +4,6 @@
 #include "AI.h"
 
 using namespace HAPISPACE;
-constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
-constexpr float DRAW_ENTITY_OFFSET_Y{ 32 };
 
 Battle::Particle::Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteSheet> texture, float scale) :
 	m_position(),
@@ -29,8 +27,8 @@ void Battle::Particle::update(float deltaTime, const Map& map)
 	{
 		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_position);
 		m_particle->GetTransformComp().SetPosition({
-			tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
-			tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+			tileTransform.first + DRAW_OFFSET_X * map.getDrawScale(),
+			tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale() });
 
 		m_lifeSpan.update(deltaTime);
 
@@ -499,7 +497,7 @@ void Battle::nextTurn()
 
 		if (allPlayersDeployed)
 		{
-			m_currentBattlePhase = BattlePhase::Movement;
+			switchToBattlePhase(BattlePhase::Movement);
 			m_currentFactionTurn = 0;
 			GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
 			for (auto& ship : m_factions[m_currentFactionTurn]->m_ships)
@@ -521,9 +519,8 @@ void Battle::nextTurn()
 	}
 	else if (m_currentBattlePhase == BattlePhase::Movement)
 	{
-		m_currentBattlePhase = BattlePhase::Attack;
+		switchToBattlePhase(BattlePhase::Attack);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
-		GameEventMessenger::getInstance().broadcast(GameEvent::eEnteringAttackPhase);
 
 		for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 		{
@@ -538,9 +535,8 @@ void Battle::nextTurn()
 	}
 	else if (m_currentBattlePhase == BattlePhase::Attack)
 	{
-		m_currentBattlePhase = BattlePhase::Movement;
+		switchToBattlePhase(BattlePhase::Movement);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
-		GameEventMessenger::getInstance().broadcast(GameEvent::eEnteringMovementPhase);
 
 		for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 		{
@@ -564,6 +560,12 @@ void Battle::nextTurn()
 			GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
 		}
 	}
+}
+
+void Battle::switchToBattlePhase(BattlePhase newBattlePhase)
+{
+	m_currentBattlePhase = newBattlePhase;
+	m_battleUI.onEnteringBattlePhase(m_currentBattlePhase);
 }
 
 void Battle::notifyPlayersOnNewTurn()
@@ -679,8 +681,7 @@ void Battle::updateAttackPhase()
 Faction& Battle::getPlayer(FactionName factionName)
 {
 	assert(m_factions[static_cast<int>(factionName)]);
-	return m_factions[static_cast<int>(factionName)].get
-	;
+	return m_factions[static_cast<int>(factionName)].get;
 	auto cIter = std::find_if(m_factions.begin(), m_factions.end(), [factionName](auto& player) { return factionName == player->m_factionName; });
 	assert(cIter != m_factions.end());
 	return *cIter->get();
@@ -824,7 +825,7 @@ bool Battle::WinningFactionHandler::isGameOver() const
 	return m_gameOver;
 }
 
-void Battle::WinningFactionHandler::update(float deltaTime)
+void Battle::WinningFactionHandler::update(BattleUI& battleUI, float deltaTime)
 {
 	m_winTimer.update(deltaTime);
 	if (m_winTimer.isExpired())
@@ -832,16 +833,16 @@ void Battle::WinningFactionHandler::update(float deltaTime)
 		switch (m_winningFaction)
 		{
 		case FactionName::eYellow :
-			GameEventMessenger::getInstance().broadcast(GameEvent::eYellowWin);
+			battleUI.onFactionWin(FactionName::eYellow);
 			break;
 		case FactionName::eBlue :
-			GameEventMessenger::getInstance().broadcast(GameEvent::eBlueWin);
+			battleUI.onFactionWin(FactionName::eBlue);
 			break;
 		case FactionName::eRed :
-			GameEventMessenger::getInstance().broadcast(GameEvent::eRedWin);
+			battleUI.onFactionWin(FactionName::eRed);
 			break;
 		case FactionName::eGreen :
-			GameEventMessenger::getInstance().broadcast(GameEvent::eGreenWin);
+			battleUI.onFactionWin(FactionName::eGreen);
 			break;
 		}
 
@@ -849,7 +850,7 @@ void Battle::WinningFactionHandler::update(float deltaTime)
 	}
 }
 
-void Battle::WinningFactionHandler::onYellowShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
+void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
 {
 	++m_yellowShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eYellow; });
@@ -861,7 +862,7 @@ void Battle::WinningFactionHandler::onYellowShipDestroyed(std::vector<std::uniqu
 	}
 }
 
-void Battle::WinningFactionHandler::onBlueShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
+void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
 {
 	++m_blueShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eBlue; });
@@ -873,7 +874,7 @@ void Battle::WinningFactionHandler::onBlueShipDestroyed(std::vector<std::unique_
 	}
 }
 
-void Battle::WinningFactionHandler::onGreenShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
+void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
 {
 	++m_greenShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eGreen; });
@@ -885,7 +886,7 @@ void Battle::WinningFactionHandler::onGreenShipDestroyed(std::vector<std::unique
 	}
 }
 
-void Battle::WinningFactionHandler::onRedShipDestroyed(std::vector<std::unique_ptr<Faction>>& players)
+void Battle::WinningFactionHandler::onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
 {
 	++m_redShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eRed; });

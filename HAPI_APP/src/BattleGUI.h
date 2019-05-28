@@ -35,6 +35,14 @@ public:
 	void setMaxCameraOffset(std::pair<int, int> maxCameraOffset);
 	void snapCameraToPosition(std::pair<int, int> snapLocation);
 	bool isPaused();
+
+	void onBlueWin();
+	void onGreenWin();
+	void onYellowWin();
+	void onRedWin();
+	void onEnteringMovementPhase();
+	void onEnteringAttackPhase();
+
 private:
 	BattleWindow m_currentBattleWindow;
 	std::pair<int, int> m_maxCameraOffset;
@@ -66,12 +74,6 @@ private:
 	
 	void onBattleReset();
 	std::string getWinningFactionName();
-	void onBlueWin();
-	void onGreenWin();
-	void onYellowWin();
-	void onRedWin();
-	void onEnteringMovementPhase();
-	void onEnteringAttackPhase();
 	void onUnableToSkipPhase();
 	void onEnteredAITurn();
 	void onLeftAITurn();

@@ -7,11 +7,8 @@
 #include "GameEventMessenger.h"
 #include "Battle.h"
 
-
+constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr size_t MOVEMENT_PATH_SIZE{ 32 };
-constexpr size_t WEAPON_HIGHLIGHT_SIZE{ 200 };
-constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
-constexpr float DRAW_ENTITY_OFFSET_Y{ 32 };
 
 
 FactionName Ship::getFactionName() const
@@ -156,7 +153,7 @@ bool Ship::move(Map& map, std::pair<int, int> destination)
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			m_pathToTile = pathToTile;
-			map.updateShipOnTile(m_currentPosition, pathToTile.back().pair());
+			map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.m_active = false;
@@ -178,13 +175,12 @@ bool Ship::move(Map& map, std::pair<int, int> destination, eDirection endDirecti
 	{
 		posi currentPos = { m_currentPosition.first, m_currentPosition.second, m_currentDirection };
 		posi destinationPos = { destination.first, destination.second };
-		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
 		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
 			pathToTile.emplace(posi(pathToTile.back().pair(), endDirection));
 			m_pathToTile = pathToTile;
-			map.updateShipOnTile(m_currentPosition, pathToTile.back().pair());
+			map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition, pathToTile.back().pair());
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.m_active = false;
@@ -287,13 +283,15 @@ unsigned int Ship::getDirectionCost(int currentDirection, int newDirection)
 	{
 		return 0;
 	}
+
 	//number of direction % difference between the new and old directions
 	return (static_cast<int>(eDirection::Max) % diff) + 1;
 }
 
-Ship::Ship(FactionName factionName, eShipType shipType)
+Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	: m_factionName(factionName),
 	m_shipType(shipType),
+	m_ID(ID),
 	m_currentPosition(),
 	m_pathToTile(),
 	m_movementTimer(MOVEMENT_ANIMATION_TIME),
@@ -304,6 +302,7 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 	m_actionSprite(factionName, 2.f, 2.f),
 	m_movingToDestination(false),
 	m_destinationSet(false),
+	m_maxHealth(0),
 	m_health(0),
 	m_damage(0),
 	m_range(0),
@@ -431,10 +430,10 @@ Ship::Ship(FactionName factionName, eShipType shipType)
 Ship::Ship(Ship & orig)
 	: m_factionName(orig.m_factionName),
 	m_shipType(orig.m_shipType),
+	m_ID(orig.m_ID),
 	m_currentPosition(),
 	m_pathToTile(),
 	m_movementTimer(MOVEMENT_ANIMATION_TIME),
-	m_movementPath(),
 	m_movementPathSize(0),
 	m_currentDirection(orig.m_currentDirection),
 	m_weaponFired(false),
@@ -442,12 +441,14 @@ Ship::Ship(Ship & orig)
 	m_actionSprite(orig.m_actionSprite),
 	m_movingToDestination(false),
 	m_destinationSet(false),
+	m_maxHealth(orig.m_maxHealth),
 	m_health(orig.m_health),
 	m_damage(orig.m_damage),
 	m_range(orig.m_range),
 	m_movementPoints(orig.m_movementPoints),
 	m_sprite(),
-	m_deployed(false)
+	m_deployed(false),
+	m_movementPath()
 {
 	m_sprite.swap(orig.m_sprite);
 }
@@ -485,8 +486,8 @@ void Ship::render(const Map & map) const
 			float scale = map.getDrawScale();
 
 			i.m_sprite->GetTransformComp().SetPosition({
-				static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
-				static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
+				static_cast<float>(tileTransform.first + DRAW_OFFSET_X * scale),
+				static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * scale) });
 			i.m_sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
 
 			i.m_sprite->Render(SCREEN_SURFACE);
@@ -498,8 +499,8 @@ void Ship::render(const Map & map) const
 	float scale = map.getDrawScale();
 
 	m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * scale),
-		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * scale) });
+		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * scale),
+		static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * scale) });
 	m_sprite->GetTransformComp().SetScaling({ scale / 2, scale / 2 });
 
 	m_sprite->Render(SCREEN_SURFACE);
@@ -508,13 +509,11 @@ void Ship::render(const Map & map) const
 
 void Ship::setDeploymentPosition(std::pair<int, int> position)
 {
-	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
 	m_currentPosition = position;
 }
 
 void Ship::deployAtPosition(std::pair<int, int> position, eDirection startingDirection)
 {
-	assert(battle.getCurrentPhase() == BattlePhase::Deployment);
 	m_currentPosition = position;
 	m_deployed = true;
 	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));

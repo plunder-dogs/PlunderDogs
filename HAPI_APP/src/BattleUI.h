@@ -23,7 +23,7 @@ class BattleUI : public IHapiSpritesInputListener
 
 		TargetArea();
 		void render(const Map& map) const;
-		void generateTargetArea(const Map& map, const Tile& source, BattlePhase phase = BattlePhase::Attack);
+		void generateTargetArea(Battle& battle, const Tile& source, BattlePhase phase = BattlePhase::Attack);
 		void clearTargetArea();
 		void onReset();
 
@@ -67,6 +67,8 @@ public:
 	void renderUI() const;
 	void renderGUI() const;
 	void loadGUI(std::pair<int, int> mapDimensions);
+	void onFactionWin(FactionName winningFaction);
+	void onEnteringBattlePhase(BattlePhase currentBattlePhase);
 
 	void drawTargetArea() const;
 

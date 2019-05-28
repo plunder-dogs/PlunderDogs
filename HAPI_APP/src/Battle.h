@@ -6,8 +6,6 @@
 #include "Faction.h"
 #include <array>
 
-//https://en.wikipedia.org/wiki/Builder_pattern#C.2B.2B_Example
-
 class Battle
 {
 	enum class eDeploymentState
@@ -40,12 +38,12 @@ class Battle
 	
 		bool isGameOver() const;
 
-		void update(float deltaTime);
+		void update(BattleUI& battleUI, float deltaTime);
 
-		void onYellowShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
-		void onBlueShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
-		void onGreenShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
-		void onRedShipDestroyed(std::vector<std::unique_ptr<Faction>>& players);
+		void onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& factions);
+		void onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
+		void onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
+		void onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
 
 	private:
 		int m_yellowShipsDestroyed;
@@ -112,6 +110,7 @@ private:
 	std::unique_ptr<Faction>& getCurrentPlayer();
 
 	void nextTurn();
+	void switchToBattlePhase(BattlePhase newBattlePhase);
 	void notifyPlayersOnNewTurn();
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
@@ -129,4 +128,5 @@ private:
 	void onRedShipDestroyed();
 	void onEndMovementPhaseEarly();
 	void onEndAttackPhaseEarly();
+
 };
