@@ -174,7 +174,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 		if (i == static_cast<int>(ourFaction))
 			continue;
 
-		const auto& factionShips = battle.getPlayer(static_cast<FactionName>(i)).m_ships;
+		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i)).m_ships;
 
 		for (int j = 0; j < factionShips.size(); j++)
 		{
@@ -356,8 +356,11 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	//If a tile is found
 	if (bestTile != posi(-1, -1, eNorth))
 	{
-		currentShip.generateMovementPath(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
-		currentShip.move(map, *map.getTile(bestTile.pair()), targetTile.second);
+		currentShip.generateMovementPath(map, map.getTile(bestTile.pair())->m_tileCoordinate);
+		currentShip.move(map, map.getTile(bestTile.pair())->m_tileCoordinate, targetTile.second);		
+
+		//currentShip.generateMovementPath(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
+		//currentShip.move(map, *map.getTile(bestTile.pair()), targetTile.second);
 	}
 	currentShip.setDestination();
 }

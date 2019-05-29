@@ -16,6 +16,8 @@ struct Faction
 {
 	Faction(FactionName name, ePlayerType playerType);
 
+	const Ship& getShip(int shipID) const;
+
 	void render(const Map& map) const;
 	void onNewTurn();
 
@@ -24,7 +26,7 @@ struct Faction
 	bool isAllShipsDeployed() const;
 	void createSpawnArea(Map& map);
 	bool deployShipAtPosition(Map& map, std::pair<int, int> startingPosition, eDirection startingDirection);
-	void setShipDeploymentAtPosition(std::pair<int, int> startingPosition);
+	bool setShipDeploymentAtPosition(std::pair<int, int> startingPosition);
 	//Movement Phase
 	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination);
 	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection);

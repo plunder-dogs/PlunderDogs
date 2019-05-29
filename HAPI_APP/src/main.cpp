@@ -38,18 +38,7 @@ void HAPI_Sprites_Main()
 
 	players[static_cast<int>(FactionName::eRed)] = std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI);
 	AI::loadInPlayerShips(*players.back().get());
-	//std::vector<std::unique_ptr<Faction>> players;
-	//std::unique_ptr<Faction> player1 = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//player1->addShip(FactionName::eYellow, eShipType::eFrigate);
-	//players.push_back(std::move(player1));
 
-	//players.emplace_back(std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI));
-	
 
 	Battle battle(players);
 

@@ -71,8 +71,8 @@ public:
 	FactionName getCurrentFaction() const;
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
-	const Faction& getPlayer(FactionName name) const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
+	const Faction& getFaction(FactionName factionName) const;
 
 	void start(const std::string& newMapName);
 	void render() const;
@@ -88,8 +88,6 @@ public:
 	void generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination);
 	//Attack Phase
 	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
-	void playFireAnimation(const Ship& entity, std::pair<int, int> position);
-	void playExplosionAnimation(const Ship& entity);
 
 private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_factions;
@@ -106,9 +104,11 @@ private:
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
 
-	std::unique_ptr<Faction>& getFaction(FactionName factionName);
 	std::unique_ptr<Faction>& getCurrentPlayer();
-
+	Faction& getFaction(FactionName factionName);
+	
+	void playFireAnimation(eDirection orientation, std::pair<int, int> position);
+	void playExplosionAnimation(std::pair<int, int> position);
 	void nextTurn();
 	void switchToBattlePhase(BattlePhase newBattlePhase);
 	void notifyPlayersOnNewTurn();

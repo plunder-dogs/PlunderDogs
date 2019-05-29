@@ -3,9 +3,6 @@
 #include "Textures.h"
 #include "Map.h"
 
-constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
-constexpr float DRAW_ENTITY_OFFSET_Y{ 32 };
-
 //BATTLE PLAYER
 Faction::Faction(FactionName name, ePlayerType playerType)
 	: m_ships(),
@@ -16,6 +13,12 @@ Faction::Faction(FactionName name, ePlayerType playerType)
 	m_spawnArea()
 {
 	m_ships.reserve(size_t(6));
+}
+
+const Ship & Faction::getShip(int shipID) const
+{
+	assert(shipID < m_ships.size());
+	return m_ships[shipID];
 }
 
 void Faction::render(const Map & map) const
@@ -70,7 +73,7 @@ void Faction::createSpawnArea(Map & map)
 	m_spawnArea.reserve(tileRadius.size());
 	for (const auto& tile : tileRadius)
 	{
-		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate, map);
+		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate);
 	}
 }
 
@@ -83,7 +86,15 @@ bool Faction::deployShipAtPosition(Map& map, std::pair<int, int> startingPositio
 	{
 		m_shipToDeploy->deployAtPosition(startingPosition, startingDirection);
 		map.setShipOnTile({ m_factionName, m_shipToDeploy->getID() }, startingPosition);
-		m_shipToDeploy = nullptr;
+		//Select new Ship
+		for (auto& ship : m_ships)
+		{
+			if (!ship.isDeployed())
+			{
+				m_shipToDeploy = &ship;
+				break;
+			}
+		}
 		return true;
 	}
 	else
@@ -92,12 +103,17 @@ bool Faction::deployShipAtPosition(Map& map, std::pair<int, int> startingPositio
 	}
 }
 
-void Faction::setShipDeploymentAtPosition(std::pair<int, int> startingPosition)
+bool Faction::setShipDeploymentAtPosition(std::pair<int, int> startingPosition)
 {
+	if (!m_shipToDeploy)
+	{
+		return false;
+	}
 	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
 		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
 	
 	m_shipToDeploy->setDeploymentPosition(startingPosition);
+	return cIter != m_spawnArea.end();
 }
 
 void Faction::onNewTurn()
@@ -166,7 +182,7 @@ void SpawnNode::render(const Map & map) const
 {
 	auto screenPosition = map.getTileScreenPos(m_position);
 	m_sprite->GetTransformComp().SetPosition({
-	(float)screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale(),
-	(float)screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale() });
+	(float)screenPosition.first + DRAW_OFFSET_X * map.getDrawScale(),
+	(float)screenPosition.second + DRAW_OFFSET_Y * map.getDrawScale() });
 	m_sprite->Render(SCREEN_SURFACE);
 }

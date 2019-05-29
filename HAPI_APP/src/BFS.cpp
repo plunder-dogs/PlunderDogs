@@ -128,7 +128,7 @@ std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float
 {
 	//No bullshit
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
-		map.getTile(endPos)->m_shipOnTile ||
+		map.getTile(endPos)->m_shipOnTile.isValid() ||
 		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
 		return std::queue<posi>();
 	//Initialise variables
@@ -236,7 +236,7 @@ finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = (it.m_type == eSea || it.m_type == eOcean);
-		bool occupied = static_cast<bool>(it.m_shipOnTile);
+		bool occupied = static_cast<bool>(it.m_shipOnTile.isValid());
 		data.emplace_back(traversable, occupied);
 	}
 }
@@ -246,7 +246,7 @@ boolMap::boolMap(const Map& map) : width(map.getDimensions().first)
 	data.reserve(map.getDimensions().first * map.getDimensions().second);
 	for (const Tile& it : map.getData())
 	{
-		bool traversable = ((it.m_type == eSea || it.m_type == eOcean) && !static_cast<bool>(it.m_shipOnTile));
+		bool traversable = ((it.m_type == eSea || it.m_type == eOcean) && !static_cast<bool>(it.m_shipOnTile.isValid()));
 		data.emplace_back(byteStore(traversable));
 	}
 }
