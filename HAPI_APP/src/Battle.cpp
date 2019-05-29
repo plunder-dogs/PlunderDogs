@@ -856,7 +856,6 @@ void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_p
 		factions[static_cast<int>(FactionName::eBlue)]->m_eliminated = true;
 		checkGameStatus(factions);
 	}
-
 }
 
 void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
