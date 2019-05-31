@@ -246,10 +246,10 @@ struct Textures
 			return false;
 		}
 
-		m_selectedHex = HAPI_Wrapper::makeSpriteSheet("whiteHex75.png");
+		m_selectedHex = HAPI_Wrapper::makeSpriteSheet("whiteHexthird.png");
 		if (!m_selectedHex)
 		{
-			HAPI_Sprites.UserMessage("Connot Load: 'WhiteHex75.png'", "Texture Error");
+			HAPI_Sprites.UserMessage("Connot Load: 'WhiteHexthird.png'", "Texture Error");
 			return false;
 		}
 
