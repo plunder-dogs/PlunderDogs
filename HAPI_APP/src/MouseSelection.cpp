@@ -10,7 +10,7 @@ double MouseSelection::radsToDeg(double angle)
 std::pair<int, int> MouseSelection::coordToHexPos(std::pair<int, int> coord)
 {
 	const float xPos = static_cast<float>(coord.first * 12);
-	const float yPos = static_cast<float>((((1 + coord.first) % 2) + 2 * coord.second) * 7);
+	const float yPos = static_cast<float>((2 * coord.second - (coord.first & 1)) * 7);
 	return { xPos, yPos };
 }
 

@@ -5,12 +5,38 @@
 #include <vector>
 #include <deque>
 
-struct ShipGlobalProperties;
+
+constexpr int MAX_MOVE_AREA{ 700 };
 struct Tile;
 class Battle;
 class Map;
 class BattleUI : public IHapiSpritesInputListener
 {
+	//For displaying and remembering the location of the movement area of a selected ship
+	struct MovementArea
+	{
+		bool m_display;
+		int m_displaySize;
+		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
+
+		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet> texturePtr) : m_display(false), m_displaySize(0), m_tileOverlays()
+		{
+			m_tileOverlays.resize(MAX_MOVE_AREA);
+			for (int i = 0; i < MAX_MOVE_AREA; i++)
+			{
+				m_tileOverlays[i].second = std::make_unique<HAPISPACE::Sprite>(texturePtr);
+				m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
+			}
+		}
+		void render(const Battle& battle) const;
+		void newArea(const Battle& battle, BattleEntity& ship);
+		void clear()
+		{
+			m_display = false;
+			m_displaySize = 0;
+		}
+	};
+
 	struct TargetArea
 	{
 		struct HighlightNode
@@ -112,6 +138,7 @@ private:
 	void onMouseMoveMovementPhase();
 	void onLeftClickMovementPhase();
 	void onRightClickMovementPhase();
+	MovementArea m_movementArea;
 
 	//Attack Phase
 	void onLeftClickAttackPhase();
