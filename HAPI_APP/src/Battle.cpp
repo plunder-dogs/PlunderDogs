@@ -411,7 +411,6 @@ bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& ti
 			m_factions[static_cast<int>(enemy.factionName)]->shipTakeDamage(
 				tileOnPlayer.m_shipOnTile.shipID, getFactionShip(enemy).getDamage());
 		
-			
 			return true;
 		}
 	}
@@ -518,6 +517,7 @@ void Battle::nextTurn()
 	{
 		switchToBattlePhase(BattlePhase::Attack);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
+		m_factions[m_currentFactionTurn]->onNewTurn();
 
 		for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 		{
@@ -535,6 +535,7 @@ void Battle::nextTurn()
 		switchToBattlePhase(BattlePhase::Movement);
 		GameEventMessenger::getInstance().broadcast(GameEvent::eNewTurn);
 
+		m_factions[m_currentFactionTurn]->onNewTurn();
 		for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 		{
 			entity.disableAction();
@@ -700,13 +701,31 @@ void Battle::onResetBattle()
 
 void Battle::incrementPlayerTurn()
 {
+	//Change wind direction
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
 	
-	++m_currentFactionTurn;
-	if (m_currentFactionTurn == static_cast<int>(m_factions.size()))
+	//Select first faction
+	if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
 	{
-		m_currentFactionTurn = 0;
+		for (int i = 0; i < m_factions.size(); ++i)
+		{
+			if (m_factions[i])
+			{
+				m_currentFactionTurn = i;
+				return;
+			}
+		}
+	}
+
+	//Select next faction
+	for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
+	{
+		if (m_factions[i])
+		{
+			m_currentFactionTurn = i;
+			return;
+		}
 	}
 }
 
