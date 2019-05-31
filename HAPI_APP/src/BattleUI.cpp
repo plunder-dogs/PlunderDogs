@@ -9,6 +9,7 @@
 
 using namespace HAPISPACE;
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
+constexpr int MAX_MOVE_AREA{ 700 };
 
 //
 //InvalidPositionSprite
@@ -937,18 +938,33 @@ void BattleUI::SelectedTile::render(const Map & map) const
 
 }
 
-void BattleUI::MovementArea::render(const Battle& battle) const
+
+BattleUI::MovementArea::MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr, const Map& map)
+	: m_display(false),
+	m_displaySize(0),
+	m_tileOverlays()
+{
+	m_tileOverlays.resize(MAX_MOVE_AREA);
+	float scale = map.getDrawScale();
+	for (int i = 0; i < MAX_MOVE_AREA; i++)
+	{
+		m_tileOverlays[i].second = std::make_unique<HAPISPACE::Sprite>(texturePtr);
+		m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
+		m_tileOverlays[i].second->GetTransformComp().SetScaling({ scale, scale });
+	}
+}
+
+void BattleUI::MovementArea::render(const Map& map) const
 {
 	if (m_display)
 	{
-		float scale = battle.getMap().getDrawScale();
+		float scale = map.getDrawScale();
 		for (int i = 0; i < m_displaySize; i++)
 		{
-			posi pos = battle.getMap().getTileScreenPos(m_tileOverlays[i].first);
-			float x = static_cast<float>(pos.x) + 16 * scale;
-			float y = static_cast<float>(pos.y) + 32 * scale;
+			posi pos = map.getTileScreenPos(m_tileOverlays[i].first);
+			float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
+			float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
 			m_tileOverlays[i].second->GetTransformComp().SetPosition({ x, y });
-			m_tileOverlays[i].second->GetTransformComp().SetScaling({ scale, scale });
 			m_tileOverlays[i].second->Render(SCREEN_SURFACE);
 		}
 	}
@@ -966,4 +982,10 @@ void BattleUI::MovementArea::newArea(const Map& map, const Ship& ship)
 	}
 
 	m_display = true;
+}
+
+void BattleUI::MovementArea::clear()
+{
+	m_display = false;
+	m_displaySize = 0;
 }

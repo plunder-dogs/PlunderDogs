@@ -4,8 +4,6 @@
 #include <vector>
 #include <deque>
 
-
-constexpr int MAX_MOVE_AREA{ 700 };
 struct Tile;
 class Battle;
 class Map;
@@ -14,25 +12,15 @@ class BattleUI : public IHapiSpritesInputListener
 	//For displaying and remembering the location of the movement area of a selected ship
 	struct MovementArea
 	{
-		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr) 
-			: m_display(false), 
-			m_displaySize(0), 
-			m_tileOverlays()
-		{
-			m_tileOverlays.resize(MAX_MOVE_AREA);
-			for (int i = 0; i < MAX_MOVE_AREA; i++)
-			{
-				m_tileOverlays[i].second = std::make_unique<HAPISPACE::Sprite>(texturePtr);
-				m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
-			}
-		}
-		void render(const Battle& battle) const;
+		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr, const Map& map);
+		MovementArea(const MovementArea&) = delete;
+		MovementArea& operator=(const MovementArea&) = delete;
+		MovementArea(MovementArea&&) = delete;
+		MovementArea&& operator=(MovementArea&&) = delete;
+
+		void render(const Map& map) const;
 		void newArea(const Map& map, const Ship& ship);
-		void clear()
-		{
-			m_display = false;
-			m_displaySize = 0;
-		}
+		void clear();
 
 		bool m_display;
 		int m_displaySize;
