@@ -43,6 +43,7 @@ class BattleUI : public IHapiSpritesInputListener
 		bool m_activate;
 		std::pair<int, int> m_position;
 	};
+
 	struct SelectedTile
 	{
 		SelectedTile();

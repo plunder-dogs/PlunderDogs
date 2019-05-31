@@ -141,7 +141,12 @@ void BattleUI::onEnteringBattlePhase(BattlePhase currentBattlePhase)
 {
 	switch (currentBattlePhase)
 	{
-
+	case BattlePhase::Movement :
+		m_gui.onEnteringMovementPhase();
+		break;
+	case BattlePhase::Attack:
+		m_gui.onEnteringAttackPhase();
+		break;
 	}
 }
 

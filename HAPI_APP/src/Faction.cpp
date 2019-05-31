@@ -126,31 +126,31 @@ void Faction::onNewTurn()
 
 void Faction::shipTakeDamage(int shipID, int damage)
 {
-	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].takeDamage(damage);
 }
 
 bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination)
 {
-	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	return m_ships[shipID].move(map, destination);
 }
 
 bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection)
 {
-	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	return m_ships[shipID].move(map, destination, endDirection);
 }
 
 void Faction::generateShipMovementPath(const Map & map, int shipID, std::pair<int, int> destination)
 {
-	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].generateMovementPath(map, destination);
 }
 
 void Faction::disableShipMovementPath(int shipID)
 {
-	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
+	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].disableMovementPath();
 }
 
