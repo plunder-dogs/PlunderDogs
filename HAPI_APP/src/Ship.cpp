@@ -1,6 +1,5 @@
 #include "Ship.h"
 
-#include "entity.h"
 #include "Map.h"
 #include "BFS.h"
 #include "Textures.h"

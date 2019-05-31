@@ -1,7 +1,6 @@
 #include "BattleUI.h"
 #include "Battle.h"
 #include "BFS.h"
-#include "OverWorld.h"
 #include "Textures.h"
 #include "MouseSelection.h"
 #include "GameEventMessenger.h"
@@ -64,7 +63,7 @@ BattleUI::BattleUI(Battle & battle)
 	m_arrowActive(false),
 	m_arrowSprite(HAPI_Sprites.MakeSprite(Textures::m_CompassPointer)),
 	m_lastMouseData({0, 0}),
-	m_targetArea()
+	m_targetArea(),
 	m_movementArea(Textures::m_selectedHex)
 {
 	m_arrowSprite->GetTransformComp().SetScaling({ 0.5, 0.5 });
@@ -479,9 +478,10 @@ void BattleUI::onLeftClickMovementPhase()
 		{
 			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 			//Display the available movement tiles
-			if (!m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.isDestinationSet())
+			const Ship& ship = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile);
+			if (!ship.isDestinationSet())
 			{
-				m_movementArea.newArea(m_battle, *m_selectedTile.m_tile->m_entityOnTile);
+				m_movementArea.newArea(m_battle.getMap(), ship);
 			}
 		}
 		return;
@@ -538,13 +538,15 @@ void BattleUI::onLeftClickMovementPhase()
 		}
 
 		//Disallow movement to tile occupied by other player
-		else if (tileOnMouse->m_entityOnTile)
+		else if (tileOnMouse->m_shipOnTile.isValid())
 		{
 			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
 			m_selectedTile.m_tile = tileOnMouse;
-			if (tileOnMouse->m_entityOnTile->m_factionName == m_battle.getCurrentFaction() && !m_selectedTile.m_tile->m_entityOnTile->m_battleProperties.isDestinationSet())
+
+			const Ship& ship = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile);
+			if (ship.getFactionName() == m_battle.getCurrentFaction() && !ship.isDestinationSet())
 			{
-				m_movementArea.newArea(m_battle, *m_selectedTile.m_tile->m_entityOnTile);
+				m_movementArea.newArea(m_battle.getMap(), ship);
 			}
 		}
 
@@ -935,11 +937,6 @@ void BattleUI::SelectedTile::render(const Map & map) const
 
 }
 
-std::pair<int, int> BattleUI::DeploymentPhase::getSpawnPosition() const
-{
-	return m_spawnPosition;
-}
-
 void BattleUI::MovementArea::render(const Battle& battle) const
 {
 	if (m_display)
@@ -957,14 +954,16 @@ void BattleUI::MovementArea::render(const Battle& battle) const
 	}
 }
 
-void BattleUI::MovementArea::newArea(const Battle& battle, BattleEntity& ship)
+void BattleUI::MovementArea::newArea(const Map& map, const Ship& ship)
 {
-	posi startPos = { ship.m_battleProperties.getCurrentPosition(), ship.m_battleProperties.getCurrentDirection() };
-	std::vector<posi> area = BFS::findArea(battle.getMap(), startPos, ship.m_entityProperties.m_movementPoints);
+	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
+	std::vector<posi> area = BFS::findArea(map, startPos, ship.getMovementPoints());
+	
 	m_displaySize = area.size();
 	for (int i = 0; i < m_displaySize; i++)
 	{
 		m_tileOverlays[i].first = area[i].pair();
 	}
+
 	m_display = true;
 }

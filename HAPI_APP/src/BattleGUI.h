@@ -4,7 +4,6 @@
 #include <HAPISprites_UI.h>
 #include "Global.h"
 #include "Textures.h"
-#include "entity.h"
 
 using namespace HAPI_UI_SPACE;
 using namespace HAPISPACE;

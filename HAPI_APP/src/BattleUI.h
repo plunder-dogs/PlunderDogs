@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BattleGUI.h"
-#include "entity.h"
 #include <vector>
 #include <deque>
 
@@ -15,11 +14,10 @@ class BattleUI : public IHapiSpritesInputListener
 	//For displaying and remembering the location of the movement area of a selected ship
 	struct MovementArea
 	{
-		bool m_display;
-		int m_displaySize;
-		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
-
-		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet> texturePtr) : m_display(false), m_displaySize(0), m_tileOverlays()
+		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr) 
+			: m_display(false), 
+			m_displaySize(0), 
+			m_tileOverlays()
 		{
 			m_tileOverlays.resize(MAX_MOVE_AREA);
 			for (int i = 0; i < MAX_MOVE_AREA; i++)
@@ -29,12 +27,16 @@ class BattleUI : public IHapiSpritesInputListener
 			}
 		}
 		void render(const Battle& battle) const;
-		void newArea(const Battle& battle, BattleEntity& ship);
+		void newArea(const Map& map, const Ship& ship);
 		void clear()
 		{
 			m_display = false;
 			m_displaySize = 0;
 		}
+
+		bool m_display;
+		int m_displaySize;
+		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
 	};
 
 	struct TargetArea

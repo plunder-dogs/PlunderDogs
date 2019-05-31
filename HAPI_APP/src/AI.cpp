@@ -4,7 +4,6 @@
 #include "BFS.h"
 #include "Battle.h"
 #include "Map.h"
-#include "entity.h"
 #include "Global.h"
 #include <ctime>
 #include <cstdlib>

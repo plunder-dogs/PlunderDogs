@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <HAPISprites_Lib.h>
 #include "Utilities/Utilities.h"
-#include "entity.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
 #include "Utilities/MapParser.h"
