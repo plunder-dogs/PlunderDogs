@@ -87,7 +87,7 @@ public:
 	void disableFactionShipMovementPath(ShipOnTile shipOnTile);
 	void generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination);
 	//Attack Phase
-	bool fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea);
+	bool fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea);
 
 private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_factions;
@@ -115,7 +115,7 @@ private:
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
-	void incrementPlayerTurn();
+	void incrementFactionTurn();
 	void updateWindDirection();
 
 	void handleAIMovementPhaseTimer(float deltaTime);

@@ -7,8 +7,8 @@
 #include "GameEventMessenger.h"
 #include <assert.h>
 #include "AI.h"
-using namespace HAPISPACE;
 
+using namespace HAPISPACE;
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
 
 //
@@ -662,7 +662,7 @@ void BattleUI::onLeftClickAttackPhase()
 		if ((tileOnMouse->m_shipOnTile.isValid()) && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != 
 			m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName())
 		{
-			m_battle.fireEntityWeaponAtPosition(*m_selectedTile.m_tile, *tileOnMouse, m_targetArea.m_targetArea);
+			m_battle.fireFactionShipAtPosition(m_selectedTile.m_tile->m_shipOnTile, tileOnMouse->m_shipOnTile, m_targetArea.m_targetArea);
 		}
 		m_targetArea.clearTargetArea();
 		m_selectedTile.m_tile = nullptr;

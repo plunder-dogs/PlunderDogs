@@ -358,9 +358,6 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	{
 		currentShip.generateMovementPath(map, map.getTile(bestTile.pair())->m_tileCoordinate);
 		currentShip.move(map, map.getTile(bestTile.pair())->m_tileCoordinate, targetTile.second);		
-
-		//currentShip.generateMovementPath(map, *map.getTile(currentPos), *map.getTile(bestTile.pair()));
-		//currentShip.move(map, *map.getTile(bestTile.pair()), targetTile.second);
 	}
 	currentShip.setDestination();
 }
@@ -379,7 +376,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireEntityWeaponAtPosition(tileOnFiringShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
 			break;
 		}
 		break;
@@ -393,7 +390,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireEntityWeaponAtPosition(tileOnFiringShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
 			
 			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;
@@ -409,7 +406,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireEntityWeaponAtPosition(tileOnFiringShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
 
 			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;
@@ -442,7 +439,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireEntityWeaponAtPosition(tileOnFiringShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
 
 			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;

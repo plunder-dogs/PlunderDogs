@@ -50,7 +50,7 @@ public:
 	bool move(Map& map, std::pair<int, int> destination);
 	bool move(Map& map, std::pair<int, int> destination, eDirection endDirection);
 	//Attack Phase
-	void takeDamage(int damageAmount, FactionName entityFaction);
+	void takeDamage(int damageAmount);
 	void fireWeapon();
 
 private:

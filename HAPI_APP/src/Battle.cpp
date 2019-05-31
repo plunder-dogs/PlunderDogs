@@ -280,6 +280,7 @@ void Battle::render() const
 
 	m_battleUI.drawTargetArea();
 	
+	
 	for (const auto& explosionParticle : m_explosionParticles)
 	{
 		explosionParticle.render();
@@ -377,40 +378,35 @@ bool Battle::setShipDeploymentAtPosition(std::pair<int, int> position)
 	return m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position);
 }
 
-bool Battle::fireEntityWeaponAtPosition(const Tile& tileOnPlayer, const Tile& tileOnAttackPosition, const std::vector<const Tile*>& targetArea)
+bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea)
 {
 	assert(m_currentBattlePhase == BattlePhase::Attack);
-	assert(tileOnPlayer.m_shipOnTile.isValid());
-	assert(!getFactionShip(tileOnPlayer.m_shipOnTile).isWeaponFired());
-	
-	if (!tileOnPlayer.m_shipOnTile.isValid())
-	{
-		return false;
-	}
+	assert(firingShip.isValid());
+	assert(!getFactionShip(firingShip).isWeaponFired());
+
+	const Ship& firingShipInPlay = getFactionShip(firingShip);
+	const Ship& enemyShipInPlay = getFactionShip(enemyShip);
 
 	//Disallow attacking same team
-	if (tileOnAttackPosition.m_shipOnTile.factionName != getCurrentFaction()
-			&& !getFactionShip(tileOnAttackPosition.m_shipOnTile).isDead())
+	if (enemyShipInPlay.getFactionName() != getCurrentFaction() && !enemyShipInPlay.isDead())
 	{
-		//Find entity 
-		auto tileCoordinate =  getFactionShip(tileOnAttackPosition.m_shipOnTile).getCurrentPosition();
-		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), [tileCoordinate](const auto& tile) { if(tile) return tileCoordinate == tile->m_tileCoordinate; });
-		//Enemy within range of weapon
+		//Find Enemy Ship 
+		std::pair<int, int> enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
+		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), 
+			[enemyShipInPlayPosition](const auto& tile) { if (tile) return enemyShipInPlayPosition == tile->m_tileCoordinate; });
+		//Enemy Ship within range of weapon
 		if (cIter != targetArea.cend())
 		{
-			if (getFactionShip(tileOnPlayer.m_shipOnTile).getShipType() == eShipType::eFire)
+			if (firingShipInPlay.getShipType() == eShipType::eFire)
 			{
-				playFireAnimation(getFactionShip(tileOnPlayer.m_shipOnTile).getCurrentDirection(), targetArea[0]->m_tileCoordinate);
+				playFireAnimation(firingShipInPlay.getCurrentDirection(), targetArea[0]->m_tileCoordinate);
 			}
 			else
 			{
-				playExplosionAnimation(getFactionShip(tileOnAttackPosition.m_shipOnTile).getCurrentPosition());
+				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
 			}
 
-			ShipOnTile enemy = tileOnAttackPosition.m_shipOnTile;
-			m_factions[static_cast<int>(enemy.factionName)]->shipTakeDamage(
-				tileOnPlayer.m_shipOnTile.shipID, getFactionShip(enemy).getDamage());
-		
+			getFaction(enemyShip.factionName).shipTakeDamage(enemyShip.shipID, firingShipInPlay.getDamage());
 			return true;
 		}
 	}
@@ -542,7 +538,7 @@ void Battle::nextTurn()
 		}
 
 		updateWindDirection();
-		incrementPlayerTurn();
+		incrementFactionTurn();
 		for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 		{
 			entity.enableAction();
@@ -699,7 +695,7 @@ void Battle::onResetBattle()
 	m_lightIntensityTimer.reset();
 }
 
-void Battle::incrementPlayerTurn()
+void Battle::incrementFactionTurn()
 {
 	//Change wind direction
 	int wind = rand() % eDirection::Max;

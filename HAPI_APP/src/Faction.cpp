@@ -127,7 +127,7 @@ void Faction::onNewTurn()
 void Faction::shipTakeDamage(int shipID, int damage)
 {
 	assert(static_cast<size_t>(shipID + 1) <= m_ships.size());
-	m_ships[shipID].takeDamage(damage, m_factionName);
+	m_ships[shipID].takeDamage(damage);
 }
 
 bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination)

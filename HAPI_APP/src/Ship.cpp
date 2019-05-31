@@ -195,7 +195,7 @@ bool Ship::move(Map& map, std::pair<int, int> destination, eDirection endDirecti
 	return true;
 }
 
-void Ship::takeDamage(int damageAmount, FactionName entityFaction)
+void Ship::takeDamage(int damageAmount)
 {
 	m_health -= damageAmount;
 	int healthPercentage = ((float)m_health / m_maxHealth) * 100;
@@ -218,7 +218,7 @@ void Ship::takeDamage(int damageAmount, FactionName entityFaction)
 		m_isDead = true;
 		m_actionSprite.m_active = false;
 		disableMovementPath();
-		switch (entityFaction)
+		switch (m_factionName)
 		{
 		case FactionName::eYellow:
 			GameEventMessenger::broadcast(GameEvent::eYellowShipDestroyed);
