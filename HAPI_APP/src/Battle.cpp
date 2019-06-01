@@ -16,7 +16,7 @@ Battle::Particle::Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteShee
 	m_particle->SetFrameNumber(m_frameNum);
 }
 
-void Battle::Particle::setPosition(std::pair<int, int> position)
+void Battle::Particle::setPosition(sf::Vector2i position)
 {
 	m_position = position;
 }
@@ -25,7 +25,7 @@ void Battle::Particle::update(float deltaTime, const Map& map)
 {
 	if (m_isEmitting)
 	{
-		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_position);
+		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
 		m_particle->GetTransformComp().SetPosition({
 			tileTransform.first + DRAW_OFFSET_X * map.getDrawScale(),
 			tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale() });
@@ -337,13 +337,13 @@ void Battle::update(float deltaTime)
 	m_winningFactionHandler.update(m_battleUI, deltaTime);
 }
 
-void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination)
+void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, destination);
 }
 
-void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination, eDirection endDirection)
+void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, destination, endDirection);
@@ -355,13 +355,13 @@ void Battle::disableFactionShipMovementPath(ShipOnTile shipOnTile)
 	getFaction(shipOnTile.factionName).disableShipMovementPath(shipOnTile.shipID);
 }
 
-void Battle::generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination)
+void Battle::generateFactionShipMovementPath(ShipOnTile shipOnTile, sf::Vector2i destination)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).generateShipMovementPath(m_map, shipOnTile.shipID, destination);
 }
 
-void Battle::deployFactionShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection)
+void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 	m_factions[m_currentFactionTurn]->deployShipAtPosition(m_map, startingPosition, startingDirection);
@@ -372,7 +372,7 @@ void Battle::deployFactionShipAtPosition(std::pair<int, int> startingPosition, e
 	}
 }
 
-bool Battle::setShipDeploymentAtPosition(std::pair<int, int> position)
+bool Battle::setShipDeploymentAtPosition(sf::Vector2i position)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 	return m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position);
@@ -391,7 +391,7 @@ bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemySh
 	if (enemyShipInPlay.getFactionName() != getCurrentFaction() && !enemyShipInPlay.isDead())
 	{
 		//Find Enemy Ship 
-		std::pair<int, int> enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
+		sf::Vector2i enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
 		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), 
 			[enemyShipInPlayPosition](const auto& tile) { if (tile) return enemyShipInPlayPosition == tile->m_tileCoordinate; });
 		//Enemy Ship within range of weapon
@@ -586,7 +586,7 @@ std::vector<FactionName> Battle::getAllFactionsInPlay() const
 	return allFactionsInPlay;
 }
 
-void Battle::playFireAnimation(eDirection orientation, std::pair<int, int> position)
+void Battle::playFireAnimation(eDirection orientation, sf::Vector2i position)
 {
 	for (auto& it : m_fireParticles)
 	{
@@ -600,7 +600,7 @@ void Battle::playFireAnimation(eDirection orientation, std::pair<int, int> posit
 	}
 }
 
-void Battle::playExplosionAnimation(std::pair<int, int> position)
+void Battle::playExplosionAnimation(sf::Vector2i position)
 {
 	for (auto& it : m_explosionParticles)
 	{

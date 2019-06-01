@@ -24,7 +24,7 @@ class Battle
 		const float m_scale;
 
 		Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteSheet> texture, float scale);
-		void setPosition(std::pair<int, int> position);
+		void setPosition(sf::Vector2i position);
 		void update(float deltaTime, const Map& map);
 		void render() const;
 		void orient(eDirection direction);
@@ -79,13 +79,13 @@ public:
 	void update(float deltaTime);
 	
 	//Deploy Phase
-	void deployFactionShipAtPosition(std::pair<int, int> startingPosition, eDirection startingDirection);
-	bool setShipDeploymentAtPosition(std::pair<int, int> position);
+	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
+	bool setShipDeploymentAtPosition(sf::Vector2i position);
 	//Movement Phase
-	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination);
-	void moveFactionShipToPosition(ShipOnTile shipOnTile, std::pair<int, int> destination, eDirection endDirection);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination, eDirection endDirection);
 	void disableFactionShipMovementPath(ShipOnTile shipOnTile);
-	void generateFactionShipMovementPath(ShipOnTile shipOnTile, std::pair<int, int> destination);
+	void generateFactionShipMovementPath(ShipOnTile shipOnTile, sf::Vector2i destination);
 	//Attack Phase
 	bool fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea);
 
@@ -107,8 +107,8 @@ private:
 	std::unique_ptr<Faction>& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);
 	
-	void playFireAnimation(eDirection orientation, std::pair<int, int> position);
-	void playExplosionAnimation(std::pair<int, int> position);
+	void playFireAnimation(eDirection orientation, sf::Vector2i position);
+	void playExplosionAnimation(sf::Vector2i position);
 	void nextTurn();
 	void switchToBattlePhase(BattlePhase newBattlePhase);
 	void notifyPlayersOnNewTurn();

@@ -9,7 +9,7 @@
 #include "Utilities/MapParser.h"
 #include <algorithm>
 
-typedef std::pair<int, int> intPair;
+typedef sf::Vector2i intPair;
 
 constexpr int FRAME_HEIGHT{ 28 };
 constexpr float FRAME_CENTRE_X{ 15.5 };
@@ -17,7 +17,7 @@ constexpr float FRAME_CENTRE_Y{ 32.5 };
 constexpr float WIND_STRENGTH{ 0.3 };
 
 //SpawnPosition
-Map::SpawnPosition::SpawnPosition(std::pair<int, int> spawnPosition)
+Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
 	: position(spawnPosition),
 	inUse(false)
 {}
@@ -388,7 +388,7 @@ std::vector<const Tile*> Map::cGetTileCone(intPair coord, int range, eDirection 
 	return tileStore;
 }
 
-bool Map::updateShipOnTile(ShipOnTile ship, std::pair<int, int> currentPosition, std::pair<int, int> newPosition)
+bool Map::updateShipOnTile(ShipOnTile ship, sf::Vector2i currentPosition, sf::Vector2i newPosition)
 {
 	Tile* currentTile = getTile(currentPosition);
 	assert(currentTile);
@@ -405,7 +405,7 @@ bool Map::updateShipOnTile(ShipOnTile ship, std::pair<int, int> currentPosition,
 	return true;
 }
 
-void Map::setShipOnTile(ShipOnTile ship, std::pair<int, int> shipPosition)
+void Map::setShipOnTile(ShipOnTile ship, sf::Vector2i shipPosition)
 {
 	Tile* tile = getTile(shipPosition);	
 	assert(tile);
@@ -507,7 +507,7 @@ Map::Map() :
 void Map::onReset()
 {
 	m_data.clear();
-	m_mapDimensions = std::pair<int, int>(0, 0);
+	m_mapDimensions = sf::Vector2i(0, 0);
 	m_drawOffset = intPair(10, 60);
 	m_drawScale = 2;
 
@@ -516,7 +516,7 @@ void Map::onReset()
 	m_spawnPositions.clear();
 }
 
-const Tile * Map::getTile(std::pair<int, int> coordinate) const
+const Tile * Map::getTile(sf::Vector2i coordinate) const
 {
 	//Bounds check
 	if (coordinate.first < m_mapDimensions.first &&
@@ -562,7 +562,7 @@ if (coordinate.x < m_mapDimensions.first &&
 return nullptr;
 }
 
-std::vector<const Tile*> Map::cGetAdjacentTiles(std::pair<int, int> coord) const
+std::vector<const Tile*> Map::cGetAdjacentTiles(sf::Vector2i coord) const
 {
 	const size_t allAdjacentTiles = 6;
 	std::vector<const Tile*> result;
@@ -588,7 +588,7 @@ std::vector<const Tile*> Map::cGetAdjacentTiles(std::pair<int, int> coord) const
 	return result;
 }
 
-std::vector<const Tile*> Map::cGetTileRadius(std::pair<int, int> coord, int range, bool avoidInvalid, bool includeSource) const
+std::vector<const Tile*> Map::cGetTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
 	if (range < 1)
 		HAPI_Sprites.UserMessage("getTileRadius range less than 1", "Map error");
@@ -643,7 +643,7 @@ std::vector<const Tile*> Map::cGetTileRadius(std::pair<int, int> coord, int rang
 }
 
 std::vector<Tile*> Map::getTileLine(
-	std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid)
+	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid)
 {
 	std::vector<Tile*> tileStore;
 	tileStore.reserve(range);
@@ -665,7 +665,7 @@ std::vector<Tile*> Map::getTileLine(
 }
 
 std::vector<const Tile*> Map::cGetTileLine(
-	std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid)const
+	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid)const
 {
 	std::vector<const Tile*> tileStore;
 	tileStore.reserve(range);
@@ -686,7 +686,7 @@ std::vector<const Tile*> Map::cGetTileLine(
 	return tileStore;
 }
 
-std::vector<Tile*> Map::getTileRing(std::pair<int, int> coord, int range)
+std::vector<Tile*> Map::getTileRing(sf::Vector2i coord, int range)
 {
 	if (range < 1)
 		HAPI_Sprites.UserMessage("getTileRing range less than 1", "Map error");
@@ -716,7 +716,7 @@ std::vector<Tile*> Map::getTileRing(std::pair<int, int> coord, int range)
 	return tileStore;
 }
 
-std::vector<const Tile*> Map::cGetTileRing(std::pair<int, int> coord, int range) const
+std::vector<const Tile*> Map::cGetTileRing(sf::Vector2i coord, int range) const
 {
 	if (range < 1)
 		HAPI_Sprites.UserMessage("getTileRing range less than 1", "Map error");
@@ -746,13 +746,13 @@ std::vector<const Tile*> Map::cGetTileRing(std::pair<int, int> coord, int range)
 	return tileStore;
 }
 
-std::pair<int, int> Map::getRandomSpawnPosition()
+sf::Vector2i Map::getRandomSpawnPosition()
 {
 	//Make sure all spawn positions aren't in use
 	assert(std::find_if(m_spawnPositions.cbegin(), m_spawnPositions.cend(),
 		[](const auto& spawnPosition) { return spawnPosition.inUse == false; }) != m_spawnPositions.cend());
 
-	std::pair<int, int> spawnPosition;
+	sf::Vector2i spawnPosition;
 	bool validSpawnPositionFound = false;
 	while (!validSpawnPositionFound)
 	{

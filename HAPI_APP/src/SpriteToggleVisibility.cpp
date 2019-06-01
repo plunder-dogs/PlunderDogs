@@ -6,7 +6,7 @@
 constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
 constexpr float DRAW_ENTITY_OFFSET_Y{ 32 };
 
-SpriteToggleVisibility::SpriteToggleVisibility(std::shared_ptr<SpriteSheet>& spriteSheet, float scaleX, float scaleY, bool active)
+SpriteToggleVisibility::SpriteToggleVisibility(std::unique_ptr<sf::Texture>& spriteSheet, float scaleX, float scaleY, bool active)
 	: m_sprite(std::make_unique<Sprite>(spriteSheet)),
 	m_active(active),
 	m_position(0, 0)
@@ -47,7 +47,7 @@ SpriteToggleVisibility::SpriteToggleVisibility(SpriteToggleVisibility & orig)
 	m_sprite.swap(orig.m_sprite);
 }
 
-void SpriteToggleVisibility::render(const Map & map, std::pair<int, int> position) const
+void SpriteToggleVisibility::render(const Map & map, sf::Vector2i position) const
 {
 	if (m_active)
 	{
@@ -63,7 +63,7 @@ void SpriteToggleVisibility::render(const Map & map) const
 {
 	if (m_active)
 	{
-		std::pair<int, int> tileTransform = map.getTileScreenPos(m_position);
+		sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
 		m_sprite->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });

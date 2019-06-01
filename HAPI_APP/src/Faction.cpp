@@ -77,7 +77,7 @@ void Faction::createSpawnArea(Map & map)
 	}
 }
 
-bool Faction::deployShipAtPosition(Map& map, std::pair<int, int> startingPosition, eDirection startingDirection)
+bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
 {
 	assert(m_shipToDeploy);
 	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
@@ -103,7 +103,7 @@ bool Faction::deployShipAtPosition(Map& map, std::pair<int, int> startingPositio
 	}
 }
 
-bool Faction::setShipDeploymentAtPosition(std::pair<int, int> startingPosition)
+bool Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 {
 	if (!m_shipToDeploy)
 	{
@@ -130,19 +130,19 @@ void Faction::shipTakeDamage(int shipID, int damage)
 	m_ships[shipID].takeDamage(damage);
 }
 
-bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination)
+bool Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	return m_ships[shipID].move(map, destination);
 }
 
-bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection)
+bool Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	return m_ships[shipID].move(map, destination, endDirection);
 }
 
-void Faction::generateShipMovementPath(const Map & map, int shipID, std::pair<int, int> destination)
+void Faction::generateShipMovementPath(const Map & map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].generateMovementPath(map, destination);
@@ -154,7 +154,7 @@ void Faction::disableShipMovementPath(int shipID)
 	m_ships[shipID].disableMovementPath();
 }
 
-SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position)
+SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)
 	: m_position(position),
 	m_sprite()
 {

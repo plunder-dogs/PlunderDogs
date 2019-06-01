@@ -7,14 +7,14 @@ double MouseSelection::radsToDeg(double angle)
 	return 180 * (angle / MouseSelection::PI); 
 }
 
-std::pair<int, int> MouseSelection::coordToHexPos(std::pair<int, int> coord)
+sf::Vector2i MouseSelection::coordToHexPos(sf::Vector2i coord)
 {
 	const float xPos = static_cast<float>(coord.first * 12);
 	const float yPos = static_cast<float>((2 * coord.second - (coord.first & 1)) * 7);
 	return { xPos, yPos };
 }
 
-std::pair<double, eDirection> MouseSelection::calculateDirection(std::pair<int, int> startLocation, std::pair<int, int> endLocation)
+std::pair<double, eDirection> MouseSelection::calculateDirection(sf::Vector2i startLocation, sf::Vector2i endLocation)
 {
 	std::pair<double, double> distance{ endLocation.first - startLocation.first, endLocation.second - startLocation.second }; // Calculates the distance vector of the line between the start and end point.
 	// Calculating the magnitude of the line between the start and end point.
@@ -72,9 +72,9 @@ std::pair<double, eDirection> MouseSelection::calculateDirection(const Tile* sta
 	if (!startLocation || !endLocation)
 		return { 0.0 , eNorth };
 	// Calculating the distance vector of the line between the start and end point
-	std::pair<int, int> startPos{ MouseSelection::coordToHexPos(startLocation->m_tileCoordinate) };
-	std::pair<int, int> endPos{ MouseSelection::coordToHexPos(endLocation->m_tileCoordinate) };
-	std::pair<int, int> distance{ endPos.first - startPos.first, endPos.second - startPos.second };
+	sf::Vector2i startPos{ MouseSelection::coordToHexPos(startLocation->m_tileCoordinate) };
+	sf::Vector2i endPos{ MouseSelection::coordToHexPos(endLocation->m_tileCoordinate) };
+	sf::Vector2i distance{ endPos.first - startPos.first, endPos.second - startPos.second };
 	// Calculating the magnitude of the line between the start and end point.
 	double magnitude{ sqrt(distance.first * distance.first + distance.second * distance.second) };
 	std::pair<double, eDirection> returnVariable{ magnitude, eNorth };

@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 //Finds closest living enemy, returns nullptr if none found
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName faction);
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName faction);
 //Finds nearest firing position to ship, if none are found will return the tile the ship is on
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range);
 void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
@@ -162,11 +162,11 @@ void AI::loadInPlayerShips(Faction& player)
 	}
 }
 
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName ourFaction)
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName ourFaction)
 {
 	const Tile* closestEnemy{ nullptr };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShipPosition) };
+	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShipPosition) };
 	auto activeFactions = battle.getAllFactionsInPlay();
 	for (FactionName i : activeFactions)
 	{
@@ -180,10 +180,10 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 			if (factionShips[j].isDead()) continue;
 			//Find the distance^2 from the allied ship to the enemy ship, 
 			//then set closestEnemy to that enemy if it's the closest yet found
-			std::pair<int, int> enemyPos = MouseSelection::coordToHexPos(
+			sf::Vector2i enemyPos = MouseSelection::coordToHexPos(
 				factionShips[j].getCurrentPosition());
 
-			std::pair<int, int> diff(
+			sf::Vector2i diff(
 				{ enemyPos.first - alliedPos.first, enemyPos.second - alliedPos.second });
 			int enemyDistance = diff.first * diff.first + diff.second * diff.second;
 			
@@ -203,7 +203,7 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
+	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
 	std::vector<const Tile*> availableTiles{ map.cGetTileRing(targetShip->m_tileCoordinate, range) };
 	for (const Tile* it : availableTiles)
 	{
@@ -212,8 +212,8 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 		if (it->m_type != eSea && it->m_type != eOcean) continue;
 		if (it->m_shipOnTile.isValid()) continue;
 		//Determine distance
-		std::pair<int, int> tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
-		std::pair<int, int> diff(
+		sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
+		sf::Vector2i diff(
 			{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
 		int tempDistance = diff.first * diff.first + diff.second * diff.second;
 		//If distance is smallest, set as new target tile
@@ -232,7 +232,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
+	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
 	//TODO: can't use const Tile* for some reason
 	std::vector<const Tile*> availableTiles;
 	availableTiles.reserve(range);
@@ -247,8 +247,8 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 			if (it->m_type != eSea && it->m_type != eOcean) continue;
 			if (it->m_shipOnTile.isValid()) continue;
 			//Determine distance
-			std::pair<int, int> tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
-			std::pair<int, int> diff(
+			sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
+			sf::Vector2i diff(
 				{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
 			int tempDistance = diff.first * diff.first + diff.second * diff.second;
 			//If distance is smallest, set as new target tile
@@ -336,13 +336,13 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 		posi(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
 		static_cast<float>(currentShip.getMovementPoints()));
 	//Loop to find the closest tile to the target tile
-	std::pair<int, int> targetPos = targetTile.first->m_tileCoordinate;
-	std::pair<int, int> currentPos = currentShip.getCurrentPosition();
+	sf::Vector2i targetPos = targetTile.first->m_tileCoordinate;
+	sf::Vector2i currentPos = currentShip.getCurrentPosition();
 	int closestDistance{ INT_MAX };
 	posi bestTile{ -1, -1, eNorth };
 	for (posi it : availableTiles)
 	{
-		std::pair<int, int> diff(
+		sf::Vector2i diff(
 			{ targetPos.first - it.x, targetPos.second - it.y });
 		int tileDistance = diff.first * diff.first + diff.second * diff.second;
 

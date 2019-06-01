@@ -114,7 +114,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>TIXML_USE_STL;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>HAPI_SPRITES;HAPI_SPRITES\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
@@ -178,7 +178,6 @@
     <ClCompile Include="src\Battle.cpp" />
     <ClCompile Include="src\BattleUI.cpp" />
     <ClCompile Include="src\GameEventMessenger.cpp" />
-    <ClCompile Include="src\HAPIWrapper.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MouseSelection.cpp" />
@@ -202,7 +201,6 @@
     <ClInclude Include="src\BattleUI.h" />
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
-    <ClInclude Include="src\HAPIWrapper.h" />
     <ClInclude Include="src\Map.h" />
     <ClInclude Include="src\MouseSelection.h" />
     <ClInclude Include="src\BFS.h" />

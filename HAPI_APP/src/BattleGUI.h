@@ -22,7 +22,7 @@ public:
 	BattleGUI();
 	~BattleGUI();
 
-	std::pair<int, int> getCameraPositionOffset() const;
+	sf::Vector2i getCameraPositionOffset() const;
 
 	void render(BattlePhase currentBattlePhase) const;
 	void renderStats(const Ship& ship) const;
@@ -31,8 +31,8 @@ public:
 	void OnMouseLeftClick(const HAPI_TMouseData& mouseData, BattlePhase currentBattlePhase);
 	//void OnMouseScroll could be added
 	void OnMouseMove(const HAPI_TMouseData& mouseData, BattlePhase currentBattlePhase);
-	void setMaxCameraOffset(std::pair<int, int> maxCameraOffset);
-	void snapCameraToPosition(std::pair<int, int> snapLocation);
+	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
+	void snapCameraToPosition(sf::Vector2i snapLocation);
 	bool isPaused();
 
 	void onBlueWin();
@@ -44,7 +44,7 @@ public:
 
 private:
 	BattleWindow m_currentBattleWindow;
-	std::pair<int, int> m_maxCameraOffset;
+	sf::Vector2i m_maxCameraOffset;
 	std::unique_ptr<Sprite> m_battleIcons;
 	std::unique_ptr<Sprite> m_pauseButton;
 	std::unique_ptr<Sprite> m_chickenButton;
@@ -67,9 +67,9 @@ private:
 	bool victory = false;
 	std::string winningFaction{ "" };
 	VectorF pendingCameraMovement{ 0 };
-	std::pair<int, int> CameraPositionOffset;//camera offset that will be used by the map
+	sf::Vector2i CameraPositionOffset;//camera offset that will be used by the map
 	float cameraZoom = 1.0f;//variable to multiply scale by
-	std::pair<int, int> m_cameraPositionOffset;
+	sf::Vector2i m_cameraPositionOffset;
 	
 	void onBattleReset();
 	std::string getWinningFactionName();

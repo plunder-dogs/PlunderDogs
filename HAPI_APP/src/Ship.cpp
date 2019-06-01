@@ -24,7 +24,7 @@ eShipType Ship::getShipType() const
 	return m_shipType;
 }
 
-std::pair<int, int> Ship::getCurrentPosition() const
+sf::Vector2i Ship::getCurrentPosition() const
 {
 	return m_currentPosition;
 }
@@ -79,7 +79,7 @@ int Ship::getID() const
 	return m_ID;
 }
 
-int Ship::generateMovementPath(const Map & map, std::pair<int, int> destination)
+int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 {
 	posi start = { m_currentPosition, m_currentDirection };
 	posi end = { destination.first, destination.second };
@@ -116,7 +116,7 @@ void Ship::disableMovementPath()
 	}
 }
 
-std::pair<int, int> Ship::getEndOfMovementPath() const
+sf::Vector2i Ship::getEndOfMovementPath() const
 {
 	int i = m_movementPath.size() - 1;
 	for (i; i > 0; i--)
@@ -140,7 +140,7 @@ void Ship::disableAction()
 	m_actionSprite.m_active = false;
 }
 
-bool Ship::move(Map& map, std::pair<int, int> destination)
+bool Ship::move(Map& map, sf::Vector2i destination)
 {
 	if (!m_destinationSet)
 	{
@@ -167,7 +167,7 @@ bool Ship::move(Map& map, std::pair<int, int> destination)
 	return true;
 }
 
-bool Ship::move(Map& map, std::pair<int, int> destination, eDirection endDirection)
+bool Ship::move(Map& map, sf::Vector2i destination, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
@@ -201,19 +201,16 @@ void Ship::takeDamage(int damageAmount)
 
 	if (healthPercentage < 100 && healthPercentage >= 50)
 	{
-		m_sprite->SetFrameNumber(eShipSpriteFrame::eLowDamage);
-		m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+		//m_sprite->SetFrameNumber(eShipSpriteFrame::eLowDamage);
 	}
 	else if (healthPercentage < 50 && healthPercentage >= 1)
 	{
-		m_sprite->SetFrameNumber(eShipSpriteFrame::eHighDamage);
-		m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+		//m_sprite.SetFrameNumber(eShipSpriteFrame::eHighDamage);
 	}
 	else
 	{
 		m_health = 0;
-		m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
-		m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+		//m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
 		m_isDead = true;
 		m_actionSprite.m_active = false;
 		disableMovementPath();
@@ -254,8 +251,9 @@ void Ship::onNewTurn()
 	m_movingToDestination = false;
 }
 
-void Ship::disableMovementPathNode(std::pair<int, int> position, const Map & map)
+void Ship::disableMovementPathNode(sf::Vector2i position, const Map & map)
 {
+	sf::Vector2i
 	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
 	{
 		auto i = map.getMouseClickCoord({ iter->m_sprite->GetTransformComp().GetPosition().x, iter->m_sprite->GetTransformComp().GetPosition().y });
@@ -480,7 +478,7 @@ void Ship::render(const Map & map) const
 	{
 		if (i.m_active)
 		{
-			const std::pair<int, int> tileTransform = map.getTileScreenPos(i.m_position);
+			const sf::Vector2i tileTransform = map.getTileScreenPos(i.m_position);
 			float scale = map.getDrawScale();
 
 			i.m_sprite->GetTransformComp().SetPosition({
@@ -493,7 +491,7 @@ void Ship::render(const Map & map) const
 	}
 
 	//Set sprite position to current position
-	const std::pair<int, int> tileTransform = map.getTileScreenPos(m_currentPosition);
+	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
 
 	m_sprite->GetTransformComp().SetPosition({
@@ -505,12 +503,12 @@ void Ship::render(const Map & map) const
 	m_actionSprite.render(map, m_currentPosition);
 }
 
-void Ship::setDeploymentPosition(std::pair<int, int> position)
+void Ship::setDeploymentPosition(sf::Vector2i position)
 {
 	m_currentPosition = position;
 }
 
-void Ship::deployAtPosition(std::pair<int, int> position, eDirection startingDirection)
+void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)
 {
 	m_currentPosition = position;
 	m_deployed = true;

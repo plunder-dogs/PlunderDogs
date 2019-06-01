@@ -6,6 +6,7 @@ constexpr float DRAW_OFFSET_X{ 16 };
 constexpr float DRAW_OFFSET_Y{ 32 };
 
 const size_t TOTAL_SHIPS = 6;
+const std::string DIRECTORY = "Data";
 
 enum FactionName
 {
@@ -132,9 +133,9 @@ struct posi
 	eDirection dir;
 
 	posi(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
-	posi(std::pair<int, int> pair, eDirection direction = eNorth) : x(pair.first), y(pair.second), dir(direction) {}
+	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.first), y(pair.second), dir(direction) {}
 
-	std::pair<int, int> pair() { return { x, y }; }
+	sf::Vector2i pair() { return { x, y }; }
 	int dirDiff(const posi& compare)
 	{
 		int diff = std::abs(static_cast<int>(this->dir) - static_cast<int>(compare.dir));

@@ -23,7 +23,6 @@ void HAPI_Sprites_Main()
 	}
 
 	int lastFrameStart = HAPI_Sprites.GetTime();
-	
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
 
 	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);

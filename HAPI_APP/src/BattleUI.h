@@ -24,7 +24,7 @@ class BattleUI : public IHapiSpritesInputListener
 
 		bool m_display;
 		int m_displaySize;
-		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
+		std::vector<std::pair<sf::Vector2i, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
 	};
 
 	struct TargetArea
@@ -34,7 +34,7 @@ class BattleUI : public IHapiSpritesInputListener
 			HighlightNode();
 			std::unique_ptr<Sprite> sprite;
 			bool activate;
-			std::pair<int, int> position;
+			sf::Vector2i position;
 		};
 
 		TargetArea();
@@ -52,12 +52,12 @@ class BattleUI : public IHapiSpritesInputListener
 		InvalidPosition();
 
 		void render(const Map& map) const;
-		void setPosition(std::pair<int, int> newPosition, const Map& map);
+		void setPosition(sf::Vector2i newPosition, const Map& map);
 		void onReset();
 
 		std::unique_ptr<Sprite> m_sprite;
 		bool m_activate;
-		std::pair<int, int> m_position;
+		sf::Vector2i m_position;
 	};
 
 	struct SelectedTile
@@ -68,7 +68,7 @@ class BattleUI : public IHapiSpritesInputListener
 
 		std::unique_ptr<Sprite> m_sprite;
 		const Tile* m_tile;
-		std::pair<int, int> m_position;
+		sf::Vector2i m_position;
 	};
 
 public:
@@ -79,11 +79,11 @@ public:
 	BattleUI&& operator=(BattleUI&&) = delete;
 	~BattleUI();
 
-	std::pair<int, int> getCameraPositionOffset() const;
+	sf::Vector2i getCameraPositionOffset() const;
 
 	void renderUI() const;
 	void renderGUI() const;
-	void loadGUI(std::pair<int, int> mapDimensions);
+	void loadGUI(sf::Vector2i mapDimensions);
 	void onFactionWin(FactionName winningFaction);
 	void onEnteringBattlePhase(BattlePhase currentBattlePhase);
 
@@ -105,7 +105,7 @@ private:
 	SelectedTile m_selectedTile;
 	//This stores the position at which the mouse event "eLeftMouseButtonDown" last occured while giving an entity a move command, 
 	//it's used to calculate what direction the mouse moved during that input.
-	std::pair<int, int> m_leftMouseDownPosition;
+	sf::Vector2i m_leftMouseDownPosition;
 	//This is used to determine if an entity is currently being given a move command, it gets set to true in the "handleOnLeftClickMovementPhase()" and false after "eLeftMouseButtonUp" is detected.
 	bool m_isMovingEntity;
 	//Used to store the tile selected for movement when the lmb is depressed, so that it can be used for moveEntity input on mouse up
@@ -114,7 +114,7 @@ private:
 	InvalidPosition m_invalidPosition;
 	//std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
 	//Directional arrow
-	std::pair<int, int> m_lastMouseData;
+	sf::Vector2i m_lastMouseData;
 	bool m_arrowActive;
 	std::unique_ptr<Sprite> m_arrowSprite;
 

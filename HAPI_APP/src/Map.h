@@ -38,8 +38,8 @@ struct Tile
 	//TODO: Dangerous exposure of raw pointer
 	ShipOnTile m_shipOnTile;
 	FactionName m_shipOnTileFaction;
-	std::unique_ptr<sf::Sprite> m_daySprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_aftersprite;
+	sf::Sprite m_daySprite;
+	sf::Sprite m_aftersprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_eveningSprite;
 	std::unique_ptr<HAPISPACE::Sprite> m_nightSprite;
 	const sf::Vector2i m_tileCoordinate;

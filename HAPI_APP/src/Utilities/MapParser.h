@@ -5,12 +5,12 @@
 
 struct MapDetails
 {
-	MapDetails(std::pair<int, int> mapSize, std::vector<std::vector<int>>&& tileData, 
-		std::vector<std::pair<int, int>>&& spawnPositions);
+	MapDetails(sf::Vector2i mapSize, std::vector<std::vector<int>>&& tileData, 
+		std::vector<sf::Vector2i>&& spawnPositions);
 
-	const std::pair<int, int> mapDimensions;
+	const sf::Vector2i mapDimensions;
 	const std::vector<std::vector<int>> tileData;
-	const std::vector<std::pair<int, int>> m_spawnPositions;
+	const std::vector<sf::Vector2i> m_spawnPositions;
 };
 
 namespace MapParser

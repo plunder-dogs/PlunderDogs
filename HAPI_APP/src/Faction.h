@@ -4,11 +4,11 @@
 
 struct SpawnNode
 {
-	SpawnNode(FactionName factionName, std::pair<int, int> position);
+	SpawnNode(FactionName factionName, sf::Vector2i position);
 
 	void render(const Map& map) const;
 
-	std::pair<int, int> m_position;
+	sf::Vector2i m_position;
 	std::unique_ptr<Sprite> m_sprite;
 };
 
@@ -25,12 +25,12 @@ struct Faction
 	void addShip(FactionName factionName, eShipType shipType);
 	bool isAllShipsDeployed() const;
 	void createSpawnArea(Map& map);
-	bool deployShipAtPosition(Map& map, std::pair<int, int> startingPosition, eDirection startingDirection);
-	bool setShipDeploymentAtPosition(std::pair<int, int> startingPosition);
+	bool deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
+	bool setShipDeploymentAtPosition(sf::Vector2i startingPosition);
 	//Movement Phase
-	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination);
-	bool moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection);
-	void generateShipMovementPath(const Map& map, int shipID, std::pair<int, int> destination);
+	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination);
+	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection);
+	void generateShipMovementPath(const Map& map, int shipID, sf::Vector2i destination);
 	void disableShipMovementPath(int shipID);
 	//Attack Phase
 	void shipTakeDamage(int shipID, int damage);

@@ -53,7 +53,7 @@ BattleGUI::~BattleGUI()
 	GameEventMessenger::getInstance().unsubscribe("BattleGUI", GameEvent::eLeftAITurn);
 }
 
-std::pair<int, int> BattleGUI::getCameraPositionOffset() const
+sf::Vector2i BattleGUI::getCameraPositionOffset() const
 {
 	return m_cameraPositionOffset;
 }
@@ -218,7 +218,7 @@ void BattleGUI::updateFactionToken(int factionName)
 void BattleGUI::OnMouseLeftClick(const HAPI_TMouseData& mouseData, BattlePhase currentBattlePhase)
 {
 	
-	//snapCameraToPosition(std::pair<int, int>{ 15, 15 });
+	//snapCameraToPosition(sf::Vector2i{ 15, 15 });
 
 	switch (m_currentBattleWindow)
 	{
@@ -391,9 +391,9 @@ void BattleGUI::OnMouseMove(const HAPI_TMouseData& mouseData, BattlePhase curren
 	}
 }
 
-void BattleGUI::setMaxCameraOffset(std::pair<int, int> maxCameraOffset)
+void BattleGUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 {
-	m_maxCameraOffset = std::pair<int, int>(maxCameraOffset.first * 24 - 820, maxCameraOffset.second * 28 - 400);
+	m_maxCameraOffset = sf::Vector2i(maxCameraOffset.first * 24 - 820, maxCameraOffset.second * 28 - 400);
 	if (m_maxCameraOffset.first < 0)
 	{
 		m_maxCameraOffset.first = 0;
@@ -499,7 +499,7 @@ void BattleGUI::onLeftAITurn()
 	m_AIInPlay = false;
 }
 
-void BattleGUI::snapCameraToPosition(std::pair<int, int> snapLocation)//snaps the camera to be centered on a given tile
+void BattleGUI::snapCameraToPosition(sf::Vector2i snapLocation)//snaps the camera to be centered on a given tile
 {
 	int xPos = snapLocation.first * 24 - 480;
 	int yPos = snapLocation.second  * 28 - 270;

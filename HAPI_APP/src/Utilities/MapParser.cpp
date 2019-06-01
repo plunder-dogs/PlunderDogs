@@ -5,18 +5,18 @@
 #include <assert.h>
 #include "Utilities.h"
 
-MapDetails::MapDetails(std::pair<int, int> mapSize, std::vector<std::vector<int>>&& tileData,
-	std::vector<std::pair<int, int>>&& spawnPositions)
+MapDetails::MapDetails(sf::Vector2i mapSize, std::vector<std::vector<int>>&& tileData,
+	std::vector<sf::Vector2i>&& spawnPositions)
 	: mapDimensions(mapSize),
 	tileData(std::move(tileData)),
 	m_spawnPositions(std::move(spawnPositions))
 {}
 
-std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const std::pair<int, int> mapSize);
-std::pair<int, int> parseMapSize(const TiXmlElement& rootElement);
-std::pair<int, int> parseTileSize(const TiXmlElement& rootElement);
-std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, std::pair<int, int> mapSize);
-std::vector<std::pair<int, int>> parseSpawnPositions(const TiXmlElement & rootElement, std::pair<int, int> tileSize);
+std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
+sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
+sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
+std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
+std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
 MapDetails MapParser::parseMapDetails(const std::string& name)
 {
@@ -25,15 +25,15 @@ MapDetails MapParser::parseMapDetails(const std::string& name)
 	assert(mapLoaded);
 
 	const auto& rootElement = mapFile.RootElement();
-	std::pair<int, int> mapSize = parseMapSize(*rootElement);
-	std::pair<int, int> tileSize = parseTileSize(*rootElement);
+	sf::Vector2i mapSize = parseMapSize(*rootElement);
+	sf::Vector2i tileSize = parseTileSize(*rootElement);
 	std::vector<std::vector<int>> tileData = parseTileData(*rootElement, mapSize);
-	std::vector<std::pair<int, int>> spawnPositions = parseSpawnPositions(*rootElement, tileSize);
+	std::vector<sf::Vector2i> spawnPositions = parseSpawnPositions(*rootElement, tileSize);
 
 	return MapDetails(mapSize, std::move(tileData), std::move(spawnPositions));
 }
 
-std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, std::pair<int, int> mapSize)
+std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize)
 {
 	std::vector<std::vector<int>> tileData;
 	tileData.reserve(mapSize.second);
@@ -71,7 +71,7 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 	return tileData;
 }
 
-std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, const std::pair<int, int> mapSize)
+std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, const sf::Vector2i mapSize)
 {
 	std::vector<std::vector<int>> tileData;
 	for (const auto* tileLayerElement = rootElement.FirstChildElement();
@@ -89,27 +89,27 @@ std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, co
 	return tileData;
 }
 
-std::pair<int, int> parseMapSize(const TiXmlElement & rootElement)
+sf::Vector2i parseMapSize(const TiXmlElement & rootElement)
 {
-	std::pair<int, int> mapSize(0, 0);
+	sf::Vector2i mapSize(0, 0);
 	rootElement.Attribute("width", &mapSize.first);
 	rootElement.Attribute("height", &mapSize.second);
 	assert(mapSize.first != 0 && mapSize.second != 0);
 	return mapSize;
 }
 
-std::pair<int, int> parseTileSize(const TiXmlElement & rootElement)
+sf::Vector2i parseTileSize(const TiXmlElement & rootElement)
 {
-	std::pair<int, int> tileSize(0, 0);
+	sf::Vector2i tileSize(0, 0);
 	rootElement.Attribute("tilewidth", &tileSize.first);
 	rootElement.Attribute("tileheight", &tileSize.second);
 	assert(tileSize.first != 0 && tileSize.second != 0);
 	return tileSize;
 }
 
-std::vector<std::pair<int, int>> parseSpawnPositions(const TiXmlElement & rootElement, std::pair<int, int> tileSize)
+std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
 {
-	std::vector<std::pair<int, int>> entityStartingPositions;
+	std::vector<sf::Vector2i> entityStartingPositions;
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
 		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("SpawnPositionLayer"))
@@ -119,7 +119,7 @@ std::vector<std::pair<int, int>> parseSpawnPositions(const TiXmlElement & rootEl
 
 		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
 		{
-			std::pair<int, int> startingPosition;
+			sf::Vector2i startingPosition;
 			entityElement->Attribute("x", &startingPosition.first);
 			entityElement->Attribute("y", &startingPosition.second);
 			//startingPosition.second -= tileSize; //Tiled Hack

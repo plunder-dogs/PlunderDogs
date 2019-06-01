@@ -16,7 +16,7 @@ constexpr int MAX_MOVE_AREA{ 700 };
 //InvalidPositionSprite
 //
 BattleUI::InvalidPosition::InvalidPosition()
-	: m_sprite(std::make_unique<Sprite>(Textures::m_thing)),
+	: m_sprite(std::make_unique<Sprite>(Textures::m_cross)),
 	m_activate(false)
 {
 	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
@@ -26,7 +26,7 @@ void BattleUI::InvalidPosition::render(const Map& map) const
 {
 	if (m_activate)
 	{
-		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_position);
+		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
 
 		m_sprite->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
@@ -36,7 +36,7 @@ void BattleUI::InvalidPosition::render(const Map& map) const
 	}
 }
 
-void BattleUI::InvalidPosition::setPosition(std::pair<int, int> newPosition, const Map& map)
+void BattleUI::InvalidPosition::setPosition(sf::Vector2i newPosition, const Map& map)
 {
 	m_sprite->GetTransformComp().SetPosition({
 		(float)newPosition.first + DRAW_OFFSET_X * map.getDrawScale(),
@@ -48,7 +48,7 @@ void BattleUI::InvalidPosition::setPosition(std::pair<int, int> newPosition, con
 void BattleUI::InvalidPosition::onReset()
 {
 	m_activate = false;
-	m_position = std::pair<int, int>(0, 0);
+	m_position = sf::Vector2i(0, 0);
 }
 
 //
@@ -80,7 +80,7 @@ BattleUI::~BattleUI()
 	GameEventMessenger::getInstance().unsubscribe("BattleUI", GameEvent::eNewTurn);
 }
 
-std::pair<int, int> BattleUI::getCameraPositionOffset() const
+sf::Vector2i BattleUI::getCameraPositionOffset() const
 {
 	return m_gui.getCameraPositionOffset();
 }
@@ -116,7 +116,7 @@ void BattleUI::renderGUI() const
 	}
 }
 
-void BattleUI::loadGUI(std::pair<int, int> mapDimensions)
+void BattleUI::loadGUI(sf::Vector2i mapDimensions)
 {
 	m_gui.setMaxCameraOffset(mapDimensions);
 }
@@ -159,7 +159,7 @@ void BattleUI::drawTargetArea() const
 	{
 		if (i.activate)
 		{
-			const std::pair<int, int> tileTransform = m_battle.getMap().getTileScreenPos(i.position);
+			const sf::Vector2i tileTransform = m_battle.getMap().getTileScreenPos(i.position);
 
 			i.sprite->GetTransformComp().SetPosition({
 			static_cast<float>(tileTransform.first + DRAW_OFFSET_X * m_battle.getMap().getDrawScale()),
@@ -348,7 +348,7 @@ void BattleUI::renderArrow() const
 	if (directionData.first < 20)
 		return;
 	int windDirection = static_cast<int>(directionData.second);
-	std::pair<int, int> pos = m_battle.getMap().getTileScreenPos(m_mouseDownTile->m_tileCoordinate);
+	sf::Vector2i pos = m_battle.getMap().getTileScreenPos(m_mouseDownTile->m_tileCoordinate);
 	float scale = m_battle.getMap().getDrawScale();
 	m_arrowSprite->GetTransformComp().SetPosition({ static_cast<float>(pos.first + (16 * scale)), static_cast<float>(pos.second + (32 * scale)) });
 	m_arrowSprite->GetTransformComp().SetRotation(((windDirection * 60) % 360) * M_PI / 180.0f);
@@ -773,9 +773,9 @@ void BattleUI::onResetBattle()
 {
 	m_targetArea.onReset();
 	m_selectedTile.m_tile = nullptr;
-	m_selectedTile.m_position = std::pair<int, int>(0, 0);
+	m_selectedTile.m_position = sf::Vector2i(0, 0);
 	m_invalidPosition.onReset();
-	m_leftMouseDownPosition = std::pair<int, int>(0, 0);
+	m_leftMouseDownPosition = sf::Vector2i(0, 0);
 	m_mouseDownTile = nullptr;
 	m_arrowActive = false;
 	m_lastMouseData = { 0,0 };
@@ -806,7 +806,7 @@ void BattleUI::TargetArea::render(const Map& map) const
 	{
 		if (i.activate)
 		{
-			const std::pair<int, int> tileTransform = map.getTileScreenPos(i.position);
+			const sf::Vector2i tileTransform = map.getTileScreenPos(i.position);
 
 			i.sprite->GetTransformComp().SetPosition({
 			static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
@@ -880,7 +880,7 @@ void BattleUI::TargetArea::generateTargetArea(Battle& battle, const Tile & sourc
 		if (!m_targetArea[i])//Check that i is not nullptr
 			continue;
 
-		std::pair<int, int>tilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
+		sf::Vector2itilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
 		m_targetAreaSprites[i].sprite->GetTransformComp().SetPosition(
 			{
 				 tilePos.first + 12 * battle.getMap().getDrawScale(),
@@ -928,7 +928,7 @@ void BattleUI::SelectedTile::render(const Map & map) const
 {
 	if (m_tile && (m_tile->m_type == eTileType::eSea || m_tile->m_type == eTileType::eOcean))
 	{
-		const std::pair<int, int> tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
+		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
 
 		m_sprite->GetTransformComp().SetPosition({
 		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
