@@ -107,11 +107,11 @@ void BattleUI::renderUI() const
 void BattleUI::renderGUI() const
 {
 	m_invalidPosition.render(m_battle.getMap());
-	m_gui.render(m_battle.getCurrentPhase());
+	//m_gui.render(m_battle.getCurrentPhase());
 
 	if (m_selectedTile.m_tile != nullptr && m_selectedTile.m_tile->m_shipOnTile.isValid())
 	{
-		m_gui.renderStats(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile));
+		//m_gui.renderStats(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile));
 	}
 }
 

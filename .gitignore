@@ -48,6 +48,7 @@
 *.userosscache
 *.sln.docstates
 HAPI_SPRITES/
+SFML/
 *HAPI_Log.html
 Clean.bat
 MakeDistributable.bat
