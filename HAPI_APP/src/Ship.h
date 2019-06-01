@@ -1,11 +1,10 @@
 #pragma once
 
-#include <HAPISprites_lib.h>
-#include <HAPISprites_UI.h>
 #include <memory>
 #include "Timer.h"
 #include "Global.h"
 #include "SpriteToggleVisibility.h"
+#include <SFML/Graphics.hpp>
 
 //TODO: Temp
 

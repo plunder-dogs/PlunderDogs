@@ -2,6 +2,7 @@
 #include "Battle.h"
 #include "AI.h"
 #include <array>
+#include "SFML/Graphics.hpp"
 
 using namespace HAPISPACE;
 
@@ -12,18 +13,15 @@ float getDeltaTime(int frameStart, int lastFrameStart)
 
 void HAPI_Sprites_Main()
 {
-	std::pair<int, int> windowSize(1920, 1080);
-	if (!HAPI_Sprites.Initialise(windowSize.first, windowSize.second, "Plunder Dogs", eHSEnableUI))
-		return;
+	sf::Vector2u windowSize(1920, 1080);
+	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
+	window.setFramerateLimit(60);
 
 	if (!Textures::loadAllTextures())
 	{
-		HAPI_Sprites.UserMessage("Could not pre-load all textures", "Texture Error");
 		return;
 	}
 
-	HAPI_Sprites.SetShowFPS(true);
-	HAPI_Sprites.LimitFrameRate(150);
 	int lastFrameStart = HAPI_Sprites.GetTime();
 	
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;

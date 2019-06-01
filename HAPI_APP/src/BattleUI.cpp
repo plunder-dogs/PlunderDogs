@@ -6,6 +6,7 @@
 #include "GameEventMessenger.h"
 #include <assert.h>
 #include "AI.h"
+#include "../s"
 
 using namespace HAPISPACE;
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
