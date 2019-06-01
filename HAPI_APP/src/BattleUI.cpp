@@ -65,7 +65,7 @@ BattleUI::BattleUI(Battle & battle)
 	m_arrowSprite(HAPI_Sprites.MakeSprite(Textures::m_CompassPointer)),
 	m_lastMouseData({0, 0}),
 	m_targetArea(),
-	m_movementArea(Textures::m_selectedHex)
+	m_movementArea(Textures::m_selectedHex, m_battle.getMap())
 {
 	m_arrowSprite->GetTransformComp().SetScaling({ 0.5, 0.5 });
 	m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
@@ -94,7 +94,7 @@ void BattleUI::renderUI() const
 
 	case BattlePhase::Movement:
 		m_selectedTile.render(m_battle.getMap());
-		m_movementArea.render(m_battle);
+		m_movementArea.render(m_battle.getMap());
 		renderArrow();
 		break;
 	
