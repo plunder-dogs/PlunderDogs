@@ -2,7 +2,6 @@
 #include <memory>
 #include <math.h>
 #include <algorithm>
-#include <HAPISprites_Lib.h>
 #include "Utilities/Utilities.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
@@ -24,50 +23,51 @@ Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
 
 void Map::drawMap(eLightIntensity lightIntensity) const 
 {
-	intPair textureDimensions = intPair(
-		m_data[0].m_daySprite->FrameWidth(), 
-		FRAME_HEIGHT);
+	//TODO: Whats the texture dimension
+	//intPair textureDimensions = intPair(
+	//	m_data[0].m_daySprite.FrameWidth(), 
+	//	FRAME_HEIGHT);
 
 	int access{ 0 };
-	for (int y = 0; y < m_mapDimensions.second; y++)
+	for (int y = 0; y < m_mapDimensions.y; y++)
 	{
-		const float yPosEven = (float)(0.5 + y) * textureDimensions.second;
-		const float yPosOdd = (float)y * textureDimensions.second;
+		const float yPosEven = (float)(0.5 + y) * textureDimensions.y;
+		const float yPosOdd = (float)y * textureDimensions.y;
 
-		for (int x = 1; x < m_mapDimensions.first; x += 2)
+		for (int x = 1; x < m_mapDimensions.x; x += 2)
 		{
-			const float xPos = (float)x * textureDimensions.first * 3 / 4;
+			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			int fin = access + x;
 			switch (lightIntensity)
 			{
 			case eLightIntensity::eMaximum:
 				m_data[fin].m_daySprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-					(xPos - m_drawOffset.first)*m_drawScale,
-					(yPosOdd - m_drawOffset.second)*m_drawScale));
+					(xPos - m_drawOffset.x)*m_drawScale,
+					(yPosOdd - m_drawOffset.y)*m_drawScale));
 				m_data[fin].m_daySprite->GetTransformComp().SetScaling(
 					HAPISPACE::VectorF(m_drawScale, m_drawScale));
 				m_data[fin].m_daySprite->Render(SCREEN_SURFACE);
 				break;
 			//case eLightIntensity::eHigh:
 			//	m_data[fin].m_aftersprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-			//		(xPos - m_drawOffset.first)*m_drawScale,
-			//		(yPosOdd - m_drawOffset.second)*m_drawScale));
+			//		(xPos - m_drawOffset.x)*m_drawScale,
+			//		(yPosOdd - m_drawOffset.y)*m_drawScale));
 			//	m_data[fin].m_aftersprite->GetTransformComp().SetScaling(
 			//		HAPISPACE::VectorF(m_drawScale, m_drawScale));
 			//	m_data[fin].m_aftersprite->Render(SCREEN_SURFACE);
 			//	break;
 			//case eLightIntensity::eLow:
 			//	m_data[fin].m_eveningSprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-			//		(xPos - m_drawOffset.first)*m_drawScale,
-			//		(yPosOdd - m_drawOffset.second)*m_drawScale));
+			//		(xPos - m_drawOffset.x)*m_drawScale,
+			//		(yPosOdd - m_drawOffset.y)*m_drawScale));
 			//	m_data[fin].m_eveningSprite->GetTransformComp().SetScaling(
 			//		HAPISPACE::VectorF(m_drawScale, m_drawScale));
 			//	m_data[fin].m_eveningSprite->Render(SCREEN_SURFACE);
 			//	break;
 			case eLightIntensity::eMinimum:
 				m_data[fin].m_nightSprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-					(xPos - m_drawOffset.first)*m_drawScale,
-					(yPosOdd - m_drawOffset.second)*m_drawScale));
+					(xPos - m_drawOffset.x)*m_drawScale,
+					(yPosOdd - m_drawOffset.y)*m_drawScale));
 				m_data[fin].m_nightSprite->GetTransformComp().SetScaling(
 					HAPISPACE::VectorF(m_drawScale, m_drawScale));
 				m_data[fin].m_nightSprite->Render(SCREEN_SURFACE);
@@ -75,47 +75,47 @@ void Map::drawMap(eLightIntensity lightIntensity) const
 			}
 			//Is Odd
 		}
-		for (int x = 0; x < m_mapDimensions.first; x += 2)
+		for (int x = 0; x < m_mapDimensions.x; x += 2)
 		{
-			const float xPos = (float)x * textureDimensions.first * 3 / 4;
+			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			//Is even
 			switch (lightIntensity)
 			{
 			case eLightIntensity::eMaximum:
 				m_data[access + x].m_daySprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-					(xPos - m_drawOffset.first)*m_drawScale,
-					(yPosEven - m_drawOffset.second)*m_drawScale));
+					(xPos - m_drawOffset.x)*m_drawScale,
+					(yPosEven - m_drawOffset.y)*m_drawScale));
 				m_data[access + x].m_daySprite->GetTransformComp().SetScaling(
 					HAPISPACE::VectorF(m_drawScale, m_drawScale));
 				m_data[access + x].m_daySprite->Render(SCREEN_SURFACE);
 				break;
 			//case eLightIntensity::eHigh:
 			//	m_data[access + x].m_aftersprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-			//		(xPos - m_drawOffset.first)*m_drawScale,
-			//		(yPosEven - m_drawOffset.second)*m_drawScale));
+			//		(xPos - m_drawOffset.x)*m_drawScale,
+			//		(yPosEven - m_drawOffset.y)*m_drawScale));
 			//	m_data[access + x].m_aftersprite->GetTransformComp().SetScaling(
 			//		HAPISPACE::VectorF(m_drawScale, m_drawScale));
 			//	m_data[access + x].m_aftersprite->Render(SCREEN_SURFACE);
 			//	break;
 			//case eLightIntensity::eLow:
 			//	m_data[access + x].m_eveningSprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-			//		(xPos - m_drawOffset.first)*m_drawScale,
-			//		(yPosEven - m_drawOffset.second)*m_drawScale));
+			//		(xPos - m_drawOffset.x)*m_drawScale,
+			//		(yPosEven - m_drawOffset.y)*m_drawScale));
 			//	m_data[access + x].m_eveningSprite->GetTransformComp().SetScaling(
 			//		HAPISPACE::VectorF(m_drawScale, m_drawScale));
 			//	m_data[access + x].m_eveningSprite->Render(SCREEN_SURFACE);
 			//	break;
 			case eLightIntensity::eMinimum:
 				m_data[access + x].m_nightSprite->GetTransformComp().SetPosition(HAPISPACE::VectorF(
-					(xPos - m_drawOffset.first)*m_drawScale,
-					(yPosEven - m_drawOffset.second)*m_drawScale));
+					(xPos - m_drawOffset.x)*m_drawScale,
+					(yPosEven - m_drawOffset.y)*m_drawScale));
 				m_data[access + x].m_nightSprite->GetTransformComp().SetScaling(
 					HAPISPACE::VectorF(m_drawScale, m_drawScale));
 				m_data[access + x].m_nightSprite->Render(SCREEN_SURFACE);
 				break;
 			}
 		}
-		access += m_mapDimensions.first;
+		access += m_mapDimensions.x;
 	}
 }
 
@@ -126,47 +126,47 @@ Map::~Map()
 
 intPair Map::offsetToCube(intPair offset) const
 {
-	int cubeX = offset.first;
-	int cubeY = - offset.first - (offset.second - (offset.first + (offset.first & 1)) / 2);
+	int cubeX = offset.x;
+	int cubeY = - offset.x - (offset.y - (offset.x + (offset.x & 1)) / 2);
 	int cubeZ = -cubeX - cubeY;
 	return intPair(cubeX, cubeY);
 }
 
 intPair Map::cubeToOffset(intPair cube) const
 {
-	int offsetX = cube.first;
-	int offsetY = -cube.first - cube.second + (cube.first + (cube.first & 1)) / 2;
+	int offsetX = cube.x;
+	int offsetY = -cube.x - cube.y + (cube.x + (cube.x & 1)) / 2;
 	return intPair(offsetX, offsetY);
 }
 
 int Map::cubeDistance(intPair a, intPair b) const
 {
-	const int x = abs(a.first - b.first);
-	const int y = abs(a.second - b.second);
-	const int z = abs(a.first + a.second - b.first - b.second);
+	const int x = abs(a.x - b.x);
+	const int y = abs(a.y - b.y);
+	const int z = abs(a.x + a.y - b.x - b.y);
 	return std::max(x, std::max(y, z));
 }
 
 bool Map::inCone(intPair orgHex, intPair testHex, eDirection dir) const
 {
-	const intPair diff(testHex.first - orgHex.first, testHex.second - orgHex.second);
-	const int zDiff = -diff.first - diff.second;
+	const intPair diff(testHex.x - orgHex.x, testHex.y - orgHex.y);
+	const int zDiff = -diff.x - diff.y;
 	if (dir == eNorth || dir == eSouth)//Axis x = 0
 	{
 		//Deadzones y pos and z neg or y neg and z pos
-		if ((diff.second > 0 && zDiff < 0) || (diff.second < 0 && zDiff > 0))
+		if ((diff.y > 0 && zDiff < 0) || (diff.y < 0 && zDiff > 0))
 			return false;
 	}
 	else if (dir == eNorthEast || dir == eSouthWest)//Axis y = 0
 	{
 		//Deadzones x pos and z neg or x neg and z pos
-		if ((diff.first > 0 && zDiff < 0) || (diff.first < 0 && zDiff > 0))
+		if ((diff.x > 0 && zDiff < 0) || (diff.x < 0 && zDiff > 0))
 			return false;
 	}
 	else if (dir == eNorthWest || dir == eSouthEast)//Axis z = 0
 	{
 		//Deadzones x pos and y neg or x neg and y pos
-		if ((diff.first > 0 && diff.second < 0) || (diff.first < 0 && diff.second > 0))
+		if ((diff.x > 0 && diff.y < 0) || (diff.x < 0 && diff.y > 0))
 			return false;
 	}
 	return true;
@@ -175,11 +175,11 @@ bool Map::inCone(intPair orgHex, intPair testHex, eDirection dir) const
 float Map::tileDistanceMag(intPair tileCoord, intPair mouseClick) const
 {
 	std::pair<float, float> tileCentre = getTileScreenPos(tileCoord);
-	tileCentre.first += FRAME_CENTRE_X * m_drawScale;
-	tileCentre.second += FRAME_CENTRE_Y * m_drawScale;
+	tileCentre.x += FRAME_CENTRE_X * m_drawScale;
+	tileCentre.y += FRAME_CENTRE_Y * m_drawScale;
 
-	const float diffX = tileCentre.first - static_cast<float>(mouseClick.first);
-	const float diffY = tileCentre.second - static_cast<float>(mouseClick.second);
+	const float diffX = tileCentre.x - static_cast<float>(mouseClick.x);
+	const float diffY = tileCentre.y - static_cast<float>(mouseClick.y);
 
 	return (diffX * diffX) + (diffY * diffY);
 }
@@ -187,18 +187,18 @@ float Map::tileDistanceMag(intPair tileCoord, intPair mouseClick) const
 Tile* Map::getTile(intPair coordinate)
 {
 	//Bounds check
-	if (coordinate.first < m_mapDimensions.first &&
-		coordinate.second < m_mapDimensions.second &&
-		coordinate.first >= 0 &&
-		coordinate.second >= 0)
+	if (coordinate.x < m_mapDimensions.x &&
+		coordinate.y < m_mapDimensions.y &&
+		coordinate.x >= 0 &&
+		coordinate.y >= 0)
 	{	 
-		return &m_data[coordinate.first + coordinate.second * m_mapDimensions.first];
+		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 	}
 	/*
 	HAPI_Sprites.UserMessage(
-		std::string("getTile request out of bounds: " + std::to_string(coordinate.first) +
-			", " + std::to_string(coordinate.second) + " map dimensions are: " +
-			std::to_string(m_mapDimensions.first) +", "+ std::to_string(m_mapDimensions.second)),
+		std::string("getTile request out of bounds: " + std::to_string(coordinate.x) +
+			", " + std::to_string(coordinate.y) + " map dimensions are: " +
+			std::to_string(m_mapDimensions.x) +", "+ std::to_string(m_mapDimensions.y)),
 		"Map error");
 	*/
 	return nullptr;
@@ -209,23 +209,23 @@ std::vector<Tile*> Map::getAdjacentTiles(intPair coord)
 	const size_t allAdjacentTiles = 6;
 	std::vector<Tile*> result;
 	result.reserve(size_t(allAdjacentTiles));
-	if (coord.first & 1)//Is an odd tile
+	if (coord.x & 1)//Is an odd tile
 	{
-		result.push_back(getTile(intPair(coord.first, coord.second - 1)));		//N
-		result.push_back(getTile(intPair(coord.first + 1, coord.second - 1)));	//NE
-		result.push_back(getTile(intPair(coord.first + 1, coord.second)));		//SE
-		result.push_back(getTile(intPair(coord.first, coord.second + 1)));		//S
-		result.push_back(getTile(intPair(coord.first - 1, coord.second)));		//SW
-		result.push_back(getTile(intPair(coord.first - 1, coord.second - 1)));	//NW
+		result.push_back(getTile(intPair(coord.x, coord.y - 1)));		//N
+		result.push_back(getTile(intPair(coord.x + 1, coord.y - 1)));	//NE
+		result.push_back(getTile(intPair(coord.x + 1, coord.y)));		//SE
+		result.push_back(getTile(intPair(coord.x, coord.y + 1)));		//S
+		result.push_back(getTile(intPair(coord.x - 1, coord.y)));		//SW
+		result.push_back(getTile(intPair(coord.x - 1, coord.y - 1)));	//NW
 	}
 	else//Is even
 	{
-		result.push_back(getTile(intPair(coord.first, coord.second - 1)));		//N
-		result.push_back(getTile(intPair(coord.first + 1, coord.second)));		//NE
-		result.push_back(getTile(intPair(coord.first + 1, coord.second + 1)));	//SE
-		result.push_back(getTile(intPair(coord.first, coord.second + 1)));		//S
-		result.push_back(getTile(intPair(coord.first - 1, coord.second + 1)));	//SW
-		result.push_back(getTile(intPair(coord.first - 1, coord.second)));		//NW
+		result.push_back(getTile(intPair(coord.x, coord.y - 1)));		//N
+		result.push_back(getTile(intPair(coord.x + 1, coord.y)));		//NE
+		result.push_back(getTile(intPair(coord.x + 1, coord.y + 1)));	//SE
+		result.push_back(getTile(intPair(coord.x, coord.y + 1)));		//S
+		result.push_back(getTile(intPair(coord.x - 1, coord.y + 1)));	//SW
+		result.push_back(getTile(intPair(coord.x - 1, coord.y)));		//NW
 	}
 	return result;
 }
@@ -251,15 +251,15 @@ std::vector<Tile*> Map::getTileRadius(intPair coord, int range, bool avoidInvali
 	
 	intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range);
-		y < std::min(m_mapDimensions.second, coord.second + range + 1);
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range);
-			x < std::min(m_mapDimensions.first, coord.first + range + 1);
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				if (cubeDistance(cubeCoord, offsetToCube(intPair(x, y))) <= range)
 				{
@@ -299,15 +299,15 @@ std::vector<Tile*> Map::getTileCone(intPair coord, int range, eDirection directi
 
 	const intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range - 1);
-		y < std::min(m_mapDimensions.second, coord.second + range + 2);
+	for (int y = std::max(0, coord.y - range - 1);
+		y < std::min(m_mapDimensions.y, coord.y + range + 2);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range - 1);
-			x < std::min(m_mapDimensions.first, coord.first + range + 2);
+		for (int x = std::max(0, coord.x - range - 1);
+			x < std::min(m_mapDimensions.x, coord.x + range + 2);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				intPair tempCube(offsetToCube(intPair(x, y)));
 				if (cubeDistance(cubeCoord, tempCube) <= range)
@@ -351,15 +351,15 @@ std::vector<const Tile*> Map::cGetTileCone(intPair coord, int range, eDirection 
 
 	const intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range - 1);
-		y < std::min(m_mapDimensions.second, coord.second + range + 2);
+	for (int y = std::max(0, coord.y - range - 1);
+		y < std::min(m_mapDimensions.y, coord.y + range + 2);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range - 1);
-			x < std::min(m_mapDimensions.first, coord.first + range + 2);
+		for (int x = std::max(0, coord.x - range - 1);
+			x < std::min(m_mapDimensions.x, coord.x + range + 2);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				intPair tempCube(offsetToCube(intPair(x, y)));
 				if (cubeDistance(cubeCoord, tempCube) <= range)
@@ -421,13 +421,13 @@ intPair Map::getTileScreenPos(intPair coord) const
 		m_data[0].m_daySprite->FrameWidth(),
 		FRAME_HEIGHT);
 
-	const float xPos = static_cast<float>(coord.first * textureDimensions.first) * 3 / 4;
-	const float yPos = static_cast<float>((((1 + coord.first) % 2) + 2 * coord.second)
-		* textureDimensions.second) / 2;
+	const float xPos = static_cast<float>(coord.x * textureDimensions.x) * 3 / 4;
+	const float yPos = static_cast<float>((((1 + coord.x) % 2) + 2 * coord.y)
+		* textureDimensions.y) / 2;
 
 	return intPair(
-		(xPos - m_drawOffset.first)* m_drawScale,
-		(yPos - m_drawOffset.second)* m_drawScale);
+		(xPos - m_drawOffset.x)* m_drawScale,
+		(yPos - m_drawOffset.y)* m_drawScale);
 }
 
 intPair Map::getMouseClickCoord(intPair mouseCoord) const
@@ -436,10 +436,10 @@ intPair Map::getMouseClickCoord(intPair mouseCoord) const
 		m_data[0].m_daySprite->FrameWidth(),
 		FRAME_HEIGHT);
 	
-	const float translatedX = (static_cast<float>(mouseCoord.first - FRAME_CENTRE_X) / m_drawScale) + static_cast<float>(m_drawOffset.first);
-	const float translatedY = (static_cast<float>(mouseCoord.second - FRAME_CENTRE_Y) / m_drawScale) + static_cast<float>(m_drawOffset.second);
-	const int predictedTileX = static_cast<const int>(translatedX * 4 / (3 * textureDimensions.first));
-	const int predictedTileY = static_cast<const int>(translatedY / textureDimensions.second);
+	const float translatedX = (static_cast<float>(mouseCoord.x - FRAME_CENTRE_X) / m_drawScale) + static_cast<float>(m_drawOffset.x);
+	const float translatedY = (static_cast<float>(mouseCoord.y - FRAME_CENTRE_Y) / m_drawScale) + static_cast<float>(m_drawOffset.y);
+	const int predictedTileX = static_cast<const int>(translatedX * 4 / (3 * textureDimensions.x));
+	const int predictedTileY = static_cast<const int>(translatedY / textureDimensions.y);
 	
 	float distance{ 10000000 };//An arbitrary big number
 	intPair closestTile(predictedTileX, predictedTileY);
@@ -464,15 +464,15 @@ void Map::loadmap(const std::string & mapName)
 	assert(!mapName.empty());
 	MapDetails mapDetails = MapParser::parseMapDetails(mapName);
 	m_mapDimensions = mapDetails.mapDimensions;
-	m_data.reserve(m_mapDimensions.first * m_mapDimensions.second);
+	m_data.reserve(m_mapDimensions.x * m_mapDimensions.y);
 	for (auto spawnPosition : mapDetails.m_spawnPositions)
 	{
 		m_spawnPositions.push_back(spawnPosition);
 	}
 
-	for (int y = 0; y < m_mapDimensions.second; y++)
+	for (int y = 0; y < m_mapDimensions.y; y++)
 	{
-		for (int x = 0; x < m_mapDimensions.first; x++)
+		for (int x = 0; x < m_mapDimensions.x; x++)
 		{
 			const int tileID = mapDetails.tileData[y][x];
 			assert(tileID != -1);
@@ -480,15 +480,15 @@ void Map::loadmap(const std::string & mapName)
 				Textures::m_hexTiles, Textures::m_afternoonHexTiles,
 				Textures::m_eveningHexTiles, Textures::m_nightHexTiles, intPair(x, y));
 
-			if (!m_data[x + y * m_mapDimensions.first].m_daySprite)
+			if (!m_data[x + y * m_mapDimensions.x].m_daySprite)
 			{
 				HAPI_Sprites.UserMessage("Could not load tile spritesheet", "Error");
 				return;
 			}
-			m_data[x + y * m_mapDimensions.first].m_daySprite->SetFrameNumber(tileID);
-			m_data[x + y * m_mapDimensions.first].m_aftersprite->SetFrameNumber(tileID);
-			m_data[x + y * m_mapDimensions.first].m_eveningSprite->SetFrameNumber(tileID);
-			m_data[x + y * m_mapDimensions.first].m_nightSprite->SetFrameNumber(tileID);
+			m_data[x + y * m_mapDimensions.x].m_daySprite->SetFrameNumber(tileID);
+			m_data[x + y * m_mapDimensions.x].m_aftersprite->SetFrameNumber(tileID);
+			m_data[x + y * m_mapDimensions.x].m_eveningSprite->SetFrameNumber(tileID);
+			m_data[x + y * m_mapDimensions.x].m_nightSprite->SetFrameNumber(tileID);
 		}
 	}
 }
@@ -519,18 +519,18 @@ void Map::onReset()
 const Tile * Map::getTile(sf::Vector2i coordinate) const
 {
 	//Bounds check
-	if (coordinate.first < m_mapDimensions.first &&
-		coordinate.second < m_mapDimensions.second &&
-		coordinate.first >= 0 &&
-		coordinate.second >= 0)
+	if (coordinate.x < m_mapDimensions.x &&
+		coordinate.y < m_mapDimensions.y &&
+		coordinate.x >= 0 &&
+		coordinate.y >= 0)
 	{
-		return &m_data[coordinate.first + coordinate.second * m_mapDimensions.first];
+		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 	}
 	/*
 	HAPI_Sprites.UserMessage(
-		std::string("getTile request out of bounds: " + std::to_string(coordinate.first) +
-			", " + std::to_string(coordinate.second) + " map dimensions are: " +
-			std::to_string(m_mapDimensions.first) +", "+ std::to_string(m_mapDimensions.second)),
+		std::string("getTile request out of bounds: " + std::to_string(coordinate.x) +
+			", " + std::to_string(coordinate.y) + " map dimensions are: " +
+			std::to_string(m_mapDimensions.x) +", "+ std::to_string(m_mapDimensions.y)),
 		"Map error");
 	*/
 	return nullptr;
@@ -539,12 +539,12 @@ const Tile * Map::getTile(sf::Vector2i coordinate) const
 Tile * Map::getTile(posi coordinate)
 {
 	//Bounds check
-	if (coordinate.x < m_mapDimensions.first &&
-		coordinate.y < m_mapDimensions.second &&
+	if (coordinate.x < m_mapDimensions.x &&
+		coordinate.y < m_mapDimensions.y &&
 		coordinate.x >= 0 &&
 		coordinate.y >= 0)
 	{
-		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.first];
+		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 	}
 	return nullptr;
 }
@@ -552,12 +552,12 @@ Tile * Map::getTile(posi coordinate)
 const Tile * Map::getTile(posi coordinate) const
 {
 //Bounds check
-if (coordinate.x < m_mapDimensions.first &&
-	coordinate.y < m_mapDimensions.second &&
+if (coordinate.x < m_mapDimensions.x &&
+	coordinate.y < m_mapDimensions.y &&
 	coordinate.x >= 0 &&
 	coordinate.y >= 0)
 {
-	return &m_data[coordinate.x + coordinate.y * m_mapDimensions.first];
+	return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 }
 return nullptr;
 }
@@ -567,23 +567,23 @@ std::vector<const Tile*> Map::cGetAdjacentTiles(sf::Vector2i coord) const
 	const size_t allAdjacentTiles = 6;
 	std::vector<const Tile*> result;
 	result.reserve(size_t(allAdjacentTiles));
-	if (coord.first & 1)//Is an odd tile
+	if (coord.x & 1)//Is an odd tile
 	{
-		result.push_back(getTile(intPair(coord.first, coord.second - 1)));		//N
-		result.push_back(getTile(intPair(coord.first + 1, coord.second - 1)));	//NE
-		result.push_back(getTile(intPair(coord.first + 1, coord.second)));		//SE
-		result.push_back(getTile(intPair(coord.first, coord.second + 1)));		//S
-		result.push_back(getTile(intPair(coord.first - 1, coord.second)));		//SW
-		result.push_back(getTile(intPair(coord.first - 1, coord.second - 1)));	//NW
+		result.push_back(getTile(intPair(coord.x, coord.y - 1)));		//N
+		result.push_back(getTile(intPair(coord.x + 1, coord.y - 1)));	//NE
+		result.push_back(getTile(intPair(coord.x + 1, coord.y)));		//SE
+		result.push_back(getTile(intPair(coord.x, coord.y + 1)));		//S
+		result.push_back(getTile(intPair(coord.x - 1, coord.y)));		//SW
+		result.push_back(getTile(intPair(coord.x - 1, coord.y - 1)));	//NW
 	}
 	else//Is even
 	{
-		result.push_back(getTile(intPair(coord.first, coord.second - 1)));		//N
-		result.push_back(getTile(intPair(coord.first + 1, coord.second)));		//NE
-		result.push_back(getTile(intPair(coord.first + 1, coord.second + 1)));	//SE
-		result.push_back(getTile(intPair(coord.first, coord.second + 1)));		//S
-		result.push_back(getTile(intPair(coord.first - 1, coord.second + 1)));	//SW
-		result.push_back(getTile(intPair(coord.first - 1, coord.second)));		//NW
+		result.push_back(getTile(intPair(coord.x, coord.y - 1)));		//N
+		result.push_back(getTile(intPair(coord.x + 1, coord.y)));		//NE
+		result.push_back(getTile(intPair(coord.x + 1, coord.y + 1)));	//SE
+		result.push_back(getTile(intPair(coord.x, coord.y + 1)));		//S
+		result.push_back(getTile(intPair(coord.x - 1, coord.y + 1)));	//SW
+		result.push_back(getTile(intPair(coord.x - 1, coord.y)));		//NW
 	}
 	return result;
 }
@@ -609,15 +609,15 @@ std::vector<const Tile*> Map::cGetTileRadius(sf::Vector2i coord, int range, bool
 
 	intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range);
-		y < std::min(m_mapDimensions.second, coord.second + range + 1);
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range);
-			x < std::min(m_mapDimensions.first, coord.first + range + 1);
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				if (cubeDistance(cubeCoord, offsetToCube(intPair(x, y))) <= range)
 				{
@@ -696,15 +696,15 @@ std::vector<Tile*> Map::getTileRing(sf::Vector2i coord, int range)
 
 	intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range);
-		y < std::min(m_mapDimensions.second, coord.second + range + 1);
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range);
-			x < std::min(m_mapDimensions.first, coord.first + range + 1);
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				if (cubeDistance(cubeCoord, offsetToCube(intPair(x, y))) == range)
 				{
@@ -726,15 +726,15 @@ std::vector<const Tile*> Map::cGetTileRing(sf::Vector2i coord, int range) const
 
 	intPair cubeCoord(offsetToCube(coord));
 
-	for (int y = std::max(0, coord.second - range);
-		y < std::min(m_mapDimensions.second, coord.second + range + 1);
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
 		y++)
 	{
-		for (int x = std::max(0, coord.first - range);
-			x < std::min(m_mapDimensions.first, coord.first + range + 1);
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
 			x++)
 		{
-			if (!(coord.first == x && coord.second == y))//If not the tile at the centre
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
 			{
 				if (cubeDistance(cubeCoord, offsetToCube(intPair(x, y))) == range)
 				{

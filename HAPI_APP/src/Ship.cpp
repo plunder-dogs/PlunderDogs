@@ -82,7 +82,7 @@ int Ship::getID() const
 int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 {
 	posi start = { m_currentPosition, m_currentDirection };
-	posi end = { destination.first, destination.second };
+	posi end = { destination.x, destination.y };
 	std::queue<posi> pathToTile = BFS::findPath(map, start, end, m_movementPoints);
 	if (pathToTile.empty())
 	{
@@ -95,9 +95,9 @@ int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 	for (i; i < queueSize; ++i)
 	{
 		auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
-		m_movementPath[i].m_sprite->GetTransformComp().SetPosition({
-			static_cast<float>(tileScreenPosition.first + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileScreenPosition.second + DRAW_OFFSET_Y * map.getDrawScale()) });
+		m_movementPath[i].m_sprite.setPosition({
+			static_cast<float>(tileScreenPosition.x + DRAW_OFFSET_X * map.getDrawScale()),
+			static_cast<float>(tileScreenPosition.y + DRAW_OFFSET_Y * map.getDrawScale()) });
 		m_movementPath[i].m_active = true;
 		m_movementPath[i].m_position = pathToTile.front().pair();
 
@@ -145,7 +145,7 @@ bool Ship::move(Map& map, sf::Vector2i destination)
 	if (!m_destinationSet)
 	{
 		posi currentPos = { m_currentPosition, m_currentDirection };
-		posi destinationPos = { destination.first, destination.second };
+		posi destinationPos = { destination.x, destination.y };
 		//TODO: We should not have to go throught the map from the entity to get to the entity movement data!
 		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
@@ -171,8 +171,8 @@ bool Ship::move(Map& map, sf::Vector2i destination, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
-		posi currentPos = { m_currentPosition.first, m_currentPosition.second, m_currentDirection };
-		posi destinationPos = { destination.first, destination.second };
+		posi currentPos = { m_currentPosition.x, m_currentPosition.y, m_currentDirection };
+		posi destinationPos = { destination.x, destination.y };
 		std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
 		if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
 		{
@@ -253,10 +253,9 @@ void Ship::onNewTurn()
 
 void Ship::disableMovementPathNode(sf::Vector2i position, const Map & map)
 {
-	sf::Vector2i
 	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
 	{
-		auto i = map.getMouseClickCoord({ iter->m_sprite->GetTransformComp().GetPosition().x, iter->m_sprite->GetTransformComp().GetPosition().y });
+		auto i = map.getMouseClickCoord({ iter->m_sprite.getPosition().x, iter->m_sprite.getPosition().y });
 		if (i == position)
 		{
 			iter->m_active = false;
@@ -268,7 +267,8 @@ void Ship::handleRotation()
 {
 	int rotationAngle = 60;
 	int directionToTurn = static_cast<int>(m_pathToTile.front().dir);
-	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(directionToTurn*rotationAngle % 360));
+	//m_sprite.setRotation()
+	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS(directionToTurn*rotationAngle % 360));
 	m_currentDirection = (eDirection)directionToTurn;
 }
 
@@ -349,16 +349,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSideCannons));
+			m_sprite.setTexture(*Textures::m_yellowShipSideCannons); 
 			break;
 		case eShipType::eTurtle:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipBomb));
+			m_sprite.setTexture(*Textures::m_yellowShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipMelee));
+			m_sprite.setTexture(*Textures::m_yellowShipMelee); 
 			break;
 		case eShipType::eSniper:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_yellowShipSnipe));
+			m_sprite.setTexture(*Textures::m_yellowShipSnipe);
 			break;
 		}
 		break;
@@ -367,16 +367,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSideCannons));
+			m_sprite.setTexture(*Textures::m_blueShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipBomb));
+			m_sprite.setTexture(*Textures::m_blueShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipMelee));
+			m_sprite.setTexture(*Textures::m_blueShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_blueShipSnipe));
+			m_sprite.setTexture(*Textures::m_blueShipSnipe);
 			break;
 		}
 		break;
@@ -384,16 +384,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSideCannons));
+			m_sprite.setTexture(*Textures::m_redShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipBomb));
+			m_sprite.setTexture(*Textures::m_redShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipMelee));
+			m_sprite.setTexture(*Textures::m_redShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_redShipSnipe));
+			m_sprite.setTexture(*Textures::m_redShipSnipe);
 			break;
 		default:
 			break;
@@ -403,24 +403,24 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSideCannons));
+			m_sprite.setTexture(*Textures::m_greenShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipBomb));
+			m_sprite.setTexture(*Textures::m_greenShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipMelee));
+			m_sprite.setTexture(*Textures::m_greenShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite = std::unique_ptr<HAPISPACE::Sprite>(HAPI_Sprites.MakeSprite(Textures::m_greenShipSnipe));
+			m_sprite.setTexture(*Textures::m_greenShipSnipe);
 			break;
 		}
 		break;
 	}
 
-	m_sprite->SetFrameNumber(eShipSpriteFrame::eMaxHealth);
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite->GetTransformComp().SetScaling({ 1, 1 }); // Might not need
+	//m_sprite.SetFrameNumber(eShipSpriteFrame::eMaxHealth);
+	//m_sprite.GetTransformComp().SetOriginToCentreOfFrame();
+	//m_sprite.GetTransformComp().SetScaling({ 1, 1 }); // Might not need
 }
 
 Ship::Ship(Ship & orig)
@@ -442,12 +442,10 @@ Ship::Ship(Ship & orig)
 	m_damage(orig.m_damage),
 	m_range(orig.m_range),
 	m_movementPoints(orig.m_movementPoints),
-	m_sprite(),
+	m_sprite(orig.m_sprite),
 	m_deployed(false),
 	m_movementPath()
-{
-	m_sprite.swap(orig.m_sprite);
-}
+{}
 
 void Ship::update(float deltaTime, const Map & map)
 {
@@ -472,21 +470,20 @@ void Ship::update(float deltaTime, const Map & map)
 	}
 }
 
-void Ship::render(const Map & map) const
+void Ship::render(sf::RenderWindow& window, const Map & map)
 {
-	for (const auto& i : m_movementPath)
+	for (auto& i : m_movementPath)
 	{
 		if (i.m_active)
 		{
 			const sf::Vector2i tileTransform = map.getTileScreenPos(i.m_position);
 			float scale = map.getDrawScale();
 
-			i.m_sprite->GetTransformComp().SetPosition({
-				static_cast<float>(tileTransform.first + DRAW_OFFSET_X * scale),
-				static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * scale) });
-			i.m_sprite->GetTransformComp().SetScaling({ 0.5f, 0.5f });
-
-			i.m_sprite->Render(SCREEN_SURFACE);
+			i.m_sprite.setPosition({
+				static_cast<float>(tileTransform.x + DRAW_OFFSET_X * scale),
+				static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * scale) });
+			//i.m_sprite.GetTransformComp().SetScaling({ 0.5f, 0.5f });
+			window.draw(i.m_sprite);
 		}
 	}
 
@@ -494,12 +491,12 @@ void Ship::render(const Map & map) const
 	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
 
-	m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * scale),
-		static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * scale) });
-	m_sprite->GetTransformComp().SetScaling({ scale / 2, scale / 2 });
+	m_sprite.setPosition({
+		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * scale),
+		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * scale) });
+	m_sprite.setScale({ scale / 2, scale / 2 });
 
-	m_sprite->Render(SCREEN_SURFACE);
+	window.draw(m_sprite);
 	m_actionSprite.render(map, m_currentPosition);
 }
 
@@ -512,6 +509,6 @@ void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)
 {
 	m_currentPosition = position;
 	m_deployed = true;
-	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
+	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
 }
 

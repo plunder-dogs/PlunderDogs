@@ -3,17 +3,15 @@
 #include "GameEventMessenger.h"
 #include "AI.h"
 
-using namespace HAPISPACE;
-
-Battle::Particle::Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteSheet> texture, float scale) :
-	m_position(),
+Battle::Particle::Particle(float lifespan, std::unique_ptr<sf::Texture>& texture, float scale) 
+	: m_position(),
 	m_lifeSpan(lifespan),
-	m_particle(HAPI_Sprites.MakeSprite(texture)),
+	m_sprite(*texture.get()),
 	m_frameNum(0),
 	m_isEmitting(false),
 	m_scale(scale)
 {
-	m_particle->SetFrameNumber(m_frameNum);
+	//m_particle->SetFrameNumber(m_frameNum);
 }
 
 void Battle::Particle::setPosition(sf::Vector2i position)
@@ -26,35 +24,35 @@ void Battle::Particle::update(float deltaTime, const Map& map)
 	if (m_isEmitting)
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-		m_particle->GetTransformComp().SetPosition({
-			tileTransform.first + DRAW_OFFSET_X * map.getDrawScale(),
-			tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale() });
+		m_sprite.setPosition({
+			tileTransform.x + DRAW_OFFSET_X * map.getDrawScale(),
+			tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale() });
 
 		m_lifeSpan.update(deltaTime);
 
 		if (m_lifeSpan.isExpired())
 		{
-			m_particle->SetFrameNumber(m_frameNum);
+			//m_sprite->SetFrameNumber(m_frameNum);
 
 			m_lifeSpan.reset();
 			++m_frameNum;
 		}
 
-		if (m_frameNum >= m_particle->GetNumFrames())
-		{
-			m_isEmitting = false;
-			m_frameNum = 0;
-		}
+		//if (m_frameNum >= m_sprite->GetNumFrames())
+		//{
+		//	m_isEmitting = false;
+		//	m_frameNum = 0;
+		//}
 	}
 }
 
-void Battle::Particle::render()const
+void Battle::Particle::render(sf::RenderWindow& window) 
 {
 	if (m_isEmitting)
 	{
-		m_particle->GetTransformComp().SetOriginToCentreOfFrame();
-		m_particle->GetTransformComp().SetScaling(m_scale);
-		m_particle->Render(SCREEN_SURFACE);
+		//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+		m_sprite.setScale(m_scale, m_scale);
+		window.draw(m_sprite);
 	}
 }
 
@@ -82,7 +80,7 @@ void Battle::Particle::orient(eDirection entityDir)
 		direction = eSouthEast;
 		break;
 	}
-	m_particle->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(static_cast<int>(direction) * 60 % 360));
+	//m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(static_cast<int>(direction) * 60 % 360));
 }
 
 void Battle::updateWindDirection()
@@ -264,30 +262,30 @@ void Battle::start(const std::string & newMapName)
 	}
 }
 
-void Battle::render() const
+void Battle::render(sf::RenderWindow& window)
 {
 	m_map.drawMap(m_currentLightIntensity);
 
 	m_battleUI.renderUI();
 
-	for (const auto& player : m_factions)
+	for (auto& faction : m_factions)
 	{
-		if (player)
+		if (faction)
 		{
-			player->render(m_map);
+			faction->render(window, m_map);
 		}
 	}
 
 	m_battleUI.drawTargetArea();
 	
 	
-	for (const auto& explosionParticle : m_explosionParticles)
+	for (auto& explosionParticle : m_explosionParticles)
 	{
-		explosionParticle.render();
+		explosionParticle.render(window);
 	}
-	for (const auto& fireParticle : m_fireParticles)
+	for (auto& fireParticle : m_fireParticles)
 	{
-		fireParticle.render();
+		fireParticle.render(window);
 	}
 
 	m_battleUI.renderGUI();

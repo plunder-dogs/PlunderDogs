@@ -15,40 +15,13 @@ struct Textures
 		loadTexture("hexTiles_surface.png", m_hexTiles);
 		loadTexture("spawnHex.png", m_spawnHex);
 		loadTexture("whiteHex75.png", m_selectedHex);
+		loadTexture("shipBlueSide_surface.png", m_blueShipSideCannons);
+		loadTexture("shipBlueBomb_surface.png", m_blueShipBomb);
+		loadTexture("shipBlueMelee_surface.png", m_blueShipMelee);
+		loadTexture("shipBlueSnipe_surface.png", m_blueShipSnipe);
+		loadTexture("shipRedSide_surface.png", m_redShipSideCannons);
+		
 
-		//blueShips
-		m_blueShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipBlueSide.xml");
-		if (!m_blueShipSideCannons)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipBlueSide.xml'", "Texture Error");
-			return false;
-		}
-		m_blueShipBomb = HAPI_Wrapper::loadSpriteSheet("shipBlueBomb.xml");
-		if (!m_blueShipBomb)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipBlueBomb.xml'", "Texture Error");
-			return false;
-		}
-		m_blueShipMelee = HAPI_Wrapper::loadSpriteSheet("shipBlueMelee.xml");
-		if (!m_blueShipMelee)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipBlueMelee.xml'", "Texture Error");
-			return false;
-		}
-		m_blueShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipBlueSnipe.xml");
-		if (!m_blueShipSnipe)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipBlueSnipe.xml'", "Texture Error");
-			return false;
-		}
-
-		//RedShips
-		m_redShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipRedSide.xml");
-		if (!m_redShipSideCannons)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipRedSide.xml'", "Texture Error");
-			return false;
-		}
 		m_redShipBomb = HAPI_Wrapper::loadSpriteSheet("shipRedBomb.xml");
 		if (!m_redShipBomb)
 		{

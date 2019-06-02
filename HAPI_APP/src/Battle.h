@@ -16,17 +16,17 @@ class Battle
 
 	struct Particle
 	{
-		std::pair<float, float> m_position;
+		sf::Vector2i m_position;
 		Timer m_lifeSpan;
-		std::unique_ptr<HAPISPACE::Sprite> m_particle;
+		sf::Sprite m_sprite;
 		int m_frameNum = 0;
 		bool m_isEmitting;
 		const float m_scale;
 
-		Particle(float lifespan, std::shared_ptr<HAPISPACE::SpriteSheet> texture, float scale);
+		Particle(float lifespan, std::unique_ptr<sf::Texture>& texture, float scale);
 		void setPosition(sf::Vector2i position);
 		void update(float deltaTime, const Map& map);
-		void render() const;
+		void render(sf::RenderWindow& window);
 		void orient(eDirection direction);
 	};
 
@@ -75,7 +75,8 @@ public:
 	const Faction& getFaction(FactionName factionName) const;
 
 	void start(const std::string& newMapName);
-	void render() const;
+	void render(sf::RenderWindow& window);
+	void handleInput(const sf::Event& currentEvent);
 	void update(float deltaTime);
 	
 	//Deploy Phase

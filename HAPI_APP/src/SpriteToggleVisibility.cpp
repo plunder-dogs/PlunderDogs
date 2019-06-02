@@ -53,8 +53,8 @@ void SpriteToggleVisibility::render(const Map & map, sf::Vector2i position) cons
 	{
 		auto screenPosition = map.getTileScreenPos(position);
 		m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(screenPosition.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()) ,
-		static_cast<float>(screenPosition.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
+		static_cast<float>(screenPosition.x + DRAW_ENTITY_OFFSET_X * map.getDrawScale()) ,
+		static_cast<float>(screenPosition.y + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
 		m_sprite->Render(SCREEN_SURFACE);
 	}
 }
@@ -65,8 +65,8 @@ void SpriteToggleVisibility::render(const Map & map) const
 	{
 		sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
 		m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(tileTransform.first + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.second + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
+		static_cast<float>(tileTransform.x + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
+		static_cast<float>(tileTransform.y + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
 
 		m_sprite->Render(SCREEN_SURFACE);
 	}

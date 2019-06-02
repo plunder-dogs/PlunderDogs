@@ -6,9 +6,7 @@
 #include "GameEventMessenger.h"
 #include <assert.h>
 #include "AI.h"
-#include "../s"
 
-using namespace HAPISPACE;
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
 constexpr int MAX_MOVE_AREA{ 700 };
 
@@ -16,31 +14,31 @@ constexpr int MAX_MOVE_AREA{ 700 };
 //InvalidPositionSprite
 //
 BattleUI::InvalidPosition::InvalidPosition()
-	: m_sprite(std::make_unique<Sprite>(Textures::m_cross)),
+	: m_sprite(*Textures::m_cross),
 	m_activate(false)
 {
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }
 
-void BattleUI::InvalidPosition::render(const Map& map) const
+void BattleUI::InvalidPosition::render(sf::RenderWindow& window, const Map& map)
 {
 	if (m_activate)
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
 
-		m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale()) });
+		m_sprite.setPosition({
+		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
+		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
 
-		m_sprite->Render(SCREEN_SURFACE);
+		window.draw(m_sprite);
 	}
 }
 
 void BattleUI::InvalidPosition::setPosition(sf::Vector2i newPosition, const Map& map)
 {
-	m_sprite->GetTransformComp().SetPosition({
-		(float)newPosition.first + DRAW_OFFSET_X * map.getDrawScale(),
-		(float)newPosition.second + DRAW_OFFSET_Y * map.getDrawScale()});
+	m_sprite.setPosition({
+		(float)newPosition.x + DRAW_OFFSET_X * map.getDrawScale(),
+		(float)newPosition.y + DRAW_OFFSET_Y * map.getDrawScale()});
 
 	m_position = newPosition;
 }
@@ -63,13 +61,13 @@ BattleUI::BattleUI(Battle & battle)
 	m_isMovingEntity(false),
 	m_mouseDownTile(nullptr),
 	m_arrowActive(false),
-	m_arrowSprite(HAPI_Sprites.MakeSprite(Textures::m_CompassPointer)),
+	m_arrowSprite(*Textures::m_CompassPointer),
 	m_lastMouseData({0, 0}),
 	m_targetArea(),
 	m_movementArea(Textures::m_selectedHex, m_battle.getMap())
 {
-	m_arrowSprite->GetTransformComp().SetScaling({ 0.5, 0.5 });
-	m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
+	m_arrowSprite.setScale({ 0.5, 0.5 });
+	//m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onResetBattle, this), "BattleUI", GameEvent::eResetBattle);
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewTurn, this), "BattleUI", GameEvent::eNewTurn);
 }
@@ -85,29 +83,29 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 	return m_gui.getCameraPositionOffset();
 }
 
-void BattleUI::renderUI() const
+void BattleUI::renderUI(sf::RenderWindow& window)
 {
 	switch (m_battle.getCurrentPhase())
 	{
 	case BattlePhase::Deployment:
-		renderArrow();
+		//renderArrow(window);
 		break;
 
 	case BattlePhase::Movement:
-		m_selectedTile.render(m_battle.getMap());
-		m_movementArea.render(m_battle.getMap());
-		renderArrow();
+		m_selectedTile.render(window, m_battle.getMap());
+		m_movementArea.render(window, m_battle.getMap());
+		//renderArrow();
 		break;
 	
 	case BattlePhase::Attack:
-		m_selectedTile.render(m_battle.getMap());
+		m_selectedTile.render(window, m_battle.getMap());
 		break;
 	}
 }
 
-void BattleUI::renderGUI() const
+void BattleUI::renderGUI(sf::RenderWindow& window)
 {
-	m_invalidPosition.render(m_battle.getMap());
+	m_invalidPosition.render(window, m_battle.getMap());
 	//m_gui.render(m_battle.getCurrentPhase());
 
 	if (m_selectedTile.m_tile != nullptr && m_selectedTile.m_tile->m_shipOnTile.isValid())
@@ -153,86 +151,78 @@ void BattleUI::onEnteringBattlePhase(BattlePhase currentBattlePhase)
 	}
 }
 
-void BattleUI::drawTargetArea() const
+void BattleUI::drawTargetArea(sf::RenderWindow& window)
 {
-	for (const auto& i : m_targetArea.m_targetAreaSprites)
+	for (auto& i : m_targetArea.m_targetAreaSprites)
 	{
 		if (i.activate)
 		{
 			const sf::Vector2i tileTransform = m_battle.getMap().getTileScreenPos(i.position);
 
-			i.sprite->GetTransformComp().SetPosition({
-			static_cast<float>(tileTransform.first + DRAW_OFFSET_X * m_battle.getMap().getDrawScale()),
-			static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * m_battle.getMap().getDrawScale()) });
+			i.sprite.setPosition({
+			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * m_battle.getMap().getDrawScale()),
+			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * m_battle.getMap().getDrawScale()) });
 
-			i.sprite->Render(SCREEN_SURFACE);
+			window.draw(i.sprite);
 		}
 	}
 }
 
-void BattleUI::update(float deltaTime)
+void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
 {
-	m_gui.update(m_battle.getMap().getWindDirection());// added update for gui to receive wind direction so compass direction updates
-}
-
-void BattleUI::FactionUpdateGUI(FactionName faction)
-{
-	m_gui.updateFactionToken(faction);
-}
-
-void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mouseData)
-{
-	m_lastMouseData = { mouseData.x , mouseData.y };
-
-	if (mouseEvent == EMouseEvent::eLeftButtonDown)
+	m_lastMouseData = sf::Mouse::getPosition(window);
+	if (currentEvent.type == sf::Event::MouseButtonPressed)
 	{
-		m_gui.OnMouseLeftClick(mouseData, m_battle.getCurrentPhase());
+		if (currentEvent.mouseButton.button == sf::Mouse::Left)
+		{
+			//m_gui.OnMouseLeftClick(mouseData, m_battle.getCurrentPhase());
 
-		switch (m_battle.getCurrentPhase())
-		{
-		case BattlePhase::Deployment :
-		{
-			m_isMovingEntity = true;
-			m_leftMouseDownPosition = { mouseData.x, mouseData.y };
-			break;
+			switch (m_battle.getCurrentPhase())
+			{
+			case BattlePhase::Deployment:
+			{
+				m_isMovingEntity = true;
+				m_leftMouseDownPosition = sf::Mouse::getPosition(window);
+				break;
+			}
+			case BattlePhase::Movement:
+			{
+				m_leftMouseDownPosition = sf::Mouse::getPosition(window);
+				onLeftClickMovementPhase(m_lastMouseData);
+				break;
+			}
+			case BattlePhase::Attack:
+			{
+				onLeftClickAttackPhase(m_lastMouseData);
+				break;
+			}
+			}
 		}
-		case BattlePhase::Movement :
+		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
-			m_leftMouseDownPosition = { mouseData.x, mouseData.y };
-			onLeftClickMovementPhase();
-			break;
-		}
-		case BattlePhase::Attack :
-		{
-			onLeftClickAttackPhase();
-			break;
-		}
+			switch (m_battle.getCurrentPhase())
+			{
+			case BattlePhase::Movement:
+			{
+				onRightClickMovementPhase(m_lastMouseData);
+				break;
+			}
+			case BattlePhase::Attack:
+			{
+				onRightClickAttackPhase(m_lastMouseData);
+				break;
+			}
+			} 
 		}
 	}
-	else if (mouseEvent == EMouseEvent::eRightButtonDown)
-	{
-		switch (m_battle.getCurrentPhase())
-		{
-		case BattlePhase::Movement :
-		{
-			onRightClickMovementPhase();
-			break;
-		}
-		case BattlePhase::Attack :
-		{
-			onRightClickAttackPhase();
-			break;
-		}
-		}
-	}
-	else if (mouseEvent == EMouseEvent::eLeftButtonUp)
+	else if (currentEvent.type == sf::Event::MouseButtonReleased)
 	{
 		if (m_isMovingEntity)
 		{
-			std::pair<double, eDirection> mouseMoveDirection{ MouseSelection::calculateDirection(m_leftMouseDownPosition,HAPI_Wrapper::getMouseLocation()) };
+			std::pair<double, eDirection> mouseMoveDirection{ MouseSelection::calculateDirection(m_leftMouseDownPosition, sf::Mouse::getPosition(window)) };
 			switch (m_battle.getCurrentPhase())
 			{
-			case BattlePhase::Deployment :
+			case BattlePhase::Deployment:
 			{
 				if (!m_selectedTile.m_tile)
 					break;
@@ -253,7 +243,7 @@ void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mous
 				m_arrowActive = false;
 				break;
 			}
-			case BattlePhase::Movement :
+			case BattlePhase::Movement:
 			{
 				if (!m_mouseDownTile || !m_selectedTile.m_tile)
 				{
@@ -279,39 +269,47 @@ void BattleUI::OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData & mous
 			m_isMovingEntity = false;
 		}
 	}
+	else if (currentEvent.type == sf::Event::MouseMoved)
+	{
+		m_lastMouseData = sf::Mouse::getPosition(window);
+
+		m_gui.OnMouseMove(sf::Mouse::getPosition(window), m_battle.getCurrentPhase());
+
+		switch (m_battle.getCurrentPhase())
+		{
+		case BattlePhase::Deployment:
+		{
+			if (!m_isMovingEntity)
+			{
+				onMouseMoveDeploymentPhase(m_lastMouseData);
+				//m_selectedTile.m_tile = m_shipDeployment.front()->getTileOnMouse(
+				//	m_invalidPosition, m_selectedTile.m_tile, m_battle.getMap());
+				//TODO: Raise info box
+			}
+			break;
+		}
+		case BattlePhase::Movement:
+		{
+			onMouseMoveMovementPhase(m_lastMouseData);
+			break;
+		}
+		case BattlePhase::Attack:
+		{
+			onMouseMoveAttackPhase(m_lastMouseData);
+			break;
+		}
+		}
+	}
 }
 
-void BattleUI::OnMouseMove(const HAPI_TMouseData & mouseData)
+void BattleUI::update(float deltaTime)
 {
-	m_lastMouseData = { mouseData.x , mouseData.y };
+	m_gui.update(m_battle.getMap().getWindDirection());// added update for gui to receive wind direction so compass direction updates
+}
 
-
-	m_gui.OnMouseMove(mouseData, m_battle.getCurrentPhase());
-
-	switch (m_battle.getCurrentPhase())
-	{
-	case BattlePhase::Deployment:
-	{
-		if (!m_isMovingEntity)
-		{
-			onMouseMoveDeploymentPhase();
-			//m_selectedTile.m_tile = m_shipDeployment.front()->getTileOnMouse(
-			//	m_invalidPosition, m_selectedTile.m_tile, m_battle.getMap());
-			//TODO: Raise info box
-		}
-		break;
-	}
-	case BattlePhase::Movement:
-	{
-		onMouseMoveMovementPhase();
-		break;
-	}
-	case BattlePhase::Attack :
-	{
-		onMouseMoveAttackPhase();
-		break;
-	}
-	}
+void BattleUI::FactionUpdateGUI(FactionName faction)
+{
+	m_gui.updateFactionToken(faction);
 }
 
 void BattleUI::setCurrentFaction(FactionName faction)
@@ -340,31 +338,31 @@ void BattleUI::clearSelectedTile()
 	m_selectedTile.m_tile = nullptr;
 }
 
-void BattleUI::renderArrow() const
-{
-	if (!m_arrowActive || !m_mouseDownTile)
-		return;
-	auto directionData = MouseSelection::calculateDirection(m_leftMouseDownPosition, m_lastMouseData);
-	if (directionData.first < 20)
-		return;
-	int windDirection = static_cast<int>(directionData.second);
-	sf::Vector2i pos = m_battle.getMap().getTileScreenPos(m_mouseDownTile->m_tileCoordinate);
-	float scale = m_battle.getMap().getDrawScale();
-	m_arrowSprite->GetTransformComp().SetPosition({ static_cast<float>(pos.first + (16 * scale)), static_cast<float>(pos.second + (32 * scale)) });
-	m_arrowSprite->GetTransformComp().SetRotation(((windDirection * 60) % 360) * M_PI / 180.0f);
-	m_arrowSprite->Render(SCREEN_SURFACE);
-}
+//void BattleUI::renderArrow()
+//{
+//	//if (!m_arrowActive || !m_mouseDownTile)
+//	//	return;
+//	//auto directionData = MouseSelection::calculateDirection(m_leftMouseDownPosition, m_lastMouseData);
+//	//if (directionData.first < 20)
+//	//	return;
+//	//int windDirection = static_cast<int>(directionData.y);
+//	//sf::Vector2i pos = m_battle.getMap().getTileScreenPos(m_mouseDownTile->m_tileCoordinate);
+//	//float scale = m_battle.getMap().getDrawScale();
+//	//m_arrowSprite.setPosition({ static_cast<float>
+//	//	(pos.x + (DRAW_OFFSET_X * scale)), static_cast<float>(pos.y + (DRAW_OFFSET_Y * scale)) });
+//	//m_arrowSprite->GetTransformComp().SetRotation(((windDirection * 60) % 360) * M_PI / 180.0f);
+//	//m_arrowSprite->Render(SCREEN_SURFACE);
+//}
 
-void BattleUI::onMouseMoveDeploymentPhase()
+void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
 	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
 		return;
 	}
 
-
 	const Map& map = m_battle.getMap();
-	const Tile* tileOnMouse = map.getTile(map.getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
+	const Tile* tileOnMouse = map.getTile(map.getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
 		return;
@@ -419,7 +417,7 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 	}
 }
 
-void BattleUI::onMouseMoveMovementPhase()
+void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 
@@ -440,7 +438,7 @@ void BattleUI::onMouseMoveMovementPhase()
 		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isMovingToDestination() &&
 		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isDestinationSet())
 	{
-		const Tile* tile = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
+		const Tile* tile = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 		if (!tile)
 		{
 			return;
@@ -463,11 +461,11 @@ void BattleUI::onMouseMoveMovementPhase()
 	}
 }
 
-void BattleUI::onLeftClickMovementPhase()
+void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 	
-	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
+	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
 		return;
@@ -593,7 +591,7 @@ void BattleUI::onLeftClickMovementPhase()
 	}
 }
 
-void BattleUI::onRightClickMovementPhase()
+void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 	//Cancel selected Entity
@@ -607,7 +605,7 @@ void BattleUI::onRightClickMovementPhase()
 	m_movementArea.clear();
 }
 
-void BattleUI::onLeftClickAttackPhase()
+void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 {
 	//assert(m_battle.getCurrentPhase() == BattlePhase::Attack);
 	//const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
@@ -623,7 +621,7 @@ void BattleUI::onLeftClickAttackPhase()
 	//}
 
 	assert(m_battle.getCurrentPhase() == BattlePhase::Attack);
-	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
+	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
 		return;
@@ -726,7 +724,7 @@ void BattleUI::onLeftClickAttackPhase()
 	}
 }
 
-void BattleUI::onRightClickAttackPhase()
+void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
 	//TODO: Drop info box
 	m_selectedTile.m_tile = nullptr;
@@ -734,10 +732,10 @@ void BattleUI::onRightClickAttackPhase()
 	m_targetArea.clearTargetArea();
 }
 
-void BattleUI::onMouseMoveAttackPhase()
+void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Attack);
-	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(HAPI_Wrapper::getMouseLocation()));
+	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
 		return;
@@ -800,19 +798,18 @@ BattleUI::TargetArea::TargetArea()
 	}
 }
 
-void BattleUI::TargetArea::render(const Map& map) const
+void BattleUI::TargetArea::render(sf::RenderWindow& window, const Map& map)
 {
-	for (const auto& i : m_targetAreaSprites)
+	for (auto& i : m_targetAreaSprites)
 	{
 		if (i.activate)
 		{
 			const sf::Vector2i tileTransform = map.getTileScreenPos(i.position);
 
-			i.sprite->GetTransformComp().SetPosition({
-			static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale()) });
-
-			i.sprite->Render(SCREEN_SURFACE);
+			i.sprite.setPosition({
+			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
+			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
+			window.draw(i.sprite);
 		}
 	}
 }
@@ -880,11 +877,11 @@ void BattleUI::TargetArea::generateTargetArea(Battle& battle, const Tile & sourc
 		if (!m_targetArea[i])//Check that i is not nullptr
 			continue;
 
-		sf::Vector2itilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
-		m_targetAreaSprites[i].sprite->GetTransformComp().SetPosition(
+		sf::Vector2i tilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
+		m_targetAreaSprites[i].sprite.setPosition(
 			{
-				 tilePos.first + 12 * battle.getMap().getDrawScale(),
-				 tilePos.second + 28 * battle.getMap().getDrawScale()
+				 tilePos.x + 12 * battle.getMap().getDrawScale(),
+				 tilePos.y + 28 * battle.getMap().getDrawScale()
 			});
 
 		m_targetAreaSprites[i].activate = true;
@@ -907,40 +904,40 @@ void BattleUI::TargetArea::onReset()
 }
 
 BattleUI::TargetArea::HighlightNode::HighlightNode()
-	: sprite(std::make_unique<Sprite>(Textures::m_mouseCrossHair)),
+	: sprite(*Textures::m_mouseCrossHair),
 	activate(false)
 {
-	sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	sprite->GetTransformComp().SetScaling({ 0.75f, 0.75f });
+	//sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	sprite.setScale(0.75f, 0.75f);
+	//sprite->GetTransformComp().SetScaling({ 0.75f, 0.75f });
 }
 
 //Current Selected Tile
 BattleUI::SelectedTile::SelectedTile()
-	: m_sprite(std::make_unique<Sprite>(Textures::m_selectedHex)),
+	: m_sprite(*Textures::m_selectedHex),
 	m_tile(nullptr),
 	m_position()
 {
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite->GetTransformComp().SetScaling({ 1.9f, 1.9f });
+	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	m_sprite.setScale(1.9f, 1.9f);
+	//m_sprite->GetTransformComp().SetScaling({ 1.9f, 1.9f });
 }
 
-void BattleUI::SelectedTile::render(const Map & map) const
+void BattleUI::SelectedTile::render(sf::RenderWindow& window, const Map & map)
 {
 	if (m_tile && (m_tile->m_type == eTileType::eSea || m_tile->m_type == eTileType::eOcean))
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
 
-		m_sprite->GetTransformComp().SetPosition({
-		static_cast<float>(tileTransform.first + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.second + DRAW_OFFSET_Y * map.getDrawScale()) });
+		m_sprite.setPosition({
+		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
+		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
 
-		m_sprite->Render(SCREEN_SURFACE);
+		window.draw(m_sprite);
 	}
-
 }
 
-
-BattleUI::MovementArea::MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr, const Map& map)
+BattleUI::MovementArea::MovementArea(std::unique_ptr<sf::Texture>& texturePtr, const Map& map)
 	: m_display(false),
 	m_displaySize(0),
 	m_tileOverlays()
@@ -949,13 +946,13 @@ BattleUI::MovementArea::MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& te
 	float scale = map.getDrawScale();
 	for (int i = 0; i < MAX_MOVE_AREA; i++)
 	{
-		m_tileOverlays[i].second = std::make_unique<HAPISPACE::Sprite>(texturePtr);
-		m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
-		m_tileOverlays[i].second->GetTransformComp().SetScaling({ scale, scale });
+		m_tileOverlays[i].second.setTexture(*texturePtr);
+		//m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
+		m_tileOverlays[i].second.setScale(scale, scale);
 	}
 }
 
-void BattleUI::MovementArea::render(const Map& map) const
+void BattleUI::MovementArea::render(sf::RenderWindow& window, const Map& map)
 {
 	if (m_display)
 	{
@@ -965,8 +962,8 @@ void BattleUI::MovementArea::render(const Map& map) const
 			posi pos = map.getTileScreenPos(m_tileOverlays[i].first);
 			float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
 			float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
-			m_tileOverlays[i].second->GetTransformComp().SetPosition({ x, y });
-			m_tileOverlays[i].second->Render(SCREEN_SURFACE);
+			m_tileOverlays[i].second.setPosition({ x, y });
+			window.draw(m_tileOverlays[i].second);
 		}
 	}
 }

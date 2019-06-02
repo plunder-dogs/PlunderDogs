@@ -1654,20 +1654,20 @@ public:
 	TiXmlHandle FirstChildElement( const char * value ) const;
 
 	/** Return a handle to the "index" child with the given name. 
-		The first child is 0, the second 1, etc.
+		The first child is 0, the y 1, etc.
 	*/
 	TiXmlHandle Child( const char* value, int index ) const;
 	/** Return a handle to the "index" child. 
-		The first child is 0, the second 1, etc.
+		The first child is 0, the y 1, etc.
 	*/
 	TiXmlHandle Child( int index ) const;
 	/** Return a handle to the "index" child element with the given name. 
-		The first child element is 0, the second 1, etc. Note that only TiXmlElements
+		The first child element is 0, the y 1, etc. Note that only TiXmlElements
 		are indexed: other types are not counted.
 	*/
 	TiXmlHandle ChildElement( const char* value, int index ) const;
 	/** Return a handle to the "index" child element. 
-		The first child element is 0, the second 1, etc. Note that only TiXmlElements
+		The first child element is 0, the y 1, etc. Note that only TiXmlElements
 		are indexed: other types are not counted.
 	*/
 	TiXmlHandle ChildElement( int index ) const;

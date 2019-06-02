@@ -1,8 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <HAPISprites_lib.h>
-#include <HAPISprites_UI.h>
+#include <SFML/Graphics.hpp>
 
 enum FactionName;
 class Map;
@@ -18,7 +17,7 @@ struct SpriteToggleVisibility
 	void render(const Map& map, sf::Vector2i position) const;
 	void render(const Map& map) const;
 
-	std::unique_ptr<Sprite> m_sprite;
+	sf::Sprite m_sprite;
 	bool m_active;
 	sf::Vector2i m_position;
 };

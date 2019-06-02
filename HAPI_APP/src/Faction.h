@@ -6,10 +6,10 @@ struct SpawnNode
 {
 	SpawnNode(FactionName factionName, sf::Vector2i position);
 
-	void render(const Map& map) const;
+	void render(sf::RenderWindow& window, const Map& map);
 
 	sf::Vector2i m_position;
-	std::unique_ptr<Sprite> m_sprite;
+	sf::Sprite m_sprite;
 };
 
 struct Faction
@@ -18,7 +18,7 @@ struct Faction
 
 	const Ship& getShip(int shipID) const;
 
-	void render(const Map& map) const;
+	void render(sf::RenderWindow& window, const Map& map);
 	void onNewTurn();
 
 	//Deployment Phase

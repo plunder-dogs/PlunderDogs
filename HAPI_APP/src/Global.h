@@ -133,7 +133,7 @@ struct posi
 	eDirection dir;
 
 	posi(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
-	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.first), y(pair.second), dir(direction) {}
+	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
 
 	sf::Vector2i pair() { return { x, y }; }
 	int dirDiff(const posi& compare)

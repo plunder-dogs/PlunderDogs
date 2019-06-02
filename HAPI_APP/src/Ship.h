@@ -5,6 +5,7 @@
 #include "Global.h"
 #include "SpriteToggleVisibility.h"
 #include <SFML/Graphics.hpp>
+#include <queue>
 
 struct Tile;
 struct Weapons;
@@ -32,7 +33,7 @@ public:
 	sf::Vector2i getEndOfMovementPath() const;
 
 	void update(float deltaTime, const Map& map);
-	void render(const Map& map) const;
+	void render(sf::RenderWindow& window, const Map& map);
 	void setDestination();
 	void onNewTurn();
 	void enableAction();

@@ -4,8 +4,6 @@
 #include <array>
 #include "SFML/Graphics.hpp"
 
-using namespace HAPISPACE;
-
 float getDeltaTime(int frameStart, int lastFrameStart)
 {
 	return static_cast<float>(frameStart - lastFrameStart) / 1000.0f;
@@ -17,10 +15,7 @@ void HAPI_Sprites_Main()
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
 	window.setFramerateLimit(60);
 
-	if (!Textures::loadAllTextures())
-	{
-		return;
-	}
+	Textures::loadAllTextures();
 
 	int lastFrameStart = HAPI_Sprites.GetTime();
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
@@ -36,20 +31,25 @@ void HAPI_Sprites_Main()
 	players[static_cast<int>(FactionName::eRed)] = std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI);
 	AI::loadInPlayerShips(*players.back().get());
 
-
 	Battle battle(players);
 
 	battle.start("Level1.tmx");
 
-	while (HAPI_Sprites.Update())
+	sf::Event currentEvent;
+	while (window.isOpen())
 	{
+		while (window.pollEvent(currentEvent))
+		{
+			battle.handleInput(currentEvent);
+		}
+
 		int frameStart = HAPI_Sprites.GetTime();
-
-		SCREEN_SURFACE->Clear();
-
 		battle.update(getDeltaTime(frameStart, lastFrameStart));
-		battle.render();
-		
+
+		window.clear();
+		battle.render(window);
+		window.display();
+
 		lastFrameStart = frameStart;
 	}
 }

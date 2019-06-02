@@ -41,7 +41,7 @@ struct byteStore
 		else
 			byte &= ~(1 << 7);
 	}
-	//Second bit
+	//y bit
 	bool encountered() { return byte & 64; }
 	void setEncountered(bool isEncountered)
 	{
@@ -79,7 +79,7 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
-	float tether = queue.front().second;
+	float tether = queue.front().y;
 	queue.pop();
 	//Check if there's enough movement to do check other tiles
 	if (tether >= 0.0f)
@@ -163,7 +163,7 @@ bool areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queu
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
-	float tether = queue.front().second;
+	float tether = queue.front().y;
 	queue.pop();
 	bool output = false;
 	//Check if there's enough movement to do check other tiles
@@ -238,7 +238,7 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 
 finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().second);
+	data.reserve(map.getDimensions().first * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = (it.m_type == eSea || it.m_type == eOcean);
@@ -249,7 +249,7 @@ finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
 
 boolMap::boolMap(const Map& map) : width(map.getDimensions().first)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().second);
+	data.reserve(map.getDimensions().first * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = ((it.m_type == eSea || it.m_type == eOcean) && !static_cast<bool>(it.m_shipOnTile.isValid()));

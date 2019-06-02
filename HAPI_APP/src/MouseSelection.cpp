@@ -9,58 +9,58 @@ double MouseSelection::radsToDeg(double angle)
 
 sf::Vector2i MouseSelection::coordToHexPos(sf::Vector2i coord)
 {
-	const float xPos = static_cast<float>(coord.first * 12);
-	const float yPos = static_cast<float>((2 * coord.second - (coord.first & 1)) * 7);
+	const float xPos = static_cast<float>(coord.x * 12);
+	const float yPos = static_cast<float>((2 * coord.y - (coord.x & 1)) * 7);
 	return { xPos, yPos };
 }
 
 std::pair<double, eDirection> MouseSelection::calculateDirection(sf::Vector2i startLocation, sf::Vector2i endLocation)
 {
-	std::pair<double, double> distance{ endLocation.first - startLocation.first, endLocation.second - startLocation.second }; // Calculates the distance vector of the line between the start and end point.
+	std::pair<double, double> distance{ endLocation.x - startLocation.x, endLocation.y - startLocation.y }; // Calculates the distance vector of the line between the start and end point.
 	// Calculating the magnitude of the line between the start and end point.
 	double magnitude{ 0 };
-	if (distance.first || distance.second)
+	if (distance.x || distance.y)
 	{
-		magnitude = sqrt(distance.first * distance.first + distance.second * distance.second);
+		magnitude = sqrt(distance.x * distance.x + distance.y * distance.y);
 	}
 	std::pair<double, eDirection> returnVariable{ magnitude, eNorth };
 
 	if (magnitude)
 	{
-		if (distance.first == 0)
+		if (distance.x == 0)
 		{
-			if (distance.second > 0)
+			if (distance.y > 0)
 			{
-				returnVariable.second = eSouth;
+				returnVariable.y = eSouth;
 				return returnVariable;
 			}
-			else returnVariable.second = eNorth;
+			else returnVariable.y = eNorth;
 			return returnVariable;
 		}
 		double angle;
-		if (distance.first > 0)																					// Calculating the angle between the verticle and the distance vector.
+		if (distance.x > 0)																					// Calculating the angle between the verticle and the distance vector.
 		{
-			angle = 90 + MouseSelection::radsToDeg(atan(distance.second / distance.first));
+			angle = 90 + MouseSelection::radsToDeg(atan(distance.y / distance.x));
 		}
 		else
 		{
-			angle = 270 + MouseSelection::radsToDeg(atan(distance.second / distance.first));
+			angle = 270 + MouseSelection::radsToDeg(atan(distance.y / distance.x));
 		}
 		int tmp{ (int)(angle + 30) / 60 };																		// This calculation is just to manipulate the angle into a number that makes the switch case more convenient.
 
 		switch (tmp)
 		{
-		case 0: returnVariable.second = eNorth;
+		case 0: returnVariable.y = eNorth;
 			break;
-		case 1: returnVariable.second = eNorthEast;
+		case 1: returnVariable.y = eNorthEast;
 			break;
-		case 2: returnVariable.second = eSouthEast;
+		case 2: returnVariable.y = eSouthEast;
 			break;
-		case 3: returnVariable.second = eSouth;
+		case 3: returnVariable.y = eSouth;
 			break;
-		case 4: returnVariable.second = eSouthWest;
+		case 4: returnVariable.y = eSouthWest;
 			break;
-		case 5: returnVariable.second = eNorthWest;
+		case 5: returnVariable.y = eNorthWest;
 			break;
 		}
 	}
@@ -74,49 +74,49 @@ std::pair<double, eDirection> MouseSelection::calculateDirection(const Tile* sta
 	// Calculating the distance vector of the line between the start and end point
 	sf::Vector2i startPos{ MouseSelection::coordToHexPos(startLocation->m_tileCoordinate) };
 	sf::Vector2i endPos{ MouseSelection::coordToHexPos(endLocation->m_tileCoordinate) };
-	sf::Vector2i distance{ endPos.first - startPos.first, endPos.second - startPos.second };
+	sf::Vector2i distance{ endPos.x - startPos.x, endPos.y - startPos.y };
 	// Calculating the magnitude of the line between the start and end point.
-	double magnitude{ sqrt(distance.first * distance.first + distance.second * distance.second) };
+	double magnitude{ sqrt(distance.x * distance.x + distance.y * distance.y) };
 	std::pair<double, eDirection> returnVariable{ magnitude, eNorth };
 
 	if (magnitude)
 	{
-		if (distance.first == 0)
+		if (distance.x == 0)
 		{
-			if (distance.second > 0)
+			if (distance.y > 0)
 			{
 				//Changed from SouthEast
-				returnVariable.second = eSouth;
+				returnVariable.y = eSouth;
 				return returnVariable;
 			}
 			//Changed from NorthWest
-			else returnVariable.second = eNorth;
+			else returnVariable.y = eNorth;
 			return returnVariable;
 		}
 		double angle;
-		if (distance.first > 0)	                                        // Calculating the angle between the verticle and the distance vector.
+		if (distance.x > 0)	                                        // Calculating the angle between the verticle and the distance vector.
 		{
-			angle = 90 + MouseSelection::radsToDeg(atan(distance.second / distance.first));
+			angle = 90 + MouseSelection::radsToDeg(atan(distance.y / distance.x));
 		}
 		else
 		{
-			angle = 270 + MouseSelection::radsToDeg(atan(distance.second / distance.first));
+			angle = 270 + MouseSelection::radsToDeg(atan(distance.y / distance.x));
 		}
 		int tmp{ (int)(angle + 30) / 60 };								// This calculation is just to manipulate the angle into a number that makes the switch case more convenient.
 
 		switch (tmp)
 		{
-		case 0: returnVariable.second = eNorth;
+		case 0: returnVariable.y = eNorth;
 			break;
-		case 1: returnVariable.second = eNorthEast;
+		case 1: returnVariable.y = eNorthEast;
 			break;
-		case 2: returnVariable.second = eSouthEast;
+		case 2: returnVariable.y = eSouthEast;
 			break;
-		case 3: returnVariable.second = eSouth;
+		case 3: returnVariable.y = eSouth;
 			break;
-		case 4: returnVariable.second = eSouthWest;
+		case 4: returnVariable.y = eSouthWest;
 			break;
-		case 5: returnVariable.second = eNorthWest;
+		case 5: returnVariable.y = eNorthWest;
 			break;
 		}
 	}

@@ -21,24 +21,24 @@ const Ship & Faction::getShip(int shipID) const
 	return m_ships[shipID];
 }
 
-void Faction::render(const Map & map) const
+void Faction::render(sf::RenderWindow& window, const Map & map)
 {
-	for (const auto& spawnArea : m_spawnArea)
+	for (auto& spawnArea : m_spawnArea)
 	{
-		spawnArea.render(map);
+		spawnArea.render(window, map);
 	}
 
-	for (const auto& ship : m_ships)
+	for (auto& ship : m_ships)
 	{
 		if (ship.isDeployed())
 		{
-			ship.render(map);
+			ship.render(window, map);
 		}
 	}
 
 	if (m_shipToDeploy)
 	{
-		m_shipToDeploy->render(map);
+		m_shipToDeploy->render(window, map);
 	}
 }
 
@@ -161,28 +161,28 @@ SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)
 	switch (factionName)
 	{
 	case eYellow:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
+		m_sprite.setTexture(*Textures::m_yellowSpawnHex);
 		break;
 	case eBlue:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
+		m_sprite.setTexture(*Textures::m_blueSpawnHex);
 		break;
 	case eGreen:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
+		m_sprite.setTexture(*Textures::m_greenSpawnHex);
 		break;
 	case eRed:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
+		m_sprite.setTexture(*Textures::m_redSpawnHex);
 		break;
 	};
 
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
+	m_sprite.setScale(sf::Vector2f(2.f, 2.f));
+	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }
 
-void SpawnNode::render(const Map & map) const
+void SpawnNode::render(sf::RenderWindow& window, const Map & map)
 {
-	auto screenPosition = map.getTileScreenPos(m_position);
-	m_sprite->GetTransformComp().SetPosition({
-	(float)screenPosition.first + DRAW_OFFSET_X * map.getDrawScale(),
-	(float)screenPosition.second + DRAW_OFFSET_Y * map.getDrawScale() });
-	m_sprite->Render(SCREEN_SURFACE);
+	sf::Vector2i screenPosition = map.getTileScreenPos(m_position);
+	m_sprite.setPosition(
+	(float)screenPosition.x + DRAW_OFFSET_X * map.getDrawScale(),
+	(float)screenPosition.y + DRAW_OFFSET_Y * map.getDrawScale() );
+	window.draw(m_sprite);
 }

@@ -35,33 +35,21 @@ class Ship;
 struct Tile
 {
 	const enum eTileType m_type;
-	//TODO: Dangerous exposure of raw pointer
 	ShipOnTile m_shipOnTile;
 	FactionName m_shipOnTileFaction;
 	sf::Sprite m_daySprite;
-	sf::Sprite m_aftersprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_eveningSprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_nightSprite;
+	sf::Sprite m_nightSprite;
 	const sf::Vector2i m_tileCoordinate;
 
-	Tile(eTileType type, std::shared_ptr<HAPISPACE::SpriteSheet> daySpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> afternoonSpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> eveningSpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> nightSpriteSheet,
+	Tile(eTileType type, std::unique_ptr<sf::Texture> dayTexture,
+						std::unique_ptr<sf::Texture> nightTexture,
 						sf::Vector2i coord) :
 		m_type(type),
 		m_shipOnTile(),
-		m_daySprite(),
-		m_aftersprite(),
-		m_eveningSprite(),
-		m_nightSprite(),
+		m_daySprite(*dayTexture),
+		m_nightSprite(*nightTexture),
 		m_tileCoordinate(coord)
 	{
-		//HAPI's make sprite takes a pointer to an existing spritesheet
-		m_daySprite = HAPI_Sprites.MakeSprite(daySpriteSheet);
-		m_aftersprite = HAPI_Sprites.MakeSprite(afternoonSpriteSheet);
-		m_eveningSprite = HAPI_Sprites.MakeSprite(eveningSpriteSheet);
-		m_nightSprite = HAPI_Sprites.MakeSprite(nightSpriteSheet);
 	}
 };
 

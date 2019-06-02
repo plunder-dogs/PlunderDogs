@@ -184,8 +184,8 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i 
 				factionShips[j].getCurrentPosition());
 
 			sf::Vector2i diff(
-				{ enemyPos.first - alliedPos.first, enemyPos.second - alliedPos.second });
-			int enemyDistance = diff.first * diff.first + diff.second * diff.second;
+				{ enemyPos.first - alliedPos.first, enemyPos.y - alliedPos.y });
+			int enemyDistance = diff.first * diff.first + diff.y * diff.y;
 			
 			if (enemyDistance < closestDistance)
 			{
@@ -214,8 +214,8 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 		//Determine distance
 		sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
 		sf::Vector2i diff(
-			{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
-		int tempDistance = diff.first * diff.first + diff.second * diff.second;
+			{ tempPos.first - alliedPos.first, tempPos.y - alliedPos.y });
+		int tempDistance = diff.first * diff.first + diff.y * diff.y;
 		//If distance is smallest, set as new target tile
 		if (tempDistance < closestDistance)
 		{
@@ -249,8 +249,8 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 			//Determine distance
 			sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
 			sf::Vector2i diff(
-				{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
-			int tempDistance = diff.first * diff.first + diff.second * diff.second;
+				{ tempPos.first - alliedPos.first, tempPos.y - alliedPos.y });
+			int tempDistance = diff.first * diff.first + diff.y * diff.y;
 			//If distance is smallest, set as new target tile
 			if (tempDistance < closestDistance)
 			{
@@ -271,7 +271,7 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eFrigate:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).y;
 		switch (facingDirection)
 		{
 		case eNorth: facingDirection = eNorthEast;
@@ -292,19 +292,19 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eSniper:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).y;
 		break;
 	}
 	case eShipType::eTurtle:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).y;
 		break;
 	}
 	case eShipType::eFire:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).y;
 		switch(facingDirection)
 		{
 		case eNorth: facingDirection = eSouth;
@@ -343,8 +343,8 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	for (posi it : availableTiles)
 	{
 		sf::Vector2i diff(
-			{ targetPos.first - it.x, targetPos.second - it.y });
-		int tileDistance = diff.first * diff.first + diff.second * diff.second;
+			{ targetPos.first - it.x, targetPos.y - it.y });
+		int tileDistance = diff.first * diff.first + diff.y * diff.y;
 
 		if (tileDistance < closestDistance)
 		{
@@ -356,7 +356,7 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	if (bestTile != posi(-1, -1, eNorth))
 	{
 		currentShip.generateMovementPath(map, map.getTile(bestTile.pair())->m_tileCoordinate);
-		currentShip.move(map, map.getTile(bestTile.pair())->m_tileCoordinate, targetTile.second);		
+		currentShip.move(map, map.getTile(bestTile.pair())->m_tileCoordinate, targetTile.y);		
 	}
 	currentShip.setDestination();
 }

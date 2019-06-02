@@ -98,8 +98,8 @@ void BattleGUI::render(BattlePhase currentBattlePhase) const
 	//m_endPhaseButtons->Render(SCREEN_SURFACE);
 	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(800, 585), HAPISPACE::Colour255::RED, std::to_string(m_maxCameraOffset.first), 50);//Dont delete these until the panning has been fixed - Jack
 	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(950, 585), HAPISPACE::Colour255::RED, std::to_string(CameraPositionOffset.first), 50);
-	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(800, 685), HAPISPACE::Colour255::GREEN, std::to_string(m_maxCameraOffset.second), 50);
-	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(950, 685), HAPISPACE::Colour255::GREEN, std::to_string(CameraPositionOffset.second), 50);
+	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(800, 685), HAPISPACE::Colour255::GREEN, std::to_string(m_maxCameraOffset.y), 50);
+	//SCREEN_SURFACE->DrawText(HAPISPACE::VectorI(950, 685), HAPISPACE::Colour255::GREEN, std::to_string(CameraPositionOffset.y), 50);
 
 	switch (m_currentBattleWindow)
 	{
@@ -174,32 +174,32 @@ void BattleGUI::update(eDirection windDirection)
 		if (!pendingCameraMovement.IsZero())
 		{			
 			CameraPositionOffset.first += pendingCameraMovement.x;//translates the camera position
-			CameraPositionOffset.second += pendingCameraMovement.y;
+			CameraPositionOffset.y += pendingCameraMovement.y;
 
-			if (CameraPositionOffset.first < -120)//checks for if its reached any of the 4 boundries, need to change it to a width variable
+			if (CameraPositionOffset.x < -120)//checks for if its reached any of the 4 boundries, need to change it to a width variable
 			{
-				CameraPositionOffset.first = -120;
+				CameraPositionOffset.x = -120;
 			}
-			else if (CameraPositionOffset.first > m_maxCameraOffset.first)
+			else if (CameraPositionOffset.x > m_maxCameraOffset.x)
 			{
-				CameraPositionOffset.first = m_maxCameraOffset.first;
+				CameraPositionOffset.x = m_maxCameraOffset.x;
 			}
 			else
 			{
-				CameraPositionOffset.first += pendingCameraMovement.x;
+				CameraPositionOffset.x += pendingCameraMovement.x;
 			}
 
-			if (CameraPositionOffset.second < -100)
+			if (CameraPositionOffset.y < -100)
 			{
-				CameraPositionOffset.second = -100;
+				CameraPositionOffset.y = -100;
 			}
-			else if (CameraPositionOffset.second > m_maxCameraOffset.second)
+			else if (CameraPositionOffset.y > m_maxCameraOffset.y)
 			{
-				CameraPositionOffset.second = m_maxCameraOffset.second;
+				CameraPositionOffset.y = m_maxCameraOffset.y;
 			}
 			else
 			{
-				CameraPositionOffset.second += pendingCameraMovement.y;
+				CameraPositionOffset.y += pendingCameraMovement.y;
 			}
 
 			m_cameraPositionOffset = CameraPositionOffset;
@@ -393,14 +393,14 @@ void BattleGUI::OnMouseMove(const HAPI_TMouseData& mouseData, BattlePhase curren
 
 void BattleGUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 {
-	m_maxCameraOffset = sf::Vector2i(maxCameraOffset.first * 24 - 820, maxCameraOffset.second * 28 - 400);
-	if (m_maxCameraOffset.first < 0)
+	m_maxCameraOffset = sf::Vector2i(maxCameraOffset.x * 24 - 820, maxCameraOffset.y * 28 - 400);
+	if (m_maxCameraOffset.x < 0)
 	{
-		m_maxCameraOffset.first = 0;
+		m_maxCameraOffset.x = 0;
 	}
-	if (m_maxCameraOffset.second < 0)
+	if (m_maxCameraOffset.y < 0)
 	{
-		m_maxCameraOffset.second = 0;
+		m_maxCameraOffset.y = 0;
 	}
 }
 
@@ -501,18 +501,18 @@ void BattleGUI::onLeftAITurn()
 
 void BattleGUI::snapCameraToPosition(sf::Vector2i snapLocation)//snaps the camera to be centered on a given tile
 {
-	int xPos = snapLocation.first * 24 - 480;
-	int yPos = snapLocation.second  * 28 - 270;
+	int xPos = snapLocation.x * 24 - 480;
+	int yPos = snapLocation.y  * 28 - 270;
 	//Ensure values are within bounds
 	xPos = std::max(-120, xPos);
-	xPos = std::min(m_maxCameraOffset.first, xPos);
+	xPos = std::min(m_maxCameraOffset.x, xPos);
 	yPos = std::max(-100, yPos);
-	yPos = std::min(m_maxCameraOffset.second, yPos);
+	yPos = std::min(m_maxCameraOffset.y, yPos);
 
-	m_cameraPositionOffset.first = xPos;
-	m_cameraPositionOffset.second = yPos;
-	CameraPositionOffset.first = xPos;
-	CameraPositionOffset.second = yPos;
+	m_cameraPositionOffset.x = xPos;
+	m_cameraPositionOffset.y = yPos;
+	CameraPositionOffset.x = xPos;
+	CameraPositionOffset.y = yPos;
 }
 
 bool BattleGUI::isPaused()
