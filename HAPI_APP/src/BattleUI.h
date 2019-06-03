@@ -1,9 +1,12 @@
 #pragma once
 
-#include "BattleGUI.h"
 #include <vector>
-#include <deque>
+#include <SFML/Graphics.hpp>
+#include "Global.h"
+#include "BattleGUI.h"
+#include <memory>
 
+class Ship;
 struct Tile;
 class Battle;
 class Map;
@@ -107,13 +110,13 @@ private:
 	bool m_isMovingEntity;
 	//Used to store the tile selected for movement when the lmb is depressed, so that it can be used for moveEntity input on mouse up
 	const Tile* m_mouseDownTile;
-	BattleGUI m_gui;
 	InvalidPosition m_invalidPosition;
 	//std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
 	//Directional arrow
 	sf::Vector2i m_lastMouseData;
 	bool m_arrowActive;
 	sf::Sprite m_arrowSprite;
+	BattleGUI m_gui;
 
 	//void renderArrow() const;
 

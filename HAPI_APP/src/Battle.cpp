@@ -2,6 +2,7 @@
 #include "Utilities/MapParser.h"
 #include "GameEventMessenger.h"
 #include "AI.h"
+#include "Textures.h"
 
 Battle::Particle::Particle(float lifespan, std::unique_ptr<sf::Texture>& texture, float scale) 
 	: m_position(),
@@ -264,9 +265,9 @@ void Battle::start(const std::string & newMapName)
 
 void Battle::render(sf::RenderWindow& window)
 {
-	m_map.drawMap(m_currentLightIntensity);
+	m_map.drawMap(window, m_currentLightIntensity);
 
-	m_battleUI.renderUI();
+	m_battleUI.renderUI(window);
 
 	for (auto& faction : m_factions)
 	{
@@ -276,7 +277,7 @@ void Battle::render(sf::RenderWindow& window)
 		}
 	}
 
-	m_battleUI.drawTargetArea();
+	m_battleUI.drawTargetArea(window);
 	
 	
 	for (auto& explosionParticle : m_explosionParticles)
@@ -288,7 +289,11 @@ void Battle::render(sf::RenderWindow& window)
 		fireParticle.render(window);
 	}
 
-	m_battleUI.renderGUI();
+	m_battleUI.renderGUI(window);
+}
+
+void Battle::handleInput(const sf::Event & currentEvent)
+{
 }
 
 void Battle::update(float deltaTime)

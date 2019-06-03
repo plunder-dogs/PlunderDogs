@@ -6,13 +6,13 @@
 constexpr float DRAW_ENTITY_OFFSET_X{ 16 };
 constexpr float DRAW_ENTITY_OFFSET_Y{ 32 };
 
-SpriteToggleVisibility::SpriteToggleVisibility(std::unique_ptr<sf::Texture>& spriteSheet, float scaleX, float scaleY, bool active)
-	: m_sprite(std::make_unique<Sprite>(spriteSheet)),
+SpriteToggleVisibility::SpriteToggleVisibility(std::unique_ptr<sf::Texture>& texture, float scaleX, float scaleY, bool active)
+	: m_sprite(*texture),
 	m_active(active),
 	m_position(0, 0)
 {
-	m_sprite->GetTransformComp().SetScaling({ scaleX, scaleY });
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	m_sprite.setScale(scaleX, scaleY);
+	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }
 
 SpriteToggleVisibility::SpriteToggleVisibility(FactionName factionName, float scaleX, float scaleY, bool active)
@@ -23,51 +23,50 @@ SpriteToggleVisibility::SpriteToggleVisibility(FactionName factionName, float sc
 	switch (factionName)
 	{
 	case FactionName::eYellow:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
+		m_sprite.setTexture(*Textures::m_yellowSpawnHex);
 		break;
 	case FactionName::eBlue:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
+		m_sprite.setTexture(*Textures::m_blueSpawnHex);
 		break;
 	case FactionName::eGreen:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
+		m_sprite.setTexture(*Textures::m_greenSpawnHex);
 		break;
 	case FactionName::eRed:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
+		m_sprite.setTexture(*Textures::m_redSpawnHex);
 		break;
 	}
-
-	m_sprite->GetTransformComp().SetScaling({ scaleX, scaleY });
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
+	m_sprite.setScale(scaleX, scaleY);
+	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }
 
 SpriteToggleVisibility::SpriteToggleVisibility(SpriteToggleVisibility & orig)
-	: m_active(orig.m_active),
+	: m_sprite(orig.m_sprite),
+	m_active(orig.m_active),
 	m_position(orig.m_position)
-{
-	m_sprite.swap(orig.m_sprite);
-}
+{}
 
-void SpriteToggleVisibility::render(const Map & map, sf::Vector2i position) const
+void SpriteToggleVisibility::render(sf::RenderWindow& window, const Map & map, sf::Vector2i position)
 {
 	if (m_active)
 	{
 		auto screenPosition = map.getTileScreenPos(position);
-		m_sprite->GetTransformComp().SetPosition({
+		m_sprite.setPosition({
 		static_cast<float>(screenPosition.x + DRAW_ENTITY_OFFSET_X * map.getDrawScale()) ,
 		static_cast<float>(screenPosition.y + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
-		m_sprite->Render(SCREEN_SURFACE);
+		
+		window.draw(m_sprite);
 	}
 }
 
-void SpriteToggleVisibility::render(const Map & map) const
+void SpriteToggleVisibility::render(sf::RenderWindow& window, const Map & map)
 {
 	if (m_active)
 	{
 		sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-		m_sprite->GetTransformComp().SetPosition({
+		m_sprite.setPosition({
 		static_cast<float>(tileTransform.x + DRAW_ENTITY_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.y + DRAW_ENTITY_OFFSET_Y * map.getDrawScale()) });
 
-		m_sprite->Render(SCREEN_SURFACE);
+		window.draw(m_sprite);
 	}
 }

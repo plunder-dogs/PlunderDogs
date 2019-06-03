@@ -73,6 +73,7 @@ private:
 	sf::Sprite m_sprite;
 	bool m_deployed;
 	std::vector<SpriteToggleVisibility> m_movementPath;
+	//std::array< SpriteToggleVisibility, size_t(MAX_MOVEMENT_PATH)> m_movementPath;
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementPathNode(sf::Vector2i position, const Map& map);

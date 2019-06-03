@@ -116,25 +116,25 @@ void BattleUI::renderGUI(sf::RenderWindow& window)
 
 void BattleUI::loadGUI(sf::Vector2i mapDimensions)
 {
-	m_gui.setMaxCameraOffset(mapDimensions);
+	//m_gui.setMaxCameraOffset(mapDimensions);
 }
 
 void BattleUI::onFactionWin(FactionName winningFaction)
 {
 	switch (winningFaction)
 	{
-	case FactionName::eYellow :
-		m_gui.onYellowWin();
-		break;
-	case FactionName::eBlue :
-		m_gui.onBlueWin();
-		break;
-	case FactionName::eGreen :
-		m_gui.onGreenWin();
-		break;
-	case FactionName::eRed :
-		m_gui.onRedWin();
-		break;
+	//case FactionName::eYellow :
+	//	m_gui.onYellowWin();
+	//	break;
+	//case FactionName::eBlue :
+	//	m_gui.onBlueWin();
+	//	break;
+	//case FactionName::eGreen :
+	//	m_gui.onGreenWin();
+	//	break;
+	//case FactionName::eRed :
+	//	m_gui.onRedWin();
+	//	break;
 	}
 }
 
@@ -143,10 +143,10 @@ void BattleUI::onEnteringBattlePhase(BattlePhase currentBattlePhase)
 	switch (currentBattlePhase)
 	{
 	case BattlePhase::Movement :
-		m_gui.onEnteringMovementPhase();
+		//m_gui.onEnteringMovementPhase();
 		break;
 	case BattlePhase::Attack:
-		m_gui.onEnteringAttackPhase();
+		//m_gui.onEnteringAttackPhase();
 		break;
 	}
 }
@@ -273,7 +273,7 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 	{
 		m_lastMouseData = sf::Mouse::getPosition(window);
 
-		m_gui.OnMouseMove(sf::Mouse::getPosition(window), m_battle.getCurrentPhase());
+		m_gui.onMouseMove(sf::Mouse::getPosition(window));
 
 		switch (m_battle.getCurrentPhase())
 		{
@@ -304,12 +304,12 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 
 void BattleUI::update(float deltaTime)
 {
-	m_gui.update(m_battle.getMap().getWindDirection());// added update for gui to receive wind direction so compass direction updates
+	//m_gui.update(m_battle.getMap().getWindDirection());// added update for gui to receive wind direction so compass direction updates
 }
 
 void BattleUI::FactionUpdateGUI(FactionName faction)
 {
-	m_gui.updateFactionToken(faction);
+	//m_gui.updateFactionToken(faction);
 }
 
 void BattleUI::setCurrentFaction(FactionName faction)
@@ -319,7 +319,8 @@ void BattleUI::setCurrentFaction(FactionName faction)
 
 bool BattleUI::isPaused()
 {
-	return m_gui.isPaused();
+	//return m_gui.isPaused();
+	return false;
 }
 
 void BattleUI::clearTargetArea()

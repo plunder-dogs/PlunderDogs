@@ -6,6 +6,21 @@
 #include "Faction.h"
 #include <array>
 
+enum class ActionName
+{
+	DeployShip = 0,
+	MoveShip,
+	Attack
+};
+
+struct Action
+{
+	ShipOnTile shipOnTile;
+	ActionName actionName;
+	sf::Vector2i position;
+	eDirection direction;
+};
+
 class Battle
 {
 	enum class eDeploymentState

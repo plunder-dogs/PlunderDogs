@@ -13,4 +13,3 @@ namespace BFS
 	//For finding the possible movement area of a ship
 	std::vector<posi> findArea(const Map& map, posi startPos, float maxMovement = 10);
 };
-

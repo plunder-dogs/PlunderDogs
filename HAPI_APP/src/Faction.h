@@ -2,6 +2,8 @@
 
 #include "Ship.h"
 
+constexpr size_t MAX_SHIPS_ALLOWED = 6;
+
 struct SpawnNode
 {
 	SpawnNode(FactionName factionName, sf::Vector2i position);
@@ -34,7 +36,7 @@ struct Faction
 	void disableShipMovementPath(int shipID);
 	//Attack Phase
 	void shipTakeDamage(int shipID, int damage);
-
+	
 	std::vector<Ship> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;

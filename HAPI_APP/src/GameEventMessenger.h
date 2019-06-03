@@ -49,7 +49,7 @@ public:
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
 		{
-			iter->y.emplace_back(fp, std::move(listenerName));
+			iter->second.emplace_back(fp, std::move(listenerName));
 		}
 		else
 		{
@@ -62,7 +62,7 @@ public:
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
 
-		for (const auto& listener : iter->y)
+		for (const auto& listener : iter->second)
 		{
 			listener.m_listener(message);
 		}
@@ -73,12 +73,12 @@ public:
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
 
-		auto listener = std::find_if(iter->y.begin(), iter->y.end(),
+		auto listener = std::find_if(iter->second.begin(), iter->second.end(),
 			[&listenerName](const auto& listener) { return listener.m_name == listenerName; });
-		assert(listener != iter->y.cend());
-		iter->y.erase(listener);
+		assert(listener != iter->second.cend());
+		iter->second.erase(listener);
 
-		if (iter->y.empty())
+		if (iter->second.empty())
 		{
 			m_listeners.erase(iter);
 		}

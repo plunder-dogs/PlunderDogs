@@ -46,6 +46,7 @@ void Faction::addShip(FactionName factionName, eShipType shipType)
 {
 	assert(m_ships.size() < size_t(6));
 	int shipID = static_cast<int>(m_ships.size());
+
 	m_ships.emplace_back(factionName, shipType, shipID);
 
 	if (!m_shipToDeploy)
@@ -109,6 +110,7 @@ bool Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 	{
 		return false;
 	}
+
 	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
 		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
 	

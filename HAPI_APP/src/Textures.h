@@ -22,115 +22,115 @@ struct Textures
 		loadTexture("shipRedSide_surface.png", m_redShipSideCannons);
 		
 
-		m_redShipBomb = HAPI_Wrapper::loadSpriteSheet("shipRedBomb.xml");
-		if (!m_redShipBomb)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipRedBomb.xml'", "Texture Error");
-			return false;
-		}
-		m_redShipMelee = HAPI_Wrapper::loadSpriteSheet("shipRedMelee.xml");
-		if (!m_redShipMelee)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipRedMelee.xml'", "Texture Error");
-			return false;
-		}
-		m_redShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipRedSnipe.xml");
-		if (!m_redShipSnipe)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipRedSnipe.xml'", "Texture Error");
-			return false;
-		}
+		//m_redShipBomb = HAPI_Wrapper::loadSpriteSheet("shipRedBomb.xml");
+		//if (!m_redShipBomb)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipRedBomb.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_redShipMelee = HAPI_Wrapper::loadSpriteSheet("shipRedMelee.xml");
+		//if (!m_redShipMelee)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipRedMelee.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_redShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipRedSnipe.xml");
+		//if (!m_redShipSnipe)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipRedSnipe.xml'", "Texture Error");
+		//	return false;
+		//}
 
-		//GreenShips
-		m_greenShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipGreenSide.xml");
-		if (!m_greenShipSideCannons)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipGreenSide.xml'", "Texture Error");
-			return false;
-		}
-		m_greenShipBomb = HAPI_Wrapper::loadSpriteSheet("shipGreenBomb.xml");
-		if (!m_greenShipBomb)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipGreenBomb.xml'", "Texture Error");
-			return false;
-		}
-		m_greenShipMelee = HAPI_Wrapper::loadSpriteSheet("shipGreenMelee.xml");
-		if (!m_greenShipMelee)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipGreenMelee.xml'", "Texture Error");
-			return false;
-		}
-		m_greenShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipGreenSnipe.xml");
-		if (!m_greenShipSnipe)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipGreenSnipe.xml'", "Texture Error");
-			return false;
-		}
+		////GreenShips
+		//m_greenShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipGreenSide.xml");
+		//if (!m_greenShipSideCannons)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipGreenSide.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_greenShipBomb = HAPI_Wrapper::loadSpriteSheet("shipGreenBomb.xml");
+		//if (!m_greenShipBomb)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipGreenBomb.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_greenShipMelee = HAPI_Wrapper::loadSpriteSheet("shipGreenMelee.xml");
+		//if (!m_greenShipMelee)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipGreenMelee.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_greenShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipGreenSnipe.xml");
+		//if (!m_greenShipSnipe)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipGreenSnipe.xml'", "Texture Error");
+		//	return false;
+		//}
 
-		//YellowShips
-		m_yellowShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipYellowSide.xml");
-		if (!m_yellowShipSideCannons)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipYellowSide.xml'", "Texture Error");
-			return false;
-		}
-		m_yellowShipBomb = HAPI_Wrapper::loadSpriteSheet("shipYellowBomb.xml");
-		if (!m_yellowShipBomb)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipYellowBomb.xml'", "Texture Error");
-			return false;
-		}
-		m_yellowShipMelee = HAPI_Wrapper::loadSpriteSheet("shipYellowMelee.xml");
-		if (!m_yellowShipMelee)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipYellowMelee.xml'", "Texture Error");
-			return false;
-		}
-		m_yellowShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipYellowSnipe.xml");
-		if (!m_yellowShipSnipe)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'shipYellowSnipe.xml'", "Texture Error");
-			return false;
-		}
+		////YellowShips
+		//m_yellowShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipYellowSide.xml");
+		//if (!m_yellowShipSideCannons)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipYellowSide.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_yellowShipBomb = HAPI_Wrapper::loadSpriteSheet("shipYellowBomb.xml");
+		//if (!m_yellowShipBomb)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipYellowBomb.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_yellowShipMelee = HAPI_Wrapper::loadSpriteSheet("shipYellowMelee.xml");
+		//if (!m_yellowShipMelee)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipYellowMelee.xml'", "Texture Error");
+		//	return false;
+		//}
+		//m_yellowShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipYellowSnipe.xml");
+		//if (!m_yellowShipSnipe)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'shipYellowSnipe.xml'", "Texture Error");
+		//	return false;
+		//}
 
-		m_explosionParticles = HAPI_Wrapper::loadSpriteSheet("explosion.xml");
-		if (!m_explosionParticles)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'explosion.xml'", "Texture Error");
-			return false;
-		}
+		//m_explosionParticles = HAPI_Wrapper::loadSpriteSheet("explosion.xml");
+		//if (!m_explosionParticles)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'explosion.xml'", "Texture Error");
+		//	return false;
+		//}
 
 
-		
-		m_redSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexRed.png");
-		if (!m_redSpawnHex)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'spawnHexRed.png'", "Texture Error");
-			return false;
-		}
+		//
+		//m_redSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexRed.png");
+		//if (!m_redSpawnHex)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'spawnHexRed.png'", "Texture Error");
+		//	return false;
+		//}
 
-		m_blueSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexBlue.png");
-		if (!m_blueSpawnHex)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'spawnHexBlue.png'", "Texture Error");
-			return false;
-		}
+		//m_blueSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexBlue.png");
+		//if (!m_blueSpawnHex)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'spawnHexBlue.png'", "Texture Error");
+		//	return false;
+		//}
 
-		m_yellowSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexYellow.png");
-		if (!m_yellowSpawnHex)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'spawnHexYellow.png'", "Texture Error");
-			return false;
-		}
+		//m_yellowSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexYellow.png");
+		//if (!m_yellowSpawnHex)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'spawnHexYellow.png'", "Texture Error");
+		//	return false;
+		//}
 
-		m_greenSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexGreen.png");
-		if (!m_greenSpawnHex)
-		{
-			HAPI_Sprites.UserMessage("Connot Load: 'spawnHexGreen.png'", "Texture Error");
-			return false;
-		}
+		//m_greenSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexGreen.png");
+		//if (!m_greenSpawnHex)
+		//{
+		//	HAPI_Sprites.UserMessage("Connot Load: 'spawnHexGreen.png'", "Texture Error");
+		//	return false;
+		//}
 
-		return true;
+		//return true;
 	}
 
 	static std::unique_ptr<sf::Texture> m_mouseCrossHair;

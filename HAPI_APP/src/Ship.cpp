@@ -91,7 +91,7 @@ int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 	disableMovementPath();
 
 	int i = 0;
-	int queueSize = pathToTile.size();
+	int queueSize = static_cast<int>(pathToTile.size());
 	for (i; i < queueSize; ++i)
 	{
 		auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
@@ -118,7 +118,7 @@ void Ship::disableMovementPath()
 
 sf::Vector2i Ship::getEndOfMovementPath() const
 {
-	int i = m_movementPath.size() - 1;
+	int i = static_cast<int>(m_movementPath.size()) - 1;
 	for (i; i > 0; i--)
 	{
 		if (m_movementPath[i].m_active)
@@ -255,7 +255,8 @@ void Ship::disableMovementPathNode(sf::Vector2i position, const Map & map)
 {
 	for (auto iter = m_movementPath.begin(); iter != m_movementPath.end(); ++iter)
 	{
-		auto i = map.getMouseClickCoord({ iter->m_sprite.getPosition().x, iter->m_sprite.getPosition().y });
+		sf::Vector2i spritePosition = sf::Vector2i(iter->m_sprite.getPosition().x, iter->m_sprite.getPosition().y);
+		auto i = map.getMouseClickCoord({ spritePosition });
 		if (i == position)
 		{
 			iter->m_active = false;
@@ -497,7 +498,7 @@ void Ship::render(sf::RenderWindow& window, const Map & map)
 	m_sprite.setScale({ scale / 2, scale / 2 });
 
 	window.draw(m_sprite);
-	m_actionSprite.render(map, m_currentPosition);
+	m_actionSprite.render(window, map, m_currentPosition);
 }
 
 void Ship::setDeploymentPosition(sf::Vector2i position)

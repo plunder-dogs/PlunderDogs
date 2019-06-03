@@ -9,7 +9,7 @@ float getDeltaTime(int frameStart, int lastFrameStart)
 	return static_cast<float>(frameStart - lastFrameStart) / 1000.0f;
 }
 
-void HAPI_Sprites_Main()
+int main()
 {
 	sf::Vector2u windowSize(1920, 1080);
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
@@ -17,7 +17,6 @@ void HAPI_Sprites_Main()
 
 	Textures::loadAllTextures();
 
-	int lastFrameStart = HAPI_Sprites.GetTime();
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
 
 	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
@@ -35,15 +34,19 @@ void HAPI_Sprites_Main()
 
 	battle.start("Level1.tmx");
 
+
+	sf::Clock gameClock;
+	float lastFrameStart = gameClock.restart().asMilliseconds();
 	sf::Event currentEvent;
 	while (window.isOpen())
 	{
+		float frameStart = gameClock.restart().asMilliseconds();
+		
 		while (window.pollEvent(currentEvent))
 		{
 			battle.handleInput(currentEvent);
 		}
 
-		int frameStart = HAPI_Sprites.GetTime();
 		battle.update(getDeltaTime(frameStart, lastFrameStart));
 
 		window.clear();
@@ -52,4 +55,6 @@ void HAPI_Sprites_Main()
 
 		lastFrameStart = frameStart;
 	}
+
+	return 0;
 }

@@ -1,5 +1,7 @@
 #pragma once
 #include <utility>
+#include <string>
+#include <SFML/Graphics.hpp>
 
 constexpr int INVALID_SHIP_ID = -1;
 constexpr float DRAW_OFFSET_X{ 16 };

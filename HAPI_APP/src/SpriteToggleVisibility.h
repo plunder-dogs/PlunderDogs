@@ -10,12 +10,12 @@ struct SpriteToggleVisibility
 {
 	SpriteToggleVisibility(SpriteToggleVisibility& orig);
 	//General sprite
-	SpriteToggleVisibility(std::unique_ptr<sf::Texture>& spriteSheet, float scaleX, float scaleY, bool active = true);
+	SpriteToggleVisibility(std::unique_ptr<sf::Texture>& texture, float scaleX, float scaleY, bool active = true);
 	//Sprite belonging to a faction
 	SpriteToggleVisibility(FactionName factionName, float scaleX, float scaleY, bool active = true);
 
-	void render(const Map& map, sf::Vector2i position) const;
-	void render(const Map& map) const;
+	void render(sf::RenderWindow& window, const Map& map, sf::Vector2i position);
+	void render(sf::RenderWindow& window, const Map& map);
 
 	sf::Sprite m_sprite;
 	bool m_active;

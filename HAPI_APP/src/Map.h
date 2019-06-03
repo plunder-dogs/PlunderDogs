@@ -41,8 +41,8 @@ struct Tile
 	sf::Sprite m_nightSprite;
 	const sf::Vector2i m_tileCoordinate;
 
-	Tile(eTileType type, std::unique_ptr<sf::Texture> dayTexture,
-						std::unique_ptr<sf::Texture> nightTexture,
+	Tile(eTileType type, std::unique_ptr<sf::Texture>& dayTexture,
+						std::unique_ptr<sf::Texture>& nightTexture,
 						sf::Vector2i coord) :
 		m_type(type),
 		m_shipOnTile(),
@@ -118,7 +118,7 @@ public:
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
 	void setShipOnTile(ShipOnTile ship, sf::Vector2i shipPosition);
 
-	void drawMap(eLightIntensity lightIntensity) const;
+	void drawMap(sf::RenderWindow& window, eLightIntensity lightIntensity);
 	sf::Vector2i getDrawOffset() const { return m_drawOffset; }
 	void setDrawOffset(sf::Vector2i newOffset) { m_drawOffset = newOffset; }
 

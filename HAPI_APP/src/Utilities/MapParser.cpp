@@ -54,7 +54,7 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 	const std::string t = text->Value();
 	decodedIDs = base64.base64_decode(t);
 
-	const std::vector<int> layerColumns(mapSize.first);
+	const std::vector<int> layerColumns(mapSize.x);
 	for (int i = 0; i < mapSize.y; ++i)
 	{
 		tileData.push_back(layerColumns);
@@ -62,9 +62,9 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 
 	for (int rows = 0; rows < mapSize.y; ++rows)
 	{
-		for (int cols = 0; cols < mapSize.first; ++cols)
+		for (int cols = 0; cols < mapSize.x; ++cols)
 		{
-			tileData[rows][cols] = *((int*)decodedIDs.data() + rows * mapSize.first + cols) - 1;
+			tileData[rows][cols] = *((int*)decodedIDs.data() + rows * mapSize.x + cols) - 1;
 		}
 	}
 
@@ -92,18 +92,18 @@ std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, co
 sf::Vector2i parseMapSize(const TiXmlElement & rootElement)
 {
 	sf::Vector2i mapSize(0, 0);
-	rootElement.Attribute("width", &mapSize.first);
+	rootElement.Attribute("width", &mapSize.x);
 	rootElement.Attribute("height", &mapSize.y);
-	assert(mapSize.first != 0 && mapSize.y != 0);
+	assert(mapSize.x != 0 && mapSize.y != 0);
 	return mapSize;
 }
 
 sf::Vector2i parseTileSize(const TiXmlElement & rootElement)
 {
 	sf::Vector2i tileSize(0, 0);
-	rootElement.Attribute("tilewidth", &tileSize.first);
+	rootElement.Attribute("tilewidth", &tileSize.x);
 	rootElement.Attribute("tileheight", &tileSize.y);
-	assert(tileSize.first != 0 && tileSize.y != 0);
+	assert(tileSize.x != 0 && tileSize.y != 0);
 	return tileSize;
 }
 
@@ -120,10 +120,10 @@ std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, 
 		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
 		{
 			sf::Vector2i startingPosition;
-			entityElement->Attribute("x", &startingPosition.first);
+			entityElement->Attribute("x", &startingPosition.x);
 			entityElement->Attribute("y", &startingPosition.y);
 			//startingPosition.y -= tileSize; //Tiled Hack
-			startingPosition.first /= 24;
+			startingPosition.x /= 24;
 			startingPosition.y /= 28;
 			entityStartingPositions.push_back(startingPosition);
 		}

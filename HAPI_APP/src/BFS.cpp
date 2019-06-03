@@ -79,7 +79,7 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
-	float tether = queue.front().y;
+	float tether = queue.front().second;
 	queue.pop();
 	//Check if there's enough movement to do check other tiles
 	if (tether >= 0.0f)
@@ -163,7 +163,7 @@ bool areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queu
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
-	float tether = queue.front().y;
+	float tether = queue.front().second;
 	queue.pop();
 	bool output = false;
 	//Check if there's enough movement to do check other tiles
@@ -236,9 +236,9 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 	return allowedArea;
 }
 
-finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
+finderMap::finderMap(const Map& map) : width(map.getDimensions().x)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().y);
+	data.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = (it.m_type == eSea || it.m_type == eOcean);
@@ -247,9 +247,9 @@ finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
 	}
 }
 
-boolMap::boolMap(const Map& map) : width(map.getDimensions().first)
+boolMap::boolMap(const Map& map) : width(map.getDimensions().x)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().y);
+	data.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = ((it.m_type == eSea || it.m_type == eOcean) && !static_cast<bool>(it.m_shipOnTile.isValid()));
