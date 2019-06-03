@@ -12,6 +12,15 @@ struct Message
 
 class CircularBuffer
 {
+public:
+	CircularBuffer(int capacity);
+
+	~CircularBuffer() { delete[] buffer; }
+
+	void deposit(Message data);
+
+	Message fetch();
+
 private:
 	Message* buffer;
 	const int bufferSize;
@@ -23,13 +32,4 @@ private:
 	std::mutex lock;
 
 	std::queue<Message> overspill;
-
-public:
-	CircularBuffer(int capacity);
-
-	~CircularBuffer() { delete[] buffer; }
-
-	void deposit(Message data);
-
-	Message fetch();
 };
