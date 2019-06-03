@@ -170,6 +170,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\CircularBuffer.cpp" />
     <ClCompile Include="src\Faction.cpp" />
     <ClCompile Include="src\Ship.cpp" />
     <ClCompile Include="src\SpriteToggleVisibility.cpp" />
@@ -193,6 +194,7 @@
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\CircularBuffer.h" />
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
     <ClInclude Include="src\SpriteToggleVisibility.h" />
