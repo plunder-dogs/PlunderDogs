@@ -364,7 +364,7 @@ bool Map::updateShipOnTile(ShipOnTile ship, sf::Vector2i currentPosition, sf::Ve
 	}
 
 	newTile->m_shipOnTile = currentTile->m_shipOnTile;
-	currentTile->m_shipOnTile.reset();
+	currentTile->m_shipOnTile.clear();
 	return true;
 }
 

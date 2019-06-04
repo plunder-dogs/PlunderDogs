@@ -34,7 +34,6 @@ int main()
 
 	battle.start("Level1.tmx");
 
-
 	sf::Clock gameClock;
 	float lastFrameStart = gameClock.restart().asMilliseconds();
 	sf::Event currentEvent;

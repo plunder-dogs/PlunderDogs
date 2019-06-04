@@ -18,7 +18,6 @@ struct Action
 	ShipOnTile shipOnTile;
 	ActionName actionName;
 	sf::Vector2i position;
-	eDirection direction;
 };
 
 class Battle
@@ -94,6 +93,7 @@ public:
 	void handleInput(const sf::Event& currentEvent);
 	void update(float deltaTime);
 	
+
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
 	bool setShipDeploymentAtPosition(sf::Vector2i position);
@@ -107,6 +107,7 @@ public:
 
 private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_factions;
+
 	int m_currentFactionTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
@@ -119,6 +120,7 @@ private:
 	Timer m_timeBetweenAIUnits;
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
+
 
 	std::unique_ptr<Faction>& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);

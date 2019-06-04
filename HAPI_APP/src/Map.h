@@ -21,7 +21,7 @@ struct ShipOnTile
 		return (factionName != FactionName::Invalid && shipID != INVALID_SHIP_ID);
 	}
 
-	void reset()
+	void clear()
 	{
 		factionName = FactionName::Invalid;
 		shipID = INVALID_SHIP_ID;
@@ -62,6 +62,7 @@ class Map
 		sf::Vector2i position;
 		bool inUse;
 	};
+
 private:
 	sf::Vector2i m_mapDimensions;
 	float m_windStrength;

@@ -71,3 +71,12 @@ void Textures::loadTexture(const std::string & textureName, std::unique_ptr<sf::
 	bool textureLoaded = texture->loadFromFile(DIRECTORY + textureName);
 	assert(textureLoaded);
 }
+
+std::unique_ptr<sf::Texture> Textures::loadTexture(const std::string & textureName)
+{
+	std::unique_ptr<sf::Texture> texture = std::make_unique<sf::Texture>();
+	bool textureLoaded = texture->loadFromFile(DIRECTORY + textureName);
+	assert(textureLoaded);
+	
+	return texture;
+}

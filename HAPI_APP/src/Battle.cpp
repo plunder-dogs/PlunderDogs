@@ -81,7 +81,10 @@ void Battle::Particle::orient(eDirection entityDir)
 		direction = eSouthEast;
 		break;
 	}
-	//m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(static_cast<int>(direction) * 60 % 360));
+
+#ifdef SFML_REFACTOR
+	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(static_cast<int>(direction) * 60 % 360));
+#endif 
 }
 
 void Battle::updateWindDirection()

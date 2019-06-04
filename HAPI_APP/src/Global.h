@@ -8,7 +8,7 @@ constexpr float DRAW_OFFSET_X{ 16 };
 constexpr float DRAW_OFFSET_Y{ 32 };
 
 const size_t TOTAL_SHIPS = 6;
-const std::string DIRECTORY = "Data";
+const std::string DIRECTORY = "Data\\";
 
 enum FactionName
 {
@@ -17,7 +17,7 @@ enum FactionName
 	eBlue,
 	eGreen,
 	eRed,
-	MAX = 4
+	eMax = eRed
 };
 
 enum eDirection
