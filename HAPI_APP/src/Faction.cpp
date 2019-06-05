@@ -9,7 +9,6 @@ Faction::Faction(FactionName name, ePlayerType playerType)
 	m_factionName(name),
 	m_playerType(playerType),
 	m_eliminated(false),
-	m_shipToDeploy(nullptr),
 	m_spawnArea()
 {
 	m_ships.reserve(size_t(6));
@@ -21,24 +20,35 @@ const Ship & Faction::getShip(int shipID) const
 	return m_ships[shipID];
 }
 
-void Faction::render(sf::RenderWindow& window, const Map & map)
+void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase)
 {
 	for (auto& spawnArea : m_spawnArea)
 	{
 		spawnArea.render(window, map);
 	}
 
-	for (auto& ship : m_ships)
+	if (currentBattlePhase == BattlePhase::Deployment)
 	{
-		if (ship.isDeployed())
+		//Render all deployed ships
+		for (auto& ship : m_ships)
+		{
+			if (ship.isDeployed())
+			{
+				ship.render(window, map);
+			}
+			else
+			{
+				ship.render(window, map);
+				break;
+			}
+		}		
+	}
+	else
+	{
+		for (auto& ship : m_ships)
 		{
 			ship.render(window, map);
 		}
-	}
-
-	if (m_shipToDeploy)
-	{
-		m_shipToDeploy->render(window, map);
 	}
 }
 
@@ -48,11 +58,6 @@ void Faction::addShip(FactionName factionName, eShipType shipType)
 	int shipID = static_cast<int>(m_ships.size());
 
 	m_ships.emplace_back(factionName, shipType, shipID);
-
-	if (!m_shipToDeploy)
-	{
-		m_shipToDeploy = &m_ships.back();
-	}
 }
 
 bool Faction::isAllShipsDeployed() const
@@ -80,22 +85,20 @@ void Faction::createSpawnArea(Map & map)
 
 bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
 {
-	assert(m_shipToDeploy);
 	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
 		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
 	if (cIter != m_spawnArea.cend())
 	{
-		m_shipToDeploy->deployAtPosition(startingPosition, startingDirection);
-		map.setShipOnTile({ m_factionName, m_shipToDeploy->getID() }, startingPosition);
-		//Select new Ship
 		for (auto& ship : m_ships)
 		{
 			if (!ship.isDeployed())
 			{
-				m_shipToDeploy = &ship;
+				ship.deployAtPosition(startingPosition, startingDirection);
+				map.setShipOnTile({ m_factionName, ship.getID() }, startingPosition);
 				break;
 			}
 		}
+
 		return true;
 	}
 	else
@@ -106,15 +109,17 @@ bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDir
 
 bool Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 {
-	if (!m_shipToDeploy)
-	{
-		return false;
-	}
-
 	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
 		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
-	
-	m_shipToDeploy->setDeploymentPosition(startingPosition);
+	for (auto& ship : m_ships)
+	{
+		if (!ship.isDeployed())
+		{
+			ship.setDeploymentPosition(startingPosition);
+			break;
+		}
+	}
+
 	return cIter != m_spawnArea.end();
 }
 
