@@ -38,18 +38,16 @@ struct Tile
 	ShipOnTile m_shipOnTile;
 	FactionName m_shipOnTileFaction;
 	sf::Sprite m_daySprite;
-	sf::Sprite m_nightSprite;
 	const sf::Vector2i m_tileCoordinate;
 
 	Tile(eTileType type, std::unique_ptr<sf::Texture>& dayTexture,
-						std::unique_ptr<sf::Texture>& nightTexture,
-						sf::Vector2i coord) :
+						sf::Vector2i coord, sf::IntRect textureRect) :
 		m_type(type),
 		m_shipOnTile(),
 		m_daySprite(*dayTexture),
-		m_nightSprite(*nightTexture),
 		m_tileCoordinate(coord)
 	{
+		m_daySprite.setTextureRect(textureRect);
 	}
 };
 
@@ -119,7 +117,7 @@ public:
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
 	void setShipOnTile(ShipOnTile ship, sf::Vector2i shipPosition);
 
-	void drawMap(sf::RenderWindow& window, eLightIntensity lightIntensity);
+	void drawMap(sf::RenderWindow& window);
 	sf::Vector2i getDrawOffset() const { return m_drawOffset; }
 	void setDrawOffset(sf::Vector2i newOffset) { m_drawOffset = newOffset; }
 

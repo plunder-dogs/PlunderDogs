@@ -268,7 +268,7 @@ void Battle::start(const std::string & newMapName)
 
 void Battle::render(sf::RenderWindow& window)
 {
-	m_map.drawMap(window, m_currentLightIntensity);
+	m_map.drawMap(window);
 
 	m_battleUI.renderUI(window);
 

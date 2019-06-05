@@ -20,7 +20,7 @@ Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
 	inUse(false)
 {}
 
-void Map::drawMap(sf::RenderWindow& window, eLightIntensity lightIntensity)
+void Map::drawMap(sf::RenderWindow& window)
 {
 	//TODO: Whats the texture dimension
 	sf::Vector2i textureDimensions = sf::Vector2i(FRAME_WIDTH, FRAME_HEIGHT);
@@ -35,51 +35,24 @@ void Map::drawMap(sf::RenderWindow& window, eLightIntensity lightIntensity)
 		{
 			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			int fin = access + x;
-			switch (lightIntensity)
-			{
-			case eLightIntensity::eMaximum:
-				m_data[fin].m_daySprite.setPosition(
-					(xPos - m_drawOffset.x)*m_drawScale,
-					(yPosOdd - m_drawOffset.y)*m_drawScale);
+			m_data[fin].m_daySprite.setPosition(
+				(xPos - m_drawOffset.x)*m_drawScale,
+				(yPosOdd - m_drawOffset.y)*m_drawScale);
 
-				m_data[fin].m_daySprite.setScale(m_drawScale, m_drawScale);
-				window.draw(m_data[fin].m_daySprite);
-				break;
-
-			case eLightIntensity::eMinimum:
-				m_data[fin].m_nightSprite.setPosition(
-					(xPos - m_drawOffset.x)*m_drawScale,
-					(yPosOdd - m_drawOffset.y)*m_drawScale);
-
-				m_data[fin].m_nightSprite.setScale(m_drawScale, m_drawScale);
-				window.draw(m_data[fin].m_nightSprite);
-				break;
-			}
+			m_data[fin].m_daySprite.setScale(m_drawScale, m_drawScale);
+			window.draw(m_data[fin].m_daySprite);
 			//Is Odd
 		}
 		for (int x = 0; x < m_mapDimensions.x; x += 2)
 		{
 			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			//Is even
-			switch (lightIntensity)
-			{
-			case eLightIntensity::eMaximum:
-				m_data[access + x].m_daySprite.setPosition(
-					(xPos - m_drawOffset.x)*m_drawScale,
-					(yPosEven - m_drawOffset.y)*m_drawScale);
+			m_data[access + x].m_daySprite.setPosition(
+				(xPos - m_drawOffset.x)*m_drawScale,
+				(yPosEven - m_drawOffset.y)*m_drawScale);
 
-				m_data[access + x].m_daySprite.setScale(m_drawScale, m_drawScale);
-				window.draw(m_data[access + x].m_daySprite);
-				break;
-			case eLightIntensity::eMinimum:
-				m_data[access + x].m_nightSprite.setPosition(
-					(xPos - m_drawOffset.x)*m_drawScale,
-					(yPosEven - m_drawOffset.y)*m_drawScale);
-
-				m_data[access + x].m_nightSprite.setScale(m_drawScale, m_drawScale);
-				window.draw(m_data[access + x].m_nightSprite);
-				break;
-			}
+			m_data[access + x].m_daySprite.setScale(m_drawScale, m_drawScale);
+			window.draw(m_data[access + x].m_daySprite);
 		}
 		access += m_mapDimensions.x;
 	}
@@ -435,16 +408,14 @@ void Map::loadmap(const std::string & mapName)
 		{
 			const int tileID = mapDetails.tileData[y][x];
 			assert(tileID != -1);
-			m_data.emplace_back(static_cast<eTileType>(tileID),
-				Textures::m_hexTiles, Textures::m_nightHexTiles, sf::Vector2i(x, y));
 
-			//if (!m_data[x + y * m_mapDimensions.x].m_daySprite)
-			//{
-			//	HAPI_Sprites.UserMessage("Could not load tile spritesheet", "Error");
-			//	return;
-			//}
-			/*m_data[x + y * m_mapDimensions.x].m_daySprite->SetFrameNumber(tileID);
-			m_data[x + y * m_mapDimensions.x].m_nightSprite->SetFrameNumber(tileID);*/
+			//Texture rect of sprite
+			sf::Vector2i frameSize(32, 48);
+			int startingYPosition = frameSize.y * tileID;
+
+			m_data.emplace_back(static_cast<eTileType>(tileID),
+				Textures::m_hexTiles, sf::Vector2i(x, y), 
+				sf::IntRect(sf::Vector2i(0, startingYPosition), frameSize));
 		}
 	}
 }
