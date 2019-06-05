@@ -28,7 +28,6 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 
 	if (currentBattlePhase == BattlePhase::Deployment)
 	{
-		//Render all deployed ships
 		for (auto& ship : m_ships)
 		{
 			if (ship.isDeployed())

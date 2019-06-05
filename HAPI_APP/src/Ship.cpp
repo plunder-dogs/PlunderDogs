@@ -245,7 +245,6 @@ void Ship::setDestination()
 
 void Ship::onNewTurn()
 {
-	//m_movedToDestination = false;
 	m_weaponFired = false;
 	m_destinationSet = false;
 	m_movingToDestination = false;

@@ -13,36 +13,33 @@ struct Textures
 		m_mouseCrossHair = loadTexture("crossHair.png");
 		m_cross = loadTexture("cross.png");
 		m_hexTiles = loadTexture("hexTiles_surface.png");
-		m_selectedHex = loadTexture("spawnHex.png");
+		m_spawnHex = loadTexture("spawnHex.png");
 		m_blueShipSideCannons = loadTexture("shipBlueBomb_surface.png");
-		//m_blueShipBomb
-
-		loadTexture("cross.png", m_cross);
-		loadTexture("hexTiles_surface.png", m_hexTiles);
-		loadTexture("spawnHex.png", m_spawnHex);
-		loadTexture("whiteHex75.png", m_selectedHex);
-		loadTexture("shipBlueSide_surface.png", m_blueShipSideCannons);
-		loadTexture("shipBlueBomb_surface.png", m_blueShipBomb);
-		loadTexture("shipBlueMelee_surface.png", m_blueShipMelee);
-		loadTexture("shipBlueSnipe_surface.png", m_blueShipSnipe);
-		loadTexture("shipRedSide_surface.png", m_redShipSideCannons);
-
-		//m_yellowShipMelee = HAPI_Wrapper::loadSpriteSheet("shipYellowMelee.xml");
-		//m_redShipBomb = HAPI_Wrapper::loadSpriteSheet("shipRedBomb.xml");
-		//m_redShipMelee = HAPI_Wrapper::loadSpriteSheet("shipRedMelee.xml");
-		//m_redShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipRedSnipe.xml");
-			//m_greenShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipGreenSide.xml");
-		//m_greenShipBomb = HAPI_Wrapper::loadSpriteSheet("shipGreenBomb.xml");
-		//m_greenShipMelee = HAPI_Wrapper::loadSpriteSheet("shipGreenMelee.xml");
-		//m_greenShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipGreenSnipe.xml");
-		//m_yellowShipSideCannons = HAPI_Wrapper::loadSpriteSheet("shipYellowSide.xml");
-		//m_yellowShipBomb = HAPI_Wrapper::loadSpriteSheet("shipYellowBomb.xml");
-		//m_yellowShipSnipe = HAPI_Wrapper::loadSpriteSheet("shipYellowSnipe.xml");
-		//m_explosionParticles = HAPI_Wrapper::loadSpriteSheet("explosion.xml");
-		//m_redSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexRed.png");
-		//m_blueSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexBlue.png");
-		//m_yellowSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexYellow.png");
-		//m_greenSpawnHex = HAPI_Wrapper::makeSpriteSheet("spawnHexGreen.png");
+		m_selectedHex = loadTexture("whiteHex75.png");
+		m_blueShipSideCannons = loadTexture("shipBlueSide_surface.png");
+		m_blueShipBomb = loadTexture("shipBlueBomb_surface.png");
+		m_blueShipMelee = loadTexture("shipBlueMelee_surface.png");
+		m_blueShipSnipe = loadTexture("shipBlueSnipe_surface.png");
+		m_redShipSideCannons = loadTexture("shipRedSide_surface.png");
+		m_yellowShipMelee = loadTexture("shipYellowMelee_surface.png");
+		m_redShipBomb = loadTexture("shipRedBomb_surface.png");
+		m_redShipMelee = loadTexture("shipRedMelee_surface.png");
+		m_redShipSnipe = loadTexture("shipRedSnipe_surface.png");
+		m_greenShipSideCannons = loadTexture("shipGreenSide_surface.png");
+		m_greenShipBomb = loadTexture("shipGreenBomb_surface.png");
+		m_greenShipMelee = loadTexture("shipGreenMelee_surface.png");
+		m_greenShipSnipe = loadTexture("shipGreenSnipe_surface.png");
+		m_yellowShipSideCannons = loadTexture("shipYellowSide_surface.png");
+		m_yellowShipBomb = loadTexture("shipYellowBomb_surface.png");
+		m_yellowShipSnipe = loadTexture("shipYellowSnipe_surface.png");
+		m_explosionParticles = loadTexture("explosion_surface.png");
+		m_redSpawnHex = loadTexture("spawnHexRed.png");
+		m_blueSpawnHex = loadTexture("spawnHexBlue.png");
+		m_yellowSpawnHex = loadTexture("spawnHexYellow.png");
+		m_greenSpawnHex = loadTexture("spawnHexGreen.png");
+		m_CompassPointer = loadTexture("windDirectionArrow.png");
+		m_fireParticles = loadTexture("fire_surface.png");
+		m_nightHexTiles = loadTexture("nightHexTiles_surface.png");
 	}
 
 	static std::unique_ptr<sf::Texture> m_mouseCrossHair;
