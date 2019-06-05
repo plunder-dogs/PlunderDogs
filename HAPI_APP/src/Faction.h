@@ -22,6 +22,7 @@ struct Faction
 
 	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase);
 	void onNewTurn();
+	bool isEliminated() const;
 
 	//Deployment Phase
 	void addShip(FactionName factionName, eShipType shipType);
@@ -40,6 +41,5 @@ struct Faction
 	std::vector<Ship> m_ships;
 	const FactionName m_factionName;
 	const ePlayerType m_playerType;
-	bool m_eliminated;
 	std::vector<SpawnNode> m_spawnArea;
 };

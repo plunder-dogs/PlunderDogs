@@ -8,7 +8,6 @@ Faction::Faction(FactionName name, ePlayerType playerType)
 	: m_ships(),
 	m_factionName(name),
 	m_playerType(playerType),
-	m_eliminated(false),
 	m_spawnArea()
 {
 	m_ships.reserve(size_t(6));
@@ -129,6 +128,21 @@ void Faction::onNewTurn()
 	{
 		ship.onNewTurn();
 	}
+}
+
+bool Faction::isEliminated() const
+{
+	bool allShipsDestroyed = true;
+	for (const auto& ship : m_ships)
+	{
+		if (!ship.isDead())
+		{
+			allShipsDestroyed = false;
+			break;
+		}
+	}
+
+	return allShipsDestroyed;
 }
 
 void Faction::shipTakeDamage(int shipID, int damage)

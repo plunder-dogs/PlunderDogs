@@ -276,7 +276,7 @@ void Battle::render(sf::RenderWindow& window)
 	{
 		if (faction)
 		{
-			faction->render(window, m_map);
+			faction->render(window, m_map, m_currentBattlePhase);
 		}
 	}
 
@@ -526,7 +526,7 @@ void Battle::nextTurn()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn]->m_eliminated && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
+		if (!m_factions[m_currentFactionTurn]->isEliminated() && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
@@ -550,7 +550,7 @@ void Battle::nextTurn()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn]->m_eliminated && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
+		if (!m_factions[m_currentFactionTurn]->isEliminated() && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
@@ -863,7 +863,6 @@ void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique
 	assert(player != players.end());
 	if (m_yellowShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
 	{
-		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
@@ -874,7 +873,6 @@ void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_p
 	assert(factions[static_cast<int>(FactionName::eBlue)]);
 	if (m_greenShipsDestroyed == (int)factions[static_cast<int>(FactionName::eBlue)]->m_ships.size())
 	{
-		factions[static_cast<int>(FactionName::eBlue)]->m_eliminated = true;
 		checkGameStatus(factions);
 	}
 }
@@ -886,7 +884,6 @@ void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_
 	assert(player != players.end());
 	if (m_greenShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
 	{
-		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
@@ -898,7 +895,6 @@ void Battle::WinningFactionHandler::onRedShipDestroyed(std::array<std::unique_pt
 	assert(player != players.end());
 	if (m_redShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
 	{
-		player->get()->m_eliminated = true;
 		checkGameStatus(players);
 	}
 }
@@ -917,21 +913,21 @@ void Battle::WinningFactionHandler::onReset()
 void Battle::WinningFactionHandler::checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	//Check to see if all players have been eliminated
-	int playersEliminated = 0;
+	int factionsEliminated = 0;
 	for (const auto& faction : factions)
 	{
-		if (faction && faction->m_eliminated)
+		if (faction && faction->isEliminated())
 		{
-			++playersEliminated;
+			++factionsEliminated;
 		}
 	}
 	//Last player standing - Player wins
-	if (playersEliminated == static_cast<int>(factions.size()) - 1)
+	if (factionsEliminated == static_cast<int>(factions.size()) - 1)
 	{
 		FactionName winningFaction;
 		for (const auto& faction : factions)
 		{
-			if (faction && !faction->m_eliminated)
+			if (faction && !faction->isEliminated())
 			{
 				winningFaction = faction->m_factionName;
 			}
