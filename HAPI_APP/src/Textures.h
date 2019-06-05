@@ -15,7 +15,7 @@ struct Textures
 		m_hexTiles = loadTexture("hexTiles_surface.png");
 		m_selectedHex = loadTexture("spawnHex.png");
 		m_blueShipSideCannons = loadTexture("shipBlueBomb_surface.png");
-		m_blueShipBomb
+		//m_blueShipBomb
 
 		loadTexture("cross.png", m_cross);
 		loadTexture("hexTiles_surface.png", m_hexTiles);

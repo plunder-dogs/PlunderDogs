@@ -54,10 +54,10 @@ class Battle
 
 		void update(BattleUI& battleUI, float deltaTime);
 
-		void onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& factions);
-		void onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
-		void onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
-		void onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
+		void onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions);
+		void onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
+		void onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
+		void onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
 
 	private:
 		int m_yellowShipsDestroyed;
@@ -66,14 +66,14 @@ class Battle
 		int m_redShipsDestroyed;
 		void onReset();
 
-		void checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
+		void checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
 		Timer m_winTimer;
 		FactionName m_winningFaction;
 		bool m_gameOver;
 	};
 
 public:
-	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players);
+	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
 	Battle(const Battle&) = delete;
 	Battle& operator=(const Battle&) = delete;
 	Battle(Battle&&) = delete;
@@ -92,7 +92,6 @@ public:
 	void render(sf::RenderWindow& window);
 	void handleInput(const sf::Event& currentEvent);
 	void update(float deltaTime);
-	
 
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
@@ -106,7 +105,8 @@ public:
 	bool fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea);
 
 private:
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& m_factions;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& m_factions;
+
 
 	int m_currentFactionTurn;
 	Map m_map;
@@ -120,7 +120,6 @@ private:
 	Timer m_timeBetweenAIUnits;
 	Timer m_lightIntensityTimer;
 	eLightIntensity m_currentLightIntensity;
-
 
 	std::unique_ptr<Faction>& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);

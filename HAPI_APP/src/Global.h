@@ -14,10 +14,10 @@ enum FactionName
 {
 	Invalid = -1,
 	eYellow = 0,
-	eBlue,
-	eGreen,
-	eRed,
-	eMax = eRed
+	eBlue = 1,
+	eGreen  = 2,
+	eRed = 3,
+	eTotal = eRed + 1
 };
 
 enum eDirection

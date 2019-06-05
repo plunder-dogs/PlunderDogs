@@ -14,29 +14,6 @@ struct SpawnNode
 	sf::Sprite m_sprite;
 };
 
-
-
-//When making an API
-//How to make it so it never fails
-//Make sure things aren't ouit of sync
-//"Eliminated" could hbe oujt of sync with ships
-
-
-//Clear
-//Pass in as arguement
-//m_targetArea = battle.getMap().cGetTileCone(source.m_tileCoordinate,
-//	ship.getRange(),
-//	ship.getCurrentDirection(), true);
-
-//Handle erros in release mode
-//bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
-//{
-//	assert(m_shipToDeploy);
-//	//and return false for release
-
-//Alow the compiler to help you with warnings 
-//Don't rely on assert too much
-
 struct Faction
 {
 	Faction(FactionName name, ePlayerType playerType);
@@ -45,6 +22,7 @@ struct Faction
 
 	void render(sf::RenderWindow& window, const Map& map);
 	void onNewTurn();
+	bool isEliminated();
 
 	//Deployment Phase
 	void addShip(FactionName factionName, eShipType shipType);

@@ -17,7 +17,7 @@ int main()
 
 	Textures::loadAllTextures();
 
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
+	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)> players;
 
 	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
 	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);

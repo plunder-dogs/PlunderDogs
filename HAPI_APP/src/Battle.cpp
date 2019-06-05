@@ -82,7 +82,7 @@ void Battle::Particle::orient(eDirection entityDir)
 		break;
 	}
 
-#ifdef SFML_REFACTOR
+#ifdef SFML_REFACTOR - Ryan Swann
 	m_sprite->GetTransformComp().SetRotation(DEGREES_TO_RADIANS(static_cast<int>(direction) * 60 % 360));
 #endif 
 }
@@ -190,7 +190,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	}
 }
 
-Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
+Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 	: m_factions(players),
 	m_currentFactionTurn(0),
 	m_map(),
@@ -856,7 +856,7 @@ void Battle::WinningFactionHandler::update(BattleUI& battleUI, float deltaTime)
 	}
 }
 
-void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
+void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 {
 	++m_yellowShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eYellow; });
@@ -868,7 +868,7 @@ void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique
 	}
 }
 
-void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& factions)
+void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	++m_blueShipsDestroyed;
 	assert(factions[static_cast<int>(FactionName::eBlue)]);
@@ -879,7 +879,7 @@ void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_p
 	}
 }
 
-void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
+void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 {
 	++m_greenShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eGreen; });
@@ -891,7 +891,7 @@ void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_
 	}
 }
 
-void Battle::WinningFactionHandler::onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& players)
+void Battle::WinningFactionHandler::onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 {
 	++m_redShipsDestroyed;
 	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eRed; });
@@ -914,7 +914,7 @@ void Battle::WinningFactionHandler::onReset()
 	m_gameOver = false;
 }
 
-void Battle::WinningFactionHandler::checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)>& factions)
+void Battle::WinningFactionHandler::checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	//Check to see if all players have been eliminated
 	int playersEliminated = 0;

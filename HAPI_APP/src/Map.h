@@ -8,7 +8,7 @@
 struct ShipOnTile
 {
 	ShipOnTile()
-		: factionName(FactionName::Invalid),
+		: factionName(),
 		shipID(INVALID_SHIP_ID)
 	{}
 	ShipOnTile(FactionName factionName, int shipID)
@@ -18,7 +18,7 @@ struct ShipOnTile
 
 	bool isValid() const
 	{
-		return (factionName != FactionName::Invalid && shipID != INVALID_SHIP_ID);
+		return (shipID != INVALID_SHIP_ID);
 	}
 
 	void clear()
