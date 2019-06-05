@@ -106,8 +106,6 @@ public:
 
 private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& m_factions;
-
-
 	int m_currentFactionTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;

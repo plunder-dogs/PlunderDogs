@@ -4,10 +4,12 @@
 #include <array>
 #include "SFML/Graphics.hpp"
 
+#ifdef C++_NOTES
 //Copy Ellision
 //Return Value Optimzation
 //Stack Frames
 //https://www.youtube.com/channel/UCSX3MR0gnKDxyXAyljWzm0Q/playlists
+#endif // C++_NOTES
 
 float getDeltaTime(int frameStart, int lastFrameStart)
 {
