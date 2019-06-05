@@ -12,19 +12,11 @@ MapDetails::MapDetails(sf::Vector2i mapSize, std::vector<std::vector<int>>&& til
 	m_spawnPositions(std::move(spawnPositions))
 {}
 
-void parseTileSheets(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
-
-void MapParser::parseTextures(const std::string & fileName)
-{
-	TiXmlDocument file;
-	bool fileLoaded = file.LoadFile(Utilities::getDataDirectory() + fileName);
-	assert(fileLoaded);
-}
 
 MapDetails MapParser::parseMapDetails(const std::string& name)
 {
@@ -138,37 +130,4 @@ std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, 
 	}
 	assert(!entityStartingPositions.empty());
 	return entityStartingPositions;
-}
-
-void parseTileSheets(const TiXmlElement& rootElement)
-{
-	for (const auto* tileSheetElement = rootElement.FirstChildElement();
-		tileSheetElement != nullptr; tileSheetElement = tileSheetElement->NextSiblingElement())
-	{
-		if (tileSheetElement->Value() != std::string("tileset"))
-		{
-			continue;
-		}
-
-		int tileSheetFirstGID = 0;
-		tileSheetElement->Attribute("firstgid", &tileSheetFirstGID);
-		auto& tileSheetManager = TileSheetManagerLocator::getTileSheetManager();
-		if (tileSheetManager.hasTileSheet(tileSheetFirstGID))
-		{
-			continue;
-		}
-
-		std::string tileSheetName = tileSheetElement->Attribute("name");
-		sf::Vector2i tileSetSize;
-		int spacing = 0, margin = 0, tileSize = 0, firstGID = 0;
-		tileSheetElement->FirstChildElement()->Attribute("width", &tileSetSize.x);
-		tileSheetElement->FirstChildElement()->Attribute("height", &tileSetSize.y);
-		tileSheetElement->Attribute("tilewidth", &tileSize);
-		tileSheetElement->Attribute("spacing", &spacing);
-		tileSheetElement->Attribute("firstgid", &firstGID);
-		tileSheetElement->Attribute("margin", &margin);
-		const int columns = tileSetSize.x / (tileSize + spacing);
-		const int rows = tileSetSize.y / (tileSize + spacing);
-		tileSheetManager.addTileSheet(tileSheetFirstGID, TileSheet(std::move(tileSheetName), tileSize, columns, rows, firstGID, margin, spacing));
-	}
 }
