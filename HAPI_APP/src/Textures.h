@@ -5,11 +5,9 @@
 
 struct Textures
 {
-	static void loadTexture(const std::string& textureName, std::unique_ptr<sf::Texture>& texture);
 	static std::unique_ptr<sf::Texture> loadTexture(const std::string& textureName);
 	static void loadAllTextures()
 	{
-		//fire_surface
 		m_mouseCrossHair = loadTexture("crossHair.png");
 		m_cross = loadTexture("cross.png");
 		m_hexTiles = loadTexture("hexTiles_surface.png");

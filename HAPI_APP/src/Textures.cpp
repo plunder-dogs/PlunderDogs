@@ -66,12 +66,6 @@ std::unique_ptr<sf::Texture> Textures::m_yellowSpawnHex;
 std::unique_ptr<sf::Texture> Textures::m_greenSpawnHex;
 std::unique_ptr<sf::Texture> Textures::m_blueSpawnHex;
 
-void Textures::loadTexture(const std::string & textureName, std::unique_ptr<sf::Texture>& texture)
-{
-	bool textureLoaded = texture->loadFromFile(DIRECTORY + textureName);
-	assert(textureLoaded);
-}
-
 std::unique_ptr<sf::Texture> Textures::loadTexture(const std::string & textureName)
 {
 	std::unique_ptr<sf::Texture> texture = std::make_unique<sf::Texture>();
