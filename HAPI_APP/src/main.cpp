@@ -4,6 +4,11 @@
 #include <array>
 #include "SFML/Graphics.hpp"
 
+//Copy Ellision
+//Return Value Optimzation
+//Stack Frames
+//https://www.youtube.com/channel/UCSX3MR0gnKDxyXAyljWzm0Q/playlists
+
 float getDeltaTime(int frameStart, int lastFrameStart)
 {
 	return static_cast<float>(frameStart - lastFrameStart) / 1000.0f;
