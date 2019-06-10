@@ -15,7 +15,7 @@ Texture::Texture(const std::string& name, std::vector<FrameDetails>&& frames)
 	: m_texture(),
 	m_frames(std::move(frames))
 {
-	m_texture.loadFromFile(DATA_DIRECTORY + name);
+	m_texture.loadFromFile(name);
 }
 
 const FrameDetails & Texture::getFrame(int frameID) const

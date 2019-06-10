@@ -47,7 +47,7 @@ void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string
 		frameDetails.emplace_back(height, width, y, x, frameID);	
 	}
 
-	texture = std::make_unique<Texture>(imagePath, std::move(frameDetails));
+	texture = std::make_unique<Texture>(directory + imagePath, std::move(frameDetails));
 }
 
 MapDetails XMLParser::parseMapDetails(const std::string& name)
