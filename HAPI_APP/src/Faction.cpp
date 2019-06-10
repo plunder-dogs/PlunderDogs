@@ -181,16 +181,16 @@ SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)
 	switch (factionName)
 	{
 	case eYellow:
-		m_sprite.setTexture(*Textures::m_yellowSpawnHex);
+		m_sprite.setTexture(Textures::getInstance().m_yellowSpawnHex);
 		break;
 	case eBlue:
-		m_sprite.setTexture(*Textures::m_blueSpawnHex);
+		m_sprite.setTexture(Textures::getInstance().m_blueSpawnHex);
 		break;
 	case eGreen:
-		m_sprite.setTexture(*Textures::m_greenSpawnHex);
+		m_sprite.setTexture(Textures::getInstance().m_greenSpawnHex);
 		break;
 	case eRed:
-		m_sprite.setTexture(*Textures::m_redSpawnHex);
+		m_sprite.setTexture(Textures::getInstance().m_redSpawnHex);
 		break;
 	};
 
@@ -200,9 +200,5 @@ SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)
 
 void SpawnNode::render(sf::RenderWindow& window, const Map & map)
 {
-	sf::Vector2i screenPosition = map.getTileScreenPos(m_position);
-	m_sprite.setPosition(
-	(float)screenPosition.x + DRAW_OFFSET_X * map.getDrawScale(),
-	(float)screenPosition.y + DRAW_OFFSET_Y * map.getDrawScale() );
-	window.draw(m_sprite);
+	m_sprite.render(window, map, m_position);
 }

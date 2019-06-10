@@ -4,9 +4,11 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "global.h"
+#include "Sprite.h"
 
 struct ShipOnTile
 {
+
 	ShipOnTile()
 		: factionName(),
 		shipID(INVALID_SHIP_ID)
@@ -23,7 +25,6 @@ struct ShipOnTile
 
 	void clear()
 	{
-		factionName = FactionName::Invalid;
 		shipID = INVALID_SHIP_ID;
 	}
 
@@ -36,18 +37,17 @@ struct Tile
 {
 	const enum eTileType m_type;
 	ShipOnTile m_shipOnTile;
-	FactionName m_shipOnTileFaction;
-	sf::Sprite m_daySprite;
+	Sprite m_sprite;
 	const sf::Vector2i m_tileCoordinate;
 
-	Tile(eTileType type, std::unique_ptr<sf::Texture>& dayTexture,
-						sf::Vector2i coord, sf::IntRect textureRect) :
-		m_type(type),
+	Tile(std::unique_ptr<Texture>& dayTexture,
+						sf::Vector2i coord, int tileID) :
+		m_type(static_cast<eTileType>(tileID)),
 		m_shipOnTile(),
-		m_daySprite(*dayTexture),
+		m_sprite(dayTexture),
 		m_tileCoordinate(coord)
 	{
-		m_daySprite.setTextureRect(textureRect);
+		m_sprite.setFrameID(tileID);
 	}
 };
 

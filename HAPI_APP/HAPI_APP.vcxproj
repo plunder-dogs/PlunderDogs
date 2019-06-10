@@ -172,6 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\BattleGUI.cpp" />
     <ClCompile Include="src\Faction.cpp" />
     <ClCompile Include="src\Ship.cpp" />
@@ -179,21 +180,22 @@
     <ClCompile Include="src\AI.cpp" />
     <ClCompile Include="src\Battle.cpp" />
     <ClCompile Include="src\BattleUI.cpp" />
-    <ClCompile Include="src\GameEventMessenger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\MouseSelection.cpp" />
     <ClCompile Include="src\BFS.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Textures.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Utilities\Base64.cpp" />
-    <ClCompile Include="src\Utilities\MapParser.cpp" />
+    <ClCompile Include="src\Utilities\XMLParser.cpp" />
     <ClCompile Include="src\Utilities\tinyxml.cpp" />
     <ClCompile Include="src\Utilities\tinyxmlerror.cpp" />
     <ClCompile Include="src\Utilities\tinyxmlparser.cpp" />
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\BattleGUI.h" />
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
@@ -209,9 +211,10 @@
     <ClInclude Include="src\Textures.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Utilities\Base64.h" />
-    <ClInclude Include="src\Utilities\MapParser.h" />
+    <ClInclude Include="src\Utilities\XMLParser.h" />
     <ClInclude Include="src\Utilities\tinyxml.h" />
     <ClInclude Include="src\Utilities\Utilities.h" />
+    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

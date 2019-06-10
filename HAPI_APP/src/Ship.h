@@ -6,6 +6,10 @@
 #include "SpriteToggleVisibility.h"
 #include <SFML/Graphics.hpp>
 #include <queue>
+#include "Sprite.h"
+#include <array>
+
+constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
 
 struct Tile;
 struct Weapons;
@@ -56,13 +60,13 @@ private:
 	const eShipType m_shipType;
 	const int m_ID;
 	sf::Vector2i m_currentPosition;
-	std::queue<posi> m_pathToTile;
+	std::queue<posi> m_movementPath;
 	Timer m_movementTimer;
 	int m_movementPathSize;
 	eDirection m_currentDirection;
 	bool m_weaponFired;
 	bool m_isDead;
-	SpriteToggleVisibility m_actionSprite;
+	Sprite m_actionSprite;
 	bool m_movingToDestination;
 	bool m_destinationSet;
 	int m_maxHealth;
@@ -70,10 +74,9 @@ private:
 	int m_damage;
 	int m_range;
 	int m_movementPoints;
-	sf::Sprite m_sprite;
+	Sprite m_sprite;
 	bool m_deployed;
-	std::vector<SpriteToggleVisibility> m_movementPath;
-	//std::array< SpriteToggleVisibility, size_t(MAX_MOVEMENT_PATH)> m_movementPath;
+	std::array<Sprite, MOVEMENT_GRAPH_SIZE> m_movementGraph;
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementPathNode(sf::Vector2i position, const Map& map);

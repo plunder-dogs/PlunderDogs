@@ -8,46 +8,6 @@
 #include "AI.h"
 
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
-constexpr int MAX_MOVE_AREA{ 700 };
-
-//
-//InvalidPositionSprite
-//
-BattleUI::InvalidPosition::InvalidPosition()
-	: m_sprite(*Textures::m_cross),
-	m_activate(false)
-{
-	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-}
-
-void BattleUI::InvalidPosition::render(sf::RenderWindow& window, const Map& map)
-{
-	if (m_activate)
-	{
-		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-
-		m_sprite.setPosition({
-		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
-
-		window.draw(m_sprite);
-	}
-}
-
-void BattleUI::InvalidPosition::setPosition(sf::Vector2i newPosition, const Map& map)
-{
-	m_sprite.setPosition({
-		(float)newPosition.x + DRAW_OFFSET_X * map.getDrawScale(),
-		(float)newPosition.y + DRAW_OFFSET_Y * map.getDrawScale()});
-
-	m_position = newPosition;
-}
-
-void BattleUI::InvalidPosition::onReset()
-{
-	m_activate = false;
-	m_position = sf::Vector2i(0, 0);
-}
 
 //
 //BattleUI
@@ -56,15 +16,14 @@ BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
 	m_gui(),
 	m_selectedTile(),
-	m_invalidPosition(),
 	m_leftMouseDownPosition({ 0, 0 }),
 	m_isMovingEntity(false),
 	m_mouseDownTile(nullptr),
 	m_arrowActive(false),
-	m_arrowSprite(*Textures::m_CompassPointer),
+	m_arrowSprite(),
 	m_lastMouseData({0, 0}),
 	m_targetArea(),
-	m_movementArea(Textures::m_selectedHex, m_battle.getMap())
+	m_movementArea(Textures::getInstance().m_selectedHex, m_battle.getMap())
 {
 	m_arrowSprite.setScale({ 0.5, 0.5 });
 	//m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
@@ -105,7 +64,7 @@ void BattleUI::renderUI(sf::RenderWindow& window)
 
 void BattleUI::renderGUI(sf::RenderWindow& window)
 {
-	m_invalidPosition.render(window, m_battle.getMap());
+	m_mouseSprite.render(window, m_battle.getMap());
 	//m_gui.render(m_battle.getCurrentPhase());
 
 	if (m_selectedTile.m_tile != nullptr && m_selectedTile.m_tile->m_shipOnTile.isValid())
@@ -116,7 +75,7 @@ void BattleUI::renderGUI(sf::RenderWindow& window)
 
 void BattleUI::loadGUI(sf::Vector2i mapDimensions)
 {
-	//m_gui.setMaxCameraOffset(mapDimensions);
+	m_gui.setMaxCameraOffset(mapDimensions);
 }
 
 void BattleUI::onFactionWin(FactionName winningFaction)
@@ -153,17 +112,19 @@ void BattleUI::onEnteringBattlePhase(BattlePhase currentBattlePhase)
 
 void BattleUI::drawTargetArea(sf::RenderWindow& window)
 {
-	for (auto& i : m_targetArea.m_targetAreaSprites)
+	for (auto& i : m_targetArea.m_targetAreaGraph)
 	{
-		if (i.activate)
+		if (i.isActive())
 		{
-			const sf::Vector2i tileTransform = m_battle.getMap().getTileScreenPos(i.position);
+			i.render(window);
 
-			i.sprite.setPosition({
-			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * m_battle.getMap().getDrawScale()),
-			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * m_battle.getMap().getDrawScale()) });
+			//const sf::Vector2i tileTransform = m_battle.getMap().getTileScreenPos(i..position);
 
-			window.draw(i.sprite);
+			//i.sprite.setPosition({
+			//static_cast<float>(tileTransform.x + DRAW_OFFSET_X * m_battle.getMap().getDrawScale()),
+			//static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * m_battle.getMap().getDrawScale()) });
+
+			//window.draw(i.sprite);
 		}
 	}
 }
@@ -171,6 +132,7 @@ void BattleUI::drawTargetArea(sf::RenderWindow& window)
 void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	m_lastMouseData = sf::Mouse::getPosition(window);
+
 	if (currentEvent.type == sf::Event::MouseButtonPressed)
 	{
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
@@ -230,7 +192,7 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 				{
 					onLeftClickDeploymentPhase(mouseMoveDirection.second);
 					m_selectedTile.m_tile = nullptr;
-					m_invalidPosition.m_activate = true;
+					m_mouseSprite.deactivate();
 				}
 				else
 				{
@@ -304,6 +266,7 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 
 void BattleUI::update(float deltaTime)
 {
+	m_gui.update();
 	//m_gui.update(m_battle.getMap().getWindDirection());// added update for gui to receive wind direction so compass direction updates
 }
 
@@ -383,20 +346,20 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 		//Cannot place ship on existing ship
 		if (tileOnMouse->m_shipOnTile.isValid())
 		{
-			m_invalidPosition.setPosition(map.getTileScreenPos(tileOnMouse->m_tileCoordinate), map);
-			m_invalidPosition.m_activate = true;
+			m_mouseSprite.setPosition(map.getTileScreenPos(tileOnMouse->m_tileCoordinate), map);
+			m_mouseSprite.activate();
 		}
 		
 		//If within spawn area
 		if (m_battle.setShipDeploymentAtPosition(tileOnMouse->m_tileCoordinate))
 		{
-			m_invalidPosition.m_activate = false;
+			m_mouseSprite.activate();
 		}
 		//Outside spawn area
 		else
 		{
-			m_invalidPosition.setPosition(tileOnMouse->m_tileCoordinate, map);
-			m_invalidPosition.m_activate = true;
+			m_mouseSprite.setPosition(tileOnMouse->m_tileCoordinate, map);
+			m_mouseSprite.activate();
 		}
 	}
 }
@@ -410,9 +373,9 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 
 	if (m_selectedTile.m_tile && (m_selectedTile.m_tile->m_type == eTileType::eSea || m_selectedTile.m_tile->m_type == eTileType::eOcean))
 	{
-		if (!m_invalidPosition.m_activate && !m_selectedTile.m_tile->m_shipOnTile.isValid())
+		if (!m_mouseSprite.isActive() && !m_selectedTile.m_tile->m_shipOnTile.isValid())
 		{
-			m_invalidPosition.m_position = m_selectedTile.m_tile->m_tileCoordinate;
+			m_mouseSprite.setPosition(m_selectedTile.m_tile->m_tileCoordinate);
 			m_battle.deployFactionShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
 		}
 	}
@@ -449,14 +412,14 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 		{
 			if (tile->m_type != eTileType::eSea && tile->m_type != eTileType::eOcean)
 			{
-				m_invalidPosition.setPosition(tile->m_tileCoordinate, m_battle.getMap());
-				m_invalidPosition.m_activate = true;
+				m_mouseSprite.setPosition(tile->m_tileCoordinate, m_battle.getMap());
+				m_mouseSprite.activate();
 				m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
 			}
 			else
 			{
 				m_battle.generateFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile, tile->m_tileCoordinate);
-				m_invalidPosition.m_activate = false;
+				m_mouseSprite.deactivate();
 			}
 		}
 	}
@@ -599,7 +562,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
 	{
 		m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
-		m_invalidPosition.m_activate = false;
+		m_mouseSprite.deactivate();
 	}
 	//TODO: Drop info box
 	m_selectedTile.m_tile = nullptr;
@@ -657,7 +620,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
 	{
 		m_targetArea.clearTargetArea();
-		m_invalidPosition.m_activate = false;
+		m_mouseSprite.deactivate();
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
 		return;
@@ -667,7 +630,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
 	{
 		m_targetArea.clearTargetArea();
-		m_invalidPosition.m_activate = false;
+		m_mouseSprite.deactivate();
 		//TODO: Drop info box
 		m_selectedTile.m_tile = nullptr;
 		return;
@@ -686,7 +649,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 		}
 		m_targetArea.clearTargetArea();
 		m_selectedTile.m_tile = nullptr;
-		m_invalidPosition.m_activate = false;
+		m_mouseSprite.deactivate();
 		return;
 	}
 
@@ -729,7 +692,7 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
 	//TODO: Drop info box
 	m_selectedTile.m_tile = nullptr;
-	m_invalidPosition.m_activate = false;
+	m_mouseSprite.deactivate();
 	m_targetArea.clearTargetArea();
 }
 
@@ -757,13 +720,13 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 		//tileOnMouse within weapon range
 		if (cIter != m_targetArea.m_targetArea.cend())
 		{
-			m_invalidPosition.setPosition(tileOnMouse->m_tileCoordinate, m_battle.getMap());
-			m_invalidPosition.m_activate = true;
+			m_mouseSprite.setPosition(tileOnMouse->m_tileCoordinate, m_battle.getMap());
+			m_mouseSprite.activate();
 		}
 		//outside weapon range
 		else
 		{
-			m_invalidPosition.m_activate = false;
+			m_mouseSprite.deactivate();
 		}
 	}
 }
@@ -773,7 +736,6 @@ void BattleUI::onResetBattle()
 	m_targetArea.onReset();
 	m_selectedTile.m_tile = nullptr;
 	m_selectedTile.m_position = sf::Vector2i(0, 0);
-	m_invalidPosition.onReset();
 	m_leftMouseDownPosition = sf::Vector2i(0, 0);
 	m_mouseDownTile = nullptr;
 	m_arrowActive = false;
@@ -783,7 +745,7 @@ void BattleUI::onResetBattle()
 void BattleUI::onNewTurn()
 {
 	m_selectedTile.m_tile = nullptr;
-	m_invalidPosition.m_activate = false;
+	m_mouseSprite.deactivate();
 	clearTargetArea();
 	clearSelectedTile();
 	m_movementArea.clear();
@@ -792,25 +754,25 @@ void BattleUI::onNewTurn()
 //Weapon Graph
 BattleUI::TargetArea::TargetArea()
 {
-	m_targetAreaSprites.reserve(size_t(50));
-	for (int i = 0; i < 50; ++i)
+	for (auto& i : m_targetAreaGraph)
 	{
-		m_targetAreaSprites.push_back({});
+		i.setTexture(Textures::getInstance().m_cross);
 	}
 }
 
 void BattleUI::TargetArea::render(sf::RenderWindow& window, const Map& map)
 {
-	for (auto& i : m_targetAreaSprites)
+	for (auto& i : m_targetAreaGraph)
 	{
-		if (i.activate)
+		if (i.isActive())
 		{
-			const sf::Vector2i tileTransform = map.getTileScreenPos(i.position);
+			i.render(window);
+			//const sf::Vector2i tileTransform = map.getTileScreenPos(i.position);
 
-			i.sprite.setPosition({
-			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
-			window.draw(i.sprite);
+			//i.sprite.setPosition({
+			//static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
+			//static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
+			//window.draw(i.sprite);
 		}
 	}
 }
@@ -871,7 +833,7 @@ void BattleUI::TargetArea::generateTargetArea(Battle& battle, const Tile & sourc
 		return;
 	}
 	//clearTargetArea();
-	assert(!m_targetAreaSprites.empty());
+	assert(!m_targetAreaGraph.empty());
 	//using same convention as movement // from source should be able to get position
 	for (int i = 0; i < m_targetArea.size(); i++)
 	{
@@ -879,22 +841,22 @@ void BattleUI::TargetArea::generateTargetArea(Battle& battle, const Tile & sourc
 			continue;
 
 		sf::Vector2i tilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
-		m_targetAreaSprites[i].sprite.setPosition(
-			{
+		m_targetAreaGraph[i].setPosition(sf::Vector2i(
+			
 				 tilePos.x + 12 * battle.getMap().getDrawScale(),
 				 tilePos.y + 28 * battle.getMap().getDrawScale()
-			});
+			));
 
-		m_targetAreaSprites[i].activate = true;
-		m_targetAreaSprites[i].position = m_targetArea[i]->m_tileCoordinate;
+		m_targetAreaGraph[i].activate();
+		m_targetAreaGraph[i].setPosition(m_targetArea[i]->m_tileCoordinate);
 	}
 }
 
 void BattleUI::TargetArea::clearTargetArea()
 {
-	for (auto& i : m_targetAreaSprites)
+	for (auto& i : m_targetAreaGraph)
 	{
-		i.activate = false;
+		i.deactivate();
 	}
 }
 
@@ -904,23 +866,14 @@ void BattleUI::TargetArea::onReset()
 	m_targetArea.clear();
 }
 
-BattleUI::TargetArea::HighlightNode::HighlightNode()
-	: sprite(*Textures::m_mouseCrossHair),
-	activate(false)
-{
-	//sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	sprite.setScale(0.75f, 0.75f);
-	//sprite->GetTransformComp().SetScaling({ 0.75f, 0.75f });
-}
-
 //Current Selected Tile
 BattleUI::SelectedTile::SelectedTile()
-	: m_sprite(*Textures::m_selectedHex),
+	: m_sprite(Textures::getInstance().m_selectedHex),
 	m_tile(nullptr),
 	m_position()
 {
 	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite.setScale(1.9f, 1.9f);
+	m_sprite.setScale(sf::Vector2f(1.9f, 1.9f));
 	//m_sprite->GetTransformComp().SetScaling({ 1.9f, 1.9f });
 }
 
@@ -930,26 +883,24 @@ void BattleUI::SelectedTile::render(sf::RenderWindow& window, const Map & map)
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
 
-		m_sprite.setPosition({
+		m_sprite.setPosition(sf::Vector2i(
 		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
+		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) ));
 
-		window.draw(m_sprite);
+		m_sprite.render(window);
 	}
 }
 
-BattleUI::MovementArea::MovementArea(std::unique_ptr<sf::Texture>& texturePtr, const Map& map)
+BattleUI::MovementArea::MovementArea(std::unique_ptr<Texture>& texturePtr, const Map& map)
 	: m_display(false),
 	m_displaySize(0),
-	m_tileOverlays()
+	m_movementArea()
 {
-	m_tileOverlays.resize(MAX_MOVE_AREA);
 	float scale = map.getDrawScale();
-	for (int i = 0; i < MAX_MOVE_AREA; i++)
+	for (auto& i : m_movementArea)
 	{
-		m_tileOverlays[i].second.setTexture(*texturePtr);
-		//m_tileOverlays[i].second->GetTransformComp().SetOriginToCentreOfFrame();
-		m_tileOverlays[i].second.setScale(scale, scale);
+		i.second.setTexture(texturePtr);
+		i.second.setScale(sf::Vector2f(scale, scale));
 	}
 }
 
@@ -960,11 +911,11 @@ void BattleUI::MovementArea::render(sf::RenderWindow& window, const Map& map)
 		float scale = map.getDrawScale();
 		for (int i = 0; i < m_displaySize; i++)
 		{
-			posi pos = map.getTileScreenPos(m_tileOverlays[i].first);
+			posi pos = map.getTileScreenPos(m_movementArea[i].first);
 			float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
 			float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
-			m_tileOverlays[i].second.setPosition({ x, y });
-			window.draw(m_tileOverlays[i].second);
+			m_movementArea[i].second.setPosition(sf::Vector2i( x, y ));
+			m_movementArea[i].second.render(window);
 		}
 	}
 }
@@ -974,10 +925,10 @@ void BattleUI::MovementArea::newArea(const Map& map, const Ship& ship)
 	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
 	std::vector<posi> area = BFS::findArea(map, startPos, ship.getMovementPoints());
 	
-	m_displaySize = area.size();
+	m_displaySize = static_cast<size_t>(area.size());
 	for (int i = 0; i < m_displaySize; i++)
 	{
-		m_tileOverlays[i].first = area[i].pair();
+		m_movementArea[i].first = area[i].pair();
 	}
 
 	m_display = true;

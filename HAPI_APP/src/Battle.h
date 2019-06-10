@@ -4,21 +4,8 @@
 #include "Map.h"
 #include "BattleUI.h"
 #include "Faction.h"
+#include "Sprite.h"
 #include <array>
-
-enum class ActionName
-{
-	DeployShip = 0,
-	MoveShip,
-	Attack
-};
-
-struct Action
-{
-	ShipOnTile shipOnTile;
-	ActionName actionName;
-	sf::Vector2i position;
-};
 
 class Battle
 {
@@ -32,44 +19,16 @@ class Battle
 	{
 		sf::Vector2i m_position;
 		Timer m_lifeSpan;
-		sf::Sprite m_sprite;
+		Sprite m_sprite;
 		int m_frameNum = 0;
 		bool m_isEmitting;
 		const float m_scale;
 
-		Particle(float lifespan, std::unique_ptr<sf::Texture>& texture, float scale);
+		Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale);
 		void setPosition(sf::Vector2i position);
 		void update(float deltaTime, const Map& map);
 		void render(sf::RenderWindow& window);
 		void orient(eDirection direction);
-	};
-
-	class WinningFactionHandler
-	{
-	public:
-		WinningFactionHandler();
-		~WinningFactionHandler();
-	
-		bool isGameOver() const;
-
-		void update(BattleUI& battleUI, float deltaTime);
-
-		void onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions);
-		void onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
-		void onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
-		void onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
-
-	private:
-		int m_yellowShipsDestroyed;
-		int m_blueShipsDestroyed;
-		int m_greenShipsDestroyed;
-		int m_redShipsDestroyed;
-		void onReset();
-
-		void checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
-		Timer m_winTimer;
-		FactionName m_winningFaction;
-		bool m_gameOver;
 	};
 
 public:
@@ -90,7 +49,7 @@ public:
 
 	void start(const std::string& newMapName);
 	void render(sf::RenderWindow& window);
-	void handleInput(const sf::Event& currentEvent);
+	void handleInput(sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 
 	//Deploy Phase
@@ -111,7 +70,6 @@ private:
 	BattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;
 	BattleUI m_battleUI;
-	WinningFactionHandler m_winningFactionHandler;
 	std::vector<Particle> m_explosionParticles;
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
@@ -137,10 +95,6 @@ private:
 	void handleAIAttackPhaseTimer(float deltaTime);
 
 	void onResetBattle();
-	void onYellowShipDestroyed();
-	void onBlueShipDestroyed();
-	void onGreenShipDestroyed();
-	void onRedShipDestroyed();
 	void onEndMovementPhaseEarly();
 	void onEndAttackPhaseEarly();
 };

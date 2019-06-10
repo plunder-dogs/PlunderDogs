@@ -1,6 +1,6 @@
 #include "BattleGUI.h"
 #include "Utilities/Utilities.h"
-#include "Utilities/MapParser.h"
+#include "Utilities/XMLParser.h"
 #include "GameEventMessenger.h"
 #include "Battle.h"
 
@@ -50,10 +50,8 @@ void BattleGUI::update()
 
 		m_cameraPositionOffset = CameraPositionOffset;
 		//m_battle.setMapDrawOffset(CameraPositionOffset);//TODO: CREATE A FUNCTION FOR THIS IN BATTLE THAT'S CALLED INSTEAD
-	}
-	
+	}	
 }
-
 
 void BattleGUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 {
@@ -84,15 +82,15 @@ void BattleGUI::onMouseMove(sf::Vector2i mousePosition)
 	}
 	else if (mousePosition.x > 1820)
 	{
-		pendingCameraMovement += sf::Vector2f{ -1,0 };
+		pendingCameraMovement += sf::Vector2f{ 1,0 };
 	}
 
 	if (mousePosition.y < 50)
 	{
-		pendingCameraMovement += sf::Vector2f{ -1,0 };
+		pendingCameraMovement += sf::Vector2f{ 0 , -1 };
 	}
 	else if (mousePosition.y > 980)
 	{
-		pendingCameraMovement += sf::Vector2f{ -1,0 };
+		pendingCameraMovement += sf::Vector2f{ 0, 1 };
 	}	
 }

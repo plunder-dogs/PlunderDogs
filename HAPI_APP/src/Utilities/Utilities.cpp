@@ -1,11 +1,6 @@
 #include "Utilities.h"
 #include <random>
 
-std::string Utilities::getDataDirectory()
-{
-	return "Data\\";
-}
-
 int Utilities::getRandomNumber(int min, int max)
 {
 	static std::random_device rd;  //Will be used to obtain a seed for the random number engine

@@ -11,7 +11,7 @@ struct SpawnNode
 	void render(sf::RenderWindow& window, const Map& map);
 
 	sf::Vector2i m_position;
-	sf::Sprite m_sprite;
+	Sprite m_sprite;
 };
 
 struct Faction

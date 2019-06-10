@@ -1,13 +1,13 @@
 #include "Battle.h"
-#include "Utilities/MapParser.h"
+#include "Utilities/XMLParser.h"
 #include "GameEventMessenger.h"
 #include "AI.h"
 #include "Textures.h"
 
-Battle::Particle::Particle(float lifespan, std::unique_ptr<sf::Texture>& texture, float scale) 
+Battle::Particle::Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale) 
 	: m_position(),
 	m_lifeSpan(lifespan),
-	m_sprite(*texture.get()),
+	m_sprite(texture),
 	m_frameNum(0),
 	m_isEmitting(false),
 	m_scale(scale)
@@ -25,25 +25,24 @@ void Battle::Particle::update(float deltaTime, const Map& map)
 	if (m_isEmitting)
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-		m_sprite.setPosition({
+		m_sprite.setPosition(sf::Vector2i(
 			tileTransform.x + DRAW_OFFSET_X * map.getDrawScale(),
-			tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale() });
+			tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale() ));
 
 		m_lifeSpan.update(deltaTime);
 
 		if (m_lifeSpan.isExpired())
 		{
-			//m_sprite->SetFrameNumber(m_frameNum);
-
+			m_sprite.setFrameID(m_frameNum);
 			m_lifeSpan.reset();
 			++m_frameNum;
 		}
 
-		//if (m_frameNum >= m_sprite->GetNumFrames())
-		//{
-		//	m_isEmitting = false;
-		//	m_frameNum = 0;
-		//}
+		if (m_frameNum >= m_sprite.getCurrentFrameID())
+		{
+			m_isEmitting = false;
+			m_frameNum = 0;
+		}
 	}
 }
 
@@ -52,8 +51,8 @@ void Battle::Particle::render(sf::RenderWindow& window)
 	if (m_isEmitting)
 	{
 		//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-		m_sprite.setScale(m_scale, m_scale);
-		window.draw(m_sprite);
+		m_sprite.setScale(sf::Vector2f(m_scale, m_scale));
+		m_sprite.render(window);
 	}
 }
 
@@ -207,14 +206,11 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 	m_fireParticles.reserve(6);
 	for (int i = 0; i < 6; i++)
 	{
-		m_explosionParticles.emplace_back(0.10, Textures::m_explosionParticles, 2.5f);
-		m_fireParticles.emplace_back(0.05, Textures::m_fireParticles, 2.0f);
+		m_explosionParticles.emplace_back(0.10, Textures::getInstance().m_explosionParticles, 2.5f);
+		m_fireParticles.emplace_back(0.05, Textures::getInstance().m_fireParticles, 2.0f);
 	}
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onResetBattle, this), "Battle", GameEvent::eResetBattle);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onYellowShipDestroyed, this), "Battle", GameEvent::eYellowShipDestroyed);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onRedShipDestroyed, this), "Battle", GameEvent::eRedShipDestroyed);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onBlueShipDestroyed, this), "Battle", GameEvent::eBlueShipDestroyed);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onGreenShipDestroyed, this), "Battle", GameEvent::eGreenShipDestroyed);
+
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndMovementPhaseEarly, this), "Battle", GameEvent::eEndMovementPhaseEarly);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndAttackPhaseEarly, this), "Battle", GameEvent::eEndAttackPhaseEarly);
 }
@@ -222,10 +218,6 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 Battle::~Battle()
 {
 	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eResetBattle);
-	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eYellowShipDestroyed);
-	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eRedShipDestroyed);
-	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eBlueShipDestroyed);
-	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eGreenShipDestroyed);
 	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eEndMovementPhaseEarly);
 	GameEventMessenger::getInstance().unsubscribe("Battle", GameEvent::eEndAttackPhaseEarly);
 }
@@ -295,17 +287,13 @@ void Battle::render(sf::RenderWindow& window)
 	m_battleUI.renderGUI(window);
 }
 
-void Battle::handleInput(const sf::Event & currentEvent)
+void Battle::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
 {
+	m_battleUI.handleInput(window, currentEvent);
 }
 
 void Battle::update(float deltaTime)
 {
-	if (m_winningFactionHandler.isGameOver())
-	{
-		return;
-	}
-
 	m_battleUI.setCurrentFaction(getCurrentFaction());
 	m_battleUI.update(deltaTime);
 	m_map.setDrawOffset(m_battleUI.getCameraPositionOffset());
@@ -340,7 +328,7 @@ void Battle::update(float deltaTime)
 		}
 	}
 
-	m_winningFactionHandler.update(m_battleUI, deltaTime);
+	//m_winningFactionHandler.update(m_battleUI, deltaTime);
 }
 
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination)
@@ -764,26 +752,6 @@ const Faction & Battle::getFaction(FactionName factionName) const
 	return *m_factions[static_cast<int>(factionName)].get();
 }
 
-void Battle::onYellowShipDestroyed()
-{
-	m_winningFactionHandler.onYellowShipDestroyed(m_factions);
-}
-
-void Battle::onBlueShipDestroyed()
-{
-	m_winningFactionHandler.onBlueShipDestroyed(m_factions);
-}
-
-void Battle::onGreenShipDestroyed()
-{
-	m_winningFactionHandler.onGreenShipDestroyed(m_factions);
-}
-
-void Battle::onRedShipDestroyed()
-{
-	m_winningFactionHandler.onRedShipDestroyed(m_factions);
-}
-
 void Battle::onEndMovementPhaseEarly()
 {
 	bool actionBeingPerformed = false;
@@ -794,6 +762,7 @@ void Battle::onEndMovementPhaseEarly()
 			actionBeingPerformed = true;
 		}
 	}
+
 	if (actionBeingPerformed)
 	{
 		GameEventMessenger::getInstance().broadcast(GameEvent::eUnableToSkipPhase);
@@ -808,145 +777,4 @@ void Battle::onEndMovementPhaseEarly()
 void Battle::onEndAttackPhaseEarly()
 {
 	nextTurn();
-}
-
-Battle::WinningFactionHandler::WinningFactionHandler()
-	: m_yellowShipsDestroyed(0),
-	m_blueShipsDestroyed(0),
-	m_greenShipsDestroyed(0),
-	m_redShipsDestroyed(0),
-	m_winTimer(2.0f, false),
-	m_gameOver(false)
-{
-	GameEventMessenger::getInstance().subscribe(std::bind(&WinningFactionHandler::onReset, this), "WinningFactionHandler", GameEvent::eResetBattle);
-}
-
-Battle::WinningFactionHandler::~WinningFactionHandler()
-{
-	GameEventMessenger::getInstance().unsubscribe("WinningFactionHandler", GameEvent::eResetBattle);
-}
-
-bool Battle::WinningFactionHandler::isGameOver() const
-{
-	return m_gameOver;
-}
-
-void Battle::WinningFactionHandler::update(BattleUI& battleUI, float deltaTime)
-{
-	m_winTimer.update(deltaTime);
-	if (m_winTimer.isExpired())
-	{
-		switch (m_winningFaction)
-		{
-		case FactionName::eYellow :
-			battleUI.onFactionWin(FactionName::eYellow);
-			break;
-		case FactionName::eBlue :
-			battleUI.onFactionWin(FactionName::eBlue);
-			break;
-		case FactionName::eRed :
-			battleUI.onFactionWin(FactionName::eRed);
-			break;
-		case FactionName::eGreen :
-			battleUI.onFactionWin(FactionName::eGreen);
-			break;
-		}
-
-		m_gameOver = true;
-	}
-}
-
-void Battle::WinningFactionHandler::onYellowShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
-{
-	++m_yellowShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eYellow; });
-	assert(player != players.end());
-	if (m_yellowShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
-	{
-		checkGameStatus(players);
-	}
-}
-
-void Battle::WinningFactionHandler::onBlueShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions)
-{
-	++m_blueShipsDestroyed;
-	assert(factions[static_cast<int>(FactionName::eBlue)]);
-	if (m_greenShipsDestroyed == (int)factions[static_cast<int>(FactionName::eBlue)]->m_ships.size())
-	{
-		checkGameStatus(factions);
-	}
-}
-
-void Battle::WinningFactionHandler::onGreenShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
-{
-	++m_greenShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eGreen; });
-	assert(player != players.end());
-	if (m_greenShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
-	{
-		checkGameStatus(players);
-	}
-}
-
-void Battle::WinningFactionHandler::onRedShipDestroyed(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
-{
-	++m_redShipsDestroyed;
-	auto player = std::find_if(players.begin(), players.end(), [](auto& player) { return player->m_factionName == FactionName::eRed; });
-	assert(player != players.end());
-	if (m_redShipsDestroyed == static_cast<int>(player->get()->m_ships.size()))
-	{
-		checkGameStatus(players);
-	}
-}
-
-void Battle::WinningFactionHandler::onReset()
-{
-	m_yellowShipsDestroyed = 0;
-	m_redShipsDestroyed = 0;
-	m_blueShipsDestroyed = 0;
-	m_greenShipsDestroyed = 0;
-	m_winTimer.reset();
-	m_winTimer.setActive(false);
-	m_gameOver = false;
-}
-
-void Battle::WinningFactionHandler::checkGameStatus(const std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& factions)
-{
-	//Check to see if all players have been eliminated
-	int factionsEliminated = 0;
-	for (const auto& faction : factions)
-	{
-		if (faction && faction->isEliminated())
-		{
-			++factionsEliminated;
-		}
-	}
-	//Last player standing - Player wins
-	if (factionsEliminated == static_cast<int>(factions.size()) - 1)
-	{
-		FactionName winningFaction;
-		for (const auto& faction : factions)
-		{
-			if (faction && !faction->isEliminated())
-			{
-				winningFaction = faction->m_factionName;
-			}
-		}
-		switch (winningFaction)
-		{
-		case FactionName::eYellow:
-			m_winningFaction = FactionName::eYellow;
-			break;
-		case FactionName::eBlue:
-			m_winningFaction = FactionName::eBlue;
-			break;
-		case FactionName::eGreen:
-			m_winningFaction = FactionName::eGreen;
-			break;
-		case FactionName::eRed:
-			m_winningFaction = FactionName::eRed;
-			break;
-		}
-		m_winTimer.setActive(true);
-	}
 }

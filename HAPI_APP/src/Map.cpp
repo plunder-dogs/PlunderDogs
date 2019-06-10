@@ -5,7 +5,7 @@
 #include "Utilities/Utilities.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
-#include "Utilities/MapParser.h"
+#include "Utilities/XMLParser.h"
 #include <algorithm>
 
 constexpr int FRAME_HEIGHT{ 28 };
@@ -35,24 +35,24 @@ void Map::drawMap(sf::RenderWindow& window)
 		{
 			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			int fin = access + x;
-			m_data[fin].m_daySprite.setPosition(
+			m_data[fin].m_sprite.setPosition(sf::Vector2i(
 				(xPos - m_drawOffset.x)*m_drawScale,
-				(yPosOdd - m_drawOffset.y)*m_drawScale);
+				(yPosOdd - m_drawOffset.y)*m_drawScale ));
 
-			m_data[fin].m_daySprite.setScale(m_drawScale, m_drawScale);
-			window.draw(m_data[fin].m_daySprite);
+			m_data[fin].m_sprite.setScale({ m_drawScale, m_drawScale });
+			m_data[fin].m_sprite.render(window);
 			//Is Odd
 		}
 		for (int x = 0; x < m_mapDimensions.x; x += 2)
 		{
 			const float xPos = (float)x * textureDimensions.x * 3 / 4;
 			//Is even
-			m_data[access + x].m_daySprite.setPosition(
+			m_data[access + x].m_sprite.setPosition(sf::Vector2i(
 				(xPos - m_drawOffset.x)*m_drawScale,
-				(yPosEven - m_drawOffset.y)*m_drawScale);
+				(yPosEven - m_drawOffset.y)*m_drawScale ));
 
-			m_data[access + x].m_daySprite.setScale(m_drawScale, m_drawScale);
-			window.draw(m_data[access + x].m_daySprite);
+			m_data[access + x].m_sprite.setScale({ m_drawScale, m_drawScale });
+			m_data[access + x].m_sprite.render(window);
 		}
 		access += m_mapDimensions.x;
 	}
@@ -394,14 +394,20 @@ sf::Vector2i Map::getMouseClickCoord(sf::Vector2i mouseCoord) const
 void Map::loadmap(const std::string & mapName)
 {
 	assert(!mapName.empty());
-	MapDetails mapDetails = MapParser::parseMapDetails(mapName);
+
+	//Load in Map Details
+	MapDetails mapDetails = XMLParser::parseMapDetails(mapName);
 	m_mapDimensions = mapDetails.mapDimensions;
 	m_data.reserve(m_mapDimensions.x * m_mapDimensions.y);
+
+	//Load in Spawn Positions
+	m_spawnPositions.reserve(mapDetails.m_spawnPositions.size());
 	for (auto spawnPosition : mapDetails.m_spawnPositions)
 	{
 		m_spawnPositions.push_back(spawnPosition);
 	}
 
+	//Load in Map
 	for (int y = 0; y < m_mapDimensions.y; y++)
 	{
 		for (int x = 0; x < m_mapDimensions.x; x++)
@@ -409,13 +415,7 @@ void Map::loadmap(const std::string & mapName)
 			const int tileID = mapDetails.tileData[y][x];
 			assert(tileID != -1);
 
-			//Texture rect of sprite
-			sf::Vector2i frameSize(32, 48);
-			int startingYPosition = frameSize.y * tileID;
-
-			m_data.emplace_back(static_cast<eTileType>(tileID),
-				Textures::m_hexTiles, sf::Vector2i(x, y), 
-				sf::IntRect(sf::Vector2i(0, startingYPosition), frameSize));
+			m_data.emplace_back(Textures::getInstance().m_hexTiles, sf::Vector2i(x, y), tileID);
 		}
 	}
 }

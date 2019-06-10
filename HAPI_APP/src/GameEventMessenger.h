@@ -12,10 +12,7 @@ enum GameEvent
 {
 	eResetBattle = 0,
 	eNewTurn,
-	eYellowShipDestroyed,
-	eBlueShipDestroyed,
-	eGreenShipDestroyed,
-	eRedShipDestroyed,
+	eOnFactionShipDestroyed,
 	eEndMovementPhaseEarly,
 	eEndAttackPhaseEarly,
 	eUnableToSkipPhase,
@@ -44,7 +41,7 @@ public:
 		return instance;
 	}
 
-	static void subscribe(const std::function<void(GameEvent)>& fp, std::string&& listenerName, GameEvent message)
+	void subscribe(const std::function<void(GameEvent)>& fp, std::string&& listenerName, GameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
@@ -57,7 +54,7 @@ public:
 		}
 	}
 
-	static void broadcast(GameEvent message)
+	void broadcast(GameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
@@ -68,7 +65,7 @@ public:
 		}
 	}
 
-	static void unsubscribe(const std::string& listenerName, GameEvent message)
+	void unsubscribe(const std::string& listenerName, GameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
@@ -85,5 +82,5 @@ public:
 	}
 
 private:
-	static std::unordered_map<GameEvent, std::vector<Listener>> m_listeners;
+	std::unordered_map<GameEvent, std::vector<Listener>> m_listeners;
 };

@@ -8,11 +8,12 @@ constexpr float DRAW_OFFSET_X{ 16 };
 constexpr float DRAW_OFFSET_Y{ 32 };
 
 const size_t TOTAL_SHIPS = 6;
-const std::string DIRECTORY = "Data\\";
+const std::string DATA_DIRECTORY = "Data\\";
+const std::string SHIP_DATA_DIRECTORY = "Data\\Ships\\";
+const std::string LEVEL_DATA_DIRECTORY = "Data\\Levels\\";
 
 enum FactionName
 {
-	Invalid = -1,
 	eYellow = 0,
 	eBlue = 1,
 	eGreen  = 2,

@@ -1,10 +1,14 @@
 #pragma once
 
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include "Global.h"
 #include "BattleGUI.h"
 #include <memory>
+#include "Sprite.h"
+#include <array>
+
+constexpr int MAX_MOVE_AREA{ 700 };
+constexpr size_t MAX_TARGET_AREA_GRAPH = 50;
 
 class Ship;
 struct Tile;
@@ -15,7 +19,7 @@ class BattleUI
 	//For displaying and remembering the location of the movement area of a selected ship
 	struct MovementArea
 	{
-		MovementArea(std::unique_ptr<sf::Texture>& texturePtr, const Map& map);
+		MovementArea(std::unique_ptr<Texture>& texturePtr, const Map& map);
 		MovementArea(const MovementArea&) = delete;
 		MovementArea& operator=(const MovementArea&) = delete;
 		MovementArea(MovementArea&&) = delete;
@@ -27,49 +31,38 @@ class BattleUI
 
 		bool m_display;
 		int m_displaySize;
-		std::vector<std::pair<sf::Vector2i, sf::Sprite>> m_tileOverlays;
+		std::array<std::pair<sf::Vector2i, Sprite>, MAX_MOVE_AREA> m_movementArea;
 	};
 
 	struct TargetArea
 	{
-		struct HighlightNode
-		{
-			HighlightNode();
-			sf::Sprite sprite;
-			bool activate;
-			sf::Vector2i position;
-		};
-
 		TargetArea();
+		TargetArea(const TargetArea&) = delete;
+		TargetArea& operator=(const TargetArea&) = delete;
+		TargetArea(TargetArea&&) = delete;
+		TargetArea&& operator=(TargetArea&&) = delete;
+
+
 		void render(sf::RenderWindow& window, const Map& map);
 		void generateTargetArea(Battle& battle, const Tile& source, BattlePhase phase = BattlePhase::Attack);
 		void clearTargetArea();
 		void onReset();
 
-		std::vector<HighlightNode> m_targetAreaSprites;
+		std::array<Sprite, MAX_TARGET_AREA_GRAPH> m_targetAreaGraph;
 		std::vector<const Tile*> m_targetArea;
 	};
 
-	struct InvalidPosition
-	{
-		InvalidPosition();
-
-		void render(sf::RenderWindow& window, const Map& map);
-		void setPosition(sf::Vector2i newPosition, const Map& map);
-		void onReset();
-
-		sf::Sprite m_sprite;
-		bool m_activate;
-		sf::Vector2i m_position;
-	};
-
-	struct SelectedTile
+	struct SelectedTile	
 	{
 		SelectedTile();
+		SelectedTile(const SelectedTile&) = delete;
+		SelectedTile& operator=(const SelectedTile&) = delete;
+		SelectedTile(SelectedTile&&) = delete;
+		SelectedTile&& operator=(SelectedTile&&) = delete;
 
 		void render(sf::RenderWindow& window, const Map& map);
 
-		sf::Sprite m_sprite;
+		Sprite m_sprite;
 		const Tile* m_tile;
 		sf::Vector2i m_position;
 	};
@@ -110,7 +103,8 @@ private:
 	bool m_isMovingEntity;
 	//Used to store the tile selected for movement when the lmb is depressed, so that it can be used for moveEntity input on mouse up
 	const Tile* m_mouseDownTile;
-	InvalidPosition m_invalidPosition;
+	//InvalidPosition m_invalidPosition;
+	Sprite m_mouseSprite;
 	//std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
 	//Directional arrow
 	sf::Vector2i m_lastMouseData;

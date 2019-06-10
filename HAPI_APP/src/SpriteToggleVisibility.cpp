@@ -20,21 +20,21 @@ SpriteToggleVisibility::SpriteToggleVisibility(FactionName factionName, float sc
 	m_active(active),
 	m_position(0, 0)
 {
-	switch (factionName)
-	{
-	case FactionName::eYellow:
-		m_sprite.setTexture(*Textures::m_yellowSpawnHex);
-		break;
-	case FactionName::eBlue:
-		m_sprite.setTexture(*Textures::m_blueSpawnHex);
-		break;
-	case FactionName::eGreen:
-		m_sprite.setTexture(*Textures::m_greenSpawnHex);
-		break;
-	case FactionName::eRed:
-		m_sprite.setTexture(*Textures::m_redSpawnHex);
-		break;
-	}
+	//switch (factionName)
+	//{
+	//case FactionName::eYellow:
+	//	m_sprite.setTexture(*Textures::m_yellowSpawnHex);
+	//	break;
+	//case FactionName::eBlue:
+	//	m_sprite.setTexture(*Textures::m_blueSpawnHex);
+	//	break;
+	//case FactionName::eGreen:
+	//	m_sprite.setTexture(*Textures::m_greenSpawnHex);
+	//	break;
+	//case FactionName::eRed:
+	//	m_sprite.setTexture(*Textures::m_redSpawnHex);
+	//	break;
+	//}
 	m_sprite.setScale(scaleX, scaleY);
 	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 }

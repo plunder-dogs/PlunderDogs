@@ -3,6 +3,7 @@
 #include "AI.h"
 #include <array>
 #include "SFML/Graphics.hpp"
+#include "Utilities/XMLParser.h"
 
 #ifdef C++_NOTES
 //Copy Ellision
@@ -20,9 +21,9 @@ int main()
 {
 	sf::Vector2u windowSize(1920, 1080);
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
-	window.setFramerateLimit(60);
-
-	Textures::loadAllTextures();
+	window.setFramerateLimit(120);
+	
+	Textures::getInstance().loadAllTextures();
 
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)> players;
 
@@ -50,7 +51,12 @@ int main()
 		
 		while (window.pollEvent(currentEvent))
 		{
-			battle.handleInput(currentEvent);
+			if (currentEvent.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+
+			battle.handleInput(window, currentEvent);
 		}
 
 		battle.update(getDeltaTime(frameStart, lastFrameStart));
