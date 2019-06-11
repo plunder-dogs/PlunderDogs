@@ -7,6 +7,8 @@
 #include <assert.h>
 #include "AI.h"
 
+#include <iostream>
+
 constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
 
 //
@@ -14,8 +16,10 @@ constexpr int SHIP_PLACEMENT_SPAWN_RANGE{ 3 };
 //
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
+	m_tileOnPreviousClick(nullptr),
 	m_gui(),
-	m_selectedTile(),
+	m_tileOnClick(nullptr),
+	m_tileOnMouse(nullptr),
 	m_leftMouseDownPosition({ 0, 0 }),
 	m_isMovingEntity(false),
 	m_mouseDownTile(nullptr),
@@ -26,6 +30,7 @@ BattleUI::BattleUI(Battle & battle)
 	m_movementArea(Textures::getInstance().m_selectedHex, m_battle.getMap())
 {
 	m_arrowSprite.setScale({ 0.5, 0.5 });
+	m_tileHighlight.setScale(sf::Vector2f(1.9f, 1.9f));
 	//m_arrowSprite->GetTransformComp().SetOriginToCentreOfFrame();
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onResetBattle, this), "BattleUI", GameEvent::eResetBattle);
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewTurn, this), "BattleUI", GameEvent::eNewTurn);
@@ -51,13 +56,13 @@ void BattleUI::renderUI(sf::RenderWindow& window)
 		break;
 
 	case BattlePhase::Movement:
-		m_selectedTile.render(window, m_battle.getMap());
+		renderTileHighlight(window);
 		m_movementArea.render(window, m_battle.getMap());
 		//renderArrow();
 		break;
 	
 	case BattlePhase::Attack:
-		m_selectedTile.render(window, m_battle.getMap());
+		renderTileHighlight(window);
 		break;
 	}
 }
@@ -67,7 +72,7 @@ void BattleUI::renderGUI(sf::RenderWindow& window)
 	m_mouseSprite.render(window, m_battle.getMap());
 	//m_gui.render(m_battle.getCurrentPhase());
 
-	if (m_selectedTile.m_tile != nullptr && m_selectedTile.m_tile->m_shipOnTile.isValid())
+	if (m_tileOnClick != nullptr && m_tileOnClick->m_shipOnTile.isValid())
 	{
 		//m_gui.renderStats(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile));
 	}
@@ -116,7 +121,7 @@ void BattleUI::drawTargetArea(sf::RenderWindow& window)
 	{
 		if (i.isActive())
 		{
-			i.render(window);
+			i.render(window, m_battle.getMap());
 
 			//const sf::Vector2i tileTransform = m_battle.getMap().getTileScreenPos(i..position);
 
@@ -137,28 +142,12 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 	{
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
-			//m_gui.OnMouseLeftClick(mouseData, m_battle.getCurrentPhase());
+			if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+			{
+				return;
+			}
 
-			switch (m_battle.getCurrentPhase())
-			{
-			case BattlePhase::Deployment:
-			{
-				m_isMovingEntity = true;
-				m_leftMouseDownPosition = sf::Mouse::getPosition(window);
-				break;
-			}
-			case BattlePhase::Movement:
-			{
-				m_leftMouseDownPosition = sf::Mouse::getPosition(window);
-				onLeftClickMovementPhase(m_lastMouseData);
-				break;
-			}
-			case BattlePhase::Attack:
-			{
-				onLeftClickAttackPhase(m_lastMouseData);
-				break;
-			}
-			}
+			onLeftClick(window);
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
@@ -181,86 +170,64 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 	{
 		if (m_isMovingEntity)
 		{
-			std::pair<double, eDirection> mouseMoveDirection{ MouseSelection::calculateDirection(m_leftMouseDownPosition, sf::Mouse::getPosition(window)) };
-			switch (m_battle.getCurrentPhase())
-			{
-			case BattlePhase::Deployment:
-			{
-				if (!m_selectedTile.m_tile)
-					break;
-				if (mouseMoveDirection.first > 20)
-				{
-					onLeftClickDeploymentPhase(mouseMoveDirection.second);
-					m_selectedTile.m_tile = nullptr;
-					m_mouseSprite.deactivate();
-				}
-				else
-				{
-					//This function call is to be used if the movement of the mouse during the move command is small enough to be considered unintended,
-					//in this case the ship should not rotate after reaching the destination.
-					onLeftClickDeploymentPhase();
-					m_selectedTile.m_tile = nullptr;
-
-				}
-				m_arrowActive = false;
-				break;
-			}
-			case BattlePhase::Movement:
-			{
-				if (!m_mouseDownTile || !m_selectedTile.m_tile)
-				{
-					break;
-				}
-				if (mouseMoveDirection.first > 20)
-				{
-					m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, m_mouseDownTile->m_tileCoordinate, mouseMoveDirection.second);
-				}
-				else
-				{
-					m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, m_mouseDownTile->m_tileCoordinate);
-				}
-				m_arrowActive = false;
-				m_movementArea.clear();
-				break;
-			}
-			}
-			//Resetting the variables used as triggers
-			m_mouseDownTile = nullptr;
-			//TODO: Drop info box
-			m_selectedTile.m_tile = nullptr;
-			m_isMovingEntity = false;
+			//std::pair<double, eDirection> mouseMoveDirection{ MouseSelection::calculateDirection(m_leftMouseDownPosition, sf::Mouse::getPosition(window)) };
+			//switch (m_battle.getCurrentPhase())
+			//{
+			//case BattlePhase::Deployment:
+			//{
+			//	if (!m_tileOnClick.m_tile)
+			//		break;
+			//	if (mouseMoveDirection.first > 20)
+			//	{
+			//		onLeftClickDeploymentPhase(mouseMoveDirection.second);
+			//		m_tileOnClick.m_tile = nullptr;
+			//		m_mouseSprite.deactivate();
+			//	}
+			//	else
+			//	{
+			//		//This function call is to be used if the movement of the mouse during the move command is small enough to be considered unintended,
+			//		//in this case the ship should not rotate after reaching the destination.
+			//		onLeftClickDeploymentPhase();
+			//		m_tileOnClick.m_tile = nullptr;
+			//	}
+			//	m_arrowActive = false;
+			//	break;
+			//}
+			//case BattlePhase::Movement:
+			//{
+			//	if (!m_mouseDownTile || !m_tileOnClick.m_tile)
+			//	{
+			//		break;
+			//	}
+			//	if (mouseMoveDirection.first > 20)
+			//	{
+			//		m_battle.moveFactionShipToPosition(m_tileOnClick.m_tile->m_shipOnTile, m_mouseDownTile->m_tileCoordinate, mouseMoveDirection.second);
+			//	}
+			//	else
+			//	{
+			//		m_battle.moveFactionShipToPosition(m_tileOnClick.m_tile->m_shipOnTile, m_mouseDownTile->m_tileCoordinate);
+			//	}
+			//	m_arrowActive = false;
+			//	m_movementArea.clear();
+			//	break;
+			//}
+			//}
+			////Resetting the variables used as triggers
+			//m_mouseDownTile = nullptr;
+			////TODO: Drop info box
+			//m_tileOnClick.m_tile = nullptr;
+			//m_isMovingEntity = false;
 		}
 	}
 	else if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		m_lastMouseData = sf::Mouse::getPosition(window);
+		if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+		{
+			return;
+		}
 
 		m_gui.onMouseMove(sf::Mouse::getPosition(window));
-
-		switch (m_battle.getCurrentPhase())
-		{
-		case BattlePhase::Deployment:
-		{
-			if (!m_isMovingEntity)
-			{
-				onMouseMoveDeploymentPhase(m_lastMouseData);
-				//m_selectedTile.m_tile = m_shipDeployment.front()->getTileOnMouse(
-				//	m_invalidPosition, m_selectedTile.m_tile, m_battle.getMap());
-				//TODO: Raise info box
-			}
-			break;
-		}
-		case BattlePhase::Movement:
-		{
-			onMouseMoveMovementPhase(m_lastMouseData);
-			break;
-		}
-		case BattlePhase::Attack:
-		{
-			onMouseMoveAttackPhase(m_lastMouseData);
-			break;
-		}
-		}
+		handleMouseMovement(window);
 	}
 }
 
@@ -294,155 +261,181 @@ void BattleUI::clearTargetArea()
 void BattleUI::clearSelectedTile()
 {
 	m_arrowActive = false;
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid())
 	{
-		m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
+		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
 	}
 		
-	m_selectedTile.m_tile = nullptr;
+	m_tileOnClick = nullptr;
 }
 
-//void BattleUI::renderArrow()
-//{
-//	//if (!m_arrowActive || !m_mouseDownTile)
-//	//	return;
-//	//auto directionData = MouseSelection::calculateDirection(m_leftMouseDownPosition, m_lastMouseData);
-//	//if (directionData.first < 20)
-//	//	return;
-//	//int windDirection = static_cast<int>(directionData.y);
-//	//sf::Vector2i pos = m_battle.getMap().getTileScreenPos(m_mouseDownTile->m_tileCoordinate);
-//	//float scale = m_battle.getMap().getDrawScale();
-//	//m_arrowSprite.setPosition({ static_cast<float>
-//	//	(pos.x + (DRAW_OFFSET_X * scale)), static_cast<float>(pos.y + (DRAW_OFFSET_Y * scale)) });
-//	//m_arrowSprite->GetTransformComp().SetRotation(((windDirection * 60) % 360) * M_PI / 180.0f);
-//	//m_arrowSprite->Render(SCREEN_SURFACE);
-//}
-
-void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
+void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 {
-	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	auto& map = m_battle.getMap();
+	if (m_tileOnClick && (m_tileOnClick->m_type == eTileType::eSea || m_tileOnClick->m_type == eTileType::eOcean))
 	{
-		return;
-	}
+		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tileOnClick->m_tileCoordinate);
 
-	const Map& map = m_battle.getMap();
-	const Tile* tileOnMouse = map.getTile(map.getMouseClickCoord(mousePosition));
+		m_tileHighlight.setPosition(sf::Vector2i(
+			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
+			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));
+
+		m_tileHighlight.render(window, map);
+	}
+}
+
+void BattleUI::onLeftClick(sf::RenderWindow & window)
+{
+	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(m_lastMouseData));
 	if (!tileOnMouse)
 	{
 		return;
 	}
 
-	if (!m_selectedTile.m_tile)
+	if (!m_tileOnClick)
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		return;
 	}
 
-	//If new tile is in new position than old tile
-	if (m_selectedTile.m_tile->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
+	if (tileOnMouse->m_tileCoordinate != m_tileOnClick->m_tileCoordinate)
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnPreviousClick = m_tileOnClick;
+		m_tileOnClick = tileOnMouse;
+	}
 
-		//Cannot place ship on existing ship
-		if (tileOnMouse->m_shipOnTile.isValid())
+	m_tileOnClick = tileOnMouse;
+	m_tileOnMouse = tileOnMouse;
+
+	switch (m_battle.getCurrentPhase())
+	{
+	case BattlePhase::Deployment:
+	{
+		m_leftMouseDownPosition = sf::Mouse::getPosition(window);
+		onLeftClickDeploymentPhase();
+		m_mouseSprite.deactivate();
+		break;
+	}
+	case BattlePhase::Movement:
+	{
+		m_leftMouseDownPosition = sf::Mouse::getPosition(window);
+		onLeftClickMovementPhase(m_lastMouseData);
+		break;
+	}
+	case BattlePhase::Attack:
+	{
+		onLeftClickAttackPhase(m_lastMouseData);
+		break;
+	}
+	}
+}
+
+void BattleUI::handleMouseMovement(sf::RenderWindow & window)
+{
+	//Ship selected doesn't match faction currently in play
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid()
+		&& m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
+	{
+		return;
+	}
+
+	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(m_lastMouseData));
+	if (!tileOnMouse)
+	{
+		return;
+	}
+
+	if (!m_tileOnMouse)
+	{
+		m_tileOnMouse = tileOnMouse;
+	}
+
+	//New tile 
+	if (m_tileOnMouse->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
+	{
+		m_tileOnMouse = tileOnMouse;
+
+		switch (m_battle.getCurrentPhase())
 		{
-			m_mouseSprite.setPosition(map.getTileScreenPos(tileOnMouse->m_tileCoordinate), map);
-			m_mouseSprite.activate();
+		case BattlePhase::Deployment:
+		{
+			if (!m_isMovingEntity)
+			{
+				onMouseMoveDeploymentPhase(m_lastMouseData);
+			}
+			break;
 		}
-		
-		//If within spawn area
-		if (m_battle.setShipDeploymentAtPosition(tileOnMouse->m_tileCoordinate))
+		case BattlePhase::Movement:
 		{
-			m_mouseSprite.activate();
+			onMouseMoveMovementPhase(m_lastMouseData);
+			break;
 		}
-		//Outside spawn area
-		else
+		case BattlePhase::Attack:
 		{
-			m_mouseSprite.setPosition(tileOnMouse->m_tileCoordinate, map);
-			m_mouseSprite.activate();
+			onMouseMoveAttackPhase(m_lastMouseData);
+			break;
+		}
 		}
 	}
 }
 
-void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
+void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
-	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	//Only place ship on non occupied tile
+	if (!m_tileOnMouse->m_shipOnTile.isValid())
 	{
-		return;
+		m_battle.setShipDeploymentAtPosition(m_tileOnMouse->m_tileCoordinate);
 	}
 
-	if (m_selectedTile.m_tile && (m_selectedTile.m_tile->m_type == eTileType::eSea || m_selectedTile.m_tile->m_type == eTileType::eOcean))
+	m_mouseSprite.setPosition(m_tileOnMouse->m_tileCoordinate);
+	m_mouseSprite.activate();
+}
+
+void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
+{
+	if ((m_tileOnClick->m_type == eTileType::eSea || m_tileOnClick->m_type == eTileType::eOcean))
 	{
-		if (!m_mouseSprite.isActive() && !m_selectedTile.m_tile->m_shipOnTile.isValid())
+		//If tile isn't already occupied by a ship
+		if (!m_tileOnClick->m_shipOnTile.isValid())
 		{
-			m_mouseSprite.setPosition(m_selectedTile.m_tile->m_tileCoordinate);
-			m_battle.deployFactionShipAtPosition(m_selectedTile.m_tile->m_tileCoordinate, startingDirection);
+			m_mouseSprite.setPosition(m_tileOnClick->m_tileCoordinate);
+			m_battle.deployFactionShipAtPosition(m_tileOnClick->m_tileCoordinate, startingDirection);
 		}
 	}
 }
 
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
-	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
-
-	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() &&  
+		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isMovingToDestination() &&
+		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isDestinationSet())
 	{
-		return;
-	}
-
-	//Current tile selected does not match the current player in play
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid()
-		&& m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
-	{
-		return;
-	}
-
-	//!isMovingToDestination && !reachedDestination
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() &&  
-		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isMovingToDestination() &&
-		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isDestinationSet())
-	{
-		const Tile* tile = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
-		if (!tile)
+		if (m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean)
 		{
-			return;
+			m_battle.generateFactionShipMovementGraph(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+			m_mouseSprite.deactivate();
 		}
-
-		if (m_selectedTile.m_tile->m_tileCoordinate != tile->m_tileCoordinate && !m_mouseDownTile)
-		{
-			if (tile->m_type != eTileType::eSea && tile->m_type != eTileType::eOcean)
-			{
-				m_mouseSprite.setPosition(tile->m_tileCoordinate, m_battle.getMap());
-				m_mouseSprite.activate();
-				m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
-			}
-			else
-			{
-				m_battle.generateFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile, tile->m_tileCoordinate);
-				m_mouseSprite.deactivate();
-			}
-		}
+		else
+		{ 
+			m_mouseSprite.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
+			m_mouseSprite.activate();
+			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
+		}	
 	}
 }
 
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
-{
-	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
+{	
 	
-	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
-	if (!tileOnMouse)
-	{
-		return;
-	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid())
+	if (!m_tileOnClick && m_tileOnMouse->m_shipOnTile.isValid())
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = m_tileOnMouse;
 		if (m_battle.getCurrentPlayerType() != ePlayerType::eAI)
 		{
-			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
+			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
 			//Display the available movement tiles
-			const Ship& ship = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile);
+			const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
 			if (!ship.isDestinationSet())
 			{
 				m_movementArea.newArea(m_battle.getMap(), ship);
@@ -451,63 +444,58 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 		return;
 	}
 
-	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
+	if (!m_tileOnClick && m_tileOnMouse->m_shipOnTile.isValid() &&
+		m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
-		return;
-	}
-
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() &&
-		m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
-	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = m_tileOnMouse;
 		return;
 	}
 
 	//Invalid Location - Collidable tile
-	if (tileOnMouse->m_type != eTileType::eSea && tileOnMouse->m_type != eTileType::eOcean)
+	if (m_tileOnMouse->m_type != eTileType::eSea && m_tileOnMouse->m_type != eTileType::eOcean)
 	{
-		if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
+		if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid())
 		{
-			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
+			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
 		}
 		return;
 	}
 
 	//Do not select killed entity
-	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
+	if (m_tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).isDead())
 	{
 		//TODO: Drop info box
-		m_selectedTile.m_tile = nullptr;
+		m_tileOnClick = nullptr;
 		m_movementArea.clear();
 		return;
 	}
 
 	//Clicking to where entity is moving to
-	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDestinationSet())
+	if (m_tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).isDestinationSet())
 	{
 		//TODO: Drop info box
-		m_selectedTile.m_tile = nullptr;
+		m_tileOnClick = nullptr;
 		m_movementArea.clear();
 		return;
 	}
 
-	if (m_selectedTile.m_tile)
+	if (m_tileOnClick)
 	{
 		//Cancel movement if clicked on same entity
-		if (m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
+		if (m_tileOnClick->m_tileCoordinate == m_tileOnMouse->m_tileCoordinate)
 		{
-			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile);
+			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
 			//TODO: Drop info box
-			m_selectedTile.m_tile = nullptr;
+			m_tileOnClick = nullptr;
 		}
 
 		//Disallow movement to tile occupied by other player
-		else if (tileOnMouse->m_shipOnTile.isValid())
+		else if (m_tileOnMouse->m_shipOnTile.isValid())
 		{
-			m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
-			m_selectedTile.m_tile = tileOnMouse;
+			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
+			m_tileOnClick = m_tileOnMouse;
 
-			const Ship& ship = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile);
+			const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
 			if (ship.getFactionName() == m_battle.getCurrentFaction() && !ship.isDestinationSet())
 			{
 				m_movementArea.newArea(m_battle.getMap(), ship);
@@ -515,41 +503,41 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 		}
 
 		//Store data so Entity can move to new location
-		else if (m_selectedTile.m_tile->m_shipOnTile.isValid() && (m_selectedTile.m_tile->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
-			&& m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
+		else if (m_tileOnClick->m_shipOnTile.isValid() && (m_tileOnClick->m_tileCoordinate != m_tileOnMouse->m_tileCoordinate)
+			&& m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 		{
-			assert(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction());
-			m_mouseDownTile = tileOnMouse;
+			assert(m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction());
+			m_mouseDownTile = m_tileOnMouse;
 			m_isMovingEntity = true;
-			auto test = m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getEndOfMovementPath();
-			if (m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getEndOfMovementPath() == tileOnMouse->m_tileCoordinate)
+			auto test = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getEndOfMovementPath();
+			if (m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getEndOfMovementPath() == m_tileOnMouse->m_tileCoordinate)
 				m_arrowActive = true;
 
-			m_battle.moveFactionShipToPosition(m_selectedTile.m_tile->m_shipOnTile, tileOnMouse->m_tileCoordinate);
-			m_selectedTile.m_tile = nullptr;
+			m_battle.moveFactionShipToPosition(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+			m_tileOnClick = nullptr;
 		}
 	}
 	else
 	{
-		if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
+		if (m_tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).isDead())
 		{
 			//TODO: Drop info box
-			m_selectedTile.m_tile = nullptr;
+			m_tileOnClick = nullptr;
 			m_movementArea.clear();
 		}
 		//Do not select tile that contains wrong players entity
-		if (tileOnMouse->m_shipOnTile.isValid())
+		if (m_tileOnMouse->m_shipOnTile.isValid())
 		{
-			if (m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
+			if (m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 			{
 				//TODO: Drop info box
-				m_selectedTile.m_tile = nullptr;
+				m_tileOnClick = nullptr;
 				m_movementArea.clear();
 			}
 			//Selecting another ship you own
 			else
 			{
-				m_selectedTile.m_tile = tileOnMouse;
+				m_tileOnClick = m_tileOnMouse;
 			}
 		}
 	}
@@ -559,13 +547,13 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 {
 	assert(m_battle.getCurrentPhase() == BattlePhase::Movement);
 	//Cancel selected Entity
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid())
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid())
 	{
-		m_battle.disableFactionShipMovementPath(m_selectedTile.m_tile->m_shipOnTile); 
+		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
 		m_mouseSprite.deactivate();
 	}
 	//TODO: Drop info box
-	m_selectedTile.m_tile = nullptr;
+	m_tileOnClick = nullptr;
 	m_movementArea.clear();
 }
 
@@ -593,26 +581,26 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 	if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		return;
 	}
 
 	//Select new entity that is on same team
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && tileOnMouse->m_shipOnTile.isValid() &&
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && tileOnMouse->m_shipOnTile.isValid() &&
 		(m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()))
 	{
 		if (!m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isWeaponFired())
 		{
 			m_targetArea.clearTargetArea();
 			m_targetArea.generateTargetArea(m_battle, *tileOnMouse);
-			m_selectedTile.m_tile = tileOnMouse;
+			m_tileOnClick = tileOnMouse;
 			return;
 		}
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
+	if (!m_tileOnClick && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		return;
 	}
 
@@ -622,33 +610,33 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 		m_targetArea.clearTargetArea();
 		m_mouseSprite.deactivate();
 		//TODO: Drop info box
-		m_selectedTile.m_tile = nullptr;
+		m_tileOnClick = nullptr;
 		return;
 	}
 
 	//Clicking on the same entity that has been previously selected
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
+	if (m_tileOnClick && m_tileOnClick->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
 	{
 		m_targetArea.clearTargetArea();
 		m_mouseSprite.deactivate();
 		//TODO: Drop info box
-		m_selectedTile.m_tile = nullptr;
+		m_tileOnClick = nullptr;
 		return;
 	}
 
 	//Entity already selected Fire weapon at position
 	//If the selectedTile has an entity on it and that entity hasn't fired
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && 
-		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isWeaponFired())
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && 
+		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired())
 	{
 		//If there is an entity on the tile you're clicking on and that entity's faction name differs from the one of the ship that's firing
 		if ((tileOnMouse->m_shipOnTile.isValid()) && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != 
-			m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName())
+			m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName())
 		{
-			m_battle.fireFactionShipAtPosition(m_selectedTile.m_tile->m_shipOnTile, tileOnMouse->m_shipOnTile, m_targetArea.m_targetArea);
+			m_battle.fireFactionShipAtPosition(m_tileOnClick->m_shipOnTile, tileOnMouse->m_shipOnTile, m_targetArea.m_targetArea);
 		}
 		m_targetArea.clearTargetArea();
-		m_selectedTile.m_tile = nullptr;
+		m_tileOnClick = nullptr;
 		m_mouseSprite.deactivate();
 		return;
 	}
@@ -656,12 +644,12 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	//Entity Already Selected whilst showing where to fire
 	//Change to different Entity before firing
 	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()
-		 && m_selectedTile.m_tile && m_targetArea.m_targetArea.size() > 0)
+		 && m_tileOnClick && m_targetArea.m_targetArea.size() > 0)
 	{
 		m_targetArea.clearTargetArea();
 		m_targetArea.generateTargetArea(m_battle, *tileOnMouse);
 		//TODO: Raise info box
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		return;
 	}
 
@@ -669,21 +657,21 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	//Select new Entity to fire at something
 	if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		return;
 	}
 
-	if (!m_selectedTile.m_tile && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == 
+	if (!m_tileOnClick && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == 
 		m_battle.getCurrentFaction())
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 	}
 
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_shipOnTile.isValid() && 
-		!m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).isWeaponFired() &&
-		m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
+	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && 
+		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired() &&
+		m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 	{
-		m_selectedTile.m_tile = tileOnMouse;
+		m_tileOnClick = tileOnMouse;
 		m_targetArea.generateTargetArea(m_battle, *tileOnMouse);
 	}
 }
@@ -691,23 +679,16 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
 	//TODO: Drop info box
-	m_selectedTile.m_tile = nullptr;
+	m_tileOnClick = nullptr;
 	m_mouseSprite.deactivate();
 	m_targetArea.clearTargetArea();
 }
 
 void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 {
-	assert(m_battle.getCurrentPhase() == BattlePhase::Attack);
-	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
-	if (!tileOnMouse)
-	{
-		return;
-	}
-
-	auto tileCoordinate = tileOnMouse->m_tileCoordinate;
+	auto tileCoordinate = m_tileOnMouse->m_tileCoordinate;
 	//tileOnMouse in new position
-	if (m_selectedTile.m_tile && m_selectedTile.m_tile->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
+	if (m_tileOnClick && m_tileOnClick->m_tileCoordinate != m_tileOnMouse->m_tileCoordinate)
 	{
 		//TODO: this does not work if some of the tiles are nullptr!
 		auto cIter = std::find_if(m_targetArea.m_targetArea.cbegin(), m_targetArea.m_targetArea.cend(),
@@ -720,7 +701,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 		//tileOnMouse within weapon range
 		if (cIter != m_targetArea.m_targetArea.cend())
 		{
-			m_mouseSprite.setPosition(tileOnMouse->m_tileCoordinate, m_battle.getMap());
+			m_mouseSprite.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
 			m_mouseSprite.activate();
 		}
 		//outside weapon range
@@ -734,8 +715,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 void BattleUI::onResetBattle()
 {
 	m_targetArea.onReset();
-	m_selectedTile.m_tile = nullptr;
-	m_selectedTile.m_position = sf::Vector2i(0, 0);
+	m_tileOnClick = nullptr;
 	m_leftMouseDownPosition = sf::Vector2i(0, 0);
 	m_mouseDownTile = nullptr;
 	m_arrowActive = false;
@@ -744,7 +724,7 @@ void BattleUI::onResetBattle()
 
 void BattleUI::onNewTurn()
 {
-	m_selectedTile.m_tile = nullptr;
+	m_tileOnClick = nullptr;
 	m_mouseSprite.deactivate();
 	clearTargetArea();
 	clearSelectedTile();
@@ -766,7 +746,7 @@ void BattleUI::TargetArea::render(sf::RenderWindow& window, const Map& map)
 	{
 		if (i.isActive())
 		{
-			i.render(window);
+			i.render(window, map);
 			//const sf::Vector2i tileTransform = map.getTileScreenPos(i.position);
 
 			//i.sprite.setPosition({
@@ -842,7 +822,6 @@ void BattleUI::TargetArea::generateTargetArea(Battle& battle, const Tile & sourc
 
 		sf::Vector2i tilePos = battle.getMap().getTileScreenPos(m_targetArea[i]->m_tileCoordinate);
 		m_targetAreaGraph[i].setPosition(sf::Vector2i(
-			
 				 tilePos.x + 12 * battle.getMap().getDrawScale(),
 				 tilePos.y + 28 * battle.getMap().getDrawScale()
 			));
@@ -856,6 +835,11 @@ void BattleUI::TargetArea::clearTargetArea()
 {
 	for (auto& i : m_targetAreaGraph)
 	{
+		if (!i.isActive())
+		{
+			break;
+		}
+
 		i.deactivate();
 	}
 }
@@ -864,31 +848,6 @@ void BattleUI::TargetArea::onReset()
 {
 	//m_targetAreaSprites.clear();
 	m_targetArea.clear();
-}
-
-//Current Selected Tile
-BattleUI::SelectedTile::SelectedTile()
-	: m_sprite(Textures::getInstance().m_selectedHex),
-	m_tile(nullptr),
-	m_position()
-{
-	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite.setScale(sf::Vector2f(1.9f, 1.9f));
-	//m_sprite->GetTransformComp().SetScaling({ 1.9f, 1.9f });
-}
-
-void BattleUI::SelectedTile::render(sf::RenderWindow& window, const Map & map)
-{
-	if (m_tile && (m_tile->m_type == eTileType::eSea || m_tile->m_type == eTileType::eOcean))
-	{
-		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tile->m_tileCoordinate);
-
-		m_sprite.setPosition(sf::Vector2i(
-		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) ));
-
-		m_sprite.render(window);
-	}
 }
 
 BattleUI::MovementArea::MovementArea(std::unique_ptr<Texture>& texturePtr, const Map& map)
@@ -915,7 +874,7 @@ void BattleUI::MovementArea::render(sf::RenderWindow& window, const Map& map)
 			float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
 			float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
 			m_movementArea[i].second.setPosition(sf::Vector2i( x, y ));
-			m_movementArea[i].second.render(window);
+			m_movementArea[i].second.render(window, map);
 		}
 	}
 }

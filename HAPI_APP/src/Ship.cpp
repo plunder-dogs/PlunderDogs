@@ -4,6 +4,7 @@
 #include "Textures.h"
 #include "GameEventMessenger.h"
 #include "Battle.h"
+#include <iostream>
 
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 
@@ -77,7 +78,7 @@ int Ship::getID() const
 	return m_ID;
 }
 
-int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
+int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 {
 	posi start = { m_currentPosition, m_currentDirection };
 	posi end = { destination.x, destination.y };
@@ -86,16 +87,16 @@ int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 	{
 		return 0;
 	}
-	disableMovementPath();
+	disableMovementGraph();
 
 	int i = 0;
 	int queueSize = static_cast<int>(pathToTile.size());
 	for (i; i < queueSize; ++i)
 	{
-		auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
-		m_movementGraph[i].setPosition(sf::Vector2i(
-			static_cast<float>(tileScreenPosition.x + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileScreenPosition.y + DRAW_OFFSET_Y * map.getDrawScale()) ));
+		//auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
+		//m_movementGraph[i].setPosition(sf::Vector2i(
+		//	static_cast<float>(tileScreenPosition.x + DRAW_OFFSET_X * map.getDrawScale()),
+		//	static_cast<float>(tileScreenPosition.y + DRAW_OFFSET_Y * map.getDrawScale()) ));
 		m_movementGraph[i].activate();
 		m_movementGraph[i].setPosition(pathToTile.front().pair());
 
@@ -106,7 +107,7 @@ int Ship::generateMovementPath(const Map & map, sf::Vector2i destination)
 	return i;
 }
 
-void Ship::disableMovementPath()
+void Ship::disableMovementGraph()
 {
 	for (auto& i : m_movementGraph)
 	{
@@ -117,6 +118,7 @@ void Ship::disableMovementPath()
 sf::Vector2i Ship::getEndOfMovementPath() const
 {
 	int i = static_cast<int>(m_movementPath.size()) - 1;
+	assert(i > 0);
 	for (i; i > 0; i--)
 	{
 		if (m_movementGraph[i].isActive())
@@ -157,11 +159,11 @@ bool Ship::move(Map& map, sf::Vector2i destination)
 		}
 		else
 		{
-			disableMovementPath();
+			disableMovementGraph();
 			return false;
 		}
 	}
-	disableMovementPath();
+	disableMovementGraph();
 	return true;
 }
 
@@ -184,11 +186,11 @@ bool Ship::move(Map& map, sf::Vector2i destination, eDirection endDirection)
 		}
 		else
 		{
-			disableMovementPath();
+			disableMovementGraph();
 			return false;
 		}
 	}
-	disableMovementPath();
+	disableMovementGraph();
 	return true;
 }
 
@@ -211,7 +213,7 @@ void Ship::takeDamage(int damageAmount)
 		//m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
 		m_isDead = true;
 		m_actionSprite.deactivate();
-		disableMovementPath();
+		disableMovementGraph();
 		
 	}
 }
@@ -243,6 +245,7 @@ void Ship::disableMovementPathNode(sf::Vector2i position, const Map & map)
 		if (i == position)
 		{
 			iter->deactivate(); 
+			break;
 		}
 	}
 }
@@ -296,10 +299,12 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	{
 		i.setTexture(Textures::getInstance().m_spawnHex);
 		i.setScale(sf::Vector2f(0.5f, 0.5f));
+		i.deactivate();
 	}
 	
 	//Action Sprite
 	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
+	m_actionSprite.activate();
 	switch (factionName)
 	{
 	case FactionName::eYellow:
@@ -469,7 +474,7 @@ void Ship::update(float deltaTime, const Map & map)
 			if (m_movementPath.empty())
 			{
 				m_movingToDestination = false;
-				disableMovementPath();
+				disableMovementGraph();
 			}
 		}
 	}
@@ -477,31 +482,28 @@ void Ship::update(float deltaTime, const Map & map)
 
 void Ship::render(sf::RenderWindow& window, const Map & map)
 {
+	//Render Movemnt Graph
 	for (auto& i : m_movementGraph)
 	{
 		if (i.isActive())
 		{
-			const sf::Vector2i tileTransform = map.getTileScreenPos(i.getPosition());
-			float scale = map.getDrawScale();
-		
-			i.setPosition(sf::Vector2i(
-				static_cast<float>(tileTransform.x + DRAW_OFFSET_X * scale),
-				static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * scale) ));
-			//i.m_sprite.GetTransformComp().SetScaling({ 0.5f, 0.5f });
-			i.render(window);
+			i.render(window, map);
+		}
+		else
+		{
+			break;
 		}
 	}
 
-	//Set sprite position to current position
+	//Render Ship
 	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
-
 	m_sprite.setPosition(sf::Vector2i(
 		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * scale),
 		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * scale) ));
 	m_sprite.setScale({ scale / 2, scale / 2 });
-
 	m_sprite.render(window);
+
 	m_actionSprite.render(window, map);
 }
 

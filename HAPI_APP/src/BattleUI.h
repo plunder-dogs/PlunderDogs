@@ -10,8 +10,8 @@
 constexpr int MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA_GRAPH = 50;
 
-class Ship;
 struct Tile;
+class Ship;
 class Battle;
 class Map;
 class BattleUI
@@ -52,21 +52,6 @@ class BattleUI
 		std::vector<const Tile*> m_targetArea;
 	};
 
-	struct SelectedTile	
-	{
-		SelectedTile();
-		SelectedTile(const SelectedTile&) = delete;
-		SelectedTile& operator=(const SelectedTile&) = delete;
-		SelectedTile(SelectedTile&&) = delete;
-		SelectedTile&& operator=(SelectedTile&&) = delete;
-
-		void render(sf::RenderWindow& window, const Map& map);
-
-		Sprite m_sprite;
-		const Tile* m_tile;
-		sf::Vector2i m_position;
-	};
-
 public:
 	BattleUI(Battle& battles);
 	BattleUI(const BattleUI&) = delete;
@@ -95,7 +80,10 @@ public:
 
 private:
 	Battle& m_battle;
-	SelectedTile m_selectedTile;
+	const Tile* m_tileOnPreviousClick;
+	const Tile* m_tileOnClick;
+	const Tile* m_tileOnMouse;
+	Sprite m_tileHighlight;
 	//This stores the position at which the mouse event "eLeftMouseButtonDown" last occured while giving an entity a move command, 
 	//it's used to calculate what direction the mouse moved during that input.
 	sf::Vector2i m_leftMouseDownPosition;
@@ -112,22 +100,26 @@ private:
 	sf::Sprite m_arrowSprite;
 	BattleGUI m_gui;
 
-	//void renderArrow() const;
+	void renderTileHighlight(sf::RenderWindow& window);
+
+	void onLeftClick(sf::RenderWindow& window);
+	void handleMouseMovement(sf::RenderWindow& window);
 
 	//Deployment Phase
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
 
 	//Movement Phase
-	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
+	void onMouseMoveMovementPhase( sf::Vector2i mousePosition);
 	void onLeftClickMovementPhase(sf::Vector2i mousePosition);
 	void onRightClickMovementPhase(sf::Vector2i mousePosition);
 	MovementArea m_movementArea;
 
 	//Attack Phase
+	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	void onRightClickAttackPhase(sf::Vector2i mousePosition);
-	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
+
 	TargetArea m_targetArea;
 
 	void onResetBattle();

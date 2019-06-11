@@ -33,8 +33,8 @@ struct Faction
 	//Movement Phase
 	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination);
 	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection);
-	void generateShipMovementPath(const Map& map, int shipID, sf::Vector2i destination);
-	void disableShipMovementPath(int shipID);
+	void generateShipMovementGraph(const Map& map, int shipID, sf::Vector2i destination);
+	void disableShipMovementGraph(int shipID);
 	//Attack Phase
 	void shipTakeDamage(int shipID, int damage);
 	

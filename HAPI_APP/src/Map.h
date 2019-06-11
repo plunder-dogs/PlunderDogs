@@ -8,7 +8,6 @@
 
 struct ShipOnTile
 {
-
 	ShipOnTile()
 		: factionName(),
 		shipID(INVALID_SHIP_ID)
@@ -39,6 +38,16 @@ struct Tile
 	ShipOnTile m_shipOnTile;
 	Sprite m_sprite;
 	const sf::Vector2i m_tileCoordinate;
+
+	//bool isShipOnTile() const
+	//{
+	//	return 
+	//}
+
+	//void clearShipOnTile()
+	//{
+	//	m_shipOnTile.shipID = INVALID_SHIP_ID;
+	//}
 
 	Tile(std::unique_ptr<Texture>& dayTexture,
 						sf::Vector2i coord, int tileID) :

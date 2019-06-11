@@ -162,16 +162,16 @@ bool Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination,
 	return m_ships[shipID].move(map, destination, endDirection);
 }
 
-void Faction::generateShipMovementPath(const Map & map, int shipID, sf::Vector2i destination)
+void Faction::generateShipMovementGraph(const Map & map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].generateMovementPath(map, destination);
+	m_ships[shipID].generateMovementGraph(map, destination);
 }
 
-void Faction::disableShipMovementPath(int shipID)
+void Faction::disableShipMovementGraph(int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].disableMovementPath();
+	m_ships[shipID].disableMovementGraph();
 }
 
 SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)

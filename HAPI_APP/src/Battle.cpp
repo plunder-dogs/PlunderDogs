@@ -343,16 +343,16 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i desti
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, destination, endDirection);
 }
 
-void Battle::disableFactionShipMovementPath(ShipOnTile shipOnTile)
+void Battle::disableFactionShipMovementGraph(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).disableShipMovementPath(shipOnTile.shipID);
+	getFaction(shipOnTile.factionName).disableShipMovementGraph(shipOnTile.shipID);
 }
 
-void Battle::generateFactionShipMovementPath(ShipOnTile shipOnTile, sf::Vector2i destination)
+void Battle::generateFactionShipMovementGraph(ShipOnTile shipOnTile, sf::Vector2i destination)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).generateShipMovementPath(m_map, shipOnTile.shipID, destination);
+	getFaction(shipOnTile.factionName).generateShipMovementGraph(m_map, shipOnTile.shipID, destination);
 }
 
 void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)

@@ -388,6 +388,7 @@ sf::Vector2i Map::getMouseClickCoord(sf::Vector2i mouseCoord) const
 			}
 		}
 	}
+
 	return closestTile;
 }
 

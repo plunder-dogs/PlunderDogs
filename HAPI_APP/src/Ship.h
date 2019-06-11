@@ -46,8 +46,8 @@ public:
 	//Deployment Phase
 	void setDeploymentPosition(sf::Vector2i position);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
-	int generateMovementPath(const Map& map, sf::Vector2i destination);
-	void disableMovementPath();
+	int generateMovementGraph(const Map& map, sf::Vector2i destination);
+	void disableMovementGraph();
 	//Movement Phase
 	bool move(Map& map, sf::Vector2i destination);
 	bool move(Map& map, sf::Vector2i destination, eDirection endDirection);
