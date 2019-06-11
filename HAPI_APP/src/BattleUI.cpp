@@ -295,7 +295,6 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 	if (!m_tileOnClick)
 	{
 		m_tileOnClick = tileOnMouse;
-		return;
 	}
 
 	if (tileOnMouse->m_tileCoordinate != m_tileOnClick->m_tileCoordinate)
@@ -426,23 +425,30 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {	
-	
-
-	if (!m_tileOnClick && m_tileOnMouse->m_shipOnTile.isValid())
+	//On first click
+	if (!m_tileOnPreviousClick)
 	{
-		m_tileOnClick = m_tileOnMouse;
-		if (m_battle.getCurrentPlayerType() != ePlayerType::eAI)
+		const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
+		if (!ship.isDestinationSet())
 		{
-			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
-			//Display the available movement tiles
-			const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
-			if (!ship.isDestinationSet())
-			{
-				m_movementArea.newArea(m_battle.getMap(), ship);
-			}
+			m_movementArea.newArea(m_battle.getMap(), ship);
+			return;
 		}
-		return;
 	}
+
+	//if (!m_tileOnClick && m_tileOnMouse->m_shipOnTile.isValid())
+	//{
+	//	m_tileOnClick = m_tileOnMouse;
+	//	m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
+	//	//Display the available movement tiles
+	//	const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
+	//	if (!ship.isDestinationSet())
+	//	{
+	//		m_movementArea.newArea(m_battle.getMap(), ship);
+	//	}
+	//	
+	//	return;
+	//}
 
 	if (!m_tileOnClick && m_tileOnMouse->m_shipOnTile.isValid() &&
 		m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
@@ -874,7 +880,7 @@ void BattleUI::MovementArea::render(sf::RenderWindow& window, const Map& map)
 			float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
 			float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
 			m_movementArea[i].second.setPosition(sf::Vector2i( x, y ));
-			m_movementArea[i].second.render(window, map);
+			m_movementArea[i].second.render(window);
 		}
 	}
 }
