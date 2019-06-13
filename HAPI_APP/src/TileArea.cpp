@@ -4,7 +4,7 @@
 #include <assert.h>
 
 TileArea::TileArea(size_t maxTileAreaSize)
-	: m_displayGraph(false),
+	: m_display(false),
 	m_tileAreaGraph(),
 	m_tileArea()
 {
@@ -13,7 +13,7 @@ TileArea::TileArea(size_t maxTileAreaSize)
 }
 
 TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, const Map& map)
-	: m_displayGraph(false),
+	: m_display(false),
 	m_tileAreaGraph(),
 	m_tileArea()
 {
@@ -27,16 +27,11 @@ TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, co
 	}
 }
 
-void TileArea::fillGraph(const Texture & texture)
-{
-
-}
-
 void TileArea::render(sf::RenderWindow & window, const Map & map)
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
-	if (m_displayGraph)
+	if (m_display)
 	{
 		float scale = map.getDrawScale();
 		for (int i = 0; i < m_tileArea.size(); i++)
@@ -53,5 +48,5 @@ void TileArea::render(sf::RenderWindow & window, const Map & map)
 void TileArea::clearTileArea()
 {
 	m_tileArea.clear();
-	m_displayGraph = false;
+	m_display = false;
 }

@@ -479,6 +479,14 @@ void Battle::nextTurn()
 			switchToBattlePhase(BattlePhase::Movement);
 			m_currentFactionTurn = 0;
 
+			for (auto& faction : m_factions)
+			{
+				if (faction)
+				{
+					faction->clearSpawnArea();
+				}
+			}
+
 			for (auto& ship : m_factions[m_currentFactionTurn]->m_ships)
 			{
 				ship.enableAction();

@@ -44,6 +44,8 @@ struct Tile
 		m_sprite.setFrameID(tileID);
 	}
 
+	bool isShipOnTile() const { return m_shipOnTile.isValid(); }
+
 	const enum eTileType m_type;
 	ShipOnTile m_shipOnTile;
 	Sprite m_sprite;

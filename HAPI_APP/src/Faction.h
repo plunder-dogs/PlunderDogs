@@ -3,8 +3,6 @@
 #include "Ship.h"
 #include "TileArea.h"
 
-constexpr size_t MAX_SHIPS_ALLOWED = 6;
-
 struct Faction
 {
 	Faction(FactionName factionName, ePlayerType playerType);
@@ -13,7 +11,7 @@ struct Faction
 
 	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase);
 	bool isEliminated() const;
-
+	void clearSpawnArea();
 	//Deployment Phase
 	void addShip(FactionName factionName, eShipType shipType);
 	bool isAllShipsDeployed() const;

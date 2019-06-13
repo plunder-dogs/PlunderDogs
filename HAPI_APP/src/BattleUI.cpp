@@ -202,7 +202,7 @@ void BattleUI::generateTargetArea(const Tile & source)
 void BattleUI::generateMovementArea(const Ship & ship)
 {
 	m_movementArea.clearTileArea();
-	m_movementArea.m_displayGraph = true;
+	m_movementArea.m_display = true;
 
 	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
 	BFS::findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
@@ -244,6 +244,7 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 		m_tileOnMouse = tileOnMouse;
 	}
 
+	//if(m_tileOnClick->m_shipOnTile.isValid() && )
 	//Back out when selecting a destroyed ship?
 	//Back out when selecting an enemy ship?
 

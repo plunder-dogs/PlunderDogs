@@ -4,6 +4,7 @@
 #include "Map.h"
 
 constexpr size_t MAX_SPAWN_AREA = 75;
+constexpr size_t MAX_SHIPS = 6;
 
 //BATTLE PLAYER
 Faction::Faction(FactionName factionName, ePlayerType playerType)
@@ -12,7 +13,7 @@ Faction::Faction(FactionName factionName, ePlayerType playerType)
 	m_playerType(playerType),
 	m_spawnArea(MAX_SPAWN_AREA)
 {
-	m_ships.reserve(size_t(6));
+	m_ships.reserve(size_t(MAX_SHIPS));
 }
 
 const Ship & Faction::getShip(int shipID) const
@@ -152,6 +153,12 @@ bool Faction::isEliminated() const
 	}
 
 	return allShipsDestroyed;
+}
+
+void Faction::clearSpawnArea()
+{
+	m_spawnArea.m_tileAreaGraph.clear();
+	m_spawnArea.m_tileArea.clear();
 }
 
 void Faction::shipTakeDamage(int shipID, int damage)
