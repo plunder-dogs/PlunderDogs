@@ -8,6 +8,7 @@
 #include <queue>
 #include "Sprite.h"
 #include <array>
+#include "TileArea.h"
 
 constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
 
@@ -19,6 +20,7 @@ class Ship
 public:
 	Ship(FactionName playerName, eShipType shipType, int ID);
 	Ship(Ship& orig);
+	~Ship();
 
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
@@ -39,7 +41,6 @@ public:
 	void update(float deltaTime, const Map& map);
 	void render(sf::RenderWindow& window, const Map& map);
 	void setDestination();
-	void onNewTurn();
 	void enableAction();
 	void disableAction();
 
@@ -81,4 +82,5 @@ private:
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementPathNode(sf::Vector2i position, const Map& map);
 	void handleRotation();
+	void onNewBattlePhase();
 };

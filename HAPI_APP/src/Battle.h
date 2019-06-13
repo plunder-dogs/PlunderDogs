@@ -17,18 +17,18 @@ class Battle
 
 	struct Particle
 	{
+		Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale);
+		void setPosition(sf::Vector2i position);
+		void update(float deltaTime, const Map& map);
+		void render(sf::RenderWindow& window);
+		void orient(eDirection direction);
+
 		sf::Vector2i m_position;
 		Timer m_lifeSpan;
 		Sprite m_sprite;
 		int m_frameNum = 0;
 		bool m_isEmitting;
 		const float m_scale;
-
-		Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale);
-		void setPosition(sf::Vector2i position);
-		void update(float deltaTime, const Map& map);
-		void render(sf::RenderWindow& window);
-		void orient(eDirection direction);
 	};
 
 public:
@@ -54,7 +54,7 @@ public:
 
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
-	bool setShipDeploymentAtPosition(sf::Vector2i position);
+	void setShipDeploymentAtPosition(sf::Vector2i position);
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination, eDirection endDirection);
@@ -84,7 +84,6 @@ private:
 	void playExplosionAnimation(sf::Vector2i position);
 	void nextTurn();
 	void switchToBattlePhase(BattlePhase newBattlePhase);
-	void notifyPlayersOnNewTurn();
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
@@ -94,7 +93,6 @@ private:
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
 
-	void onResetBattle();
 	void onEndMovementPhaseEarly();
 	void onEndAttackPhaseEarly();
 };

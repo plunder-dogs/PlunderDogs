@@ -3,12 +3,14 @@
 #include "Textures.h"
 #include "Map.h"
 
+constexpr size_t MAX_SPAWN_AREA = 75;
+
 //BATTLE PLAYER
-Faction::Faction(FactionName name, ePlayerType playerType)
+Faction::Faction(FactionName factionName, ePlayerType playerType)
 	: m_ships(),
-	m_factionName(name),
+	m_factionName(factionName),
 	m_playerType(playerType),
-	m_spawnArea()
+	m_spawnArea(MAX_SPAWN_AREA)
 {
 	m_ships.reserve(size_t(6));
 }
@@ -21,7 +23,7 @@ const Ship & Faction::getShip(int shipID) const
 
 void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase)
 {
-	for (auto& spawnArea : m_spawnArea)
+	for (auto& spawnArea : m_spawnArea.m_tileAreaGraph)
 	{
 		spawnArea.render(window, map);
 	}
@@ -73,19 +75,37 @@ bool Faction::isAllShipsDeployed() const
 
 void Faction::createSpawnArea(Map & map)
 {
-	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 3, true, true);
-	m_spawnArea.reserve(tileRadius.size());
-	for (const auto& tile : tileRadius)
+	const Texture* texture = nullptr;
+	switch (m_factionName)
 	{
-		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate);
+	case eYellow:
+		texture = Textures::getInstance().m_yellowSpawnHex.get();
+		break;
+	case eBlue:
+		texture = Textures::getInstance().m_blueSpawnHex.get();
+		break;
+	case eGreen:
+		texture = Textures::getInstance().m_greenSpawnHex.get();
+		break;
+	case eRed:
+		texture = Textures::getInstance().m_redSpawnHex.get();
+		break;
+	};
+
+	assert(texture);
+	map.getTileRadius(m_spawnArea.m_tileArea, map.getRandomSpawnPosition(), 3, true, true);
+	for (const auto& tile : m_spawnArea.m_tileArea)
+	{
+		m_spawnArea.m_tileAreaGraph.emplace_back(*texture, tile->m_tileCoordinate, true);
+		m_spawnArea.m_tileAreaGraph.back().setScale(sf::Vector2f(2.0f, 2.0f));
 	}
 }
 
 bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
 {
-	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
-		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
-	if (cIter != m_spawnArea.cend())
+	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
+		[startingPosition](const auto& tile) { return startingPosition == tile->m_tileCoordinate; });
+	if (cIter != m_spawnArea.m_tileArea.cend())
 	{
 		for (auto& ship : m_ships)
 		{
@@ -105,10 +125,10 @@ bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDir
 	}
 }
 
-bool Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
+void Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 {
-	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
-		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
+	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
+		[startingPosition](const auto& tile) { return startingPosition == tile->m_tileCoordinate; });
 	for (auto& ship : m_ships)
 	{
 		if (!ship.isDeployed())
@@ -116,16 +136,6 @@ bool Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 			ship.setDeploymentPosition(startingPosition);
 			break;
 		}
-	}
-
-	return cIter != m_spawnArea.end();
-}
-
-void Faction::onNewTurn()
-{
-	for (auto& ship : m_ships)
-	{
-		ship.onNewTurn();
 	}
 }
 
@@ -172,33 +182,4 @@ void Faction::disableShipMovementGraph(int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].disableMovementGraph();
-}
-
-SpawnNode::SpawnNode(FactionName factionName, sf::Vector2i position)
-	: m_position(position),
-	m_sprite()
-{
-	switch (factionName)
-	{
-	case eYellow:
-		m_sprite.setTexture(Textures::getInstance().m_yellowSpawnHex);
-		break;
-	case eBlue:
-		m_sprite.setTexture(Textures::getInstance().m_blueSpawnHex);
-		break;
-	case eGreen:
-		m_sprite.setTexture(Textures::getInstance().m_greenSpawnHex);
-		break;
-	case eRed:
-		m_sprite.setTexture(Textures::getInstance().m_redSpawnHex);
-		break;
-	};
-
-	m_sprite.setScale(sf::Vector2f(2.f, 2.f));
-	//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-}
-
-void SpawnNode::render(sf::RenderWindow& window, const Map & map)
-{
-	m_sprite.render(window, map, m_position);
 }

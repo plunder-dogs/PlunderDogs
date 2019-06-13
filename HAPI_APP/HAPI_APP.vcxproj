@@ -186,6 +186,7 @@
     <ClCompile Include="src\BFS.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Textures.cpp" />
+    <ClCompile Include="src\TileArea.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Utilities\Base64.cpp" />
     <ClCompile Include="src\Utilities\XMLParser.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="src\MouseSelection.h" />
     <ClInclude Include="src\BFS.h" />
     <ClInclude Include="src\Textures.h" />
+    <ClInclude Include="src\TileArea.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Utilities\Base64.h" />
     <ClInclude Include="src\Utilities\XMLParser.h" />

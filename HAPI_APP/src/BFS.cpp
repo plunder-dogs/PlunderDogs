@@ -236,6 +236,40 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 	return allowedArea;
 }
 
+void BFS::findArea(std::vector<const Tile*>& tileArea, const Map& map, posi startPos, float maxMovement)
+{
+	//No bullshit
+	if (!map.getTile(startPos))
+	{
+		return;
+	}
+	
+	//Initialise variables
+	boolMap exploreArea(map);
+	std::queue<std::pair<posi, float>> exploreQueue;
+	//Add first element and set it to explored
+	exploreQueue.emplace(startPos, maxMovement);
+	exploreArea.access(startPos).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
+	//Start recursion
+	int areaSize{ 1 };
+	const eDirection windDir = { map.getWindDirection() };
+	const float windStr = { map.getWindStrength() };
+	while (!exploreQueue.empty())
+	{
+		if (areaExplorer(exploreArea, exploreQueue, windDir, windStr))
+			areaSize++;
+	}
+
+	//Iterate through exploreArea and pushback to the return vector
+	for (int i = 0; i < exploreArea.data.size(); i++)
+	{
+		if (exploreArea.data[i].encountered())
+		{
+			tileArea.push_back(map.getTile(posi(i % exploreArea.width, i / exploreArea.width)));
+		}
+	}
+}
+
 finderMap::finderMap(const Map& map) : width(map.getDimensions().x)
 {
 	data.reserve(map.getDimensions().x * map.getDimensions().y);

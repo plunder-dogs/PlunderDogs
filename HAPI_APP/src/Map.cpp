@@ -58,11 +58,6 @@ void Map::drawMap(sf::RenderWindow& window)
 	}
 }
 
-Map::~Map()
-{
-	GameEventMessenger::getInstance().unsubscribe("Map", GameEvent::eResetBattle);
-}
-
 sf::Vector2i Map::offsetToCube(sf::Vector2i offset) const
 {
 	int cubeX = offset.x;
@@ -143,137 +138,7 @@ Tile* Map::getTile(sf::Vector2i coordinate)
 	return nullptr;
 }
 
-std::vector<Tile*> Map::getAdjacentTiles(sf::Vector2i coord)
-{
-	const size_t allAdjacentTiles = 6;
-	std::vector<Tile*> result;
-	result.reserve(size_t(allAdjacentTiles));
-	if (coord.x & 1)//Is an odd tile
-	{
-		result.push_back(getTile(sf::Vector2i(coord.x, coord.y - 1)));		//N
-		result.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y - 1)));	//NE
-		result.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y)));		//SE
-		result.push_back(getTile(sf::Vector2i(coord.x, coord.y + 1)));		//S
-		result.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y)));		//SW
-		result.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y - 1)));	//NW
-	}
-	else//Is even
-	{
-		result.push_back(getTile(sf::Vector2i(coord.x, coord.y - 1)));		//N
-		result.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y)));		//NE
-		result.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y + 1)));	//SE
-		result.push_back(getTile(sf::Vector2i(coord.x, coord.y + 1)));		//S
-		result.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y + 1)));	//SW
-		result.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y)));		//NW
-	}
-	return result;
-}
-
-std::vector<Tile*> Map::getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource)
-{
-	assert(range > 1);
-
-	int reserveSize{ 0 };
-	if (includeSource)
-		reserveSize++;
-	for (int i = 1; i <= range; i++)
-	{
-		reserveSize += 6 * i;
-	}
-	std::vector<Tile*> tileStore;
-	tileStore.reserve((size_t)reserveSize);
-	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && (getTile(coord)->m_type == eSea || getTile(coord)->m_type == eOcean)))
-	{
-		tileStore.push_back(getTile(coord));
-	}
-	
-	sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range);
-		y < std::min(m_mapDimensions.y, coord.y + range + 1);
-		y++)
-	{
-		for (int x = std::max(0, coord.x - range);
-			x < std::min(m_mapDimensions.x, coord.x + range + 1);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) <= range)
-				{
-					Tile* pushBackTile = getTile(sf::Vector2i(x, y));
-					if (!pushBackTile)
-						continue;
-					if (avoidInvalid)
-					{
-						if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
-						{
-							tileStore.push_back(getTile(sf::Vector2i(x, y)));
-						}
-					}
-					else
-					{
-						tileStore.push_back(getTile(sf::Vector2i(x, y)));
-					}
-				}
-			}
-		}
-	}
-	return tileStore;
-}
-
-std::vector<Tile*> Map::getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid)
-{
-	assert(range > 1);
-
-	int reserveSize{ 0 };
-	for (int i = 2; i < range + 2; i++)
-	{
-		reserveSize += 2 * i;
-	}
-	std::vector<Tile*> tileStore;
-	tileStore.reserve((size_t)reserveSize);
-
-	const sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range - 1);
-		y < std::min(m_mapDimensions.y, coord.y + range + 2);
-		y++)
-	{
-		for (int x = std::max(0, coord.x - range - 1);
-			x < std::min(m_mapDimensions.x, coord.x + range + 2);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				sf::Vector2i tempCube(offsetToCube(sf::Vector2i(x, y)));
-				if (cubeDistance(cubeCoord, tempCube) <= range)
-				{
-					if (inCone(cubeCoord, tempCube, direction))
-					{
-						Tile* pushBackTile = getTile(sf::Vector2i(x, y));
-						if (!pushBackTile)
-							continue;
-						if (avoidInvalid)
-						{
-							if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
-							{
-								tileStore.push_back(getTile(sf::Vector2i(x, y)));
-							}
-						}
-						else
-						{
-							tileStore.push_back(getTile(sf::Vector2i(x, y)));
-						}
-					}
-				}
-			}
-		}
-	}
-	return tileStore;
-}
-
-std::vector<const Tile*> Map::cGetTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
+std::vector<const Tile*> Map::getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
 	assert(range > 1);
 
@@ -322,6 +187,48 @@ std::vector<const Tile*> Map::cGetTileCone(sf::Vector2i coord, int range, eDirec
 		}
 	}
 	return tileStore;
+}
+
+void Map::getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
+{
+	assert(range > 1);
+
+	const sf::Vector2i cubeCoord(offsetToCube(coord));
+
+	for (int y = std::max(0, coord.y - range - 1);
+		y < std::min(m_mapDimensions.y, coord.y + range + 2);
+		y++)
+	{
+		for (int x = std::max(0, coord.x - range - 1);
+			x < std::min(m_mapDimensions.x, coord.x + range + 2);
+			x++)
+		{
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
+			{
+				sf::Vector2i tempCube(offsetToCube(sf::Vector2i(x, y)));
+				if (cubeDistance(cubeCoord, tempCube) <= range)
+				{
+					if (inCone(cubeCoord, tempCube, direction))
+					{
+						const Tile* pushBackTile = getTile(sf::Vector2i(x, y));
+						if (!pushBackTile)
+							continue;
+						if (avoidInvalid)
+						{
+							if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
+							{
+								tileArea.push_back(getTile(sf::Vector2i(x, y)));
+							}
+						}
+						else
+						{
+							tileArea.push_back(getTile(sf::Vector2i(x, y)));
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 bool Map::updateShipOnTile(ShipOnTile ship, sf::Vector2i currentPosition, sf::Vector2i newPosition)
@@ -395,6 +302,7 @@ sf::Vector2i Map::getMouseClickCoord(sf::Vector2i mouseCoord) const
 void Map::loadmap(const std::string & mapName)
 {
 	assert(!mapName.empty());
+	assert(m_data.empty());
 
 	//Load in Map Details
 	MapDetails mapDetails = XMLParser::parseMapDetails(mapName);
@@ -428,21 +336,7 @@ Map::Map() :
 	m_windDirection(eNorth),
 	m_windStrength(WIND_STRENGTH),
 	m_drawScale(2)
-{
-	GameEventMessenger::getInstance().subscribe(std::bind(&Map::onReset, this), "Map", GameEvent::eResetBattle);
-}
-
-void Map::onReset()
-{
-	m_data.clear();
-	m_mapDimensions = sf::Vector2i(0, 0);
-	m_drawOffset = sf::Vector2i(10, 60);
-	m_drawScale = 2;
-
-	m_windDirection = eNorth;
-	m_windStrength = 0.3f;
-	m_spawnPositions.clear();
-}
+{}
 
 const Tile * Map::getTile(sf::Vector2i coordinate) const
 {
@@ -490,7 +384,7 @@ if (coordinate.x < m_mapDimensions.x &&
 return nullptr;
 }
 
-std::vector<const Tile*> Map::cGetAdjacentTiles(sf::Vector2i coord) const
+std::vector<const Tile*> Map::getAdjacentTiles(sf::Vector2i coord) const
 {
 	const size_t allAdjacentTiles = 6;
 	std::vector<const Tile*> result;
@@ -516,7 +410,29 @@ std::vector<const Tile*> Map::cGetAdjacentTiles(sf::Vector2i coord) const
 	return result;
 }
 
-std::vector<const Tile*> Map::cGetTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
+void Map::getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const
+{
+	if (coord.x & 1)//Is an odd tile
+	{
+		tileArea.push_back(getTile(sf::Vector2i(coord.x, coord.y - 1)));		//N
+		tileArea.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y - 1)));	//NE
+		tileArea.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y)));		//SE
+		tileArea.push_back(getTile(sf::Vector2i(coord.x, coord.y + 1)));		//S
+		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y)));		//SW
+		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y - 1)));	//NW
+	}
+	else//Is even
+	{
+		tileArea.push_back(getTile(sf::Vector2i(coord.x, coord.y - 1)));		//N
+		tileArea.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y)));		//NE
+		tileArea.push_back(getTile(sf::Vector2i(coord.x + 1, coord.y + 1)));	//SE
+		tileArea.push_back(getTile(sf::Vector2i(coord.x, coord.y + 1)));		//S
+		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y + 1)));	//SW
+		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y)));		//NW
+	}
+}
+
+std::vector<const Tile*> Map::getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
 	int reserveSize{ 0 };
 	if (includeSource)
@@ -567,30 +483,50 @@ std::vector<const Tile*> Map::cGetTileRadius(sf::Vector2i coord, int range, bool
 	return tileStore;
 }
 
-std::vector<Tile*> Map::getTileLine(
-	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid)
+void Map::getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
-	std::vector<Tile*> tileStore;
-	tileStore.reserve(range);
-	Tile* pushBackTile{ getTile(coord) };
-	for (int i = 0; i < range; i++)
+	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && (getTile(coord)->m_type == eSea || getTile(coord)->m_type == eOcean)))
 	{
-		if (!pushBackTile)
-			continue;
-		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[direction];
-		//If avoidInvalid stop the line if a mountain or Mesa is encountered
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eMountain || pushBackTile->m_type == eMesa))
-			break;
-		//If avoidInvalid skip if the tile is an entity or not water
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type != eSea && pushBackTile->m_type != eOcean))
-			continue;
-		tileStore.emplace_back(pushBackTile);
+		tileArea.push_back(getTile(coord));
 	}
-	return tileStore;
+
+	sf::Vector2i cubeCoord(offsetToCube(coord));
+
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
+		y++)
+	{
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
+			x++)
+		{
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
+			{
+				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) <= range)
+				{
+					const Tile* pushBackTile = getTile(sf::Vector2i(x, y));
+					if (!pushBackTile)
+						continue;
+					if (avoidInvalid)
+					{
+						if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
+						{
+							tileArea.push_back(getTile(sf::Vector2i(x, y)));
+						}
+					}
+					else
+					{
+						tileArea.push_back(getTile(sf::Vector2i(x, y)));
+					}
+				}
+			}
+		}
+	}
 }
 
-std::vector<const Tile*> Map::cGetTileLine(
-	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid)const
+
+std::vector<const Tile*> Map::getTileLine(
+	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
 	std::vector<const Tile*> tileStore;
 	tileStore.reserve(range);
@@ -599,7 +535,7 @@ std::vector<const Tile*> Map::cGetTileLine(
 	{
 		if (!pushBackTile)
 			continue;
-		pushBackTile = cGetAdjacentTiles(pushBackTile->m_tileCoordinate)[direction]; 
+		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[direction]; 
 		//If avoidInvalid stop the line if a mountain or Mesa is encountered
 		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eMountain || pushBackTile->m_type == eMesa))
 			break;
@@ -611,34 +547,25 @@ std::vector<const Tile*> Map::cGetTileLine(
 	return tileStore;
 }
 
-std::vector<Tile*> Map::getTileRing(sf::Vector2i coord, int range)
+void Map::getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
-	std::vector<Tile*> tileStore;
-	tileStore.reserve(6 * range);
-
-	sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range);
-		y < std::min(m_mapDimensions.y, coord.y + range + 1);
-		y++)
+	const Tile* pushBackTile{ getTile(coord) };
+	for (int i = 0; i < range; i++)
 	{
-		for (int x = std::max(0, coord.x - range);
-			x < std::min(m_mapDimensions.x, coord.x + range + 1);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) == range)
-				{
-					tileStore.push_back(getTile(sf::Vector2i(x, y)));
-				}
-			}
-		}
+		if (!pushBackTile)
+			continue;
+		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[direction];
+		//If avoidInvalid stop the line if a mountain or Mesa is encountered
+		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eMountain || pushBackTile->m_type == eMesa))
+			break;
+		//If avoidInvalid skip if the tile is not water
+		if (avoidInvalid && pushBackTile && (pushBackTile->m_type != eSea && pushBackTile->m_type != eOcean))
+			continue;
+		tileArea.push_back(pushBackTile);
 	}
-	return tileStore;
 }
 
-std::vector<const Tile*> Map::cGetTileRing(sf::Vector2i coord, int range) const
+std::vector<const Tile*> Map::getTileRing(sf::Vector2i coord, int range) const
 {
 	std::vector<const Tile*> tileStore;
 	tileStore.reserve(6 * range);
@@ -663,6 +590,29 @@ std::vector<const Tile*> Map::cGetTileRing(sf::Vector2i coord, int range) const
 		}
 	}
 	return tileStore;
+}
+
+void Map::getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const
+{
+	sf::Vector2i cubeCoord(offsetToCube(coord));
+
+	for (int y = std::max(0, coord.y - range);
+		y < std::min(m_mapDimensions.y, coord.y + range + 1);
+		y++)
+	{
+		for (int x = std::max(0, coord.x - range);
+			x < std::min(m_mapDimensions.x, coord.x + range + 1);
+			x++)
+		{
+			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
+			{
+				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) == range)
+				{
+					tileArea.push_back(getTile(sf::Vector2i(x, y)));
+				}
+			}
+		}
+	}
 }
 
 sf::Vector2i Map::getRandomSpawnPosition()

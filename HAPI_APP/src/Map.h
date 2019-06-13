@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <SFML/Graphics.hpp>
-#include "global.h"
+#include "Global.h"
 #include "Sprite.h"
 
 struct ShipOnTile
@@ -34,23 +34,8 @@ struct ShipOnTile
 class Ship;
 struct Tile
 {
-	const enum eTileType m_type;
-	ShipOnTile m_shipOnTile;
-	Sprite m_sprite;
-	const sf::Vector2i m_tileCoordinate;
-
-	//bool isShipOnTile() const
-	//{
-	//	return 
-	//}
-
-	//void clearShipOnTile()
-	//{
-	//	m_shipOnTile.shipID = INVALID_SHIP_ID;
-	//}
-
 	Tile(std::unique_ptr<Texture>& dayTexture,
-						sf::Vector2i coord, int tileID) :
+		sf::Vector2i coord, int tileID) :
 		m_type(static_cast<eTileType>(tileID)),
 		m_shipOnTile(),
 		m_sprite(dayTexture),
@@ -58,6 +43,11 @@ struct Tile
 	{
 		m_sprite.setFrameID(tileID);
 	}
+
+	const enum eTileType m_type;
+	ShipOnTile m_shipOnTile;
+	Sprite m_sprite;
+	const sf::Vector2i m_tileCoordinate;
 };
 
 class Map
@@ -86,33 +76,39 @@ private:
 	bool inCone(sf::Vector2i orgHex, sf::Vector2i testHex, eDirection dir) const;
 	//Finds the euclidean distance from a point to a tile's centre, used by getMouseClickCoord
 	float tileDistanceMag(sf::Vector2i tileCoord, sf::Vector2i mouseClick) const;
-	void onReset();
 public:
 	//Returns a pointer to a given tile, returns nullptr if there is no tile there
 	Tile* getTile(sf::Vector2i coordinate);
 	const Tile* getTile(sf::Vector2i coordinate) const;
 	Tile* getTile(posi coordinate);
 	const Tile* getTile(posi coordinate) const;
+
 	//An n = 1 version of getTileRadius for use in pathfinding, 
 	//returns nullptr for each tile out of bounds
-	std::vector<Tile*> getAdjacentTiles(sf::Vector2i coord);
-	std::vector<const Tile*> cGetAdjacentTiles(sf::Vector2i coord) const;
+	//std::vector<Tile*> getAdjacentTiles(sf::Vector2i coord);
+	std::vector<const Tile*> getAdjacentTiles(sf::Vector2i coord) const;
+	void getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
+
 	//Returns tiles in a radius around a given tile, skipping the tile itself
-	std::vector<Tile*> getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false);
-	std::vector<const Tile*> cGetTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	std::vector<const Tile*> getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	void getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	
 	//Returns tiles in two cones emanating from a given tile, skipping the tile itself
-	std::vector<Tile*> getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false);
-	std::vector<const Tile*> cGetTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	std::vector<const Tile*> getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+	void getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+
 	//Returns tiles in a line from a given direction,
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<Tile*> getTileLine(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false);
-	std::vector<const Tile*> cGetTileLine(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	std::vector<const Tile*> getTileLine(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	void getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+
 	//Returns a ring of tiles at a certain radius from a specified tile
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<Tile*> getTileRing(sf::Vector2i coord, int range);
-	std::vector<const Tile*> cGetTileRing(sf::Vector2i coord, int range)const;
+	std::vector<const Tile*> getTileRing(sf::Vector2i coord, int range)const;
+	void getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const;
 
 	sf::Vector2i getRandomSpawnPosition();
+
 	//For finding the location on the screen a given tile is being drawn
 	sf::Vector2i getTileScreenPos(sf::Vector2i coord) const;
 
@@ -140,12 +136,9 @@ public:
 
 	eDirection getWindDirection() const { return m_windDirection; }
 	void setWindDirection(eDirection direction) { m_windDirection = direction; }
-	//TODO: Find out what this is
-	//std::vector<sf::Vector2i> getSpawnPositions() const { return m_spawnPositions; }
 
 	void loadmap(const std::string& mapName);
 
-	//Only for pathfinding
 	const std::vector<Tile>& getData()const { return m_data; }
 
 	Map();
@@ -153,5 +146,4 @@ public:
 	Map& operator=(const Map&) = delete;
 	Map(Map&&) = delete;
 	Map&& operator=(Map&&) = delete;
-	~Map();
 };

@@ -78,20 +78,17 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Fac
 	//}
 }
 
-void AI::handleDeploymentPhase(Battle& battle, Map& map, const Faction& currentPlayer)
-{
-	std::vector<const Tile*> spawnArea{ map.cGetTileRadius(currentPlayer.m_spawnArea.begin()->m_position, 3, true, true) };
-	assert(spawnArea.size() > 6);
-	
-	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));
+void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
+{	
+	auto& factionSpawnArea = currentPlayer.m_spawnArea.m_tileArea;
+	int location = static_cast<int>(std::rand() % (factionSpawnArea.size() - 6));
 	int spawnPoint{ location };
 	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
 	
-	assert(currentPlayer.m_playerType == ePlayerType::eAI);
 	size_t currentPlayerTotalShips = currentPlayer.m_ships.size();
 	for (int i = 0; i < currentPlayerTotalShips; ++i)
 	{
-		battle.deployFactionShipAtPosition(spawnArea[spawnPoint]->m_tileCoordinate, randomDir);
+		battle.deployFactionShipAtPosition(factionSpawnArea[spawnPoint]->m_tileCoordinate, randomDir);
 		spawnPoint++;
 	}
 }
@@ -205,7 +202,7 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
 	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
-	std::vector<const Tile*> availableTiles{ map.cGetTileRing(targetShip->m_tileCoordinate, range) };
+	std::vector<const Tile*> availableTiles{ map.getTileRing(targetShip->m_tileCoordinate, range) };
 	for (const Tile* it : availableTiles)
 	{
 		//Ensure it's a valid tile, if not skip this one
@@ -240,7 +237,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 	//Iterate through all 6 possible lines
 	for (int i = 0; i < 6; i++)
 	{
-		availableTiles = map.cGetTileLine(targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
+		availableTiles = map.getTileLine(targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
 		for (const Tile* it : availableTiles)
 		{
 			//Ensure it's a valid tile, if not skip this one
@@ -369,7 +366,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 	{
 	case eShipType::eTurtle:
 	{
-		firingArea = map.cGetTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
+		firingArea = map.getTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -383,7 +380,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 	}
 	case eShipType::eSniper:
 	{
-		firingArea = map.cGetTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
+		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -399,7 +396,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 	}
 	case eShipType::eFrigate:
 	{
-		firingArea = map.cGetTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
+		firingArea = map.getTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
@@ -432,7 +429,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			break;
 		}
 			
-		firingArea = map.cGetTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
+		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;

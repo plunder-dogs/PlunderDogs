@@ -229,7 +229,7 @@ void Ship::setDestination()
 	m_destinationSet = true;
 }
 
-void Ship::onNewTurn()
+void Ship::onNewBattlePhase()
 {
 	m_weaponFired = false;
 	m_destinationSet = false;
@@ -425,6 +425,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		break;
 	}
 
+	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this), GameEvent::eEnteredNewBattlePhase);
 	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
 
 #ifdef HAPI_SPRITES
@@ -456,6 +457,11 @@ Ship::Ship(Ship & orig)
 	m_deployed(false),
 	m_movementGraph(orig.m_movementGraph)
 {}
+
+Ship::~Ship()
+{
+	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEnteredNewBattlePhase);
+}
 
 void Ship::update(float deltaTime, const Map & map)
 {

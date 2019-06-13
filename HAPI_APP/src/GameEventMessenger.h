@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <string>
 #include <unordered_map>
 #include <vector>
 #include <assert.h>
@@ -10,8 +9,7 @@
 
 enum GameEvent
 {
-	eResetBattle = 0,
-	eNewTurn,
+	eEnteredNewBattlePhase,
 	eOnFactionShipDestroyed,
 	eEndMovementPhaseEarly,
 	eEndAttackPhaseEarly,
@@ -23,13 +21,11 @@ enum GameEvent
 class Listener
 {
 public:
-	Listener(const std::function<void(GameEvent)>& fp, std::string&& listenerName)
-		: m_listener(fp),
-		m_name(std::move(listenerName))
+	Listener(const std::function<void(GameEvent)>& fp)
+		: m_listener(fp)
 	{}
 
 	std::function<void(GameEvent)> m_listener;
-	std::string m_name;
 };
 
 class GameEventMessenger
@@ -41,16 +37,16 @@ public:
 		return instance;
 	}
 
-	void subscribe(const std::function<void(GameEvent)>& fp, std::string&& listenerName, GameEvent message)
+	void subscribe(const std::function<void(GameEvent)>& fp, GameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
 		{
-			iter->second.emplace_back(fp, std::move(listenerName));
+			iter->second.emplace_back(fp);
 		}
 		else
 		{
-			m_listeners.emplace(message, std::vector<Listener>{Listener(fp, std::move(listenerName))});
+			m_listeners.emplace(message, std::vector<Listener>{Listener(fp)});
 		}
 	}
 
@@ -65,15 +61,12 @@ public:
 		}
 	}
 
-	void unsubscribe(const std::string& listenerName, GameEvent message)
+	void unsubscribe(GameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
 
-		auto listener = std::find_if(iter->second.begin(), iter->second.end(),
-			[&listenerName](const auto& listener) { return listener.m_name == listenerName; });
-		assert(listener != iter->second.cend());
-		iter->second.erase(listener);
+		iter->second.pop_back();
 
 		if (iter->second.empty())
 		{

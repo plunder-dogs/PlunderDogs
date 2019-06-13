@@ -12,6 +12,17 @@ Sprite::Sprite(bool active)
 	m_isActive(active)
 {}
 
+Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool active)
+	: m_texture(&texture),
+	m_sprite(),
+	m_position(startingPosition),
+	m_currentFrameID(0),
+	m_isActive(active) 
+{
+	m_sprite.setTexture(m_texture->m_texture);
+	setFrameID(m_currentFrameID);
+}
+
 Sprite::Sprite(std::unique_ptr<Texture>& texture, bool active)
 	: m_texture(texture.get()),
 	m_sprite(),
@@ -19,7 +30,7 @@ Sprite::Sprite(std::unique_ptr<Texture>& texture, bool active)
 	m_currentFrameID(0),
 	m_isActive(active)
 {
-	m_sprite.setTexture(texture->m_texture);
+	m_sprite.setTexture(m_texture->m_texture);
 	setFrameID(m_currentFrameID);
 }
 
@@ -67,7 +78,7 @@ void Sprite::setFrameID(int frameID)
 
 void Sprite::setPosition(sf::Vector2i newPosition)
 {
-	m_sprite.setPosition(sf::Vector2f(newPosition.x, newPosition.y));
+	m_sprite.setPosition(sf::Vector2f((float)newPosition.x, (float)newPosition.y));
 	m_position = newPosition;
 }
 
