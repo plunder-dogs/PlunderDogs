@@ -60,7 +60,7 @@ void BattleUI::renderGUI(sf::RenderWindow& window)
 	m_tileHighlight.render(window, m_battle.getMap());
 	//m_gui.render(m_battle.getCurrentPhase());
 
-	if (m_tileOnClick != nullptr && m_tileOnClick->m_shipOnTile.isValid())
+	if (m_tileOnClick != nullptr && m_tileOnClick->isShipOnTile())
 	{
 		//m_gui.renderStats(m_battle.getFactionShip(m_selectedTile.m_tile->m_shipOnTile));
 	}
@@ -232,21 +232,32 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 		return;
 	}
 
+	//First Click
 	if (!m_tileOnClick)
 	{
 		m_tileOnClick = tileOnMouse;
+		m_tileOnMouse = tileOnMouse;
 	}
 
-	if (tileOnMouse->m_tileCoordinate != m_tileOnClick->m_tileCoordinate)
+	//Clicked on new tile
+	if (m_tileOnClick->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
 	{
 		m_tileOnPreviousClick = m_tileOnClick;
 		m_tileOnClick = tileOnMouse;
 		m_tileOnMouse = tileOnMouse;
 	}
 
-	//if(m_tileOnClick->m_shipOnTile.isValid() && )
-	//Back out when selecting a destroyed ship?
-	//Back out when selecting an enemy ship?
+	//Clicked on tile containing non usable ship
+	if (m_tileOnClick->isShipOnTile())
+	{
+		FactionName currentFaction = m_battle.getCurrentFaction();
+		auto& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
+		if (ship.isDead() || ship.getFactionName() != currentFaction)
+		{
+			m_tileOnPreviousClick = nullptr;
+			return;
+		}
+	}
 
 	switch (m_battle.getCurrentPhase())
 	{
@@ -272,7 +283,7 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 void BattleUI::handleMouseMovement(sf::Vector2i mousePosition)
 {
 	//Ship selected doesn't match faction currently in play
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid()
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile()
 		&& m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
 	{
 		return;
@@ -332,7 +343,7 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 	if ((m_tileOnClick->m_type == eTileType::eSea || m_tileOnClick->m_type == eTileType::eOcean))
 	{
 		//If tile isn't already occupied by a ship
-		if (!m_tileOnClick->m_shipOnTile.isValid())
+		if (!m_tileOnClick->isShipOnTile())
 		{
 			m_tileHighlight.setPosition(m_tileOnClick->m_tileCoordinate);
 			m_battle.deployFactionShipAtPosition(m_tileOnClick->m_tileCoordinate, startingDirection);
@@ -342,7 +353,7 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() &&  
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&  
 		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isMovingToDestination() &&
 		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isDestinationSet())
 	{
@@ -363,7 +374,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {	
 	//On first Ship Selection
-	if (!m_tileOnPreviousClick)
+	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile())
 	{
 		//m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); //TODO: Not sure if need
 		const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
@@ -373,10 +384,10 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 		}
 	}
 	//Ship already selected
-	else if (m_tileOnPreviousClick && m_tileOnPreviousClick->m_shipOnTile.isValid())
+	else if(m_tileOnPreviousClick && m_tileOnPreviousClick->isShipOnTile())
 	{	
 		//Ship not present on tile selected
-		if (!m_tileOnClick->m_shipOnTile.isValid())
+		if (!m_tileOnClick->isShipOnTile())
 		{
 			m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
 			m_tileOnClick = nullptr;
@@ -388,7 +399,7 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 {
 	//Cancel selected Entity
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid())
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile())
 	{
 		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
 		m_tileHighlight.deactivate();
@@ -428,7 +439,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	}
 
 	//Select new entity that is on same team
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && tileOnMouse->m_shipOnTile.isValid() &&
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile() && tileOnMouse->m_shipOnTile.isValid() &&
 		(m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()))
 	{
 		if (!m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isWeaponFired())
@@ -468,7 +479,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 	//Entity already selected Fire weapon at position
 	//If the selectedTile has an entity on it and that entity hasn't fired
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && 
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile() && 
 		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired())
 	{
 		//If there is an entity on the tile you're clicking on and that entity's faction name differs from the one of the ship that's firing
@@ -509,7 +520,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 		m_tileOnClick = tileOnMouse;
 	}
 
-	if (m_tileOnClick && m_tileOnClick->m_shipOnTile.isValid() && 
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile() && 
 		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired() &&
 		m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
 	{

@@ -172,6 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\BattleGUI.cpp" />
     <ClCompile Include="src\Faction.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\BattleGUI.h" />
     <ClInclude Include="src\Faction.h" />

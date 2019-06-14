@@ -4,7 +4,7 @@
 #include "Map.h"
 #include "BattleUI.h"
 #include "Faction.h"
-#include "Sprite.h"
+#include "Particle.h"
 #include <array>
 
 class Battle
@@ -14,23 +14,6 @@ class Battle
 		DeployHuman = 0,
 		DeployAI
 	};
-
-	struct Particle
-	{
-		Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale);
-		void setPosition(sf::Vector2i position);
-		void update(float deltaTime, const Map& map);
-		void render(sf::RenderWindow& window);
-		void orient(eDirection direction);
-
-		sf::Vector2i m_position;
-		Timer m_lifeSpan;
-		Sprite m_sprite;
-		int m_frameNum = 0;
-		bool m_isEmitting;
-		const float m_scale;
-	};
-
 public:
 	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
 	Battle(const Battle&) = delete;
