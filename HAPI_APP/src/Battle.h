@@ -14,6 +14,7 @@ class Battle
 		DeployHuman = 0,
 		DeployAI
 	};
+
 public:
 	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
 	Battle(const Battle&) = delete;

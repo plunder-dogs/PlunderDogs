@@ -236,7 +236,7 @@ void Ship::onNewBattlePhase()
 	m_movingToDestination = false;
 }
 
-void Ship::disableMovementPathNode(sf::Vector2i position, const Map & map)
+void Ship::disableMovementGraphNode(sf::Vector2i position, const Map & map)
 {
 	for (auto iter = m_movementGraph.begin(); iter != m_movementGraph.end(); ++iter)
 	{
@@ -465,14 +465,14 @@ Ship::~Ship()
 
 void Ship::update(float deltaTime, const Map & map)
 {
-	if (!m_movementPath.empty())
+	if (!m_movementPath.empty() && !isDead())
 	{
 		m_movementTimer.update(deltaTime);
 		if (m_movementTimer.isExpired())
 		{
 			m_movementTimer.reset();
 			m_currentPosition = m_movementPath.front().pair();
-			disableMovementPathNode(m_currentPosition, map);
+			disableMovementGraphNode(m_currentPosition, map);
 
 			handleRotation();
 			m_movementPath.pop();
@@ -510,6 +510,7 @@ void Ship::render(sf::RenderWindow& window, const Map & map)
 	m_sprite.setScale({ scale / 2, scale / 2 });
 	m_sprite.render(window);
 
+	m_actionSprite.setPosition(m_currentPosition);
 	m_actionSprite.render(window, map);
 }
 

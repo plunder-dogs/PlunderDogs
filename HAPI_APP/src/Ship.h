@@ -79,9 +79,8 @@ private:
 	bool m_deployed;
 	std::array<Sprite, MOVEMENT_GRAPH_SIZE> m_movementGraph;
 
-
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
-	void disableMovementPathNode(sf::Vector2i position, const Map& map);
+	void disableMovementGraphNode(sf::Vector2i position, const Map& map);
 	void handleRotation();
 	void onNewBattlePhase();
 };

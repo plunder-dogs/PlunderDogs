@@ -4,7 +4,6 @@
 #include "Map.h"
 
 constexpr size_t MAX_SPAWN_AREA = 75;
-constexpr size_t MAX_SHIPS = 6;
 
 //BATTLE PLAYER
 Faction::Faction(FactionName factionName, ePlayerType playerType)
@@ -13,7 +12,7 @@ Faction::Faction(FactionName factionName, ePlayerType playerType)
 	m_playerType(playerType),
 	m_spawnArea(MAX_SPAWN_AREA)
 {
-	m_ships.reserve(size_t(MAX_SHIPS));
+	m_ships.reserve(MAX_SHIPS);
 }
 
 const Ship & Faction::getShip(int shipID) const

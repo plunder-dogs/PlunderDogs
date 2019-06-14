@@ -530,8 +530,6 @@ void Battle::updateMovementPhase(float deltaTime)
 {
 	for (auto& ship : m_factions[m_currentFactionTurn]->m_ships)
 	{
-		if (ship.isDead())
-			continue;
 		ship.update(deltaTime, m_map);
 	}
 	for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
@@ -586,28 +584,36 @@ void Battle::incrementFactionTurn()
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
 	
-	//Select first faction
-	if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
+	if (m_currentFactionTurn + 1 == m_factions.size())
 	{
-		for (int i = 0; i < m_factions.size(); ++i)
-		{
-			if (m_factions[i])
-			{
-				m_currentFactionTurn = i;
-				return;
-			}
-		}
+		m_currentFactionTurn = 0;
+	}
+	else
+	{
+		++m_currentFactionTurn;
 	}
 
-	//Select next faction
-	for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
-	{
-		if (m_factions[i])
-		{
-			m_currentFactionTurn = i;
-			return;
-		}
-	}
+	////Select first faction
+	//if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
+	//{
+	//	for (int i = 0; i < m_factions.size(); ++i)
+	//	{
+	//		if (m_factions[i])
+	//		{
+	//			m_currentFactionTurn = i;
+	//			return;
+	//		}
+	//	}
+	//}
+	////Select next faction
+	//for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
+	//{
+	//	if (m_factions[i])
+	//	{
+	//		m_currentFactionTurn = i;
+	//		return;
+	//	}
+	//}
 }
 
 const Map & Battle::getMap() const
