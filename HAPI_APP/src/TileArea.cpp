@@ -29,14 +29,9 @@ void TileArea::render(sf::RenderWindow & window, const Map & map)
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
-	float scale = map.getDrawScale();
 	for (int i = 0; i < m_tileArea.size(); i++)
 	{
-		posi pos = map.getTileScreenPos(m_tileArea[i]->m_tileCoordinate);
-		float x = static_cast<float>(pos.x) + DRAW_OFFSET_X * scale;
-		float y = static_cast<float>(pos.y) + DRAW_OFFSET_Y * scale;
-		m_tileAreaGraph[i].setPosition(sf::Vector2i(x, y));
-		m_tileAreaGraph[i].render(window, map, sf::Vector2i(x, y));
+		m_tileAreaGraph[i].render(window, map);
 	}
 }
 
