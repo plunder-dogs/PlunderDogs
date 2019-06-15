@@ -5,6 +5,8 @@
 #include "Textures.h"
 #include <iostream>
 
+constexpr size_t MAX_PARTICLES = 6;
+
 void Battle::updateWindDirection()
 {
 	int turnLeft = rand() % 2;
@@ -121,9 +123,9 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 	m_lightIntensityTimer(30.0f),
 	m_currentLightIntensity(eLightIntensity::eMaximum)
 {
-	m_explosionParticles.reserve(6);
-	m_fireParticles.reserve(6);
-	for (int i = 0; i < 6; i++)
+	m_explosionParticles.reserve(MAX_PARTICLES);
+	m_fireParticles.reserve(MAX_PARTICLES);
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		m_explosionParticles.emplace_back(0.10, Textures::getInstance().m_explosionParticles, 2.5f);
 		m_fireParticles.emplace_back(0.05, Textures::getInstance().m_fireParticles, 2.0f);
@@ -186,7 +188,7 @@ void Battle::render(sf::RenderWindow& window)
 		}
 	}
 	
-	m_battleUI.renderUI(window);
+	m_battleUI.render(window);
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{

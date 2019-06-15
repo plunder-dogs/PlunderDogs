@@ -37,7 +37,7 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 	return m_gui.getCameraPositionOffset();
 }
 
-void BattleUI::renderUI(sf::RenderWindow& window)
+void BattleUI::render(sf::RenderWindow& window)
 {
 	m_tileOnClickSprite.render(window, m_battle.getMap());
 	m_shipMovementArea.render(window, m_battle.getMap());
@@ -157,11 +157,6 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	BFS::findArea(m_shipMovementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
 	m_shipMovementArea.activateGraph();
-}
-
-void BattleUI::renderTileHighlight(sf::RenderWindow& window)
-{
-
 }
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)

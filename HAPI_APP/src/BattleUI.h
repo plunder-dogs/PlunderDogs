@@ -20,7 +20,7 @@ public:
 
 	sf::Vector2i getCameraPositionOffset() const;
 
-	void renderUI(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window);
 	void loadGUI(sf::Vector2i mapDimensions);
 
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
@@ -40,7 +40,6 @@ private:
 	void onNewBattlePhase();
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
-	void renderTileHighlight(sf::RenderWindow& window);
 
 	//LeftClick
 	void onLeftClick(sf::Vector2i mousePosition);
