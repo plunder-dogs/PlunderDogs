@@ -108,7 +108,6 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	}
 }
 
-
 Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 	: m_factions(players),
 	m_currentFactionTurn(0),
@@ -161,6 +160,7 @@ void Battle::start(const std::string & newMapName)
 		if (player && player->m_playerType == ePlayerType::eHuman)
 		{
 			humanPlayerFound = true;
+			break;
 		}
 	}
 
@@ -190,11 +190,11 @@ void Battle::render(sf::RenderWindow& window)
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{
-		explosionParticle.render(window);
+		explosionParticle.render(window, m_map);
 	}
 	for (auto& fireParticle : m_fireParticles)
 	{
-		fireParticle.render(window);
+		fireParticle.render(window, m_map);
 	}
 }
 
@@ -591,7 +591,7 @@ void Battle::incrementFactionTurn()
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
 
-	//Select first faction
+	//Select first faction available
 	if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
 	{
 		for (int i = 0; i < m_factions.size(); ++i)
@@ -603,7 +603,7 @@ void Battle::incrementFactionTurn()
 			}
 		}
 	}
-	//Select next faction
+	//Select next faction available
 	for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
 	{
 		if (m_factions[i])

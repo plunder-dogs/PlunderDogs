@@ -10,7 +10,6 @@ Particle::Particle(float lifespan, std::unique_ptr<Texture>& texture, float scal
 	m_isEmitting(false),
 	m_scale(scale)
 {
-	//m_particle->SetFrameNumber(m_frameNum);
 }
 
 void Particle::setPosition(sf::Vector2i position)
@@ -22,10 +21,10 @@ void Particle::update(float deltaTime, const Map& map)
 {
 	if (m_isEmitting)
 	{
-		const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-		m_sprite.setPosition(sf::Vector2i(
-			tileTransform.x + DRAW_OFFSET_X * map.getDrawScale(),
-			tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()));
+		//const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
+		//m_sprite.setPosition(sf::Vector2i(
+		//	tileTransform.x + DRAW_OFFSET_X * map.getDrawScale(),
+		//	tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()));
 
 		m_lifeSpan.update(deltaTime);
 
@@ -44,13 +43,13 @@ void Particle::update(float deltaTime, const Map& map)
 	}
 }
 
-void Particle::render(sf::RenderWindow& window)
+void Particle::render(sf::RenderWindow& window, const Map& map)
 {
 	if (m_isEmitting)
 	{
 		//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
 		m_sprite.setScale(sf::Vector2f(m_scale, m_scale));
-		m_sprite.render(window);
+		m_sprite.render(window, map);
 	}
 }
 

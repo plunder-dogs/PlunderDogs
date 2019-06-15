@@ -4,8 +4,8 @@
 #include <SFML/Graphics.hpp>
 
 constexpr int INVALID_SHIP_ID = -1;
-constexpr float DRAW_OFFSET_X{ 16 };
-constexpr float DRAW_OFFSET_Y{ 32 };
+constexpr float DRAW_OFFSET_X{ 0 };
+constexpr float DRAW_OFFSET_Y{ 16 };
 
 const size_t MAX_SHIPS = 6;
 const std::string DATA_DIRECTORY = "Data\\";
@@ -51,8 +51,7 @@ enum BattlePhase
 
 enum ePlayerType
 {
-	eNone = 0,
-	eHuman,
+	eHuman = 0,
 	eAI
 };
 

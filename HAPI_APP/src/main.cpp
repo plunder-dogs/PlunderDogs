@@ -5,6 +5,10 @@
 #include "SFML/Graphics.hpp"
 #include "Utilities/XMLParser.h"
 
+//posi final{ NO_TILE };
+//if (!queue.empty())
+//final = pathExplorer(exploreArea, queue, destination, windDirection, windStrength);
+
 #ifdef C++_NOTES
 //Copy Ellision
 //Return Value Optimzation

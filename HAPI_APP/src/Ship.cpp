@@ -4,6 +4,7 @@
 #include "Textures.h"
 #include "GameEventMessenger.h"
 #include "Battle.h"
+//Debug
 #include <iostream>
 
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
