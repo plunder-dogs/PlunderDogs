@@ -17,15 +17,16 @@ public:
 	sf::Vector2i getPosition() const;
 	const FrameDetails& getCurrentFrameDetails() const;
 	bool isActive() const;
+	bool isAnimationCompleted() const;
 	int getCurrentFrameID() const;
-	
+
 	void setFrameID(int frameID);
+	void incrementFrameID();
 	void setPosition(sf::Vector2i newPosition);
 	void setPosition(sf::Vector2i newPosition, const Map& map);
 	void setScale(sf::Vector2f scale);
 	void render(sf::RenderWindow& window);
 	void render(sf::RenderWindow& window, const Map& map);
-	void render(sf::RenderWindow& window, const Map& map, sf::Vector2i position);
 	void setTexture(std::unique_ptr<Texture>& texture, int frameID = 0);
 	void activate();
 	void deactivate();

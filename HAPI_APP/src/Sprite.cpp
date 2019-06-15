@@ -61,6 +61,11 @@ bool Sprite::isActive() const
 	return m_isActive;
 }
 
+bool Sprite::isAnimationCompleted() const
+{
+	return m_currentFrameID >= static_cast<int>(m_texture->m_frames.size()) - 1;
+}
+
 int Sprite::getCurrentFrameID() const
 {
 	return m_currentFrameID;
@@ -71,6 +76,20 @@ void Sprite::setFrameID(int frameID)
 	assert(m_texture);
 
 	m_currentFrameID = frameID;
+	FrameDetails frame = m_texture->getFrame(m_currentFrameID);
+	sf::IntRect frameRect(sf::Vector2i(frame.x, frame.y), sf::Vector2i(frame.width, frame.height));
+	m_sprite.setTextureRect(frameRect);
+}
+
+void Sprite::incrementFrameID()
+{
+	assert(m_texture);
+	assert(m_currentFrameID < static_cast<int>(m_texture->m_frames.size()) - 1);
+	if (m_currentFrameID + 1 < static_cast<int>(m_texture->m_frames.size()))
+	{
+		++m_currentFrameID;
+	}
+
 	FrameDetails frame = m_texture->getFrame(m_currentFrameID);
 	sf::IntRect frameRect(sf::Vector2i(frame.x, frame.y), sf::Vector2i(frame.width, frame.height));
 	m_sprite.setTextureRect(frameRect);
@@ -113,20 +132,6 @@ void Sprite::render(sf::RenderWindow & window, const Map & map)
 		m_sprite.setPosition({
 		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
-		window.draw(m_sprite);
-	}
-}
-
-void Sprite::render(sf::RenderWindow & window, const Map & map, sf::Vector2i position)
-{
-	if (m_isActive)
-	{
-		const sf::Vector2i tileTransform = map.getTileScreenPos(position);
-
-		m_sprite.setPosition({
-		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
-
 		window.draw(m_sprite);
 	}
 }

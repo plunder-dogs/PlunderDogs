@@ -3,54 +3,42 @@
 #include "Map.h"
 
 Particle::Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale)
-	: m_position(),
-	m_lifeSpan(lifespan),
-	m_sprite(texture),
-	m_frameNum(0),
-	m_isEmitting(false),
+	: m_lifeSpan(lifespan),
+	m_sprite(texture, false),
 	m_scale(scale)
 {
+	m_sprite.setFrameID(0);
 }
 
 void Particle::setPosition(sf::Vector2i position)
 {
-	m_position = position;
+	m_sprite.setPosition(position);
 }
 
 void Particle::update(float deltaTime, const Map& map)
 {
-	if (m_isEmitting)
+	if (m_sprite.isActive())
 	{
-		//const sf::Vector2i tileTransform = map.getTileScreenPos(m_position);
-		//m_sprite.setPosition(sf::Vector2i(
-		//	tileTransform.x + DRAW_OFFSET_X * map.getDrawScale(),
-		//	tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()));
-
 		m_lifeSpan.update(deltaTime);
 
 		if (m_lifeSpan.isExpired())
 		{
-			m_sprite.setFrameID(m_frameNum);
+			m_sprite.incrementFrameID();
 			m_lifeSpan.reset();
-			++m_frameNum;
 		}
 
-		if (m_frameNum >= m_sprite.getCurrentFrameID())
+		if (m_sprite.isAnimationCompleted())
 		{
-			m_isEmitting = false;
-			m_frameNum = 0;
+			m_sprite.deactivate();
+			m_sprite.setFrameID(0);
 		}
 	}
 }
 
 void Particle::render(sf::RenderWindow& window, const Map& map)
 {
-	if (m_isEmitting)
-	{
-		//m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-		m_sprite.setScale(sf::Vector2f(m_scale, m_scale));
-		m_sprite.render(window, map);
-	}
+	m_sprite.setScale(sf::Vector2f(m_scale, m_scale));
+	m_sprite.render(window, map);	
 }
 
 void Particle::orient(eDirection entityDir)

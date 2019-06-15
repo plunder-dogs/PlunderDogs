@@ -490,13 +490,13 @@ std::vector<FactionName> Battle::getAllFactionsInPlay() const
 
 void Battle::playFireAnimation(eDirection orientation, sf::Vector2i position)
 {
-	for (auto& it : m_fireParticles)
+	for (auto& particle : m_fireParticles)
 	{
-		if (!it.m_isEmitting)
+		if (!particle.m_sprite.isActive())
 		{
-			it.orient(orientation);
-			it.setPosition(position);
-			it.m_isEmitting = true;
+			particle.orient(orientation);
+			particle.setPosition(position);
+			particle.m_sprite.activate();
 			break;
 		}
 	}
@@ -504,12 +504,12 @@ void Battle::playFireAnimation(eDirection orientation, sf::Vector2i position)
 
 void Battle::playExplosionAnimation(sf::Vector2i position)
 {
-	for (auto& it : m_explosionParticles)
+	for (auto& particle : m_explosionParticles)
 	{
-		if (!it.m_isEmitting)
+		if (!particle.m_sprite.isActive())
 		{
-			it.setPosition(position);
-			it.m_isEmitting = true;
+			particle.setPosition(position);
+			particle.m_sprite.activate();
 			break;
 		}
 	}
