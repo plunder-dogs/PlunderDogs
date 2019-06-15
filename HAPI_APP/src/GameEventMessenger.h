@@ -11,8 +11,7 @@ enum GameEvent
 {
 	eEnteredNewBattlePhase,
 	eOnFactionShipDestroyed,
-	eEndMovementPhaseEarly,
-	eEndAttackPhaseEarly,
+	eEndBattlePhaseEarly,
 	eUnableToSkipPhase,
 	eEnteredAITurn,
 	eLeftAITurn

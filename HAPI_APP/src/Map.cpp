@@ -20,7 +20,7 @@ Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
 	inUse(false)
 {}
 
-void Map::drawMap(sf::RenderWindow& window)
+void Map::renderMap(sf::RenderWindow& window)
 {
 	//TODO: Whats the texture dimension
 	sf::Vector2i textureDimensions = sf::Vector2i(FRAME_WIDTH, FRAME_HEIGHT);
@@ -140,7 +140,8 @@ Tile* Map::getTile(sf::Vector2i coordinate)
 
 std::vector<const Tile*> Map::getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
-	assert(range > 1);
+	//TODO: Refactor
+	//assert(range > 1);
 
 	int reserveSize{ 0 };
 	for (int i = 2; i < range + 2; i++)

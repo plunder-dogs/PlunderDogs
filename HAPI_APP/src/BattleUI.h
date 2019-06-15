@@ -21,10 +21,9 @@ public:
 	sf::Vector2i getCameraPositionOffset() const;
 
 	void renderUI(sf::RenderWindow& window);
-	void renderGUI(sf::RenderWindow& window);
 	void loadGUI(sf::Vector2i mapDimensions);
 
-	void drawTargetArea(sf::RenderWindow& window);
+	void renderTargetArea(sf::RenderWindow& window);
 	void handleInput(sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 

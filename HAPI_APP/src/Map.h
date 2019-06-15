@@ -124,7 +124,7 @@ public:
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
 	void setShipOnTile(ShipOnTile ship, sf::Vector2i shipPosition);
 
-	void drawMap(sf::RenderWindow& window);
+	void renderMap(sf::RenderWindow& window);
 	sf::Vector2i getDrawOffset() const { return m_drawOffset; }
 	void setDrawOffset(sf::Vector2i newOffset) { m_drawOffset = newOffset; }
 

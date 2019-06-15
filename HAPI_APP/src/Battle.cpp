@@ -108,6 +108,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	}
 }
 
+
 Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 	: m_factions(players),
 	m_currentFactionTurn(0),
@@ -129,14 +130,12 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 		m_fireParticles.emplace_back(0.05, Textures::getInstance().m_fireParticles, 2.0f);
 	}
 
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndMovementPhaseEarly, this), GameEvent::eEndMovementPhaseEarly);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndAttackPhaseEarly, this), GameEvent::eEndAttackPhaseEarly);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndBattlePhaseEarly, this), GameEvent::eEndBattlePhaseEarly);
 }
 
 Battle::~Battle()
 {
-	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEndMovementPhaseEarly);
-	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEndAttackPhaseEarly);
+	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEndBattlePhaseEarly);
 }
 
 void Battle::start(const std::string & newMapName)
@@ -167,18 +166,17 @@ void Battle::start(const std::string & newMapName)
 
 	if (humanPlayerFound)
 	{
-		m_currentDeploymentState = eDeploymentState::DeployHuman;
+		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
 	}
 	else
 	{
-		m_currentDeploymentState = eDeploymentState::DeployAI;
+		m_currentDeploymentState = eDeploymentState::DeployingAI;
 	}
 }
 
 void Battle::render(sf::RenderWindow& window)
 {
-	m_map.drawMap(window);
-
+	m_map.renderMap(window);
 	m_battleUI.renderUI(window);
 
 	for (auto& faction : m_factions)
@@ -189,8 +187,7 @@ void Battle::render(sf::RenderWindow& window)
 		}
 	}
 
-	m_battleUI.drawTargetArea(window);
-	
+	m_battleUI.renderTargetArea(window);
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{
@@ -200,8 +197,6 @@ void Battle::render(sf::RenderWindow& window)
 	{
 		fireParticle.render(window);
 	}
-
-	m_battleUI.renderGUI(window);
 }
 
 void Battle::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
@@ -273,7 +268,7 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 
 	if (m_factions[m_currentFactionTurn]->isAllShipsDeployed())
 	{
-		nextTurn();
+		advanceToNextBattlePhase();
 	}
 }
 
@@ -319,13 +314,13 @@ bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemySh
 	return false;
 }
 
-void Battle::nextTurn()
+void Battle::advanceToNextBattlePhase()
 {
 	if (m_currentBattlePhase == BattlePhase::Deployment)
 	{
 		bool allPlayersDeployed = true;
 		bool allHumansDeployed = true;
-		if (m_currentDeploymentState == eDeploymentState::DeployHuman)
+		if (m_currentDeploymentState == eDeploymentState::DeployingPlayer)
 		{
 			for (int i = 0; i < m_factions.size(); ++i)
 			{
@@ -352,11 +347,11 @@ void Battle::nextTurn()
 
 			if (allHumansDeployed)
 			{
-				m_currentDeploymentState = eDeploymentState::DeployAI;
+				m_currentDeploymentState = eDeploymentState::DeployingAI;
 			}
 		}
 		
-		if (m_currentDeploymentState == eDeploymentState::DeployAI)
+		if (m_currentDeploymentState == eDeploymentState::DeployingAI)
 		{
 			for (int i = 0; i < m_factions.size(); ++i)
 			{
@@ -410,7 +405,8 @@ void Battle::nextTurn()
 			if (m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
-				GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
+				//TODO: Refactor
+				//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 			}
 		}
 	}
@@ -426,7 +422,8 @@ void Battle::nextTurn()
 		if (!m_factions[m_currentFactionTurn]->isEliminated() && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
-			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
+			//TODO: Refactor
+			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
 	}
 	else if (m_currentBattlePhase == BattlePhase::Attack)
@@ -448,11 +445,13 @@ void Battle::nextTurn()
 		if (!m_factions[m_currentFactionTurn]->isEliminated() && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
-			GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
+			//TODO: Refactor
+			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
 		else if (m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eHuman)
 		{
-			GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
+			//TODO: Refactor
+			//GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
 		}
 	}
 }
@@ -546,7 +545,7 @@ void Battle::updateMovementPhase(float deltaTime)
 		}
 	}
 
-	nextTurn();
+	advanceToNextBattlePhase();
 }
 
 void Battle::updateAttackPhase()
@@ -562,7 +561,7 @@ void Battle::updateAttackPhase()
 
 	if (allEntitiesAttacked)
 	{	
-		nextTurn();
+		advanceToNextBattlePhase();
 	}
 }
 
@@ -583,37 +582,28 @@ void Battle::incrementFactionTurn()
 	//Change wind direction
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
-	
-	if (m_currentFactionTurn + 1 == m_factions.size())
-	{
-		m_currentFactionTurn = 0;
-	}
-	else
-	{
-		++m_currentFactionTurn;
-	}
 
-	////Select first faction
-	//if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
-	//{
-	//	for (int i = 0; i < m_factions.size(); ++i)
-	//	{
-	//		if (m_factions[i])
-	//		{
-	//			m_currentFactionTurn = i;
-	//			return;
-	//		}
-	//	}
-	//}
-	////Select next faction
-	//for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
-	//{
-	//	if (m_factions[i])
-	//	{
-	//		m_currentFactionTurn = i;
-	//		return;
-	//	}
-	//}
+	//Select first faction
+	if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
+	{
+		for (int i = 0; i < m_factions.size(); ++i)
+		{
+			if (m_factions[i])
+			{
+				m_currentFactionTurn = i;
+				return;
+			}
+		}
+	}
+	//Select next faction
+	for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
+	{
+		if (m_factions[i])
+		{
+			m_currentFactionTurn = i;
+			return;
+		}
+	}
 }
 
 const Map & Battle::getMap() const
@@ -649,28 +639,23 @@ const Faction & Battle::getFaction(FactionName factionName) const
 	return *m_factions[static_cast<int>(factionName)].get();
 }
 
-void Battle::onEndMovementPhaseEarly()
+void Battle::onEndBattlePhaseEarly()
 {
-	bool actionBeingPerformed = false;
-	for (const auto& ship : m_factions[m_currentFactionTurn]->m_ships)
+	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
-		if (ship.isMovingToDestination())
+		auto& ships = m_factions[m_currentFactionTurn]->m_ships;
+		auto cIter = std::find_if(ships.cbegin(), ships.cend(), [](const auto& ship) { return ship.isMovingToDestination() == true; });
+		if (cIter != ships.cend())
 		{
-			actionBeingPerformed = true;
+			GameEventMessenger::getInstance().broadcast(GameEvent::eUnableToSkipPhase);
+		}
+		else
+		{
+			advanceToNextBattlePhase();
 		}
 	}
-
-	if (actionBeingPerformed)
+	else if (m_currentBattlePhase == BattlePhase::Attack)
 	{
-		GameEventMessenger::getInstance().broadcast(GameEvent::eUnableToSkipPhase);
+		advanceToNextBattlePhase();
 	}
-	else
-	{
-		nextTurn();
-	}
-}
-
-void Battle::onEndAttackPhaseEarly()
-{
-	nextTurn();
 }

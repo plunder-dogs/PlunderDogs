@@ -10,12 +10,12 @@ struct Texture;
 struct TileArea
 {
 	TileArea(size_t maxTileAreaSize);
-	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, const Map& map);
+	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, const Map& map, bool activeGraph = false);
 
 	void render(sf::RenderWindow& window, const Map& map);
 	void clearTileArea();
+	void activateGraph();
 
-	bool m_display;
 	std::vector<Sprite> m_tileAreaGraph;
 	std::vector<const Tile*> m_tileArea;
 };

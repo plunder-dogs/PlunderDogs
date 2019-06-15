@@ -3,7 +3,6 @@
 #include <memory>
 #include "Timer.h"
 #include "Global.h"
-#include "SpriteToggleVisibility.h"
 #include <SFML/Graphics.hpp>
 #include <queue>
 #include "Sprite.h"

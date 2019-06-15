@@ -11,8 +11,8 @@ class Battle
 {
 	enum class eDeploymentState
 	{
-		DeployHuman = 0,
-		DeployAI
+		DeployingPlayer = 0,
+		DeployingAI
 	};
 
 public:
@@ -66,7 +66,7 @@ private:
 	
 	void playFireAnimation(eDirection orientation, sf::Vector2i position);
 	void playExplosionAnimation(sf::Vector2i position);
-	void nextTurn();
+	void advanceToNextBattlePhase();
 	void switchToBattlePhase(BattlePhase newBattlePhase);
 	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
@@ -76,7 +76,5 @@ private:
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
-
-	void onEndMovementPhaseEarly();
-	void onEndAttackPhaseEarly();
+	void onEndBattlePhaseEarly();
 };
