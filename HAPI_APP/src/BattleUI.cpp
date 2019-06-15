@@ -308,7 +308,6 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 	//On first Ship Selection
 	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile())
 	{
-		//m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); //TODO: Not sure if need
 		const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
 		if (!ship.isDestinationSet())
 		{
@@ -324,6 +323,7 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 			m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
 			m_tileOnClick = nullptr;
 			m_tileOnPreviousClick = nullptr;
+			m_shipMovementArea.clearTileArea();
 		}
 	}
 }

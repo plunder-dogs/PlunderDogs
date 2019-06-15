@@ -21,7 +21,7 @@ TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, co
 	float scale = map.getDrawScale();
 	for (int i = 0; i < maxTileAreaSize; ++i)
 	{
-		m_tileAreaGraph.emplace_back(texture, sf::Vector2f(scale, scale), activeGraph);
+		m_tileAreaGraph.emplace_back(texture, sf::Vector2f(2, 2), activeGraph);
 	}
 }
 

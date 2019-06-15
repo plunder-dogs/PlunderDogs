@@ -102,10 +102,6 @@ int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 	int queueSize = static_cast<int>(pathToTile.size());
 	for (i; i < queueSize; ++i)
 	{
-		//auto tileScreenPosition = map.getTileScreenPos(pathToTile.front().pair());
-		//m_movementGraph[i].setPosition(sf::Vector2i(
-		//	static_cast<float>(tileScreenPosition.x + DRAW_OFFSET_X * map.getDrawScale()),
-		//	static_cast<float>(tileScreenPosition.y + DRAW_OFFSET_Y * map.getDrawScale()) ));
 		m_movementGraph[i].activate();
 		m_movementGraph[i].setPosition(pathToTile.front().pair());
 
