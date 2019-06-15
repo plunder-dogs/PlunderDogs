@@ -19,8 +19,8 @@ BattleUI::BattleUI(Battle & battle)
 	m_tileOnClick(nullptr),
 	m_tileOnMouse(nullptr),
 	m_gui(),
-	m_movementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
-	m_targetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap())
+	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
+	m_shipTargetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap())
 {
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this), GameEvent::eEnteredNewBattlePhase);
 }
@@ -41,7 +41,7 @@ void BattleUI::renderUI(sf::RenderWindow& window)
 	{
 	case BattlePhase::Movement:
 		renderTileHighlight(window);
-		m_movementArea.render(window, m_battle.getMap());
+		m_shipMovementArea.render(window, m_battle.getMap());
 		break;
 	
 	case BattlePhase::Attack:
@@ -57,7 +57,7 @@ void BattleUI::loadGUI(sf::Vector2i mapDimensions)
 
 void BattleUI::renderTargetArea(sf::RenderWindow& window)
 {
-	for (auto& i : m_targetArea.m_tileAreaGraph)
+	for (auto& i : m_shipTargetArea.m_tileAreaGraph)
 	{
 		i.render(window, m_battle.getMap());	
 	}
@@ -96,19 +96,19 @@ void BattleUI::update(float deltaTime)
 
 void BattleUI::generateTargetArea(const Tile & source)
 {
-	m_targetArea.clearTileArea();
+	m_shipTargetArea.clearTileArea();
 
 	const Ship& ship = m_battle.getFactionShip(source.m_shipOnTile);
 	if (ship.getShipType() == eShipType::eFrigate)
 	{
-		m_battle.getMap().getTileCone(m_targetArea.m_tileArea, source.m_tileCoordinate,
+		m_battle.getMap().getTileCone(m_shipTargetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(),
 			ship.getCurrentDirection(), true);
 
 	}
 	else if (ship.getShipType() == eShipType::eSniper)
 	{
-		m_battle.getMap().getTileLine(m_targetArea.m_tileArea, source.m_tileCoordinate,
+		m_battle.getMap().getTileLine(m_shipTargetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(),
 			ship.getCurrentDirection(), true);
 
@@ -116,7 +116,7 @@ void BattleUI::generateTargetArea(const Tile & source)
 	else if (ship.getShipType() == eShipType::eTurtle)
 	{
 		// make so where ever the place presses get radius called talk adrais about size of that
-		m_battle.getMap().getTileRadius(m_targetArea.m_tileArea, source.m_tileCoordinate,
+		m_battle.getMap().getTileRadius(m_shipTargetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(), true);
 	}
 	else if (ship.getShipType() == eShipType::eFire)
@@ -144,21 +144,21 @@ void BattleUI::generateTargetArea(const Tile & source)
 			break;
 		}
 
-		m_battle.getMap().getTileLine(m_targetArea.m_tileArea, source.m_tileCoordinate,
+		m_battle.getMap().getTileLine(m_shipTargetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(), directionOfFire, true);	
 	}
 
-	m_targetArea.activateGraph();
+	m_shipTargetArea.activateGraph();
 }
 
 void BattleUI::generateMovementArea(const Ship & ship)
 {
-	m_movementArea.clearTileArea();
+	m_shipMovementArea.clearTileArea();
 
 	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
-	BFS::findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
+	BFS::findArea(m_shipMovementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
-	m_movementArea.activateGraph();
+	m_shipMovementArea.activateGraph();
 }
 
 void BattleUI::renderTileHighlight(sf::RenderWindow& window)
@@ -365,7 +365,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	//TODO: Drop info box
 	m_tileOnClick = nullptr;
 	m_tileOnPreviousClick = nullptr;
-	m_movementArea.clearTileArea();
+	m_shipMovementArea.clearTileArea();
 }
 
 void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
@@ -458,7 +458,7 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 	//TODO: Drop info box
 	m_tileOnClick = nullptr;
 	m_tileHighlight.deactivate();
-	m_targetArea.clearTileArea();
+	m_shipTargetArea.clearTileArea();
 }
 
 void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
@@ -468,7 +468,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 	if (m_tileOnClick && m_tileOnClick->m_tileCoordinate != m_tileOnMouse->m_tileCoordinate)
 	{
 		//TODO: this does not work if some of the tiles are nullptr!
-		auto cIter = std::find_if(m_targetArea.m_tileArea.cbegin(), m_targetArea.m_tileArea.cend(),
+		auto cIter = std::find_if(m_shipTargetArea.m_tileArea.cbegin(), m_shipTargetArea.m_tileArea.cend(),
 			[tileCoordinate](const auto& tile) { 
 				if (tile != nullptr)
 				{
@@ -476,7 +476,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 				}
 			});
 		//tileOnMouse within weapon range
-		if (cIter != m_targetArea.m_tileArea.cend())
+		if (cIter != m_shipTargetArea.m_tileArea.cend())
 		{
 			m_tileHighlight.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
 			m_tileHighlight.activate();
@@ -495,6 +495,6 @@ void BattleUI::onNewBattlePhase()
 	m_tileOnPreviousClick = nullptr;
 	m_tileOnMouse = nullptr;
 	m_tileHighlight.deactivate();
-	m_targetArea.clearTileArea();
-	m_movementArea.clearTileArea();
+	m_shipTargetArea.clearTileArea();
+	m_shipMovementArea.clearTileArea();
 }

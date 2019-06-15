@@ -34,8 +34,8 @@ private:
 	const Tile* m_tileOnMouse;
 	Sprite m_tileHighlight;
 	BattleGUI m_gui;
-	TileArea m_movementArea;
-	TileArea m_targetArea;
+	TileArea m_shipMovementArea;
+	TileArea m_shipTargetArea;
 
 	void onNewBattlePhase();
 	void generateTargetArea(const Tile& source);
