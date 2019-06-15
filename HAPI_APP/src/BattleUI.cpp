@@ -37,17 +37,8 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 
 void BattleUI::renderUI(sf::RenderWindow& window)
 {
-	switch (m_battle.getCurrentPhase())
-	{
-	case BattlePhase::Movement:
-		renderTileHighlight(window);
-		m_shipMovementArea.render(window, m_battle.getMap());
-		break;
-	
-	case BattlePhase::Attack:
-		renderTileHighlight(window);
-		break;
-	}
+	renderTileHighlight(window);
+	m_shipMovementArea.render(window, m_battle.getMap());
 }
 
 void BattleUI::loadGUI(sf::Vector2i mapDimensions)
