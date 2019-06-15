@@ -47,6 +47,12 @@ void BattleUI::renderUI(sf::RenderWindow& window)
 	{
 		i.render(window, m_battle.getMap());
 	}
+
+	if (m_tileOnClick && (m_tileOnClick->m_type == eTileType::eSea || m_tileOnClick->m_type == eTileType::eOcean))
+	{
+		m_tileOnClickSprite.render(window, m_battle.getMap());
+	}
+
 	m_spriteOnMouse.render(window, m_battle.getMap());
 }
 
@@ -155,15 +161,7 @@ void BattleUI::generateMovementArea(const Ship & ship)
 
 void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 {
-	auto& map = m_battle.getMap();
-	if (m_tileOnClick && (m_tileOnClick->m_type == eTileType::eSea || m_tileOnClick->m_type == eTileType::eOcean))
-	{
-		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tileOnClick->m_tileCoordinate);
 
-		m_tileOnClickSprite.setPosition(sf::Vector2i(
-			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));		
-	}
 }
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)
