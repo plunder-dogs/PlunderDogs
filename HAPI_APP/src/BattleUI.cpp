@@ -40,6 +40,7 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 void BattleUI::renderUI(sf::RenderWindow& window)
 {
 	m_tileHighlight.render(window, m_battle.getMap());
+	
 	m_shipMovementArea.render(window, m_battle.getMap());
 }
 
@@ -54,6 +55,7 @@ void BattleUI::renderTargetArea(sf::RenderWindow& window)
 	{
 		i.render(window, m_battle.getMap());	
 	}
+	m_spriteOnMouse.render(window, m_battle.getMap());
 }
 
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
@@ -163,9 +165,7 @@ void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 
 		m_tileHighlight.setPosition(sf::Vector2i(
 			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
-			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));
-
-		
+			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));		
 	}
 }
 
@@ -448,7 +448,6 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
-	//TODO: Drop info box
 	m_tileOnClick = nullptr;
 	m_tileHighlight.deactivate();
 	m_shipTargetArea.clearTileArea();
@@ -457,28 +456,17 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 {
 	auto tileCoordinate = m_tileOnMouse->m_tileCoordinate;
-	//tileOnMouse in new position
-	if (m_tileOnClick && m_tileOnClick->m_tileCoordinate != m_tileOnMouse->m_tileCoordinate)
+	auto cIter = std::find_if(m_shipTargetArea.m_tileArea.cbegin(), m_shipTargetArea.m_tileArea.cend(),
+		[tileCoordinate](const auto& tile) { return tileCoordinate == tile->m_tileCoordinate; });
+	
+	if (cIter != m_shipTargetArea.m_tileArea.cend())
 	{
-		//TODO: this does not work if some of the tiles are nullptr!
-		auto cIter = std::find_if(m_shipTargetArea.m_tileArea.cbegin(), m_shipTargetArea.m_tileArea.cend(),
-			[tileCoordinate](const auto& tile) { 
-				if (tile != nullptr)
-				{
-					return tileCoordinate == tile->m_tileCoordinate;
-				}
-			});
-		//tileOnMouse within weapon range
-		if (cIter != m_shipTargetArea.m_tileArea.cend())
-		{
-			m_tileHighlight.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
-			m_tileHighlight.activate();
-		}
-		//outside weapon range
-		else
-		{
-			m_tileHighlight.deactivate();
-		}
+		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
+		m_spriteOnMouse.activate();
+	}
+	else
+	{
+		m_spriteOnMouse.deactivate();
 	}
 }
 
