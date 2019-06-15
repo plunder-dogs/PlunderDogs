@@ -52,6 +52,14 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 	}
 }
 
+void Faction::renderShipsMovementGraphs(sf::RenderWindow & window, const Map & map)
+{
+	for (auto& ship : m_ships)
+	{
+		ship.renderMovementGraph(window, map);
+	}
+}
+
 bool Faction::isPositionInDeploymentArea(sf::Vector2i position) const
 {
 	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),

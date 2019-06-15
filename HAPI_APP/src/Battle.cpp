@@ -177,8 +177,7 @@ void Battle::start(const std::string & newMapName)
 void Battle::render(sf::RenderWindow& window)
 {
 	m_map.renderMap(window);
-	m_battleUI.renderUI(window);
-
+	
 	for (auto& faction : m_factions)
 	{
 		if (faction)
@@ -186,8 +185,8 @@ void Battle::render(sf::RenderWindow& window)
 			faction->render(window, m_map, m_currentBattlePhase);
 		}
 	}
-
-	m_battleUI.renderTargetArea(window);
+	
+	m_battleUI.renderUI(window);
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{
@@ -196,6 +195,15 @@ void Battle::render(sf::RenderWindow& window)
 	for (auto& fireParticle : m_fireParticles)
 	{
 		fireParticle.render(window);
+	}
+}
+
+void Battle::renderFactionShipsMovementGraphs(sf::RenderWindow & window)
+{
+	if (m_currentBattlePhase == BattlePhase::Movement)
+	{
+		assert(m_factions[m_currentFactionTurn].get());
+		return m_factions[m_currentFactionTurn]->renderShipsMovementGraphs(window, m_map);
 	}
 }
 

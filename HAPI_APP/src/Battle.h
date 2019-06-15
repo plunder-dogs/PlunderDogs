@@ -34,6 +34,7 @@ public:
 
 	void start(const std::string& newMapName);
 	void render(sf::RenderWindow& window);
+	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 

@@ -8,10 +8,11 @@ struct Faction
 	Faction(FactionName factionName, ePlayerType playerType);
 
 	const Ship& getShip(int shipID) const;
-
 	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase);
+	void renderShipsMovementGraphs(sf::RenderWindow& window, const Map& map);
 	bool isEliminated() const;
 	void clearSpawnArea();
+
 	//Deployment Phase
 	bool isPositionInDeploymentArea(sf::Vector2i position) const;
 	void addShip(FactionName factionName, eShipType shipType);

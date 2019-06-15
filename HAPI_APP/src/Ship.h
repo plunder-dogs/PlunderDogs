@@ -39,6 +39,7 @@ public:
 
 	void update(float deltaTime, const Map& map);
 	void render(sf::RenderWindow& window, const Map& map);
+	void renderMovementGraph(sf::RenderWindow& window, const Map& map);
 	void setDestination();
 	void enableAction();
 	void disableAction();

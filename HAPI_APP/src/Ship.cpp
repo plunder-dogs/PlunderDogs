@@ -78,10 +78,6 @@ int Ship::getID() const
 	return m_ID;
 }
 
-//if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&
-//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isMovingToDestination() &&
-//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isDestinationSet())
-
 int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 {
 	if (isMovingToDestination() || isDestinationSet())
@@ -492,18 +488,7 @@ void Ship::update(float deltaTime, const Map & map)
 
 void Ship::render(sf::RenderWindow& window, const Map & map)
 {
-	//Render Movemnt Graph
-	for (auto& i : m_movementGraph)
-	{
-		if (i.isActive())
-		{
-			i.render(window, map);
-		}
-		else
-		{
-			break;
-		}
-	}
+
 
 	//Render Ship
 	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
@@ -516,6 +501,22 @@ void Ship::render(sf::RenderWindow& window, const Map & map)
 
 	m_actionSprite.setPosition(m_currentPosition);
 	m_actionSprite.render(window, map);
+}
+
+void Ship::renderMovementGraph(sf::RenderWindow & window, const Map & map)
+{
+	//Render Movemnt Graph
+	for (auto& i : m_movementGraph)
+	{
+		if (i.isActive())
+		{
+			i.render(window, map);
+		}
+		else
+		{
+			break;
+		}
+	}
 }
 
 void Ship::setDeploymentPosition(sf::Vector2i position)

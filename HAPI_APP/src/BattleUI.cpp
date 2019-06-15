@@ -18,7 +18,7 @@ BattleUI::BattleUI(Battle & battle)
 	m_tileOnPreviousClick(nullptr),
 	m_tileOnClick(nullptr),
 	m_tileOnMouse(nullptr),
-	m_tileHighlight(),
+	m_tileOnClickSprite(),
 	m_spriteOnMouse(Textures::getInstance().m_cross),
 	m_gui(),
 	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
@@ -39,23 +39,20 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 
 void BattleUI::renderUI(sf::RenderWindow& window)
 {
-	m_tileHighlight.render(window, m_battle.getMap());
-	
+	m_tileOnClickSprite.render(window, m_battle.getMap());
 	m_shipMovementArea.render(window, m_battle.getMap());
+	m_battle.renderFactionShipsMovementGraphs(window);
+
+	for (auto& i : m_shipTargetArea.m_tileAreaGraph)
+	{
+		i.render(window, m_battle.getMap());
+	}
+	m_spriteOnMouse.render(window, m_battle.getMap());
 }
 
 void BattleUI::loadGUI(sf::Vector2i mapDimensions)
 {
 	m_gui.setMaxCameraOffset(mapDimensions);
-}
-
-void BattleUI::renderTargetArea(sf::RenderWindow& window)
-{
-	for (auto& i : m_shipTargetArea.m_tileAreaGraph)
-	{
-		i.render(window, m_battle.getMap());	
-	}
-	m_spriteOnMouse.render(window, m_battle.getMap());
 }
 
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
@@ -163,7 +160,7 @@ void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 	{
 		const sf::Vector2i tileTransform = map.getTileScreenPos(m_tileOnClick->m_tileCoordinate);
 
-		m_tileHighlight.setPosition(sf::Vector2i(
+		m_tileOnClickSprite.setPosition(sf::Vector2i(
 			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
 			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));		
 	}
@@ -286,7 +283,7 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 		//If tile isn't already occupied by a ship
 		if (!m_tileOnClick->isShipOnTile())
 		{
-			m_tileHighlight.setPosition(m_tileOnClick->m_tileCoordinate);
+			m_tileOnClickSprite.setPosition(m_tileOnClick->m_tileCoordinate);
 			m_battle.deployFactionShipAtPosition(m_tileOnClick->m_tileCoordinate, startingDirection);
 		}
 	}
@@ -353,7 +350,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	if (m_tileOnClick && m_tileOnClick->isShipOnTile())
 	{
 		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
-		m_tileHighlight.deactivate();
+		m_tileOnClickSprite.deactivate();
 	}
 	//TODO: Drop info box
 	m_tileOnClick = nullptr;
@@ -449,7 +446,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
 	m_tileOnClick = nullptr;
-	m_tileHighlight.deactivate();
+	m_tileOnClickSprite.deactivate();
 	m_shipTargetArea.clearTileArea();
 }
 
@@ -475,7 +472,7 @@ void BattleUI::onNewBattlePhase()
 	m_tileOnClick = nullptr;
 	m_tileOnPreviousClick = nullptr;
 	m_tileOnMouse = nullptr;
-	m_tileHighlight.deactivate();
+	m_tileOnClickSprite.deactivate();
 	m_shipTargetArea.clearTileArea();
 	m_shipMovementArea.clearTileArea();
 }

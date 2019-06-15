@@ -23,7 +23,6 @@ public:
 	void renderUI(sf::RenderWindow& window);
 	void loadGUI(sf::Vector2i mapDimensions);
 
-	void renderTargetArea(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 
@@ -32,7 +31,7 @@ private:
 	const Tile* m_tileOnPreviousClick;
 	const Tile* m_tileOnClick;
 	const Tile* m_tileOnMouse;
-	Sprite m_tileHighlight;
+	Sprite m_tileOnClickSprite;
 	Sprite m_spriteOnMouse;
 	BattleGUI m_gui;
 	TileArea m_shipMovementArea;
