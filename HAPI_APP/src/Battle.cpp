@@ -650,12 +650,8 @@ void Battle::onEndBattlePhaseEarly()
 	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
 		auto& ships = m_factions[m_currentFactionTurn]->m_ships;
-		auto cIter = std::find_if(ships.cbegin(), ships.cend(), [](const auto& ship) { return ship.isMovingToDestination() == true; });
-		if (cIter != ships.cend())
-		{
-			GameEventMessenger::getInstance().broadcast(GameEvent::eUnableToSkipPhase);
-		}
-		else
+		auto cIter = std::find_if(ships.cbegin(), ships.cend(), [](const auto& ship) { return ship.isMovingToDestination(); });
+		if (cIter == ships.cend())
 		{
 			advanceToNextBattlePhase();
 		}

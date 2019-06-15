@@ -52,6 +52,13 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 	}
 }
 
+bool Faction::isPositionInDeploymentArea(sf::Vector2i position) const
+{
+	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
+		[position](const auto& tile) { return position == tile->m_tileCoordinate; });
+	return cIter != m_spawnArea.m_tileArea.cend();
+}
+
 void Faction::addShip(FactionName factionName, eShipType shipType)
 {
 	assert(m_ships.size() < size_t(6));
@@ -127,8 +134,6 @@ bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDir
 
 void Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
 {
-	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
-		[startingPosition](const auto& tile) { return startingPosition == tile->m_tileCoordinate; });
 	for (auto& ship : m_ships)
 	{
 		if (!ship.isDeployed())
@@ -169,13 +174,13 @@ void Faction::shipTakeDamage(int shipID, int damage)
 bool Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	return m_ships[shipID].move(map, destination);
+	return m_ships[shipID].startMovement(map, destination);
 }
 
 bool Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	return m_ships[shipID].move(map, destination, endDirection);
+	return m_ships[shipID].startMovement(map, destination, endDirection);
 }
 
 void Faction::generateShipMovementGraph(const Map & map, int shipID, sf::Vector2i destination)

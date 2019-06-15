@@ -13,6 +13,7 @@ struct Faction
 	bool isEliminated() const;
 	void clearSpawnArea();
 	//Deployment Phase
+	bool isPositionInDeploymentArea(sf::Vector2i position) const;
 	void addShip(FactionName factionName, eShipType shipType);
 	bool isAllShipsDeployed() const;
 	void createSpawnArea(Map& map);

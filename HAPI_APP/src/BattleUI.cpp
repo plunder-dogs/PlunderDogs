@@ -18,6 +18,8 @@ BattleUI::BattleUI(Battle & battle)
 	m_tileOnPreviousClick(nullptr),
 	m_tileOnClick(nullptr),
 	m_tileOnMouse(nullptr),
+	m_tileHighlight(),
+	m_spriteOnMouse(Textures::getInstance().m_cross),
 	m_gui(),
 	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
 	m_shipTargetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap())
@@ -37,7 +39,7 @@ sf::Vector2i BattleUI::getCameraPositionOffset() const
 
 void BattleUI::renderUI(sf::RenderWindow& window)
 {
-	renderTileHighlight(window);
+	m_tileHighlight.render(window, m_battle.getMap());
 	m_shipMovementArea.render(window, m_battle.getMap());
 }
 
@@ -163,7 +165,7 @@ void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 			static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
 			static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale())));
 
-		m_tileHighlight.render(window, map);
+		
 	}
 }
 
@@ -271,7 +273,7 @@ void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
 	//Only place ship on non occupied tile
-	if (!m_tileOnMouse->m_shipOnTile.isValid())
+	if (!m_tileOnMouse->isShipOnTile())
 	{
 		m_battle.setShipDeploymentAtPosition(m_tileOnMouse->m_tileCoordinate);
 	}
@@ -297,7 +299,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	{
 		m_battle.generateFactionShipMovementGraph(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
 	}
-	else if(m_tileOnClick)
+	else if(m_tileOnClick && m_tileOnClick->isShipOnTile())
 	{
 		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
 	}

@@ -33,6 +33,7 @@ private:
 	const Tile* m_tileOnClick;
 	const Tile* m_tileOnMouse;
 	Sprite m_tileHighlight;
+	Sprite m_spriteOnMouse;
 	BattleGUI m_gui;
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;

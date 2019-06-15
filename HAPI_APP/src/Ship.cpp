@@ -96,6 +96,7 @@ int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 	{
 		return 0;
 	}
+
 	disableMovementGraph();
 
 	int i = 0;
@@ -145,7 +146,7 @@ void Ship::disableAction()
 	m_actionSprite.deactivate();
 }
 
-bool Ship::move(Map& map, sf::Vector2i destination)
+bool Ship::startMovement(Map& map, sf::Vector2i destination)
 {
 	if (!m_destinationSet)
 	{
@@ -172,7 +173,7 @@ bool Ship::move(Map& map, sf::Vector2i destination)
 	return true;
 }
 
-bool Ship::move(Map& map, sf::Vector2i destination, eDirection endDirection)
+bool Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
@@ -245,17 +246,15 @@ void Ship::disableMovementGraphNode(sf::Vector2i position, const Map & map)
 {
 	for (auto iter = m_movementGraph.begin(); iter != m_movementGraph.end(); ++iter)
 	{
-		sf::Vector2i spritePosition = iter->getPosition();
-		auto i = map.getMouseClickCoord({ spritePosition });
-		if (i == position)
+		if (iter->getPosition() == position)
 		{
-			iter->deactivate(); 
+			iter->deactivate();
 			break;
 		}
 	}
 }
 
-void Ship::handleRotation()
+void Ship:: handleRotation()
 {
 	int rotationAngle = 60;
 	int directionToTurn = static_cast<int>(m_movementPath.front().dir);
@@ -478,7 +477,7 @@ void Ship::update(float deltaTime, const Map & map)
 			m_movementTimer.reset();
 			m_currentPosition = m_movementPath.front().pair();
 			disableMovementGraphNode(m_currentPosition, map);
-
+		
 			handleRotation();
 			m_movementPath.pop();
 
