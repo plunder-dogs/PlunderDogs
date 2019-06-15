@@ -52,6 +52,8 @@ void TileArea::clearTileArea()
 
 void TileArea::activateGraph()
 {
+	assert(m_tileArea.size() <= m_tileAreaGraph.size());
+
 	for (int i = 0; i < m_tileArea.size(); i++)
 	{
 		assert(m_tileArea[i]);

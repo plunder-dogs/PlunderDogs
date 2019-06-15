@@ -199,7 +199,7 @@ void Battle::render(sf::RenderWindow& window)
 	}
 }
 
-void Battle::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
+void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	m_battleUI.handleInput(window, currentEvent);
 }
@@ -604,6 +604,12 @@ void Battle::incrementFactionTurn()
 			return;
 		}
 	}
+}
+
+bool Battle::isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const
+{
+	assert(m_factions[m_currentFactionTurn].get());
+	return m_factions[m_currentFactionTurn]->m_factionName == getCurrentFaction();
 }
 
 const Map & Battle::getMap() const

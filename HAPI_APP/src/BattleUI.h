@@ -24,7 +24,7 @@ public:
 	void loadGUI(sf::Vector2i mapDimensions);
 
 	void renderTargetArea(sf::RenderWindow& window);
-	void handleInput(sf::RenderWindow& window, const sf::Event& currentEvent);
+	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 
 private:
@@ -43,16 +43,17 @@ private:
 	void renderTileHighlight(sf::RenderWindow& window);
 
 	//LeftClick
-	void onLeftClick(sf::RenderWindow& window);
+	void onLeftClick(sf::Vector2i mousePosition);
 	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
 	void onLeftClickMovementPhase(sf::Vector2i mousePosition);
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	//MouseMove
-	void handleMouseMovement(sf::Vector2i mousePosition);
+	void onMouseMovement(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
 	//RightClick
+	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickMovementPhase(sf::Vector2i mousePosition);
 	void onRightClickAttackPhase(sf::Vector2i mousePosition);
 };

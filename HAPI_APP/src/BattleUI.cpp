@@ -63,7 +63,7 @@ void BattleUI::renderTargetArea(sf::RenderWindow& window)
 	}
 }
 
-void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEvent)
+void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
@@ -71,34 +71,17 @@ void BattleUI::handleInput(sf::RenderWindow& window, const sf::Event & currentEv
 	{
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
-			onLeftClick(window);
+			onLeftClick(mousePosition);
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
-			switch (m_battle.getCurrentPhase())
-			{
-			case BattlePhase::Movement:
-			{
-				onRightClickMovementPhase(mousePosition);
-				break;
-			}
-			case BattlePhase::Attack:
-			{
-				onRightClickAttackPhase(mousePosition);
-				break;
-			}
-			} 
+			onRightClick(mousePosition);
 		}
 	}
 	else if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		if (m_battle.getCurrentPlayerType() == ePlayerType::eAI)
-		{
-			return;
-		}
-
-		m_gui.onMouseMove(sf::Mouse::getPosition(window));
-		handleMouseMovement(sf::Mouse::getPosition(window));
+		m_gui.onMouseMove(mousePosition);
+		onMouseMovement(mousePosition);
 	}
 	else if (currentEvent.type == sf::Event::KeyPressed)
 	{
@@ -162,9 +145,7 @@ void BattleUI::generateTargetArea(const Tile & source)
 		}
 
 		m_battle.getMap().getTileLine(m_targetArea.m_tileArea, source.m_tileCoordinate,
-			ship.getRange(), directionOfFire, true);
-		
-		
+			ship.getRange(), directionOfFire, true);	
 	}
 
 	m_targetArea.activateGraph();
@@ -176,6 +157,8 @@ void BattleUI::generateMovementArea(const Ship & ship)
 
 	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
 	BFS::findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
+
+	m_movementArea.activateGraph();
 }
 
 void BattleUI::renderTileHighlight(sf::RenderWindow& window)
@@ -193,9 +176,8 @@ void BattleUI::renderTileHighlight(sf::RenderWindow& window)
 	}
 }
 
-void BattleUI::onLeftClick(sf::RenderWindow & window)
+void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 {
-	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
@@ -232,8 +214,7 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 	{
 	case BattlePhase::Deployment:
 	{
-		onLeftClickDeploymentPhase();
-		m_tileHighlight.deactivate();
+		onLeftClickDeploymentPhase(); 
 		break;
 	}
 	case BattlePhase::Movement:
@@ -249,11 +230,12 @@ void BattleUI::onLeftClick(sf::RenderWindow & window)
 	}
 }
 
-void BattleUI::handleMouseMovement(sf::Vector2i mousePosition)
+void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 {
 	//Ship selected doesn't match faction currently in play
-	if (m_tileOnClick && m_tileOnClick->isShipOnTile()
-		&& m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
+	if ((m_tileOnClick && m_tileOnClick->isShipOnTile()
+		&& !m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
+		|| m_battle.getCurrentPlayerType() == ePlayerType::eAI)
 	{
 		return;
 	}
@@ -302,9 +284,6 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 	{
 		m_battle.setShipDeploymentAtPosition(m_tileOnMouse->m_tileCoordinate);
 	}
-
-	m_tileHighlight.setPosition(m_tileOnMouse->m_tileCoordinate);
-	m_tileHighlight.activate();
 }
 
 void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
@@ -322,21 +301,14 @@ void BattleUI::onLeftClickDeploymentPhase(eDirection startingDirection)
 
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&  
-		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isMovingToDestination() &&
-		!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isDestinationSet())
+	if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&
+		(m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean))
 	{
-		if (m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean)
-		{
-			m_battle.generateFactionShipMovementGraph(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
-			m_tileHighlight.deactivate();
-		}
-		else
-		{ 
-			m_tileHighlight.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
-			m_tileHighlight.activate();
-			m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
-		}	
+		m_battle.generateFactionShipMovementGraph(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+	}
+	else if(m_tileOnClick)
+	{
+		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
 	}
 }
 
@@ -362,6 +334,23 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 			m_tileOnClick = nullptr;
 			m_tileOnPreviousClick = nullptr;
 		}
+	}
+}
+
+void BattleUI::onRightClick(sf::Vector2i mousePosition)
+{
+	switch (m_battle.getCurrentPhase())
+	{
+	case BattlePhase::Movement:
+	{
+		onRightClickMovementPhase(mousePosition);
+		break;
+	}
+	case BattlePhase::Attack:
+	{
+		onRightClickAttackPhase(mousePosition);
+		break;
+	}
 	}
 }
 

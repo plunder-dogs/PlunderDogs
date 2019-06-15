@@ -78,8 +78,17 @@ int Ship::getID() const
 	return m_ID;
 }
 
+//if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&
+//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isMovingToDestination() &&
+//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isDestinationSet())
+
 int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 {
+	if (isMovingToDestination() || isDestinationSet())
+	{
+		return 0;
+	}
+
 	posi start = { m_currentPosition, m_currentDirection };
 	posi end = { destination.x, destination.y };
 	std::queue<posi> pathToTile = BFS::findPath(map, start, end, m_movementPoints);
