@@ -12,7 +12,8 @@ class Battle
 	enum class eDeploymentState
 	{
 		DeployingPlayer = 0,
-		DeployingAI
+		DeployingAI,
+		Finished
 	};
 
 public:

@@ -186,7 +186,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	if (m_tileOnClick->isShipOnTile())
 	{
 		auto& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
-		if (ship.isDead() || ship.getFactionName() != m_battle.getCurrentFaction())
+		if (ship.isDead())
 		{
 			m_tileOnPreviousClick = nullptr;
 			return;
@@ -207,10 +207,73 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	}
 	case BattlePhase::Attack:
 	{
-		onLeftClickAttackPhase(mousePosition);
+		if (m_tileOnClick->isShipOnTile())
+		{
+			onLeftClickAttackPhase(mousePosition);
+		}
+		else
+		{
+			m_shipTargetArea.clearTileArea();
+			m_tileOnPreviousClick = nullptr;
+		}
 		break;
 	}
 	}
+}
+
+void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
+{
+	if (!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired()
+		&& m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
+	{
+		generateTargetArea(*m_tileOnClick);
+		return;
+	}
+
+	if (m_battle.getFactionShip(m_tileOnPreviousClick->m_shipOnTile).getFactionName() !=
+		m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName())
+	{
+		//m_battle.fireFactionShipAtPosition(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_shipOnTile, m_shipTargetArea.m_tileArea);
+	}
+
+	//m_shipTargetArea.clearTileArea();
+	//m_tileOnClick = nullptr;
+	//m_tileOnPreviousClick = nullptr;
+	//m_tileOnMouse = nullptr;
+	//m_tileOnClickSprite.deactivate();
+	////Entity Already Selected whilst showing where to fire
+	////Change to different Entity before firing
+	//if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()
+	//	 && m_tileOnClick && m_targetArea.m_tileArea.size() > 0)
+	//{
+	//	m_targetArea.clearTileArea();
+	//	generateTargetArea(*tileOnMouse);
+	//	//TODO: Raise info box
+	//	m_tileOnClick = tileOnMouse;
+	//	return;
+	//}
+
+	////Click on same
+	////Select new Entity to fire at something
+	//if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
+	//{
+	//	m_tileOnClick = tileOnMouse;
+	//	return;
+	//}
+
+	//if (!m_tileOnClick && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == 
+	//	m_battle.getCurrentFaction())
+	//{
+	//	m_tileOnClick = tileOnMouse;
+	//}
+
+	//if (m_tileOnClick && m_tileOnClick->isShipOnTile() && 
+	//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired() &&
+	//	m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
+	//{
+	//	m_tileOnClick = tileOnMouse;
+	//	generateTargetArea(*tileOnMouse);
+	//}
 }
 
 void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
@@ -351,90 +414,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	m_shipMovementArea.clearTileArea();
 }
 
-void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
-{
-	if (m_tileOnClick->isShipOnTile() && !m_battle.getFactionShip(m_tileOnMouse->m_shipOnTile).isWeaponFired())
-	{
-		generateTargetArea(*m_tileOnMouse);	
-	}
 
-	//if (!m_tileOnClick && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
-	//{
-	//	m_tileOnClick = tileOnMouse;
-	//	return;
-	//}
-
-	////Do not fire on destroyed ship
-	//if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).isDead())
-	//{
-	//	m_targetArea.clearTileArea();
-	//	m_tileHighlight.deactivate();
-	//	//TODO: Drop info box
-	//	m_tileOnClick = nullptr;
-	//	return;
-	//}
-
-	////Clicking on the same entity that has been previously selected
-	//if (m_tileOnClick && m_tileOnClick->m_tileCoordinate == tileOnMouse->m_tileCoordinate)
-	//{
-	//	m_targetArea.clearTileArea();
-	//	m_tileHighlight.deactivate();
-	//	//TODO: Drop info box
-	//	m_tileOnClick = nullptr;
-	//	return;
-	//}
-
-	////Entity already selected Fire weapon at position
-	////If the selectedTile has an entity on it and that entity hasn't fired
-	//if (m_tileOnClick && m_tileOnClick->isShipOnTile() && 
-	//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired())
-	//{
-	//	//If there is an entity on the tile you're clicking on and that entity's faction name differs from the one of the ship that's firing
-	//	if ((tileOnMouse->m_shipOnTile.isValid()) && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != 
-	//		m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName())
-	//	{
-	//		m_battle.fireFactionShipAtPosition(m_tileOnClick->m_shipOnTile, tileOnMouse->m_shipOnTile, m_targetArea.m_tileArea);
-	//	}
-	//	m_targetArea.clearTileArea();
-	//	m_tileOnClick = nullptr;
-	//	m_tileHighlight.deactivate();
-	//	return;
-	//}
-
-	////Entity Already Selected whilst showing where to fire
-	////Change to different Entity before firing
-	//if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction()
-	//	 && m_tileOnClick && m_targetArea.m_tileArea.size() > 0)
-	//{
-	//	m_targetArea.clearTileArea();
-	//	generateTargetArea(*tileOnMouse);
-	//	//TODO: Raise info box
-	//	m_tileOnClick = tileOnMouse;
-	//	return;
-	//}
-
-	////Click on same
-	////Select new Entity to fire at something
-	//if (tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() != m_battle.getCurrentFaction())
-	//{
-	//	m_tileOnClick = tileOnMouse;
-	//	return;
-	//}
-
-	//if (!m_tileOnClick && tileOnMouse->m_shipOnTile.isValid() && m_battle.getFactionShip(tileOnMouse->m_shipOnTile).getFactionName() == 
-	//	m_battle.getCurrentFaction())
-	//{
-	//	m_tileOnClick = tileOnMouse;
-	//}
-
-	//if (m_tileOnClick && m_tileOnClick->isShipOnTile() && 
-	//	!m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired() &&
-	//	m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).getFactionName() == m_battle.getCurrentFaction())
-	//{
-	//	m_tileOnClick = tileOnMouse;
-	//	generateTargetArea(*tileOnMouse);
-	//}
-}
 
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {

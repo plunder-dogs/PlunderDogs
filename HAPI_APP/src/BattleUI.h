@@ -7,7 +7,6 @@
 struct Tile;
 class Ship;
 class Battle;
-class Map;
 class BattleUI
 {
 public:

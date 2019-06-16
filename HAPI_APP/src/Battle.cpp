@@ -303,7 +303,7 @@ bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemySh
 		//Find Enemy Ship 
 		sf::Vector2i enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
 		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), 
-			[enemyShipInPlayPosition](const auto& tile) { if (tile) return enemyShipInPlayPosition == tile->m_tileCoordinate; });
+			[enemyShipInPlayPosition](const auto& tile) { return enemyShipInPlayPosition == tile->m_tileCoordinate; });
 		//Enemy Ship within range of weapon
 		if (cIter != targetArea.cend())
 		{
@@ -316,6 +316,7 @@ bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemySh
 				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
 			}
 
+			m_factions[firingShip.factionName]->m_ships[firingShip.shipID].fireWeapon();
 			getFaction(enemyShip.factionName).shipTakeDamage(enemyShip.shipID, firingShipInPlay.getDamage());
 			return true;
 		}
@@ -397,6 +398,7 @@ void Battle::advanceToNextBattlePhase()
 		if (allPlayersDeployed)
 		{
 			switchToBattlePhase(BattlePhase::Movement);
+			m_currentDeploymentState = eDeploymentState::Finished;
 			m_currentFactionTurn = 0;
 
 			for (auto& faction : m_factions)
@@ -455,7 +457,7 @@ void Battle::advanceToNextBattlePhase()
 		if (!m_factions[m_currentFactionTurn]->isEliminated() && m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
-			//TODO: Refactor
+			//TODO: Refactor		
 			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
 		else if (m_factions[m_currentFactionTurn]->m_playerType == ePlayerType::eHuman)
@@ -541,7 +543,7 @@ void Battle::updateMovementPhase(float deltaTime)
 	{
 		ship.update(deltaTime, m_map);
 	}
-	for (auto& entity : m_factions[m_currentFactionTurn]->m_ships)
+	for (const auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 	{
 		if (entity.isDead())
 			continue;
@@ -560,16 +562,16 @@ void Battle::updateMovementPhase(float deltaTime)
 
 void Battle::updateAttackPhase()
 {
-	bool allEntitiesAttacked = true;
+	bool allShipsAttacked = true;
 	for (const auto& ship : m_factions[m_currentFactionTurn]->m_ships)
 	{
 		if (!ship.isDead() && !ship.isWeaponFired())
 		{
-			allEntitiesAttacked = false;
+			allShipsAttacked = false;
 		}
 	}
 
-	if (allEntitiesAttacked)
+	if (allShipsAttacked)
 	{	
 		advanceToNextBattlePhase();
 	}
@@ -583,8 +585,8 @@ std::unique_ptr<Faction>& Battle::getCurrentPlayer()
 
 Faction & Battle::getFaction(FactionName factionName)
 {
-	assert(m_factions[m_currentFactionTurn].get());
-	return *m_factions[m_currentFactionTurn];
+	assert(m_factions[static_cast<int>(factionName)].get());
+	return *m_factions[static_cast<int>(factionName)];
 }
 
 void Battle::incrementFactionTurn()
@@ -601,17 +603,20 @@ void Battle::incrementFactionTurn()
 			if (m_factions[i])
 			{
 				m_currentFactionTurn = i;
-				return;
+				break;
 			}
 		}
 	}
-	//Select next faction available
-	for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
+	else
 	{
-		if (m_factions[i])
+		//Select next faction available
+		for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
 		{
-			m_currentFactionTurn = i;
-			return;
+			if (m_factions[i])
+			{
+				m_currentFactionTurn = i;
+				break;
+			}
 		}
 	}
 }
@@ -619,7 +624,7 @@ void Battle::incrementFactionTurn()
 bool Battle::isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].get());
-	return m_factions[m_currentFactionTurn]->m_factionName == getCurrentFaction();
+	return shipOnTile.factionName == getCurrentFaction();
 }
 
 const Map & Battle::getMap() const
@@ -634,6 +639,7 @@ BattlePhase Battle::getCurrentPhase() const
 
 FactionName Battle::getCurrentFaction() const
 {
+	assert(m_factions[m_currentFactionTurn].get());
 	return m_factions[m_currentFactionTurn]->m_factionName;
 }
 

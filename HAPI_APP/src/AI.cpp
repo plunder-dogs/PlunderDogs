@@ -361,7 +361,7 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 
 void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 {
-	std::vector< const Tile*> firingArea;
+	std::vector<const Tile*> firingArea;
 	switch (firingShip.getShipType())
 	{
 	case eShipType::eTurtle:
@@ -388,8 +388,6 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
 			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-			
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -404,8 +402,6 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
 			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -437,8 +433,6 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
 			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
 			break;
 		}
 		break;

@@ -214,10 +214,8 @@ void Ship::takeDamage(int damageAmount)
 	{
 		m_health = 0;
 		//m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
-		m_isDead = true;
 		m_actionSprite.deactivate();
-		disableMovementGraph();
-		
+		disableMovementGraph();	
 	}
 }
 
@@ -489,8 +487,6 @@ void Ship::update(float deltaTime, const Map & map)
 
 void Ship::render(sf::RenderWindow& window, const Map & map)
 {
-
-
 	//Render Ship
 	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
