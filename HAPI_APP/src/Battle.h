@@ -48,7 +48,7 @@ public:
 	void disableFactionShipMovementGraph(ShipOnTile shipOnTile);
 	void generateFactionShipMovementGraph(ShipOnTile shipOnTile, sf::Vector2i destination);
 	//Attack Phase
-	bool fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea);
+	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
 	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& m_factions;

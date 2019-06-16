@@ -232,6 +232,7 @@ void Ship::setDestination()
 
 void Ship::onNewBattlePhase()
 {
+
 	m_weaponFired = false;
 	m_destinationSet = false;
 	m_movingToDestination = false;

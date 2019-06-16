@@ -373,7 +373,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -387,7 +387,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -401,7 +401,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -432,7 +432,7 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;

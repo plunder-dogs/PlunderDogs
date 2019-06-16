@@ -288,21 +288,27 @@ void Battle::setShipDeploymentAtPosition(sf::Vector2i position)
 	m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position);
 }
 
-bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemyShip, const std::vector<const Tile*>& targetArea)
+void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea)
 {
 	assert(m_currentBattlePhase == BattlePhase::Attack);
-	assert(firingShip.isValid());
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
+	m_factions[firingShip.factionName]->m_ships[firingShip.shipID].fireWeapon();
+
+	if (!firingPosition.isShipOnTile())
+	{
+		return;
+	}
+
 	const Ship& firingShipInPlay = getFactionShip(firingShip);
-	const Ship& enemyShipInPlay = getFactionShip(enemyShip);
+	const Ship& enemyShipInPlay = getFactionShip(firingPosition.m_shipOnTile);
 
 	//Disallow attacking same team
 	if (enemyShipInPlay.getFactionName() != getCurrentFaction() && !enemyShipInPlay.isDead())
 	{
 		//Find Enemy Ship 
 		sf::Vector2i enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
-		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(), 
+		auto cIter = std::find_if(targetArea.cbegin(), targetArea.cend(),
 			[enemyShipInPlayPosition](const auto& tile) { return enemyShipInPlayPosition == tile->m_tileCoordinate; });
 		//Enemy Ship within range of weapon
 		if (cIter != targetArea.cend())
@@ -316,13 +322,11 @@ bool Battle::fireFactionShipAtPosition(ShipOnTile firingShip, ShipOnTile enemySh
 				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
 			}
 
-			m_factions[firingShip.factionName]->m_ships[firingShip.shipID].fireWeapon();
-			getFaction(enemyShip.factionName).shipTakeDamage(enemyShip.shipID, firingShipInPlay.getDamage());
-			return true;
+
+			getFaction(enemyShipInPlay.getFactionName()).shipTakeDamage(enemyShipInPlay.getID(), firingShipInPlay.getDamage());
+			return;
 		}
 	}
-
-	return false;
 }
 
 void Battle::advanceToNextBattlePhase()
