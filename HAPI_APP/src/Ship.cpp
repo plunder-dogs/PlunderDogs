@@ -159,10 +159,6 @@ void Ship::startMovement(Map& map, sf::Vector2i destination)
 			m_movingToDestination = true;
 			m_actionSprite.deactivate();
 		}
-		else
-		{
-			disableMovementGraph();
-		}
 	}
 }
 
@@ -181,10 +177,6 @@ void Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirec
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.deactivate();
-		}
-		else
-		{
-			disableMovementGraph();
 		}
 	}
 }
@@ -209,7 +201,6 @@ void Ship::takeDamage(int damageAmount)
 		FactionShipDestroyedEvent shipDestroyedEvent(m_factionName, m_ID);
 		GameEventMessenger::getInstance().broadcast(GameEvent(&shipDestroyedEvent), eGameEvent::eFactionShipDestroyed);
 		m_actionSprite.deactivate();
-		disableMovementGraph();	
 	}
 }
 
