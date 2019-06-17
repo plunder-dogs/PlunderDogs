@@ -19,7 +19,7 @@ BattleUI::BattleUI(Battle & battle)
 	m_tileOnClick(nullptr),
 	m_tileOnMouse(nullptr),
 	m_tileOnClickSprite(),
-	m_spriteOnMouse(Textures::getInstance().m_cross),
+	m_spriteOnMouse(Textures::getInstance().m_cross, false),
 	m_gui(),
 	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
 	m_shipTargetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap())

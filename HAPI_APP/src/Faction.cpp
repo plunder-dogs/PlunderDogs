@@ -28,7 +28,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 		spawnArea.render(window, map);
 	}
 
-	if (currentBattlePhase == BattlePhase::Deployment)
+	if (currentBattlePhase == BattlePhase::Deployment && m_playerType == ePlayerType::eHuman)
 	{
 		for (auto& ship : m_ships)
 		{
@@ -43,7 +43,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 			}
 		}		
 	}
-	else
+	else if(currentBattlePhase != BattlePhase::Deployment)
 	{
 		for (auto& ship : m_ships)
 		{
