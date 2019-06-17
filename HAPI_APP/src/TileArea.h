@@ -12,6 +12,8 @@ struct TileArea
 	TileArea(size_t maxTileAreaSize);
 	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, const Map& map, bool activeGraph = false);
 
+	bool isPositionInTileArea(sf::Vector2i position) const;
+
 	void render(sf::RenderWindow& window, const Map& map);
 	void clearTileArea();
 	void activateGraph();

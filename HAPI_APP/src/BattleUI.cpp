@@ -365,14 +365,18 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 	//Ship already selected
 	else if(m_tileOnPreviousClick && m_tileOnPreviousClick->isShipOnTile())
 	{	
-		//Ship not present on tile selected
-		if (!m_tileOnClick->isShipOnTile())
+		if (!m_tileOnClick->isShipOnTile() && m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))
 		{
 			m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
-			m_tileOnClick = nullptr;
-			m_tileOnPreviousClick = nullptr;
-			m_shipMovementArea.clearTileArea();
 		}
+		else if (!m_tileOnClick->isShipOnTile() && !m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))
+		{
+			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousClick->m_shipOnTile);
+		}
+
+		m_tileOnClick = nullptr;
+		m_tileOnPreviousClick = nullptr;
+		m_shipMovementArea.clearTileArea();
 	}
 }
 

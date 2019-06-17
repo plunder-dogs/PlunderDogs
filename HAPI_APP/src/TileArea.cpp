@@ -25,6 +25,14 @@ TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, co
 	}
 }
 
+bool TileArea::isPositionInTileArea(sf::Vector2i position) const
+{
+	auto cIter = std::find_if(m_tileArea.cbegin(), m_tileArea.cend(), 
+		[position](const auto& tile) { return tile->m_tileCoordinate == position; });
+
+	return (cIter != m_tileArea.cend());
+}
+
 void TileArea::render(sf::RenderWindow & window, const Map & map)
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
