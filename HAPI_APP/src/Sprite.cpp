@@ -101,15 +101,6 @@ void Sprite::setPosition(sf::Vector2i newPosition)
 	m_position = newPosition;
 }
 
-void Sprite::setPosition(sf::Vector2i newPosition, const Map & map)
-{
-	m_sprite.setPosition({
-	(float)newPosition.x + DRAW_OFFSET_X * map.getDrawScale(),
-	(float)newPosition.y + DRAW_OFFSET_Y * map.getDrawScale() });
-	
-	m_position = newPosition;
-}
-
 void Sprite::setScale(sf::Vector2f scale)
 {
 	m_sprite.setScale(scale);
