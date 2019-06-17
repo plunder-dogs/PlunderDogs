@@ -355,7 +355,8 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {	
 	//On first Ship Selection
-	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile())
+	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile() && 
+		m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
 	{
 		const Ship& ship = m_battle.getFactionShip(m_tileOnClick->m_shipOnTile);
 		if (!ship.isDestinationSet())
