@@ -288,7 +288,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	
 	//Action Sprite
 	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
-	m_actionSprite.activate();
+	m_actionSprite.deactivate();
 	switch (factionName)
 	{
 	case FactionName::eYellow:
