@@ -47,7 +47,7 @@ public:
 	//Deployment Phase
 	void setDeploymentPosition(sf::Vector2i position);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
-	int generateMovementGraph(const Map& map, sf::Vector2i destination);
+	void generateMovementGraph(const Map& map, sf::Vector2i destination);
 	void disableMovementGraph();
 	//Movement Phase
 	void startMovement(Map& map, sf::Vector2i destination);

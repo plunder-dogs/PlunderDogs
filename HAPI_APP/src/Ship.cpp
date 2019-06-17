@@ -79,11 +79,11 @@ int Ship::getID() const
 	return m_ID;
 }
 
-int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
+void Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 {
 	if (isMovingToDestination() || isDestinationSet())
 	{
-		return 0;
+		return;
 	}
 
 	posi start = { m_currentPosition, m_currentDirection };
@@ -91,7 +91,7 @@ int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 	std::queue<posi> pathToTile = BFS::findPath(map, start, end, m_movementPoints);
 	if (pathToTile.empty())
 	{
-		return 0;
+		return;
 	}
 
 	disableMovementGraph();
@@ -107,7 +107,6 @@ int Ship::generateMovementGraph(const Map & map, sf::Vector2i destination)
 	}
 
 	m_movementPathSize = i - 1;
-	return i;
 }
 
 void Ship::disableMovementGraph()
@@ -198,9 +197,10 @@ void Ship::takeDamage(int damageAmount)
 		m_health = 0;
 		m_isDead = true;
 		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eDead));
+		m_actionSprite.deactivate();
+
 		FactionShipDestroyedEvent shipDestroyedEvent(m_factionName, m_ID);
 		GameEventMessenger::getInstance().broadcast(GameEvent(&shipDestroyedEvent), eGameEvent::eFactionShipDestroyed);
-		m_actionSprite.deactivate();
 	}
 }
 
