@@ -37,7 +37,7 @@ public:
 	int getID() const;
 	sf::Vector2i getEndOfMovementPath() const;
 
-	void update(float deltaTime, const Map& map);
+	void update(float deltaTime);
 	void render(sf::RenderWindow& window, const Map& map);
 	void renderMovementGraph(sf::RenderWindow& window, const Map& map);
 	void setDestination();
@@ -80,7 +80,7 @@ private:
 	std::array<Sprite, MOVEMENT_GRAPH_SIZE> m_movementGraph;
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
-	void disableMovementGraphNode(sf::Vector2i position, const Map& map);
+	void disableMovementGraphNode(sf::Vector2i position);
 	void handleRotation();
 	void onNewBattlePhase(GameEvent gameEvent);
 };

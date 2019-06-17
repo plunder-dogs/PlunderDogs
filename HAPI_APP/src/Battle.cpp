@@ -559,7 +559,7 @@ void Battle::updateMovementPhase(float deltaTime)
 {
 	for (auto& ship : m_factions[m_currentFactionTurn]->m_ships)
 	{
-		ship.update(deltaTime, m_map);
+		ship.update(deltaTime);
 	}
 	for (const auto& entity : m_factions[m_currentFactionTurn]->m_ships)
 	{

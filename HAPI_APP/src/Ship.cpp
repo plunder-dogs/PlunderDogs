@@ -222,7 +222,7 @@ void Ship::onNewBattlePhase(GameEvent gameEvent)
 	m_movingToDestination = false;
 }
 
-void Ship::disableMovementGraphNode(sf::Vector2i position, const Map & map)
+void Ship::disableMovementGraphNode(sf::Vector2i position)
 {
 	for (auto iter = m_movementGraph.begin(); iter != m_movementGraph.end(); ++iter)
 	{
@@ -451,7 +451,7 @@ Ship::~Ship()
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
 }
 
-void Ship::update(float deltaTime, const Map & map)
+void Ship::update(float deltaTime)
 {
 	if (!m_movementPath.empty() && !isDead())
 	{
@@ -460,7 +460,7 @@ void Ship::update(float deltaTime, const Map & map)
 		{
 			m_movementTimer.reset();
 			m_currentPosition = m_movementPath.front().pair();
-			disableMovementGraphNode(m_currentPosition, map);
+			disableMovementGraphNode(m_currentPosition);
 		
 			handleRotation();
 			m_movementPath.pop();
