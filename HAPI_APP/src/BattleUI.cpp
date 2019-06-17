@@ -226,6 +226,10 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	{
 		m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
 	}
+	else if (!m_tileOnClick->isShipOnTile())
+	{
+		m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
+	}
 
 	m_shipTargetArea.clearTileArea();
 	m_tileOnClick = nullptr;
