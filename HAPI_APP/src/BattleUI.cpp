@@ -424,7 +424,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 	
 	if (cIter != m_shipTargetArea.m_tileArea.cend())
 	{
-		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate, m_battle.getMap());
+		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
 		m_spriteOnMouse.activate();
 	}
 	else
