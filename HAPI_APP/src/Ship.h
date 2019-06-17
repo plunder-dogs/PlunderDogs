@@ -49,8 +49,8 @@ public:
 	int generateMovementGraph(const Map& map, sf::Vector2i destination);
 	void disableMovementGraph();
 	//Movement Phase
-	bool startMovement(Map& map, sf::Vector2i destination);
-	bool startMovement(Map& map, sf::Vector2i destination, eDirection endDirection);
+	void startMovement(Map& map, sf::Vector2i destination);
+	void startMovement(Map& map, sf::Vector2i destination, eDirection endDirection);
 	//Attack Phase
 	void takeDamage(int damageAmount);
 	void fireWeapon();

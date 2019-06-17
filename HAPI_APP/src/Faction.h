@@ -21,8 +21,8 @@ struct Faction
 	bool deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
 	void setShipDeploymentAtPosition(sf::Vector2i startingPosition);
 	//Movement Phase
-	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination);
-	bool moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection);
+	void moveShipToPosition(Map& map, int shipID, sf::Vector2i destination);
+	void moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection);
 	void generateShipMovementGraph(const Map& map, int shipID, sf::Vector2i destination);
 	void disableShipMovementGraph(int shipID);
 	//Attack Phase

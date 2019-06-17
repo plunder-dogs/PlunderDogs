@@ -143,7 +143,7 @@ void Ship::disableAction()
 	m_actionSprite.deactivate();
 }
 
-bool Ship::startMovement(Map& map, sf::Vector2i destination)
+void Ship::startMovement(Map& map, sf::Vector2i destination)
 {
 	if (!m_destinationSet)
 	{
@@ -158,19 +158,15 @@ bool Ship::startMovement(Map& map, sf::Vector2i destination)
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.deactivate();
-			return true;
 		}
 		else
 		{
 			disableMovementGraph();
-			return false;
 		}
 	}
-	disableMovementGraph();
-	return true;
 }
 
-bool Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirection)
+void Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
@@ -185,16 +181,12 @@ bool Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirec
 			m_destinationSet = true;
 			m_movingToDestination = true;
 			m_actionSprite.deactivate();
-			return true;
 		}
 		else
 		{
 			disableMovementGraph();
-			return false;
 		}
 	}
-	disableMovementGraph();
-	return true;
 }
 
 void Ship::takeDamage(int damageAmount)
