@@ -229,6 +229,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	m_tileOnPreviousClick = nullptr;
 	m_tileOnMouse = nullptr;
 	m_tileOnClickSprite.deactivate();
+	m_spriteOnMouse.deactivate();
 
 	//***
 	//REFACTOR
