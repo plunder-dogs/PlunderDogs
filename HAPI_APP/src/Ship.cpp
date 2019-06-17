@@ -201,18 +201,21 @@ void Ship::takeDamage(int damageAmount)
 {
 	m_health -= damageAmount;
 	int healthPercentage = ((float)m_health / m_maxHealth) * 100;
-
 	if (healthPercentage < 100 && healthPercentage >= 50)
 	{
+		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eLowDamage));
 		//m_sprite->SetFrameNumber(eShipSpriteFrame::eLowDamage);
 	}
 	else if (healthPercentage < 50 && healthPercentage >= 1)
 	{
+		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eHighDamage));
 		//m_sprite.SetFrameNumber(eShipSpriteFrame::eHighDamage);
 	}
 	else
 	{
 		m_health = 0;
+		m_isDead = true;
+		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eDead));
 		//m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
 		m_actionSprite.deactivate();
 		disableMovementGraph();	
@@ -232,7 +235,6 @@ void Ship::setDestination()
 
 void Ship::onNewBattlePhase()
 {
-
 	m_weaponFired = false;
 	m_destinationSet = false;
 	m_movingToDestination = false;
@@ -326,23 +328,27 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	{
 	case eShipType::eFrigate:
 		m_movementPoints = 5;
+		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;
 		m_damage = 5;
 		break;
 	case eShipType::eTurtle:
 		m_movementPoints = 8;
+		m_maxHealth = 20;
 		m_health = 20;
 		m_range = 1;
 		m_damage = 2;
 		break;
 	case eShipType::eFire:
+		m_maxHealth = 8;
 		m_health = 8;
 		m_movementPoints = 10;
 		m_range = 2;
 		m_damage = 6;
 		break;
 	case eShipType::eSniper:
+		m_maxHealth = 8;
 		m_health = 8;
 		m_movementPoints = 6;
 		m_range = 10;
