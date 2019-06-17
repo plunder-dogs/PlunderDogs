@@ -498,10 +498,6 @@ void Ship::renderMovementGraph(sf::RenderWindow & window, const Map & map)
 		{
 			i.render(window, map);
 		}
-		else
-		{
-			break;
-		}
 	}
 }
 
