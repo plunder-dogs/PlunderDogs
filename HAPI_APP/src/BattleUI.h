@@ -7,6 +7,7 @@
 struct Tile;
 class Ship;
 class Battle;
+struct GameEvent;
 class BattleUI
 {
 public:
@@ -36,7 +37,7 @@ private:
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
 
-	void onNewBattlePhase();
+	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
 

@@ -39,7 +39,7 @@ int main()
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
-	while (window.isOpen())
+	while (battle.isRunning())
 	{
 		while (window.pollEvent(currentEvent))
 		{

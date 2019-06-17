@@ -10,6 +10,7 @@
 
 constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
 
+struct GameEvent;
 struct Tile;
 struct Weapons;
 class Map;
@@ -81,5 +82,5 @@ private:
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementGraphNode(sf::Vector2i position, const Map& map);
 	void handleRotation();
-	void onNewBattlePhase();
+	void onNewBattlePhase(GameEvent gameEvent);
 };

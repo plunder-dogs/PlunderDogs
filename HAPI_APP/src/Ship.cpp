@@ -196,19 +196,18 @@ void Ship::takeDamage(int damageAmount)
 	if (healthPercentage < 100 && healthPercentage >= 50)
 	{
 		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eLowDamage));
-		//m_sprite->SetFrameNumber(eShipSpriteFrame::eLowDamage);
 	}
 	else if (healthPercentage < 50 && healthPercentage >= 1)
 	{
 		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eHighDamage));
-		//m_sprite.SetFrameNumber(eShipSpriteFrame::eHighDamage);
 	}
 	else
 	{
 		m_health = 0;
 		m_isDead = true;
 		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eDead));
-		//m_sprite->SetFrameNumber(eShipSpriteFrame::eDead);
+		FactionShipDestroyedEvent shipDestroyedEvent(m_factionName, m_ID);
+		GameEventMessenger::getInstance().broadcast(GameEvent(&shipDestroyedEvent), eGameEvent::eFactionShipDestroyed);
 		m_actionSprite.deactivate();
 		disableMovementGraph();	
 	}
@@ -225,7 +224,7 @@ void Ship::setDestination()
 	m_destinationSet = true;
 }
 
-void Ship::onNewBattlePhase()
+void Ship::onNewBattlePhase(GameEvent gameEvent)
 {
 	m_weaponFired = false;
 	m_destinationSet = false;
@@ -423,7 +422,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		break;
 	}
 
-	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this), GameEvent::eEnteredNewBattlePhase);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
 
 #ifdef HAPI_SPRITES
@@ -458,7 +457,7 @@ Ship::Ship(Ship & orig)
 
 Ship::~Ship()
 {
-	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEnteredNewBattlePhase);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
 }
 
 void Ship::update(float deltaTime, const Map & map)

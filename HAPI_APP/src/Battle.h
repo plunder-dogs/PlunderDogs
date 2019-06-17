@@ -7,6 +7,7 @@
 #include "Particle.h"
 #include <array>
 
+struct GameEvent;
 class Battle
 {
 	enum class eDeploymentState
@@ -24,6 +25,7 @@ public:
 	Battle&& operator=(Battle&&) = delete;
 	~Battle();
 
+	bool isRunning() const;
 	bool isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	BattlePhase getCurrentPhase() const;
@@ -62,7 +64,9 @@ private:
 	Timer m_timeUntilAITurn;
 	Timer m_timeBetweenAIUnits;
 	Timer m_lightIntensityTimer;
+	Timer m_timeUntilGameOver;
 	eLightIntensity m_currentLightIntensity;
+	bool m_isRunning;
 
 	std::unique_ptr<Faction>& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);
@@ -79,5 +83,9 @@ private:
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
-	void onEndBattlePhaseEarly();
+	void handleTimeUntilGameOver(float deltaTime);
+
+	void onEndBattlePhaseEarly(GameEvent gameEvent);
+	void onFactionShipDestroyed(GameEvent gameEvent);
+
 };

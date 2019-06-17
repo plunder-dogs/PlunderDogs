@@ -5,28 +5,47 @@
 #include <vector>
 #include <assert.h>
 
-enum GameEvent
+enum eGameEvent
 {
 	eEnteredNewBattlePhase,
-	eOnFactionShipDestroyed,
+	eFactionShipDestroyed,
 	eEndBattlePhaseEarly,
 	eUnableToSkipPhase,
 	eEnteredAITurn,
 	eLeftAITurn
 };
 
-class Listener
+struct GameEvent
 {
-public:
-	Listener(const std::function<void(GameEvent)>& fp)
-		: m_listener(fp)
+	GameEvent(const void* data = nullptr)
+		: data(data)
 	{}
 
-	std::function<void(GameEvent)> m_listener;
+	const void* data;
+};
+
+struct FactionShipDestroyedEvent
+{
+	FactionShipDestroyedEvent(FactionName factionName, int shipID)
+		: factionName(factionName),
+		shipID(shipID)
+	{}
+
+	const FactionName factionName;
+	const int shipID;
 };
 
 class GameEventMessenger
 {
+	struct Listener
+	{
+		Listener(const std::function<void(GameEvent)>& fp)
+			: m_listener(fp)
+		{}
+
+		std::function<void(GameEvent)> m_listener;
+	};
+
 public:
 	static GameEventMessenger& getInstance()
 	{
@@ -34,7 +53,7 @@ public:
 		return instance;
 	}
 
-	void subscribe(const std::function<void(GameEvent)>& fp, GameEvent message)
+	void subscribe(const std::function<void(GameEvent)>& fp, eGameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
@@ -47,9 +66,9 @@ public:
 		}
 	}
 
-	void broadcast(GameEvent message)
+	void broadcast(GameEvent message, eGameEvent gameEvent)
 	{
-		auto iter = m_listeners.find(message);
+		auto iter = m_listeners.find(gameEvent);
 		assert(iter != m_listeners.cend());
 
 		for (const auto& listener : iter->second)
@@ -58,7 +77,7 @@ public:
 		}
 	}
 
-	void unsubscribe(GameEvent message)
+	void unsubscribe(eGameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
@@ -72,5 +91,5 @@ public:
 	}
 
 private:
-	std::unordered_map<GameEvent, std::vector<Listener>> m_listeners;
+	std::unordered_map<eGameEvent, std::vector<Listener>> m_listeners;
 };

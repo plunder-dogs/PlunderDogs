@@ -110,6 +110,15 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 	}
 }
 
+void Battle::handleTimeUntilGameOver(float deltaTime)
+{
+	m_timeUntilGameOver.update(deltaTime);
+	if (m_timeUntilGameOver.isExpired())
+	{
+		m_isRunning = false;
+	}
+}
+
 Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players)
 	: m_factions(players),
 	m_currentFactionTurn(0),
@@ -121,7 +130,9 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 	m_timeUntilAITurn(1.5f, false),
 	m_timeBetweenAIUnits(0.3f, false),
 	m_lightIntensityTimer(30.0f),
-	m_currentLightIntensity(eLightIntensity::eMaximum)
+	m_currentLightIntensity(eLightIntensity::eMaximum),
+	m_isRunning(true),
+	m_timeUntilGameOver(2.f, false)
 {
 	m_explosionParticles.reserve(MAX_PARTICLES);
 	m_fireParticles.reserve(MAX_PARTICLES);
@@ -131,12 +142,14 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 		m_fireParticles.emplace_back(0.05, Textures::getInstance().m_fireParticles, 2.0f);
 	}
 
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndBattlePhaseEarly, this), GameEvent::eEndBattlePhaseEarly);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndBattlePhaseEarly, this, std::placeholders::_1), eGameEvent::eEndBattlePhaseEarly);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onFactionShipDestroyed, this, std::placeholders::_1), eGameEvent::eFactionShipDestroyed);
 }
 
 Battle::~Battle()
 {
-	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEndBattlePhaseEarly);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEndBattlePhaseEarly);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
 void Battle::start(const std::string & newMapName)
@@ -219,6 +232,7 @@ void Battle::update(float deltaTime)
 	m_battleUI.update(deltaTime);
 	m_map.setDrawOffset(m_battleUI.getCameraPositionOffset());
 	updateLightIntensity(deltaTime);
+	handleTimeUntilGameOver(deltaTime);
 
 	for (auto& explosionParticle : m_explosionParticles)
 	{
@@ -475,7 +489,7 @@ void Battle::advanceToNextBattlePhase()
 void Battle::switchToBattlePhase(BattlePhase newBattlePhase)
 {
 	m_currentBattlePhase = newBattlePhase;
-	GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredNewBattlePhase);
+	GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewBattlePhase);
 }
 
 std::vector<FactionName> Battle::getAllFactionsInPlay() const
@@ -625,6 +639,11 @@ void Battle::incrementFactionTurn()
 	}
 }
 
+bool Battle::isRunning() const
+{
+	return m_isRunning;
+}
+
 bool Battle::isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].get());
@@ -665,7 +684,7 @@ const Faction & Battle::getFaction(FactionName factionName) const
 	return *m_factions[static_cast<int>(factionName)].get();
 }
 
-void Battle::onEndBattlePhaseEarly()
+void Battle::onEndBattlePhaseEarly(GameEvent gameEvent)
 {
 	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
@@ -679,5 +698,33 @@ void Battle::onEndBattlePhaseEarly()
 	else if (m_currentBattlePhase == BattlePhase::Attack)
 	{
 		advanceToNextBattlePhase();
+	}
+}
+
+void Battle::onFactionShipDestroyed(GameEvent gameEvent)
+{
+	auto factionShipDestroyedEvent = static_cast<const FactionShipDestroyedEvent*>(gameEvent.data);
+	assert(m_factions[static_cast<int>(factionShipDestroyedEvent->factionName)]->getShip(factionShipDestroyedEvent->shipID).isDead());
+	
+	int factionsWithShipsRemaining = 0;
+	for (auto& faction : m_factions)
+	{
+		if (faction && !faction->isEliminated())
+		{
+			++factionsWithShipsRemaining;
+		}
+	}
+
+	if (factionsWithShipsRemaining == 1)
+	{
+		for (auto& faction : m_factions)
+		{
+			if (faction && !faction->isEliminated())
+			{
+				std::cout << "Winning Faction : " << static_cast<int>(faction->m_factionName) << "\n";
+				m_timeUntilGameOver.setActive(true);
+				break;
+			}
+		}
 	}
 }

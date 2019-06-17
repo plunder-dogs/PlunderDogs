@@ -24,12 +24,12 @@ BattleUI::BattleUI(Battle & battle)
 	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
 	m_shipTargetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap())
 {
-	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this), GameEvent::eEnteredNewBattlePhase);
+	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
 
 BattleUI::~BattleUI()
 {
-	GameEventMessenger::getInstance().unsubscribe(GameEvent::eEnteredNewBattlePhase);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
 }
 
 sf::Vector2i BattleUI::getCameraPositionOffset() const
@@ -83,7 +83,7 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 	}
 	else if (currentEvent.type == sf::Event::KeyPressed)
 	{
-		GameEventMessenger::getInstance().broadcast(GameEvent::eEndBattlePhaseEarly);
+		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
 	}
 }
 
@@ -433,7 +433,7 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onNewBattlePhase()
+void BattleUI::onNewBattlePhase(GameEvent gameEvent)
 {
 	m_tileOnClick = nullptr;
 	m_tileOnPreviousClick = nullptr;
