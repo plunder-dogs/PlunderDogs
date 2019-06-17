@@ -374,6 +374,10 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 		{
 			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousClick->m_shipOnTile);
 		}
+		else if (m_tileOnClick->isShipOnTile())
+		{
+			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousClick->m_shipOnTile);
+		}
 
 		m_tileOnClick = nullptr;
 		m_tileOnPreviousClick = nullptr;
