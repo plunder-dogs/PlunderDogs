@@ -215,14 +215,17 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 
 void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnClick->isShipOnTile() && !m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired()
+	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile() && !m_battle.getFactionShip(m_tileOnClick->m_shipOnTile).isWeaponFired()
 		&& m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
 	{
 		generateTargetArea(*m_tileOnClick);
 		return;
 	}
 
-	m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
+	if (m_tileOnClick->isShipOnTile() && !m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
+	{
+		m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
+	}
 
 	m_shipTargetArea.clearTileArea();
 	m_tileOnClick = nullptr;
