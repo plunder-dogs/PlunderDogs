@@ -714,7 +714,7 @@ void Battle::onFactionShipDestroyed(GameEvent gameEvent)
 			++factionsWithShipsRemaining;
 		}
 	}
-
+	assert(factionsWithShipsRemaining > 0);
 	//Found winning faction
 	if (factionsWithShipsRemaining == 1)
 	{
