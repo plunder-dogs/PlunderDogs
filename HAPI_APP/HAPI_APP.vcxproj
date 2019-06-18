@@ -182,7 +182,6 @@
     <ClCompile Include="src\BattleUI.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
-    <ClCompile Include="src\MouseSelection.cpp" />
     <ClCompile Include="src\BFS.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Textures.cpp" />
@@ -207,7 +206,6 @@
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\Map.h" />
-    <ClInclude Include="src\MouseSelection.h" />
     <ClInclude Include="src\BFS.h" />
     <ClInclude Include="src\Textures.h" />
     <ClInclude Include="src\TileArea.h" />
