@@ -686,9 +686,9 @@ void Battle::onEndBattlePhaseEarly(GameEvent gameEvent)
 {
 	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
-		auto& ships = m_factions[m_currentFactionTurn]->m_ships;
-		auto cIter = std::find_if(ships.cbegin(), ships.cend(), [](const auto& ship) { return ship.isMovingToDestination(); });
-		if (cIter == ships.cend())
+		auto& currentFactionShips = m_factions[m_currentFactionTurn]->m_ships;
+		auto cIter = std::find_if(currentFactionShips.cbegin(), currentFactionShips.cend(), [](const auto& ship) { return ship.isMovingToDestination(); });
+		if (cIter == currentFactionShips.cend())
 		{
 			advanceToNextBattlePhase();
 		}
