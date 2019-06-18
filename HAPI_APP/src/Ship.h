@@ -81,6 +81,5 @@ private:
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementGraphNode(sf::Vector2i position);
-	void handleRotation();
 	void onNewBattlePhase(GameEvent gameEvent);
 };

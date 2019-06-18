@@ -9,6 +9,7 @@
 #include <iostream>
 
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
+constexpr int ROTATION_ANGLE = 60;
 
 FactionName Ship::getFactionName() const
 {
@@ -235,16 +236,6 @@ void Ship::disableMovementGraphNode(sf::Vector2i position)
 	}
 }
 
-void Ship:: handleRotation()
-{
-	int rotationAngle = 60;
-	int directionToTurn = static_cast<int>(m_movementPath.front().dir);
-	m_sprite.setRotation(directionToTurn * rotationAngle % 360);
-	//m_sprite.setRotation()
-	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS());
-	m_currentDirection = (eDirection)directionToTurn;
-}
-
 unsigned int Ship::getDirectionCost(int currentDirection, int newDirection)
 {
 	unsigned int diff = std::abs(newDirection - currentDirection);
@@ -466,7 +457,10 @@ void Ship::update(float deltaTime)
 			m_currentPosition = m_movementPath.front().pair();
 			disableMovementGraphNode(m_currentPosition);
 		
-			handleRotation();
+			int directionToTurn = static_cast<int>(m_movementPath.front().dir);
+			m_sprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);
+			m_currentDirection = (eDirection)directionToTurn;
+
 			m_movementPath.pop();
 
 			if (m_movementPath.empty())
