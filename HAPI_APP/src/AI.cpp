@@ -1,6 +1,6 @@
 #include <vector>
 #include "AI.h"
-#include "MouseSelection.h"
+#include "Utilities/Utilities.h"
 #include "BFS.h"
 #include "Battle.h"
 #include "Map.h"
@@ -164,7 +164,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i 
 {
 	const Tile* closestEnemy{ nullptr };
 	int closestDistance{ INT_MAX };
-	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShipPosition) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShipPosition) };
 	auto activeFactions = battle.getAllFactionsInPlay();
 	for (FactionName i : activeFactions)
 	{
@@ -178,7 +178,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i 
 			if (factionShips[j].isDead()) continue;
 			//Find the distance^2 from the allied ship to the enemy ship, 
 			//then set closestEnemy to that enemy if it's the closest yet found
-			sf::Vector2i enemyPos = MouseSelection::coordToHexPos(
+			sf::Vector2i enemyPos = Math::coordToHexPos(
 				factionShips[j].getCurrentPosition());
 
 			sf::Vector2i diff(
@@ -201,7 +201,7 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShip->m_tileCoordinate) };
 	std::vector<const Tile*> availableTiles{ map.getTileRing(targetShip->m_tileCoordinate, range) };
 	for (const Tile* it : availableTiles)
 	{
@@ -210,7 +210,7 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 		if (it->m_type != eSea && it->m_type != eOcean) continue;
 		if (it->m_shipOnTile.isValid()) continue;
 		//Determine distance
-		sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
+		sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
 		sf::Vector2i diff(
 			{ tempPos.x - alliedPos.x, tempPos.y - alliedPos.y });
 		int tempDistance = diff.x * diff.x + diff.y * diff.y;
@@ -230,7 +230,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	sf::Vector2i alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShip->m_tileCoordinate) };
 	//TODO: can't use const Tile* for some reason
 	std::vector<const Tile*> availableTiles;
 	availableTiles.reserve(range);
@@ -245,7 +245,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 			if (it->m_type != eSea && it->m_type != eOcean) continue;
 			if (it->m_shipOnTile.isValid()) continue;
 			//Determine distance
-			sf::Vector2i tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
+			sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
 			sf::Vector2i diff(
 				{ tempPos.x - alliedPos.x, tempPos.y - alliedPos.y });
 			int tempDistance = diff.x * diff.x + diff.y * diff.y;
@@ -269,7 +269,7 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eFrigate:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch (facingDirection)
 		{
 		case eNorth: facingDirection = eNorthEast;
@@ -290,19 +290,19 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eSniper:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		break;
 	}
 	case eShipType::eTurtle:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		break;
 	}
 	case eShipType::eFire:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch(facingDirection)
 		{
 		case eNorth: facingDirection = eSouth;
