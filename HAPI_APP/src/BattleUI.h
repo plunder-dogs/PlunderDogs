@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Global.h"
-#include "BattleGUI.h"
 #include "TileArea.h"
 
 struct Tile;
@@ -21,8 +20,7 @@ public:
 	sf::Vector2i getCameraPositionOffset() const;
 
 	void render(sf::RenderWindow& window);
-	void loadGUI(sf::Vector2i mapDimensions);
-
+	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 
@@ -33,16 +31,20 @@ private:
 	const Tile* m_tileOnMouse;
 	Sprite m_tileOnClickSprite;
 	Sprite m_spriteOnMouse;
-	BattleGUI m_gui;
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
 	
 	bool m_leftClickHeld;
 	sf::Vector2i m_leftClickPosition;
 
+	sf::Vector2i m_maxCameraOffset;
+	sf::Vector2f m_pendingCameraMovement;
+	sf::Vector2i m_cameraPositionOffset;
+
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
+	void updateCamera();
 
 	//ClickReleased
 	void onClickReleased(sf::Vector2i mousePosition);
@@ -54,6 +56,7 @@ private:
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	//MouseMove
 	void onMouseMovement(sf::Vector2i mousePosition);
+	void moveCamera(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
@@ -61,4 +64,6 @@ private:
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickMovementPhase(sf::Vector2i mousePosition);
 	void onRightClickAttackPhase(sf::Vector2i mousePosition);
+
+
 };

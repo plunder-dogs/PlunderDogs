@@ -157,8 +157,8 @@ void Battle::start(const std::string & newMapName)
 	assert(!m_factions.empty());
 
 	m_map.loadmap(newMapName);
-	m_battleUI.loadGUI(m_map.getDimensions());
-	
+	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
+
 	//Assign Spawn Position
 	for (auto& faction : m_factions)
 	{

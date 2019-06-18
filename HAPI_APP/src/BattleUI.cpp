@@ -20,11 +20,13 @@ BattleUI::BattleUI(Battle & battle)
 	m_tileOnMouse(nullptr),
 	m_tileOnClickSprite(),
 	m_spriteOnMouse(Textures::getInstance().m_cross, false),
-	m_gui(),
 	m_shipMovementArea(Textures::getInstance().m_selectedHex, MAX_MOVE_AREA, m_battle.getMap()),
 	m_shipTargetArea(Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA, m_battle.getMap()),
 	m_leftClickHeld(false),
-	m_leftClickPosition()
+	m_leftClickPosition(),
+	m_maxCameraOffset(),
+	m_pendingCameraMovement(),
+	m_cameraPositionOffset()
 {
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
@@ -36,7 +38,7 @@ BattleUI::~BattleUI()
 
 sf::Vector2i BattleUI::getCameraPositionOffset() const
 {
-	return m_gui.getCameraPositionOffset();
+	return m_cameraPositionOffset;
 }
 
 void BattleUI::render(sf::RenderWindow& window)
@@ -58,9 +60,17 @@ void BattleUI::render(sf::RenderWindow& window)
 	m_spriteOnMouse.render(window, m_battle.getMap());
 }
 
-void BattleUI::loadGUI(sf::Vector2i mapDimensions)
+void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 {
-	m_gui.setMaxCameraOffset(mapDimensions);
+	m_maxCameraOffset = sf::Vector2i(maxCameraOffset.x * 24 - 820, maxCameraOffset.y * 28 - 400);
+	if (m_maxCameraOffset.x < 0)
+	{
+		m_maxCameraOffset.x = 0;
+	}
+	if (m_maxCameraOffset.y < 0)
+	{
+		m_maxCameraOffset.y = 0;
+	}
 }
 
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
@@ -83,7 +93,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 	case sf::Event::MouseMoved :
 		if (!m_leftClickHeld)
 		{
-			m_gui.onMouseMove(mousePosition);
 			onMouseMovement(mousePosition);
 		}
 		break;
@@ -100,7 +109,7 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 
 void BattleUI::update(float deltaTime)
 {
-	m_gui.update();
+	updateCamera();
 }
 
 void BattleUI::generateTargetArea(const Tile & source)
@@ -168,6 +177,42 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	BFS::findArea(m_shipMovementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
 	m_shipMovementArea.activateGraph();
+}
+
+void BattleUI::updateCamera()
+{
+	//camera pan
+	if (m_pendingCameraMovement != sf::Vector2f(0, 0))
+	{
+		m_cameraPositionOffset.x += m_pendingCameraMovement.x;//translates the camera position
+		m_cameraPositionOffset.y += m_pendingCameraMovement.y;
+
+		if (m_cameraPositionOffset.x < -120)//checks for if its reached any of the 4 boundries, need to change it to a width variable
+		{
+			m_cameraPositionOffset.x = -120;
+		}
+		else if (m_cameraPositionOffset.x > m_maxCameraOffset.x)
+		{
+			m_cameraPositionOffset.x = m_maxCameraOffset.x;
+		}
+		else
+		{
+			m_cameraPositionOffset.x += m_pendingCameraMovement.x;
+		}
+
+		if (m_cameraPositionOffset.y < -100)
+		{
+			m_cameraPositionOffset.y = -100;
+		}
+		else if (m_cameraPositionOffset.y > m_maxCameraOffset.y)
+		{
+			m_cameraPositionOffset.y = m_maxCameraOffset.y;
+		}
+		else
+		{
+			m_cameraPositionOffset.y += m_pendingCameraMovement.y;
+		}
+	}
 }
 
 void BattleUI::onClickReleased(sf::Vector2i mousePosition)
@@ -299,6 +344,8 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 {
+	moveCamera(mousePosition);
+
 	//Ship selected doesn't match faction currently in play
 	if ((m_tileOnClick && m_tileOnClick->isShipOnTile()
 		&& !m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
@@ -341,6 +388,29 @@ void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 			break;
 		}
 		}
+	}
+}
+
+void BattleUI::moveCamera(sf::Vector2i mousePosition)
+{
+	m_pendingCameraMovement = sf::Vector2f(0, 0);
+
+	if (mousePosition.x < 100)
+	{
+		m_pendingCameraMovement += sf::Vector2f{ -1,0 };
+	}
+	else if (mousePosition.x > 1820)
+	{
+		m_pendingCameraMovement += sf::Vector2f{ 1,0 };
+	}
+
+	if (mousePosition.y < 50)
+	{
+		m_pendingCameraMovement += sf::Vector2f{ 0 , -1 };
+	}
+	else if (mousePosition.y > 980)
+	{
+		m_pendingCameraMovement += sf::Vector2f{ 0, 1 };
 	}
 }
 
