@@ -1,7 +1,5 @@
 #include "CircularBuffer.h"
 
-
-
 CircularBuffer::CircularBuffer(int capacity) : 
 	bufferSize(capacity), front(0), rear(0), count(0), overspill()
 {
