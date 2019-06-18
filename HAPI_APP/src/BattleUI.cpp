@@ -70,15 +70,13 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 	case sf::Event::MouseButtonPressed :
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
-			m_leftClickHeld = true;
-			m_leftClickPosition = mousePosition;
 			onLeftClick(mousePosition);
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
-			m_leftClickHeld = false;
 			onRightClick(mousePosition);
 		}
+
 		break;
 
 	case sf::Event::MouseMoved :
@@ -183,12 +181,15 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 	}
 	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
 	{
-
+		onLeftClickMovementPhase(mousePosition);
 	}
 }
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 {
+	m_leftClickHeld = true;
+	m_leftClickPosition = mousePosition;
+
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
 	{
@@ -423,6 +424,8 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
+	m_leftClickHeld = false;
+
 	switch (m_battle.getCurrentBattlePhase())
 	{
 	case BattlePhase::Movement:
@@ -451,8 +454,6 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	m_tileOnPreviousClick = nullptr;
 	m_shipMovementArea.clearTileArea();
 }
-
-
 
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {

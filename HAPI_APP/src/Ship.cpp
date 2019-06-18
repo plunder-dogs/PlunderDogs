@@ -3,6 +3,7 @@
 #include "BFS.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
+#include "Utilities/Utilities.h"
 #include "Battle.h"
 //Debug
 #include <iostream>
@@ -238,8 +239,9 @@ void Ship:: handleRotation()
 {
 	int rotationAngle = 60;
 	int directionToTurn = static_cast<int>(m_movementPath.front().dir);
+	m_sprite.setRotation(directionToTurn * rotationAngle % 360);
 	//m_sprite.setRotation()
-	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS(directionToTurn*rotationAngle % 360));
+	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS());
 	m_currentDirection = (eDirection)directionToTurn;
 }
 
@@ -416,6 +418,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
+	m_sprite.setOriginAtCenter();
 
 #ifdef HAPI_SPRITES
 	m_sprite.GetTransformComp().SetOriginToCentreOfFrame();
