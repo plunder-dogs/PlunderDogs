@@ -39,8 +39,6 @@ private:
 	
 	bool m_leftClickHeld = false;
 	sf::Vector2i m_leftClickPosition;
-	Sprite m_directionalArrow;
-	
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
