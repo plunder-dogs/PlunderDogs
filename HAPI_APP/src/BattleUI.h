@@ -37,7 +37,7 @@ private:
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
 	
-	bool m_leftClickHeld = false;
+	bool m_leftClickHeld;
 	sf::Vector2i m_leftClickPosition;
 
 	void onNewBattlePhase(GameEvent gameEvent);
