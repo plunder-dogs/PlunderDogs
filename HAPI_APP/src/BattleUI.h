@@ -36,10 +36,14 @@ private:
 	BattleGUI m_gui;
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
+	bool m_leftClickHeld = false;
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
+
+	//ClickReleased
+	void onClickReleased(sf::Vector2i mousePosition);
 
 	//LeftClick
 	void onLeftClick(sf::Vector2i mousePosition);

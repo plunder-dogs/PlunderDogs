@@ -2,7 +2,7 @@
 #include "Battle.h"
 #include "BFS.h"
 #include "Textures.h"
-#include "MouseSelection.h"
+#include "Utilities/Utilities.h"
 #include "GameEventMessenger.h"
 #include <assert.h>
 #include "AI.h"
@@ -65,25 +65,32 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
-	if (currentEvent.type == sf::Event::MouseButtonPressed)
+	switch (currentEvent.type)
 	{
+	case sf::Event::MouseButtonPressed :
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
-			onLeftClick(mousePosition);
+			m_leftClickHeld = true;
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
+			m_leftClickHeld = false;
 			onRightClick(mousePosition);
 		}
-	}
-	else if (currentEvent.type == sf::Event::MouseMoved)
-	{
+		break;
+
+	case sf::Event::MouseMoved :
 		m_gui.onMouseMove(mousePosition);
 		onMouseMovement(mousePosition);
-	}
-	else if (currentEvent.type == sf::Event::KeyPressed)
-	{
+		break;
+
+	case sf::Event::KeyPressed :
 		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
+		break;
+
+	case sf::Event::MouseButtonReleased :
+		onClickReleased(mousePosition);
+		break;
 	}
 }
 
@@ -157,6 +164,10 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	BFS::findArea(m_shipMovementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
 	m_shipMovementArea.activateGraph();
+}
+
+void BattleUI::onClickReleased(sf::Vector2i mousePosition)
+{
 }
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)
