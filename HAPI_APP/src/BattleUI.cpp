@@ -222,24 +222,10 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		}
 	}
 
-	//switch (m_battle.getCurrentBattlePhase())
-	//{
-	//case BattlePhase::Deployment:
-	//{
-	//	onLeftClickDeploymentPhase(); 
-	//	break;
-	//}
-	//case BattlePhase::Movement:
-	//{
-	//	onLeftClickMovementPhase(mousePosition);
-	//	break;
-	//}
-	//case BattlePhase::Attack:
-	//{
-	//	onLeftClickAttackPhase(mousePosition);
-	//	break;
-	//}
-	//}
+	if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
+	{
+		onLeftClickAttackPhase(mousePosition);
+	}
 }
 
 void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
