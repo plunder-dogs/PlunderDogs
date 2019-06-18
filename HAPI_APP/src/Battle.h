@@ -28,7 +28,7 @@ public:
 	bool isRunning() const;
 	bool isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
-	BattlePhase getCurrentPhase() const;
+	BattlePhase getCurrentBattlePhase() const;
 	FactionName getCurrentFaction() const;
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;

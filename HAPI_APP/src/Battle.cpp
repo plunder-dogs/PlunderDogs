@@ -336,9 +336,7 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
 			}
 
-
 			getFaction(enemyShipInPlay.getFactionName()).shipTakeDamage(enemyShipInPlay.getID(), firingShipInPlay.getDamage());
-			return;
 		}
 	}
 }
@@ -655,7 +653,7 @@ const Map & Battle::getMap() const
 	return m_map;
 }
 
-BattlePhase Battle::getCurrentPhase() const
+BattlePhase Battle::getCurrentBattlePhase() const
 {
 	return m_currentBattlePhase;
 }
