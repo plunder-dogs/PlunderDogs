@@ -17,6 +17,11 @@ double Math::radsToDeg(double angle)
 	return 180 * (angle / Math::PI);
 }
 
+bool Math::facingDifferentTile(double i)
+{
+	return i > 20;
+}
+
 sf::Vector2i Math::coordToHexPos(sf::Vector2i coord)
 {
 	const float xPos = static_cast<float>(coord.x * 12);

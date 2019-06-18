@@ -36,7 +36,9 @@ private:
 	BattleGUI m_gui;
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
+	
 	bool m_leftClickHeld = false;
+	sf::Vector2i m_leftClickPosition;
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);

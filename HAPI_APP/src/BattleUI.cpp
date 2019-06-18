@@ -71,6 +71,8 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
 			m_leftClickHeld = true;
+			m_leftClickPosition = mousePosition;
+			onLeftClick(mousePosition);
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
@@ -80,8 +82,12 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		break;
 
 	case sf::Event::MouseMoved :
-		m_gui.onMouseMove(mousePosition);
-		onMouseMovement(mousePosition);
+		if (!m_leftClickHeld)
+		{
+			m_gui.onMouseMove(mousePosition);
+			onMouseMovement(mousePosition);
+		}
+
 		break;
 
 	case sf::Event::KeyPressed :
@@ -168,6 +174,17 @@ void BattleUI::generateMovementArea(const Ship & ship)
 
 void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 {
+	m_leftClickHeld = false;
+	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);
+
+	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment)
+	{
+		onLeftClickDeploymentPhase(mouseDirection.second);	
+	}
+	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
+	{
+
+	}
 }
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)
@@ -204,24 +221,24 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		}
 	}
 
-	switch (m_battle.getCurrentPhase())
-	{
-	case BattlePhase::Deployment:
-	{
-		onLeftClickDeploymentPhase(); 
-		break;
-	}
-	case BattlePhase::Movement:
-	{
-		onLeftClickMovementPhase(mousePosition);
-		break;
-	}
-	case BattlePhase::Attack:
-	{
-		onLeftClickAttackPhase(mousePosition);
-		break;
-	}
-	}
+	//switch (m_battle.getCurrentBattlePhase())
+	//{
+	//case BattlePhase::Deployment:
+	//{
+	//	onLeftClickDeploymentPhase(); 
+	//	break;
+	//}
+	//case BattlePhase::Movement:
+	//{
+	//	onLeftClickMovementPhase(mousePosition);
+	//	break;
+	//}
+	//case BattlePhase::Attack:
+	//{
+	//	onLeftClickAttackPhase(mousePosition);
+	//	break;
+	//}
+	//}
 }
 
 void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
@@ -314,7 +331,7 @@ void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 	{
 		m_tileOnMouse = tileOnMouse;
 
-		switch (m_battle.getCurrentPhase())
+		switch (m_battle.getCurrentBattlePhase())
 		{
 		case BattlePhase::Deployment:
 		{
@@ -406,7 +423,7 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
-	switch (m_battle.getCurrentPhase())
+	switch (m_battle.getCurrentBattlePhase())
 	{
 	case BattlePhase::Movement:
 	{
