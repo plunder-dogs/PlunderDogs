@@ -13,7 +13,6 @@ public:
 	void update();
 	//void OnMouseScroll could be added
 	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
-	void handleInput(sf::RenderWindow& window, const sf::Event& currentEvent);
 	void onMouseMove(sf::Vector2i mousePosition);
 
 private:

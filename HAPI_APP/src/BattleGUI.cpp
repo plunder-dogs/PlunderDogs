@@ -66,10 +66,6 @@ void BattleGUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 	}
 }
 
-void BattleGUI::handleInput(sf::RenderWindow & window, const sf::Event & currentEvent)
-{
-}
-
 void BattleGUI::onMouseMove(sf::Vector2i mousePosition)
 {
 	//moves the sprites when the mouse is on the edge of the screen
