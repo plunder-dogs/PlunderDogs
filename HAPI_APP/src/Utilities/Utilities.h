@@ -19,7 +19,7 @@ namespace Math
 
 	double radsToDeg(double angle);
 
-	bool facingDifferentTile(double i);
+	bool isFacingDifferentTile(double i);
 
 	sf::Vector2i coordToHexPos(sf::Vector2i coord);
 

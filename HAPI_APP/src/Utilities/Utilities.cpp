@@ -17,7 +17,7 @@ double Math::radsToDeg(double angle)
 	return 180 * (angle / Math::PI);
 }
 
-bool Math::facingDifferentTile(double i)
+bool Math::isFacingDifferentTile(double i)
 {
 	return i > 20;
 }
