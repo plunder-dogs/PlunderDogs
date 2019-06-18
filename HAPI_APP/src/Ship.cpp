@@ -508,5 +508,5 @@ void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)
 {
 	m_currentPosition = position;
 	m_deployed = true;
-	//m_sprite.GetTransformComp().SetRotation(DEGREES_TO_RADIANS(startingDirection * 60 % 360));
+	m_sprite.setRotation(startingDirection * ROTATION_ANGLE % 360);
 }
