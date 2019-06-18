@@ -10,7 +10,9 @@ Sprite::Sprite(bool active)
 	m_position(),
 	m_currentFrameID(0),
 	m_isActive(active)
-{}
+{
+	setOriginAtCenter();
+}
 
 Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool active)
 	: m_texture(&texture),
@@ -21,6 +23,7 @@ Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool acti
 {
 	m_sprite.setTexture(m_texture->m_texture);
 	setFrameID(m_currentFrameID);
+	setOriginAtCenter();
 }
 
 Sprite::Sprite(std::unique_ptr<Texture>& texture, bool active)
@@ -32,6 +35,7 @@ Sprite::Sprite(std::unique_ptr<Texture>& texture, bool active)
 {
 	m_sprite.setTexture(m_texture->m_texture);
 	setFrameID(m_currentFrameID);
+	setOriginAtCenter();
 }
 
 Sprite::Sprite(std::unique_ptr<Texture>& texture, sf::Vector2f startingPosition, bool active)
@@ -43,6 +47,7 @@ Sprite::Sprite(std::unique_ptr<Texture>& texture, sf::Vector2f startingPosition,
 {
 	m_sprite.setTexture(texture->m_texture);
 	setFrameID(m_currentFrameID);
+	setOriginAtCenter();
 }
 
 sf::Vector2i Sprite::getPosition() const
@@ -101,6 +106,22 @@ void Sprite::setPosition(sf::Vector2i newPosition)
 	m_position = newPosition;
 }
 
+void Sprite::setRotation(float angle)
+{
+	m_sprite.setRotation(angle);
+}
+
+void Sprite::rotate(float angle)
+{
+	m_sprite.setRotation(m_sprite.getRotation() + angle);
+}
+
+void Sprite::setOriginAtCenter()
+{
+	sf::FloatRect localBounds = m_sprite.getLocalBounds();
+	m_sprite.setOrigin(localBounds.width / 2.0f, localBounds.height / 2.0f);
+}
+
 void Sprite::setScale(sf::Vector2f scale)
 {
 	m_sprite.setScale(scale);
@@ -133,6 +154,7 @@ void Sprite::setTexture(std::unique_ptr<Texture>& texture, int frameID)
 	m_texture = texture.get();
 	m_sprite.setTexture(m_texture->m_texture);
 	setFrameID(frameID);
+	setOriginAtCenter();
 }
 
 void Sprite::activate()
