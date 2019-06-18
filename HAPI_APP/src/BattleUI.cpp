@@ -76,7 +76,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		{
 			onRightClick(mousePosition);
 		}
-
 		break;
 
 	case sf::Event::MouseMoved :
@@ -85,7 +84,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 			m_gui.onMouseMove(mousePosition);
 			onMouseMovement(mousePosition);
 		}
-
 		break;
 
 	case sf::Event::KeyPressed :
@@ -172,6 +170,11 @@ void BattleUI::generateMovementArea(const Ship & ship)
 
 void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 {
+	if (!m_leftClickHeld)
+	{
+		return;
+	}
+
 	m_leftClickHeld = false;
 	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);
 
@@ -181,7 +184,7 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 	}
 	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
 	{
-		onLeftClickMovementPhase(mousePosition);
+		onLeftClickMovementPhase(mouseDirection, mousePosition);
 	}
 }
 
@@ -374,7 +377,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
+void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
 	//On first Ship Selection
 	if (!m_tileOnPreviousClick && m_tileOnClick->isShipOnTile() && 
@@ -391,7 +394,14 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 	{	
 		if (!m_tileOnClick->isShipOnTile() && m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))
 		{
-			m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+			if (Math::isFacingDifferentTile(mouseDirection.first))
+			{
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate, mouseDirection.second);
+			}
+			else
+			{
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+			}
 		}
 		else if (!m_tileOnClick->isShipOnTile() && !m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))
 		{

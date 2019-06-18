@@ -87,5 +87,4 @@ private:
 
 	void onEndBattlePhaseEarly(GameEvent gameEvent);
 	void onFactionShipDestroyed(GameEvent gameEvent);
-
 };

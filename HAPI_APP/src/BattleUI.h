@@ -39,6 +39,8 @@ private:
 	
 	bool m_leftClickHeld = false;
 	sf::Vector2i m_leftClickPosition;
+	Sprite m_directionalArrow;
+	
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
@@ -50,7 +52,7 @@ private:
 	//LeftClick
 	void onLeftClick(sf::Vector2i mousePosition);
 	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
-	void onLeftClickMovementPhase(sf::Vector2i mousePosition);
+	void onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	//MouseMove
 	void onMouseMovement(sf::Vector2i mousePosition);
