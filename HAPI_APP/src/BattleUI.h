@@ -2,6 +2,9 @@
 
 #include "Global.h"
 #include "TileArea.h"
+#include <array>
+
+constexpr size_t MAX_SHIPS_SELECT = 6;
 
 struct Tile;
 class Ship;
@@ -29,7 +32,7 @@ private:
 	const Tile* m_tileOnPreviousClick;
 	const Tile* m_tileOnClick;
 	const Tile* m_tileOnMouse;
-	Sprite m_tileOnClickSprite;
+	Sprite m_spriteOnTileClick;
 	Sprite m_spriteOnMouse;
 	TileArea m_shipMovementArea;
 	TileArea m_shipTargetArea;
@@ -40,6 +43,11 @@ private:
 	sf::Vector2i m_maxCameraOffset;
 	sf::Vector2f m_pendingCameraMovement;
 	sf::Vector2i m_cameraPositionOffset;
+
+	std::array<ShipOnTile, MAX_SHIPS_SELECT> m_factionShipsSelected;
+	
+	sf::FloatRect m_selectorAABB;
+	sf::RectangleShape m_selectorShape;
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
