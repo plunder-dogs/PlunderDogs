@@ -8,27 +8,30 @@
 
 constexpr size_t MAX_SHIPS_SELECT = 6;
 
+struct SelectedShip
+{
+	SelectedShip();
+
+	void add(ShipOnTile shipOnTile, sf::Vector2i position);
+	void clear();
+
+	ShipOnTile m_shipOnTile;
+	Sprite m_sprite;
+};
+
 class Map;
 class Ship;
 class Selector
 {
-	struct SelectedShip
-	{
-		SelectedShip();
-
-		void add(ShipOnTile shipOnTile, sf::Vector2i position);
-		void clear();
-
-		ShipOnTile m_shipOnTile;
-		Sprite m_sprite;
-	};
-	
 public:
 	Selector();
 	Selector(const Selector&) = delete;
 	Selector& operator=(const Selector&) = delete;
 	Selector(Selector&&) = delete;
 	Selector&& operator=(Selector&&) = delete;
+
+	bool isShipsSelected() const;
+	const std::array<SelectedShip, MAX_SHIPS_SELECT>& getSelectedShips() const;
 
 	void setPosition(sf::Vector2i position);
 	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);

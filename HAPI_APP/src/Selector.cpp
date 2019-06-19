@@ -5,13 +5,12 @@
 #include <math.h>
 
 constexpr int MIN_SHIP_SELECT_SIZE = 75;
-
-Selector::SelectedShip::SelectedShip()
+SelectedShip::SelectedShip()
 	: m_shipOnTile(),
 	m_sprite()
 {}
 
-void Selector::SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
+void SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
 {
 	m_shipOnTile = shipOnTile;
 
@@ -19,7 +18,7 @@ void Selector::SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
 	m_sprite.activate();
 }
 
-void Selector::SelectedShip::clear()
+void SelectedShip::clear()
 {
 	m_shipOnTile.clear();
 	m_sprite.deactivate();
@@ -38,6 +37,17 @@ Selector::Selector()
 	m_shape.setFillColor(sf::Color::Transparent);
 	m_shape.setOutlineColor(sf::Color::Green);
 	m_shape.setOutlineThickness(1.5f);
+}
+
+bool Selector::isShipsSelected() const
+{
+	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [](const auto& selectedShip) { return selectedShip.m_shipOnTile.isValid(); });
+	return cIter != m_selectedShips.cend();
+}
+
+const std::array<SelectedShip, MAX_SHIPS_SELECT>& Selector::getSelectedShips() const
+{
+	return m_selectedShips;
 }
 
 void Selector::setPosition(sf::Vector2i position)
