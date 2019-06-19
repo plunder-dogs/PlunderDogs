@@ -2,6 +2,7 @@
 #include "Textures.h"
 #include "Ship.h"
 #include <assert.h>
+#include <math.h>
 
 constexpr int MIN_SHIP_SELECT_SIZE = 75;
 
@@ -56,8 +57,8 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	m_AABB.height = selectorSize.y;
 
 	//Add/Remove ships
-	if (m_shape.getSize().x >= MIN_SHIP_SELECT_SIZE &&
-		m_shape.getSize().y >= MIN_SHIP_SELECT_SIZE)
+	if (std::abs(m_shape.getSize().x) >= MIN_SHIP_SELECT_SIZE &&
+		std::abs(m_shape.getSize().y) >= MIN_SHIP_SELECT_SIZE)
 	{
 		for (auto& ship : currentFactionShips)
 		{
