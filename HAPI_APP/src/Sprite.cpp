@@ -50,6 +50,11 @@ Sprite::Sprite(std::unique_ptr<Texture>& texture, sf::Vector2f startingPosition,
 	setOriginAtCenter();
 }
 
+sf::Vector2f Sprite::getSize() const
+{
+	return sf::Vector2f(m_sprite.getLocalBounds().width, m_sprite.getLocalBounds().height);
+}
+
 sf::Vector2i Sprite::getPosition() const
 {
 	return m_position;

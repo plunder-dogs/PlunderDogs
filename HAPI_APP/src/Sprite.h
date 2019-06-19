@@ -14,6 +14,7 @@ public:
 	Sprite(std::unique_ptr<Texture>& texture, bool active = true);
 	Sprite(std::unique_ptr<Texture>& texture, sf::Vector2f startingPosition, bool active = true);
 
+	sf::Vector2f getSize() const;
 	sf::Vector2i getPosition() const;
 	const FrameDetails& getCurrentFrameDetails() const;
 	bool isActive() const;
