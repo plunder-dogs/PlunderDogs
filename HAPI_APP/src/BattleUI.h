@@ -33,8 +33,8 @@ private:
 	const Tile* m_tileOnMouse;
 	Sprite m_spriteOnTileClick;
 	Sprite m_spriteOnMouse;
-	TileArea m_shipMovementArea;
-	TileArea m_shipTargetArea;
+	TileArea m_movementArea;
+	TileArea m_targetArea;
 	
 	bool m_leftClickHeld;
 	sf::Vector2i m_leftClickPosition;
@@ -70,6 +70,4 @@ private:
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickMovementPhase(sf::Vector2i mousePosition);
 	void onRightClickAttackPhase(sf::Vector2i mousePosition);
-
-
 };

@@ -107,6 +107,13 @@ void Selector::reset()
 	}
 }
 
+void Selector::resetShape()
+{
+	m_shape.setSize(sf::Vector2f(0, 0));
+	m_AABB.width = 0;
+	m_AABB.height = 0;
+}
+
 void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
 {
 	for (SelectedShip& selectedShip : m_selectedShips)

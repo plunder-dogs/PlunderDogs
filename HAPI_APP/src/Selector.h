@@ -35,6 +35,7 @@ public:
 	void renderShipHighlight(sf::RenderWindow& window, const Map& map);
 	void renderSelector(sf::RenderWindow& window);
 	void reset();
+	void resetShape();
 
 private:
 	std::array<SelectedShip, MAX_SHIPS_SELECT> m_selectedShips;
