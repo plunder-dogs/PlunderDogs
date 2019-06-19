@@ -6,9 +6,24 @@
 constexpr int MIN_SHIP_SELECT_SIZE = 75;
 
 Selector::SelectedShip::SelectedShip()
-	: shipOnTile(),
-	sprite()
+	: m_shipOnTile(),
+	m_sprite()
 {}
+
+void Selector::SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
+{
+	m_shipOnTile = shipOnTile;
+
+	m_sprite.setPosition(position);
+	m_sprite.activate();
+
+}
+
+void Selector::SelectedShip::clear()
+{
+	m_shipOnTile.clear();
+	m_sprite.deactivate();
+}
 
 Selector::Selector()
 	: m_selectedShips(),
@@ -17,7 +32,7 @@ Selector::Selector()
 {
 	for (auto& selectedShip : m_selectedShips)
 	{
-		selectedShip.sprite.setTexture(Textures::getInstance().m_selectedHex);
+		selectedShip.m_sprite.setTexture(Textures::getInstance().m_selectedHex);
 	}
 
 	m_shape.setFillColor(sf::Color::Transparent);
@@ -65,9 +80,9 @@ void Selector::render(sf::RenderWindow & window, const Map& map)
 
 	for (auto& selectedShip : m_selectedShips)
 	{
-		if (selectedShip.shipOnTile.isValid())
+		if (selectedShip.m_shipOnTile.isValid())
 		{
-			selectedShip.sprite.render(window, map);
+			selectedShip.m_sprite.render(window, map);
 		}
 	}
 }
@@ -77,6 +92,14 @@ void Selector::reset()
 	m_shape.setSize(sf::Vector2f(0, 0));
 	m_AABB.width = 0;
 	m_AABB.height = 0;
+
+	for (auto& selectedShip : m_selectedShips)
+	{
+		if (selectedShip.m_shipOnTile.isValid())
+		{
+			selectedShip.clear();
+		}
+	}
 }
 
 void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
@@ -84,16 +107,16 @@ void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
 	for (SelectedShip& selectedShip : m_selectedShips)
 	{
 		//Ship to add already exists
-		if (shipToAdd == selectedShip.shipOnTile)
+		if (shipToAdd == selectedShip.m_shipOnTile)
 		{
 			break;
 		}
 
-		if (!selectedShip.shipOnTile.isValid())
+		if (!selectedShip.m_shipOnTile.isValid())
 		{
-			selectedShip.shipOnTile = shipToAdd;
-			selectedShip.sprite.setPosition(position);
-			selectedShip.sprite.activate();
+			selectedShip.m_shipOnTile = shipToAdd;
+			selectedShip.m_sprite.setPosition(position);
+			selectedShip.m_sprite.activate();
 			break;
 		}
 	}
@@ -104,10 +127,10 @@ void Selector::removeFromSelector(ShipOnTile shipToRemove)
 	for (SelectedShip& selectedShip : m_selectedShips)
 	{
 		//Remove ship from selected
-		if (shipToRemove == selectedShip.shipOnTile)
+		if (shipToRemove == selectedShip.m_shipOnTile)
 		{
-			selectedShip.shipOnTile.clear();
-			selectedShip.sprite.deactivate();
+			selectedShip.m_shipOnTile.clear();
+			selectedShip.m_sprite.deactivate();
 			break;
 		}
 	}

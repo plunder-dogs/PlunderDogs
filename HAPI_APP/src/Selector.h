@@ -16,8 +16,11 @@ class Selector
 	{
 		SelectedShip();
 
-		ShipOnTile shipOnTile;
-		Sprite sprite;
+		void add(ShipOnTile shipOnTile, sf::Vector2i position);
+		void clear();
+
+		ShipOnTile m_shipOnTile;
+		Sprite m_sprite;
 	};
 	
 public:
