@@ -16,7 +16,6 @@ void Selector::SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
 
 	m_sprite.setPosition(position);
 	m_sprite.activate();
-
 }
 
 void Selector::SelectedShip::clear()
@@ -74,9 +73,9 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	}
 }
 
-void Selector::render(sf::RenderWindow & window, const Map& map)
+void Selector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
 {
-	window.draw(m_shape);
+	
 
 	for (auto& selectedShip : m_selectedShips)
 	{
@@ -85,6 +84,11 @@ void Selector::render(sf::RenderWindow & window, const Map& map)
 			selectedShip.m_sprite.render(window, map);
 		}
 	}
+}
+
+void Selector::renderSelector(sf::RenderWindow & window)
+{
+	window.draw(m_shape);
 }
 
 void Selector::reset()
@@ -114,9 +118,7 @@ void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
 
 		if (!selectedShip.m_shipOnTile.isValid())
 		{
-			selectedShip.m_shipOnTile = shipToAdd;
-			selectedShip.m_sprite.setPosition(position);
-			selectedShip.m_sprite.activate();
+			selectedShip.add(shipToAdd, position);
 			break;
 		}
 	}
@@ -129,8 +131,7 @@ void Selector::removeFromSelector(ShipOnTile shipToRemove)
 		//Remove ship from selected
 		if (shipToRemove == selectedShip.m_shipOnTile)
 		{
-			selectedShip.m_shipOnTile.clear();
-			selectedShip.m_sprite.deactivate();
+			selectedShip.clear();
 			break;
 		}
 	}

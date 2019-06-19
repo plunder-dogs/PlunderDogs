@@ -59,10 +59,11 @@ void BattleUI::render(sf::RenderWindow& window)
 	}
 
 	m_spriteOnMouse.render(window, m_battle.getMap());
-	
+
+	m_shipSelector.renderShipHighlight(window, m_battle.getMap());
 	if (m_leftClickHeld)
 	{
-		m_shipSelector.render(window, m_battle.getMap());
+		m_shipSelector.renderSelector(window);
 	}
 }
 
@@ -83,7 +84,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	ePlayerType currentPlayerType = m_battle.getCurrentPlayerType();
-
 
 	switch (currentEvent.type)
 	{
@@ -235,8 +235,6 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 
 	m_leftClickHeld = false;
 	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);	
-	m_shipSelector.reset();
-
 
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment)
 	{
@@ -258,6 +256,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	
 	m_leftClickPosition = mousePosition;
 	m_shipSelector.setPosition(mousePosition);
+	//m_shipSelector.reset();
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)

@@ -5,7 +5,6 @@
 #include "Selector.h"
 #include <array>
 
-
 struct Tile;
 class Ship;
 class Battle;
@@ -47,13 +46,6 @@ private:
 	void updateCamera();
 	
 	Selector m_shipSelector;
-	//Selector
-	//sf::FloatRect m_selectorAABB;
-	//sf::RectangleShape m_selectorShape;
-	//std::array<ShipOnTile, MAX_SHIPS_SELECT> m_selectedShips;
-	//std::array<Sprite, MAX_SHIPS_SELECT> m_selectedShipsSprites;
-	//void updateSelector();
-	//void addToSelector(ShipOnTile shipToAdd);
 
 
 	void onNewBattlePhase(GameEvent gameEvent);
