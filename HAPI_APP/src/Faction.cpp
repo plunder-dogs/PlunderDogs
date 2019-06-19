@@ -116,7 +116,7 @@ void Faction::createSpawnArea(Map & map)
 	}
 }
 
-bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
+void Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
 {
 	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
 		[startingPosition](const auto& tile) { return startingPosition == tile->m_tileCoordinate; });
@@ -131,12 +131,6 @@ bool Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDir
 				break;
 			}
 		}
-
-		return true;
-	}
-	else
-	{
-		return false;
 	}
 }
 
