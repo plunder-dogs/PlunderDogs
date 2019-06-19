@@ -486,6 +486,7 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
+	m_selectorShape.setSize(sf::Vector2f(0, 0));
 
 	switch (m_battle.getCurrentBattlePhase())
 	{
