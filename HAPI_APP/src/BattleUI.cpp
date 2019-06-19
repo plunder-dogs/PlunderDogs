@@ -76,6 +76,7 @@ void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	ePlayerType currentPlayerType = m_battle.getCurrentPlayerType();
 
 	switch (currentEvent.type)
 	{
@@ -84,7 +85,7 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		{
 			onLeftClick(mousePosition);
 		}
-		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
+		else if (currentEvent.mouseButton.button == sf::Mouse::Right && currentPlayerType == ePlayerType::eHuman)
 		{
 			onRightClick(mousePosition);
 		}
@@ -98,11 +99,17 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		break;
 
 	case sf::Event::KeyPressed :
-		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
+		if (currentPlayerType == ePlayerType::eHuman)
+		{
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
+		}
 		break;
 
 	case sf::Event::MouseButtonReleased :
-		onClickReleased(mousePosition);
+		if (currentPlayerType == ePlayerType::eHuman)
+		{
+			onClickReleased(mousePosition);
+		}	
 		break;
 	}
 }
@@ -237,7 +244,12 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 
 void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 {
-	m_leftClickHeld = true;
+	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment 
+		|| m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
+	{
+		m_leftClickHeld = true;
+	}
+	
 	m_leftClickPosition = mousePosition;
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
@@ -287,11 +299,12 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 		return;
 	}
 
-	if (m_tileOnClick->isShipOnTile() && !m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
+	if (m_tileOnClick->isShipOnTile() && m_tileOnPreviousClick && 
+		!m_battle.isShipBelongToCurrentFactionInPlay(m_tileOnClick->m_shipOnTile))
 	{
 		m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
 	}
-	else if (!m_tileOnClick->isShipOnTile())
+	else if (!m_tileOnClick->isShipOnTile() && m_tileOnPreviousClick)
 	{
 		m_battle.fireFactionShipAtPosition(m_tileOnPreviousClick->m_shipOnTile, *m_tileOnClick, m_shipTargetArea.m_tileArea);
 	}
