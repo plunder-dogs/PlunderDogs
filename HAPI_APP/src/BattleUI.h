@@ -43,8 +43,6 @@ private:
 	sf::Vector2i m_maxCameraOffset;
 	sf::Vector2f m_pendingCameraMovement;
 	sf::Vector2i m_cameraPositionOffset;
-
-	std::array<ShipOnTile, MAX_SHIPS_SELECT> m_factionShipsSelected;
 	
 	sf::FloatRect m_selectorAABB;
 	sf::RectangleShape m_selectorShape;

@@ -32,7 +32,7 @@ BattleUI::BattleUI(Battle & battle)
 	
 	m_selectorShape.setFillColor(sf::Color::Transparent);
 	m_selectorShape.setOutlineColor(sf::Color::Green);
-	m_selectorShape.setOutlineThickness(.75f);
+	m_selectorShape.setOutlineThickness(1.5f);
 }
 
 BattleUI::~BattleUI()
@@ -259,6 +259,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	}
 	
 	m_leftClickPosition = mousePosition;
+	m_selectorShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -328,6 +329,15 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 {
 	moveCamera(mousePosition);
+
+	//Change size of selector 
+	if (m_leftClickHeld)
+	{
+		sf::Vector2f selectorSize(static_cast<float>(mousePosition.x) - m_selectorShape.getPosition().x,
+			static_cast<float>(mousePosition.y) - m_selectorShape.getPosition().y);
+		m_selectorShape.setSize(selectorSize);
+
+	}
 
 	//Ship selected doesn't match faction currently in play
 	if ((m_tileOnClick && m_tileOnClick->isShipOnTile()
