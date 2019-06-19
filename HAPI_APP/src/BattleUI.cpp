@@ -62,7 +62,7 @@ void BattleUI::render(sf::RenderWindow& window)
 	
 	if (m_leftClickHeld)
 	{
-		m_shipSelector.render(window);
+		m_shipSelector.render(window, m_battle.getMap());
 	}
 }
 
@@ -234,8 +234,8 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 	}
 
 	m_leftClickHeld = false;
-	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);
-
+	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);	
+	m_shipSelector.reset();
 
 
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment)
@@ -257,7 +257,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	}
 	
 	m_leftClickPosition = mousePosition;
-
+	m_shipSelector.setPosition(mousePosition);
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -331,7 +331,6 @@ void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 	if (m_leftClickHeld)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
-
 	}
 
 	//Ship selected doesn't match faction currently in play
@@ -506,6 +505,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
 		m_spriteOnTileClick.deactivate();
 	}
+
 	//TODO: Drop info box
 	m_tileOnClick = nullptr;
 	m_tileOnPreviousClick = nullptr;

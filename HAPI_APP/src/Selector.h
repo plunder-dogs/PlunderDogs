@@ -29,7 +29,7 @@ public:
 
 	void setPosition(sf::Vector2i position);
 	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);
-	void render(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window, const Map& map);
 	void reset();
 
 private:

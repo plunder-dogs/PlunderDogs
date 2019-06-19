@@ -50,7 +50,6 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 			if (m_AABB.intersects(ship.getAABB(map)))
 			{
 				addToSelector(ShipOnTile(ship.getFactionName(), ship.getID()), ship.getCurrentPosition());
-
 			}
 			else
 			{
@@ -60,13 +59,15 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	}
 }
 
-void Selector::render(sf::RenderWindow & window)
+void Selector::render(sf::RenderWindow & window, const Map& map)
 {
+	window.draw(m_shape);
+
 	for (auto& selectedShip : m_selectedShips)
 	{
 		if (selectedShip.shipOnTile.isValid())
 		{
-			selectedShip.sprite.render(window);
+			selectedShip.sprite.render(window, map);
 		}
 	}
 }
@@ -100,7 +101,6 @@ void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
 
 void Selector::removeFromSelector(ShipOnTile shipToRemove)
 {
-	bool shipToRemoveFound = false;
 	for (SelectedShip& selectedShip : m_selectedShips)
 	{
 		//Remove ship from selected
@@ -108,10 +108,7 @@ void Selector::removeFromSelector(ShipOnTile shipToRemove)
 		{
 			selectedShip.shipOnTile.clear();
 			selectedShip.sprite.deactivate();
-			shipToRemoveFound = true;
 			break;
 		}
 	}
-
-	assert(shipToRemoveFound);
 }
