@@ -173,6 +173,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\Selector.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\Faction.cpp" />
     <ClCompile Include="src\Ship.cpp" />
@@ -196,6 +197,8 @@
   <ItemGroup>
     <ClInclude Include="src\Battle.h" />
     <ClInclude Include="src\Particle.h" />
+    <ClInclude Include="src\Selector.h" />
+    <ClInclude Include="src\ShipOnTile.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
