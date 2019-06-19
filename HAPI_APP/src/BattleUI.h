@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Global.h"
+#include "ShipOnTile.h"
 #include "TileArea.h"
+#include "Selector.h"
 #include <array>
 
-constexpr size_t MAX_SHIPS_SELECT = 6;
 
 struct Tile;
 class Ship;
@@ -40,18 +40,26 @@ private:
 	bool m_leftClickHeld;
 	sf::Vector2i m_leftClickPosition;
 
+	//Camera
 	sf::Vector2i m_maxCameraOffset;
 	sf::Vector2f m_pendingCameraMovement;
 	sf::Vector2i m_cameraPositionOffset;
+	void updateCamera();
 	
-	sf::FloatRect m_selectorAABB;
-	sf::RectangleShape m_selectorShape;
+	Selector m_shipSelector;
+	//Selector
+	//sf::FloatRect m_selectorAABB;
+	//sf::RectangleShape m_selectorShape;
+	//std::array<ShipOnTile, MAX_SHIPS_SELECT> m_selectedShips;
+	//std::array<Sprite, MAX_SHIPS_SELECT> m_selectedShipsSprites;
+	//void updateSelector();
+	//void addToSelector(ShipOnTile shipToAdd);
+
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
-	void updateCamera();
-
+	
 	//ClickReleased
 	void onClickReleased(sf::Vector2i mousePosition);
 

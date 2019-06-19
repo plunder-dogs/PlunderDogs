@@ -13,6 +13,7 @@
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
 
+
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
 	m_tileOnPreviousClick(nullptr),
@@ -29,10 +30,6 @@ BattleUI::BattleUI(Battle & battle)
 	m_cameraPositionOffset()
 {
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
-	
-	m_selectorShape.setFillColor(sf::Color::Transparent);
-	m_selectorShape.setOutlineColor(sf::Color::Green);
-	m_selectorShape.setOutlineThickness(1.5f);
 }
 
 BattleUI::~BattleUI()
@@ -65,7 +62,7 @@ void BattleUI::render(sf::RenderWindow& window)
 	
 	if (m_leftClickHeld)
 	{
-		window.draw(m_selectorShape);
+		m_shipSelector.render(window);
 	}
 }
 
@@ -86,6 +83,7 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	ePlayerType currentPlayerType = m_battle.getCurrentPlayerType();
+
 
 	switch (currentEvent.type)
 	{
@@ -238,7 +236,7 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 	m_leftClickHeld = false;
 	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);
 
-	m_selectorShape.setSize(sf::Vector2f(0, 0));
+
 
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment)
 	{
@@ -259,7 +257,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	}
 	
 	m_leftClickPosition = mousePosition;
-	m_selectorShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
+
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -330,12 +328,9 @@ void BattleUI::onMouseMovement(sf::Vector2i mousePosition)
 {
 	moveCamera(mousePosition);
 
-	//Change size of selector 
 	if (m_leftClickHeld)
 	{
-		sf::Vector2f selectorSize(static_cast<float>(mousePosition.x) - m_selectorShape.getPosition().x,
-			static_cast<float>(mousePosition.y) - m_selectorShape.getPosition().y);
-		m_selectorShape.setSize(selectorSize);
+		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
 
 	}
 
@@ -486,7 +481,7 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
-	m_selectorShape.setSize(sf::Vector2f(0, 0));
+	m_shipSelector.reset();
 
 	switch (m_battle.getCurrentBattlePhase())
 	{

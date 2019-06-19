@@ -676,6 +676,12 @@ const Ship & Battle::getFactionShip(ShipOnTile shipOnTile) const
 	return m_factions[static_cast<int>(shipOnTile.factionName)]->getShip(shipOnTile.shipID);
 }
 
+const std::vector<Ship>& Battle::getCurrentFactionShips() const
+{
+	assert(m_factions[m_currentFactionTurn]);
+	return m_factions[m_currentFactionTurn]->getAllShips();
+}
+
 const Faction & Battle::getFaction(FactionName factionName) const
 {
 	assert(m_factions[static_cast<int>(factionName)]);

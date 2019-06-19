@@ -33,6 +33,7 @@ public:
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
+	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
 	void start(const std::string& newMapName);

@@ -15,6 +15,11 @@ Faction::Faction(FactionName factionName, ePlayerType playerType)
 	m_ships.reserve(MAX_SHIPS);
 }
 
+const std::vector<Ship>& Faction::getAllShips() const
+{
+	return m_ships;
+}
+
 const Ship & Faction::getShip(int shipID) const
 {
 	assert(shipID < m_ships.size());

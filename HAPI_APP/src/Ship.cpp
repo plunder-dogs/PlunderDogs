@@ -11,6 +11,13 @@
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
 
+sf::FloatRect Ship::getAABB(const Map& map) const
+{
+	sf::Vector2i position = map.getTileScreenPos(m_currentPosition);
+	sf::FloatRect AABB(sf::Vector2f(position.x, position.y), m_sprite.getSize());
+	return AABB;
+}
+
 FactionName Ship::getFactionName() const
 {
 	return m_factionName;

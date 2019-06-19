@@ -3,35 +3,9 @@
 #include <vector>
 #include <string>
 #include <SFML/Graphics.hpp>
-#include "Global.h"
 #include "Sprite.h"
+#include "ShipOnTile.h"
 
-struct ShipOnTile
-{
-	ShipOnTile()
-		: factionName(),
-		shipID(INVALID_SHIP_ID)
-	{}
-	ShipOnTile(FactionName factionName, int shipID)
-		: factionName(factionName),
-		shipID(shipID)
-	{}
-
-	bool isValid() const
-	{
-		return (shipID != INVALID_SHIP_ID);
-	}
-
-	void clear()
-	{
-		shipID = INVALID_SHIP_ID;
-	}
-
-	FactionName factionName;
-	int shipID;
-};
-
-class Ship;
 struct Tile
 {
 	Tile(std::unique_ptr<Texture>& dayTexture,

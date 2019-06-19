@@ -7,6 +7,7 @@ struct Faction
 {
 	Faction(FactionName factionName, ePlayerType playerType);
 
+	const std::vector<Ship>& getAllShips() const;
 	const Ship& getShip(int shipID) const;
 	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase);
 	void renderShipsMovementGraphs(sf::RenderWindow& window, const Map& map);

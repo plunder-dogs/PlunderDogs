@@ -21,6 +21,7 @@ public:
 	Ship(Ship& orig);
 	~Ship();
 
+	sf::FloatRect getAABB(const Map& map) const;
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
 	eShipType getShipType() const;
