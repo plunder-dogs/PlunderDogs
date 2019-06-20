@@ -22,10 +22,10 @@ struct Faction
 	void deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
 	void setShipDeploymentAtPosition(sf::Vector2i startingPosition);
 	//Movement Phase
-	void moveShipToPosition(Map& map, int shipID, sf::Vector2i destination);
-	void moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection);
-	void generateShipMovementGraph(const Map& map, int shipID, sf::Vector2i destination);
-	void disableShipMovementGraph(int shipID);
+	void moveShipToPosition(Map& map, int shipID);
+	void moveShipToPosition(Map& map, int shipID, eDirection endDirection);
+	void generateShipMovementArea(const Map& map, int shipID, sf::Vector2i destination);
+	void clearShipMovementArea(int shipID);
 	//Attack Phase
 	void shipTakeDamage(int shipID, int damage);
 	

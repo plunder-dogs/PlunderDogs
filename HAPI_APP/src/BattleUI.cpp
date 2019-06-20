@@ -465,11 +465,11 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile() &&
 		(m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean))
 	{
-		m_battle.generateFactionShipMovementGraph(m_tileOnLeftClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+		m_battle.generateFactionShipMovementArea(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
 	}
 	else if(m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
 	{
-		m_battle.disableFactionShipMovementGraph(m_tileOnLeftClick->m_shipOnTile);
+		m_battle.clearFactionShipMovementArea(m_tileOnClick->m_shipOnTile);
 	}
 }
 
@@ -492,20 +492,20 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 		{
 			if (Math::isFacingDifferentTile(mouseDirection.first))
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnPreviousLeftClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate, mouseDirection.second);
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, mouseDirection.second);
 			}
 			else
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnPreviousLeftClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile);
 			}
 		}
 		else if (!m_tileOnLeftClick->isShipOnTile() && !m_movementArea.isPositionInTileArea(m_tileOnLeftClick->m_tileCoordinate))
 		{
-			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousLeftClick->m_shipOnTile);
+			m_battle.clearFactionShipMovementArea(m_tileOnPreviousClick->m_shipOnTile);
 		}
 		else if (m_tileOnLeftClick->isShipOnTile())
 		{
-			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousLeftClick->m_shipOnTile);
+			m_battle.clearFactionShipMovementArea(m_tileOnPreviousClick->m_shipOnTile);
 		}
 
 		m_tileOnLeftClick = nullptr;
