@@ -38,7 +38,7 @@ public:
 
 	void update(float deltaTime);
 	void render(sf::RenderWindow& window, const Map& map);
-	void renderMovementGraph(sf::RenderWindow& window, const Map& map);
+	void renderMovementArea(sf::RenderWindow& window, const Map& map);
 	void setDestination();
 	void enableAction();
 	void disableAction();
@@ -47,7 +47,7 @@ public:
 	void setDeploymentPosition(sf::Vector2i position);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
 	void generateMovementArea(const Map& map, sf::Vector2i destination);
-	void disableMovementGraph();
+	void clearMovementArea();
 	//Movement Phase
 	void startMovement(Map& map);
 	void startMovement(Map& map, eDirection endDirection);
@@ -77,7 +77,5 @@ private:
 	bool m_deployed;
 	PosiArea m_movementArea;
 
-	unsigned int getDirectionCost(int currentDirection, int newDirection);
-	void disableMovementGraphNode(sf::Vector2i position);
 	void onNewBattlePhase(GameEvent gameEvent);
 };

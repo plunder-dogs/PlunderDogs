@@ -29,9 +29,14 @@ void PosiArea::render(sf::RenderWindow & window, const Map & map)
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
-	for (int i = 0; i < m_tileArea.size(); i++)
+	for (auto& i : m_tileAreaGraph)
 	{
-		m_tileAreaGraph[i].render(window, map);
+
+		if (i.isActive())
+		{
+			i.render(window, map);
+		}
+		
 	}
 }
 

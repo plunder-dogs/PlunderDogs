@@ -47,8 +47,8 @@ public:
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
-	void disableFactionShipMovementGraph(ShipOnTile shipOnTile);
-	void generateFactionShipMovementGraph(ShipOnTile shipOnTile, sf::Vector2i destination);
+	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
+	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination);
 	//Attack Phase
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 

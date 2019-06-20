@@ -56,7 +56,7 @@ void Faction::renderShipsMovementGraphs(sf::RenderWindow & window, const Map & m
 {
 	for (auto& ship : m_ships)
 	{
-		ship.renderMovementGraph(window, map);
+		ship.renderMovementArea(window, map);
 	}
 }
 
@@ -185,14 +185,14 @@ void Faction::moveShipToPosition(Map& map, int shipID, eDirection endDirection)
 	m_ships[shipID].startMovement(map, endDirection);
 }
 
-void Faction::generateShipMovementGraph(const Map & map, int shipID, sf::Vector2i destination)
+void Faction::generateShipMovementArea(const Map & map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
 	m_ships[shipID].generateMovementArea(map, destination);
 }
 
-void Faction::disableShipMovementGraph(int shipID)
+void Faction::clearShipMovementArea(int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].disableMovementGraph();
+	m_ships[shipID].clearMovementArea();
 }

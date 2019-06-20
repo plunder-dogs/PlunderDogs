@@ -106,7 +106,7 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination)
 	m_movementArea.activateGraph();
 }
 
-void Ship::disableMovementGraph()
+void Ship::clearMovementArea()
 {
 	m_movementArea.clearTileArea();
 }
@@ -191,23 +191,6 @@ void Ship::onNewBattlePhase(GameEvent gameEvent)
 	m_weaponFired = false;
 	m_destinationSet = false;
 	m_movingToDestination = false;
-}
-
-void Ship::disableMovementGraphNode(sf::Vector2i position)
-{
-	m_movementArea.disableNode(position);
-}
-
-unsigned int Ship::getDirectionCost(int currentDirection, int newDirection)
-{
-	unsigned int diff = std::abs(newDirection - currentDirection);
-	if (diff == 0)
-	{
-		return 0;
-	}
-
-	//number of direction % difference between the new and old directions
-	return (static_cast<int>(eDirection::Max) % diff) + 1;
 }
 
 Ship::Ship(FactionName factionName, eShipType shipType, int ID)
@@ -407,8 +390,10 @@ void Ship::update(float deltaTime)
 		{
 			m_movementTimer.reset();
 			m_currentPosition = m_movementArea.m_tileArea.front().pair();
-			disableMovementGraphNode(m_currentPosition);
-		
+			m_movementArea.disableNode(m_movementArea.m_tileArea.front().pair());
+			//disableMovementGraphNode(m_currentPosition);
+
+			
 			int directionToTurn = static_cast<int>(m_movementArea.m_tileArea.front().dir);
 			m_sprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);
 			m_currentDirection = (eDirection)directionToTurn;
@@ -418,7 +403,7 @@ void Ship::update(float deltaTime)
 			if (m_movementArea.m_tileArea.empty())
 			{
 				m_movingToDestination = false;
-				disableMovementGraph();
+				clearMovementArea();
 			}
 		}
 	}
@@ -439,7 +424,7 @@ void Ship::render(sf::RenderWindow& window, const Map & map)
 	m_actionSprite.render(window, map);
 }
 
-void Ship::renderMovementGraph(sf::RenderWindow & window, const Map & map)
+void Ship::renderMovementArea(sf::RenderWindow & window, const Map & map)
 {
 	m_movementArea.render(window, map);
 }

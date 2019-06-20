@@ -413,11 +413,11 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	if (m_tileOnClick && m_tileOnClick->isShipOnTile() &&
 		(m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean))
 	{
-		m_battle.generateFactionShipMovementGraph(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+		m_battle.generateFactionShipMovementArea(m_tileOnClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
 	}
 	else if(m_tileOnClick && m_tileOnClick->isShipOnTile())
 	{
-		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile);
+		m_battle.clearFactionShipMovementArea(m_tileOnClick->m_shipOnTile);
 	}
 }
 
@@ -449,11 +449,11 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 		}
 		else if (!m_tileOnClick->isShipOnTile() && !m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))
 		{
-			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousClick->m_shipOnTile);
+			m_battle.clearFactionShipMovementArea(m_tileOnPreviousClick->m_shipOnTile);
 		}
 		else if (m_tileOnClick->isShipOnTile())
 		{
-			m_battle.disableFactionShipMovementGraph(m_tileOnPreviousClick->m_shipOnTile);
+			m_battle.clearFactionShipMovementArea(m_tileOnPreviousClick->m_shipOnTile);
 		}
 
 		m_tileOnClick = nullptr;
@@ -486,7 +486,7 @@ void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 	//Cancel selected Entity
 	if (m_tileOnClick && m_tileOnClick->isShipOnTile())
 	{
-		m_battle.disableFactionShipMovementGraph(m_tileOnClick->m_shipOnTile); 
+		m_battle.clearFactionShipMovementArea(m_tileOnClick->m_shipOnTile); 
 		m_tileOnClickSprite.deactivate();
 	}
 	//TODO: Drop info box
