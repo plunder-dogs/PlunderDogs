@@ -104,35 +104,12 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination)
 	}
 	
 	m_movementArea.activateGraph();
-
-	//int queueSize = static_cast<int>(pathToTile.size());
-	//for (i; i < queueSize; ++i)
-	//{
-	//	m_movementGraph[i].activate();
-	//	m_movementGraph[i].setPosition(pathToTile.front().pair());
-	//	pathToTile.pop();
-	//}
-	//m_movementPathSize = i - 1;
 }
 
 void Ship::disableMovementGraph()
 {
 	m_movementArea.clearTileArea();
 }
-
-//sf::Vector2i Ship::getEndOfMovementPath() const
-//{
-//	//TODO: Refactor 
-//
-//	//int i = static_cast<int>(m_movementPath.size()) - 1;
-//	//assert(i > 0);
-//	//for (i; i > 0; i--)
-//	//{
-//	//	if (m_movementGraph[i].isActive())
-//	//		break;
-//	//}
-//	//return m_movementGraph[i].getPosition();
-//}
 
 void Ship::enableAction()
 {
@@ -147,37 +124,33 @@ void Ship::disableAction()
 	m_actionSprite.deactivate();
 }
 
-void Ship::startMovement(Map& map, sf::Vector2i destination)
+void Ship::startMovement(Map& map)
 {
 	if (!m_destinationSet)
 	{
 		m_moving = true;
-		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
-		sf::Vector2i(m_movementArea.m_tileArea.back().x, m_movementArea.m_tileArea.back().y));
-		
 		m_destinationSet = true;
 		m_movingToDestination = true;
+
 		m_actionSprite.deactivate();
 	}
 }
 
-void Ship::startMovement(Map& map, sf::Vector2i destination, eDirection endDirection)
+void Ship::startMovement(Map& map, eDirection endDirection)
 {
-	//if (!m_destinationSet)
-	//{
-	//	posi currentPos = { m_currentPosition.x, m_currentPosition.y, m_currentDirection };
-	//	posi destinationPos = { destination.x, destination.y };
-	//	std::queue<posi> pathToTile = BFS::findPath(map, currentPos, destinationPos, m_movementPoints);
-	//	if (!pathToTile.empty() && pathToTile.size() <= m_movementPathSize + 1)
-	//	{
-	//		pathToTile.emplace(posi(pathToTile.back().pair(), endDirection));
-	//		m_movementPath = pathToTile;
-	//		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition, pathToTile.back().pair());
-	//		m_destinationSet = true;
-	//		m_movingToDestination = true;
-	//		m_actionSprite.deactivate();
-	//	}
-	//}
+	if (!m_destinationSet)
+	{
+		m_moving = true;
+		m_destinationSet = true;
+		m_movingToDestination = true;
+
+		m_movementArea.m_tileArea.emplace_back(m_movementArea.m_tileArea.back().pair(), endDirection);
+
+		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
+			sf::Vector2i(m_movementArea.m_tileArea.back().x, m_movementArea.m_tileArea.back().y));
+
+		m_actionSprite.deactivate();
+	}
 }
 
 void Ship::takeDamage(int damageAmount)
@@ -262,14 +235,6 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_movementArea(Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE),
 	m_moving(false)
 {
-	////Initialize Movement Path
-	//for (auto& i : m_movementGraph)
-	//{
-	//	i.setTexture(Textures::getInstance().m_spawnHex);
-	//	i.setScale(sf::Vector2f(0.5f, 0.5f));
-	//	i.deactivate();
-	//}
-	
 	//Action Sprite
 	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
 	m_actionSprite.deactivate();

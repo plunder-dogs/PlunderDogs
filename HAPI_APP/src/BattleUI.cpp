@@ -440,11 +440,11 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 		{
 			if (Math::isFacingDifferentTile(mouseDirection.first))
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate, mouseDirection.second);
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, mouseDirection.second);
 			}
 			else
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+				m_battle.moveFactionShipToPosition(m_tileOnPreviousClick->m_shipOnTile);
 			}
 		}
 		else if (!m_tileOnClick->isShipOnTile() && !m_shipMovementArea.isPositionInTileArea(m_tileOnClick->m_tileCoordinate))

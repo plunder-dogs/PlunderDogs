@@ -173,16 +173,16 @@ void Faction::shipTakeDamage(int shipID, int damage)
 	m_ships[shipID].takeDamage(damage);
 }
 
-void Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination)
+void Faction::moveShipToPosition(Map& map, int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].startMovement(map, destination);
+	m_ships[shipID].startMovement(map);
 }
 
-void Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination, eDirection endDirection)
+void Faction::moveShipToPosition(Map& map, int shipID, eDirection endDirection)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].startMovement(map, destination, endDirection);
+	m_ships[shipID].startMovement(map, endDirection);
 }
 
 void Faction::generateShipMovementGraph(const Map & map, int shipID, sf::Vector2i destination)

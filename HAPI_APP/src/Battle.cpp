@@ -261,16 +261,16 @@ void Battle::update(float deltaTime)
 	}
 }
 
-void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination)
+void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, destination);
+	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 }
 
-void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination, eDirection endDirection)
+void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, destination, endDirection);
+	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 }
 
 void Battle::disableFactionShipMovementGraph(ShipOnTile shipOnTile)

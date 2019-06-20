@@ -45,8 +45,8 @@ public:
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
 	void setShipDeploymentAtPosition(sf::Vector2i position);
 	//Movement Phase
-	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination);
-	void moveFactionShipToPosition(ShipOnTile shipOnTile, sf::Vector2i destination, eDirection endDirection);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile);
+	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
 	void disableFactionShipMovementGraph(ShipOnTile shipOnTile);
 	void generateFactionShipMovementGraph(ShipOnTile shipOnTile, sf::Vector2i destination);
 	//Attack Phase
