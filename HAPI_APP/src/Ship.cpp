@@ -310,7 +310,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 5;
+		m_movementPoints = 8;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;

@@ -233,8 +233,8 @@ void BattleUI::onClickReleased(sf::Vector2i mousePosition)
 	}
 
 	m_leftClickHeld = false;
-	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);	
 
+	auto mouseDirection = Math::calculateDirection(m_leftClickPosition, mousePosition);	
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Deployment)
 	{
 		onLeftClickDeploymentPhase(mouseDirection.second);	
@@ -252,13 +252,29 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	{
 		m_leftClickHeld = true;
 	}
-	
-	//Selector
-
 
 	m_leftClickPosition = mousePosition;
+	
 	m_shipSelector.resetShape();
 	m_shipSelector.setPosition(mousePosition);
+	
+	if (m_shipSelector.isShipsSelected())
+	{
+		std::vector<const Tile*> adjacentTiles = m_battle.getMap().getAdjacentTiles(m_tileOnLeftClick->m_tileCoordinate);
+		for (auto& tile : adjacentTiles)
+		{
+			if (tile && !tile->isShipOnTile())
+			{
+				ShipOnTile selectedShip = m_shipSelector.getSelectedShip();
+				m_battle.moveFactionShipToPosition(selectedShip, tile->m_tileCoordinate);
+
+				if (!m_shipSelector.isShipsSelected())
+				{
+					break;
+				}
+			}		
+		}
+	}
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -333,8 +349,6 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
 	}
-
-
 
 	//Ship selected doesn't match faction currently in play
 	if ((m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile()
