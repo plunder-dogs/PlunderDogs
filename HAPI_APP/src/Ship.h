@@ -35,7 +35,7 @@ public:
 	int getDamage() const;
 	int getHealth() const;
 	int getID() const;
-	sf::Vector2i getEndOfMovementPath() const;
+	//sf::Vector2i getEndOfMovementPath() const;
 
 	void update(float deltaTime);
 	void render(sf::RenderWindow& window, const Map& map);
@@ -47,7 +47,7 @@ public:
 	//Deployment Phase
 	void setDeploymentPosition(sf::Vector2i position);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
-	void generateMovementGraph(const Map& map, sf::Vector2i destination);
+	void generateMovementArea(const Map& map, sf::Vector2i destination);
 	void disableMovementGraph();
 	//Movement Phase
 	void startMovement(Map& map, sf::Vector2i destination);
@@ -61,7 +61,7 @@ private:
 	const eShipType m_shipType;
 	const int m_ID;
 	sf::Vector2i m_currentPosition;
-	std::queue<posi> m_movementPath;
+	//std::queue<posi> m_movementPath;
 	Timer m_movementTimer;
 	int m_movementPathSize;
 	eDirection m_currentDirection;
@@ -77,7 +77,9 @@ private:
 	int m_movementPoints;
 	Sprite m_sprite;
 	bool m_deployed;
-	std::array<Sprite, MOVEMENT_GRAPH_SIZE> m_movementGraph;
+	//std::array<Sprite, MOVEMENT_GRAPH_SIZE> m_movementGraph;
+	PosiArea m_movementArea;
+	bool m_moving;
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementGraphNode(sf::Vector2i position);

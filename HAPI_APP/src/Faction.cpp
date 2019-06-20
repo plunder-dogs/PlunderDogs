@@ -188,7 +188,7 @@ void Faction::moveShipToPosition(Map& map, int shipID, sf::Vector2i destination,
 void Faction::generateShipMovementGraph(const Map & map, int shipID, sf::Vector2i destination)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].generateMovementGraph(map, destination);
+	m_ships[shipID].generateMovementArea(map, destination);
 }
 
 void Faction::disableShipMovementGraph(int shipID)
