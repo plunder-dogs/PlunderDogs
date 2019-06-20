@@ -391,8 +391,6 @@ void Ship::update(float deltaTime)
 			m_movementTimer.reset();
 			m_currentPosition = m_movementArea.m_tileArea.front().pair();
 			m_movementArea.disableNode(m_movementArea.m_tileArea.front().pair());
-			//disableMovementGraphNode(m_currentPosition);
-
 			
 			int directionToTurn = static_cast<int>(m_movementArea.m_tileArea.front().dir);
 			m_sprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);
