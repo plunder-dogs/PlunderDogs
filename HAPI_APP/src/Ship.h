@@ -76,7 +76,6 @@ private:
 	Sprite m_sprite;
 	bool m_deployed;
 	PosiArea m_movementArea;
-	bool m_moving;
 
 	unsigned int getDirectionCost(int currentDirection, int newDirection);
 	void disableMovementGraphNode(sf::Vector2i position);

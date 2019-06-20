@@ -128,7 +128,6 @@ void Ship::startMovement(Map& map)
 {
 	if (!m_destinationSet)
 	{
-		m_moving = true;
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
@@ -140,7 +139,6 @@ void Ship::startMovement(Map& map, eDirection endDirection)
 {
 	if (!m_destinationSet)
 	{
-		m_moving = true;
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
@@ -232,8 +230,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_movementPoints(0),
 	m_sprite(),
 	m_deployed(false),
-	m_movementArea(Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE),
-	m_moving(false)
+	m_movementArea(Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE)
 {
 	//Action Sprite
 	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
@@ -403,7 +400,7 @@ Ship::~Ship()
 
 void Ship::update(float deltaTime)
 {
-	if (!m_movementArea.m_tileArea.empty() && !isDead() && m_moving)
+	if (!m_movementArea.m_tileArea.empty() && !isDead() && m_movingToDestination)
 	{
 		m_movementTimer.update(deltaTime);
 		if (m_movementTimer.isExpired())
@@ -422,7 +419,6 @@ void Ship::update(float deltaTime)
 			{
 				m_movingToDestination = false;
 				disableMovementGraph();
-				m_moving = false;
 			}
 		}
 	}
