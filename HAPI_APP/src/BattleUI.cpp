@@ -84,26 +84,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	ePlayerType currentPlayerType = m_battle.getCurrentPlayerType();
 
-	//if (currentEvent.type == sf::Event::MouseMoved &&
-	//	m_shipSelector.isShipsSelected())
-	//{
-	//	//onLeftClick(mousePosition);
-	//	std::vector<const Tile*> adjacentTiles = m_battle.getMap().getAdjacentTiles(m_tileOnLeftClick->m_tileCoordinate);
-	//	for (auto& tile : adjacentTiles)
-	//	{
-	//		if (m_shipSelector.isShipsSelected() && (tile && !tile->isShipOnTile()))
-	//		{
-	//			ShipOnTile selectedShip = m_shipSelector.getSelectedShip();
-	//			m_battle.generateFactionShipMovementGraph(selectedShip, tile->m_tileCoordinate);
-
-	//			if (!m_shipSelector.isShipsSelected())
-	//			{
-	//				break;
-	//			}
-	//		}		
-	//	}
-	//}
-
 	switch (currentEvent.type)
 	{
 	case sf::Event::MouseButtonPressed:
@@ -383,7 +363,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		if (m_shipSelector.isShipsSelected())
 		{
 			std::vector<const Tile*> adjacentTiles = m_battle.getMap().getAdjacentTiles(m_tileOnMouse->m_tileCoordinate);
-			for (auto& tile : adjacentTiles)
+			for (const auto& tile : adjacentTiles)
 			{
 				if (tile && !tile->isShipOnTile())
 				{
@@ -400,24 +380,24 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 			}
 		}
 
-		//switch (m_battle.getCurrentBattlePhase())
-		//{
-		//case BattlePhase::Deployment:
-		//{
-		//	onMouseMoveDeploymentPhase(mousePosition);
-		//	break;
-		//}
-		//case BattlePhase::Movement:
-		//{
-		//	onMouseMoveMovementPhase(mousePosition);
-		//	break;
-		//}
-		//case BattlePhase::Attack:
-		//{
-		//	onMouseMoveAttackPhase(mousePosition);
-		//	break;
-		//}
-		//}
+		switch (m_battle.getCurrentBattlePhase())
+		{
+		case BattlePhase::Deployment:
+		{
+			onMouseMoveDeploymentPhase(mousePosition);
+			break;
+		}
+		case BattlePhase::Movement:
+		{
+			//onMouseMoveMovementPhase(mousePosition);
+			break;
+		}
+		case BattlePhase::Attack:
+		{
+			onMouseMoveAttackPhase(mousePosition);
+			break;
+		}
+		}
 	}
 }
 
@@ -523,7 +503,7 @@ void BattleUI::onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirec
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
-	m_shipSelector.reset();
+	
 
 	switch (m_battle.getCurrentBattlePhase())
 	{
@@ -538,18 +518,30 @@ void BattleUI::onRightClick(sf::Vector2i mousePosition)
 		break;
 	}
 	}
+
+	m_shipSelector.reset();
 }
 
 void BattleUI::onRightClickMovementPhase(sf::Vector2i mousePosition)
 {
-	//Cancel selected Entity
-	if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
+	//Cancel selected ships within box
+	if (m_shipSelector.isShipsSelected())
+	{
+		for (auto& selectedShip : m_shipSelector.getSelectedShips())
+		{
+			if (selectedShip.m_shipOnTile.isValid())
+			{
+				m_battle.disableFactionShipMovementGraph(selectedShip.m_shipOnTile);
+			}
+		}
+	}
+	//Cancel individually selected Ship
+	else if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
 	{
 		m_battle.disableFactionShipMovementGraph(m_tileOnLeftClick->m_shipOnTile); 
 		m_spriteOnTileClick.deactivate();
 	}
 
-	//TODO: Drop info box
 	m_tileOnLeftClick = nullptr;
 	m_tileOnPreviousLeftClick = nullptr;
 	m_movementArea.clearTileArea();
