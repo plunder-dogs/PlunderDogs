@@ -1,16 +1,32 @@
 #pragma once
 
+#include "Global.h"
 #include <memory>
 #include <vector>
 #include <Sprite.h>
+#include <deque>
 
-struct Tile;
 class Map;
 struct Texture;
+struct PosiArea
+{
+	PosiArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph = false);
+
+	void disableNode(sf::Vector2i position);
+	
+	void render(sf::RenderWindow& window, const Map& map);
+	void clearTileArea();
+	void activateGraph();
+
+	std::vector<Sprite> m_tileAreaGraph;
+	std::deque<posi> m_tileArea;
+};
+
+struct Tile;
 struct TileArea
 {
 	TileArea(size_t maxTileAreaSize);
-	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, const Map& map, bool activeGraph = false);
+	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph = false);
 
 	bool isPositionInTileArea(sf::Vector2i position) const;
 
