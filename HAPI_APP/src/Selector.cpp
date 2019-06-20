@@ -50,6 +50,18 @@ const std::array<SelectedShip, MAX_SHIPS_SELECT>& Selector::getSelectedShips() c
 	return m_selectedShips;
 }
 
+ShipOnTile Selector::getSelectedShip()
+{
+	auto iter = std::find_if(m_selectedShips.begin(), m_selectedShips.end(), [] 
+		(const auto& selectedShip) { return selectedShip.m_shipOnTile.isValid(); });
+	assert(iter != m_selectedShips.cend());
+	
+	ShipOnTile shipOnTile = iter->m_shipOnTile;
+	iter->clear();
+
+	return shipOnTile;
+}
+
 void Selector::setPosition(sf::Vector2i position)
 {
 	m_shape.setPosition(sf::Vector2f(position.x, position.y));
@@ -86,8 +98,6 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 
 void Selector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
 {
-	
-
 	for (auto& selectedShip : m_selectedShips)
 	{
 		if (selectedShip.m_shipOnTile.isValid())

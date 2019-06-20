@@ -28,8 +28,8 @@ public:
 
 private:
 	Battle& m_battle;
-	const Tile* m_tileOnPreviousClick;
-	const Tile* m_tileOnClick;
+	const Tile* m_tileOnPreviousLeftClick;
+	const Tile* m_tileOnLeftClick;
 	const Tile* m_tileOnMouse;
 	Sprite m_spriteOnTileClick;
 	Sprite m_spriteOnMouse;
@@ -47,7 +47,6 @@ private:
 	
 	Selector m_shipSelector;
 
-
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
@@ -61,7 +60,7 @@ private:
 	void onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	//MouseMove
-	void onMouseMovement(sf::Vector2i mousePosition);
+	void onMouseMove(sf::Vector2i mousePosition);
 	void moveCamera(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);

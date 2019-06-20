@@ -32,6 +32,7 @@ public:
 
 	bool isShipsSelected() const;
 	const std::array<SelectedShip, MAX_SHIPS_SELECT>& getSelectedShips() const;
+	ShipOnTile getSelectedShip();
 
 	void setPosition(sf::Vector2i position);
 	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);
