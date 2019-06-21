@@ -112,7 +112,7 @@ void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
 	if (cIter == m_selectedShips.cend())
 	{
 		m_selectedShips.emplace_back(shipToAdd, shipPosition);
-		assert(m_selectedShips.size() > MAX_SHIPS_PER_FACTION);
+		assert(m_selectedShips.size() <= MAX_SHIPS_PER_FACTION);
 	}
 }
 

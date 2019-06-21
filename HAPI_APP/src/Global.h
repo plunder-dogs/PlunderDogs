@@ -7,7 +7,7 @@ constexpr int INVALID_SHIP_ID = -1;
 constexpr float DRAW_OFFSET_X{ 16 };
 constexpr float DRAW_OFFSET_Y{ 32 };
 
-const size_t MAX_SHIPS = 6;
+const size_t MAX_SHIPS_PER_FACTION = 6;
 const std::string DATA_DIRECTORY = "Data\\";
 const std::string SHIP_DATA_DIRECTORY = "Data\\Ships\\";
 const std::string LEVEL_DATA_DIRECTORY = "Data\\Levels\\";

@@ -65,6 +65,7 @@ private:
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
+	void handleOnMouseMoveShipSelector();
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickMovementPhase(sf::Vector2i mousePosition);
