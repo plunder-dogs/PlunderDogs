@@ -375,7 +375,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		std::cout << "\n";
 		m_tileOnMouse = tileOnMouse;
 
-		if (m_shipSelector.isShipsSelected())
+		if (m_shipSelector.isShipsSelected() && !m_leftClickHeld)
 		{
 			std::vector<const Tile*> adjacentTiles = m_battle.getMap().getAdjacentTiles(m_tileOnMouse->m_tileCoordinate);
 			int shipIndex = 0;

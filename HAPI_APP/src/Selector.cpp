@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <math.h>
 
-constexpr int MIN_SHIP_SELECT_SIZE = 75;
+constexpr int MIN_SHIP_SELECT_SIZE = 25;
 SelectedShip::SelectedShip()
 	: m_shipOnTile(),
 	m_sprite()
