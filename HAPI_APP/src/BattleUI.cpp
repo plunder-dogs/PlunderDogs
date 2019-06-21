@@ -258,22 +258,11 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	m_shipSelector.resetShape();
 	m_shipSelector.setPosition(mousePosition);
 	
-	if (!m_shipSelector.getSelectedShips().empty())
+	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+	for (int i = 0; i < selectedShipCount; ++i)
 	{
-		std::vector<const Tile*> adjacentTiles = m_battle.getMap().getAdjacentTiles(m_tileOnLeftClick->m_tileCoordinate);
-		for (auto& tile : adjacentTiles)
-		{
-			if (tile && !tile->isShipOnTile())
-			{
-				ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-				m_battle.moveFactionShipToPosition(selectedShip);
-
-				if (m_shipSelector.getSelectedShips().empty())
-				{
-					break;
-				}
-			}		
-		}
+		ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+		m_battle.moveFactionShipToPosition(selectedShip);
 	}
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
@@ -500,7 +489,6 @@ void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	
-
 	switch (m_battle.getCurrentBattlePhase())
 	{
 	case BattlePhase::Movement:
