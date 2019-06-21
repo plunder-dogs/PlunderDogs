@@ -1,4 +1,4 @@
-#include "Ship.h"
+ #include "Ship.h"
 #include "Map.h"
 #include "BFS.h"
 #include "Textures.h"
@@ -246,7 +246,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 8;
+		m_movementPoints = 18;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;
@@ -397,7 +397,7 @@ void Ship::update(float deltaTime)
 		{
 			m_movementTimer.reset();
 			m_currentPosition = m_movementArea.m_tileArea.front().pair();
-			m_movementArea.disableNode(m_movementArea.m_tileArea.front().pair());
+			m_movementArea.disableNode(m_currentPosition);
 			
 			int directionToTurn = static_cast<int>(m_movementArea.m_tileArea.front().dir);
 			m_sprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);

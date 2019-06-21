@@ -20,7 +20,6 @@ void PosiArea::disableNode(sf::Vector2i position)
 		if (iter->getPosition() == position)
 		{
 			iter->deactivate();
-			break;
 		}
 	}
 }
@@ -31,12 +30,7 @@ void PosiArea::render(sf::RenderWindow & window, const Map & map)
 
 	for (auto& i : m_tileAreaGraph)
 	{
-
-		if (i.isActive())
-		{
-			i.render(window, map);
-		}
-		
+		i.render(window, map);
 	}
 }
 

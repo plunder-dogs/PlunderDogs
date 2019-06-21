@@ -75,7 +75,7 @@ posi turnLeft(const posi& currentTile);
 posi turnRight(const posi& currentTile);
 
 //This is the recursive algorithm that hunts for the assigned tile
-bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, const posi destination, const eDirection windDirection, const float windStrength)
+bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, posi destination, const eDirection windDirection, const float windStrength)
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
