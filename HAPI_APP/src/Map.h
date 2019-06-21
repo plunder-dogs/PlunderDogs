@@ -63,6 +63,7 @@ public:
 	//returns nullptr for each tile out of bounds
 	//std::vector<Tile*> getAdjacentTiles(sf::Vector2i coord);
 	std::vector<const Tile*> getAdjacentTiles(sf::Vector2i coord) const;
+	std::vector<const Tile*> getNonCollidableAdjacentTiles(sf::Vector2i coord) const;
 	void getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
 
 	//Returns tiles in a radius around a given tile, skipping the tile itself
@@ -116,6 +117,8 @@ public:
 	void loadmap(const std::string& mapName);
 
 	const std::vector<Tile>& getData()const { return m_data; }
+
+	bool isTileCollidable(const Tile* tile) const;
 
 	Map();
 	Map(const Map&) = delete;
