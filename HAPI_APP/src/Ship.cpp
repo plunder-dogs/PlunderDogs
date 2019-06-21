@@ -110,7 +110,9 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination)
 		pathToTile.pop();
 	}
 	
-	m_movementArea.activateGraph();
+	sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
+	m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
+	m_movementArea.m_tileAreaGraph[0].activate();
 }
 
 void Ship::clearMovementArea()
@@ -129,6 +131,7 @@ void Ship::enableAction()
 void Ship::disableAction()
 {
 	m_actionSprite.deactivate();
+
 }
 
 void Ship::startMovement(Map& map)
