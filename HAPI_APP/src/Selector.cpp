@@ -10,6 +10,11 @@ SelectedShip::SelectedShip()
 	m_sprite()
 {}
 
+bool SelectedShip::isValid() const
+{
+	return m_shipOnTile.isValid();
+}
+
 void SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
 {
 	m_shipOnTile = shipOnTile;
@@ -82,7 +87,7 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	if (std::abs(m_shape.getSize().x) >= MIN_SHIP_SELECT_SIZE &&
 		std::abs(m_shape.getSize().y) >= MIN_SHIP_SELECT_SIZE)
 	{
-		for (auto& ship : currentFactionShips)
+		for (const auto& ship : currentFactionShips)
 		{
 			if (m_AABB.intersects(ship.getAABB(map)))
 			{

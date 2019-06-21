@@ -12,6 +12,7 @@ struct SelectedShip
 {
 	SelectedShip();
 
+	bool isValid() const;
 	void add(ShipOnTile shipOnTile, sf::Vector2i position);
 	void clear();
 
