@@ -372,7 +372,6 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 	//New tile 
 	if (m_tileOnMouse->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
 	{
-		std::cout << "\n";
 		m_tileOnMouse = tileOnMouse;
 
 		if (m_shipSelector.isShipsSelected() && !m_leftClickHeld)
@@ -410,7 +409,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		}
 		case BattlePhase::Movement:
 		{
-			//onMouseMoveMovementPhase(mousePosition);
+			onMouseMoveMovementPhase(mousePosition);
 			break;
 		}
 		case BattlePhase::Attack:
