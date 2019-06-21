@@ -428,90 +428,6 @@ std::vector<const Tile*> Map::getAdjacentTiles(sf::Vector2i coord) const
 	return result;
 }
 
-std::vector<const Tile*> Map::getNonCollidableAdjacentTiles(sf::Vector2i coord) const
-{
-	const size_t allAdjacentTiles = 6;
-	std::vector<const Tile*> result;
-	result.reserve(size_t(allAdjacentTiles));
-	if (coord.x & 1)//Is an odd tile
-	{
-		const Tile* tile = getTile(sf::Vector2i(coord.x, coord.y - 1));//N
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x + 1, coord.y - 1)); //NE
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x + 1, coord.y)); //SE
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x, coord.y + 1)); //S
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x - 1, coord.y)); //SW
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x - 1, coord.y - 1)); //NW
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-	}
-	else//Is even
-	{
-		const Tile* tile = getTile(sf::Vector2i(coord.x, coord.y - 1));//N
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x + 1, coord.y));
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x + 1, coord.y + 1));
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x, coord.y + 1));
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x - 1, coord.y + 1));
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-
-		tile = getTile(sf::Vector2i(coord.x - 1, coord.y));
-		if (!isTileCollidable(tile))
-		{
-			result.push_back(tile);
-		}
-	}
-	return result;
-}
-
 void Map::getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const
 {
 	if (coord.x & 1)//Is an odd tile
@@ -531,6 +447,86 @@ void Map::getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coor
 		tileArea.push_back(getTile(sf::Vector2i(coord.x, coord.y + 1)));		//S
 		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y + 1)));	//SW
 		tileArea.push_back(getTile(sf::Vector2i(coord.x - 1, coord.y)));		//NW
+	}
+}
+
+void Map::getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const
+{
+	if (coord.x & 1)//Is an odd tile
+	{
+		const Tile* tile = getTile(sf::Vector2i(coord.x, coord.y - 1));//N
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x + 1, coord.y - 1)); //NE
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x + 1, coord.y)); //SE
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x, coord.y + 1)); //S
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x - 1, coord.y)); //SW
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x - 1, coord.y - 1)); //NW
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+	}
+	else//Is even
+	{
+		const Tile* tile = getTile(sf::Vector2i(coord.x, coord.y - 1));//N
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x + 1, coord.y));
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x + 1, coord.y + 1));
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x, coord.y + 1));
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x - 1, coord.y + 1));
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
+
+		tile = getTile(sf::Vector2i(coord.x - 1, coord.y));
+		if (!isTileCollidable(tile))
+		{
+			tileArea.push_back(tile);
+		}
 	}
 }
 

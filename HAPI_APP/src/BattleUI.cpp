@@ -571,14 +571,15 @@ void BattleUI::handleOnMouseMoveShipSelector()
 {
 	if (!m_shipSelector.getSelectedShips().empty() && !m_leftClickHeld)
 	{
-		std::vector<const Tile*> availableTiles =  m_battle.getMap().getNonCollidableAdjacentTiles(m_tileOnMouse->m_tileCoordinate);
-		if (m_shipSelector.getSelectedShips().size() > availableTiles.size())
+		m_movementArea.clearTileArea();
+		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
+		if (m_shipSelector.getSelectedShips().size() > m_movementArea.m_tileArea.size())
 		{
 			return;
 		}
 
 		int shipIndex = 0;
-		for (const auto& tile : availableTiles)
+		for (const auto& tile : m_movementArea.m_tileArea)
 		{
 			if (tile && !tile->isShipOnTile())
 			{
