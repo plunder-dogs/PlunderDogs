@@ -257,13 +257,6 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	
 	m_shipSelector.resetShape();
 	m_shipSelector.setPosition(mousePosition);
-	
-	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
-	for (int i = 0; i < selectedShipCount; ++i)
-	{
-		ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-		m_battle.moveFactionShipToPosition(selectedShip);
-	}
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -295,6 +288,13 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 			m_tileOnPreviousLeftClick = nullptr;
 			return;
 		}
+	}
+
+	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+	for (int i = 0; i < selectedShipCount; ++i)
+	{
+		ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+		m_battle.moveFactionShipToPosition(selectedShip);
 	}
 
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
@@ -334,7 +334,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
 	moveCamera(mousePosition);
 
-	if (m_leftClickHeld)
+	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
 	}
