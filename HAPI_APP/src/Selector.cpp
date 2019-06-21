@@ -5,28 +5,12 @@
 #include <math.h>
 
 constexpr int MIN_SHIP_SELECT_SIZE = 25;
-SelectedShip::SelectedShip()
-	: m_shipOnTile(),
-	m_sprite()
-{}
 
-bool SelectedShip::isValid() const
+SelectedShip::SelectedShip(ShipOnTile shipOnTile, sf::Vector2i shipPosition)
+	: m_shipOnTile(shipOnTile),
+	m_sprite(Textures::getInstance().m_selectedHex)
 {
-	return m_shipOnTile.isValid();
-}
-
-void SelectedShip::add(ShipOnTile shipOnTile, sf::Vector2i position)
-{
-	m_shipOnTile = shipOnTile;
-
-	m_sprite.setPosition(position);
-	m_sprite.activate();
-}
-
-void SelectedShip::clear()
-{
-	m_shipOnTile.clear();
-	m_sprite.deactivate();
+	m_sprite.setPosition(shipPosition);
 }
 
 Selector::Selector()
@@ -34,37 +18,26 @@ Selector::Selector()
 	m_shape(),
 	m_AABB()
 {
-	for (auto& selectedShip : m_selectedShips)
-	{
-		selectedShip.m_sprite.setTexture(Textures::getInstance().m_selectedHex);
-	}
+	m_selectedShips.reserve(MAX_SHIPS_PER_FACTION);
 
 	m_shape.setFillColor(sf::Color::Transparent);
 	m_shape.setOutlineColor(sf::Color::Green);
 	m_shape.setOutlineThickness(1.5f);
 }
 
-bool Selector::isShipsSelected() const
-{
-	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [](const auto& selectedShip) { return selectedShip.m_shipOnTile.isValid(); });
-	return cIter != m_selectedShips.cend();
-}
-
-const std::array<SelectedShip, MAX_SHIPS_SELECT>& Selector::getSelectedShips() const
+const std::vector<SelectedShip>& Selector::getSelectedShips() const
 {
 	return m_selectedShips;
 }
 
-ShipOnTile Selector::getSelectedShip()
+ShipOnTile Selector::removeSelectedShip()
 {
-	auto iter = std::find_if(m_selectedShips.begin(), m_selectedShips.end(), [] 
-		(const auto& selectedShip) { return selectedShip.m_shipOnTile.isValid(); });
-	assert(iter != m_selectedShips.cend());
-	
-	ShipOnTile shipOnTile = iter->m_shipOnTile;
-	iter->clear();
+	assert(!m_selectedShips.empty());
 
-	return shipOnTile;
+	ShipOnTile removedSelectedShip = m_selectedShips.back().m_shipOnTile;
+	m_selectedShips.pop_back();
+
+	return removedSelectedShip;
 }
 
 void Selector::setPosition(sf::Vector2i position)
@@ -79,6 +52,7 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	//Change Size
 	sf::Vector2f selectorSize(static_cast<float>(mousePosition.x) - m_shape.getPosition().x,
 		static_cast<float>(mousePosition.y) - m_shape.getPosition().y);
+
 	m_shape.setSize(selectorSize);
 	m_AABB.width = selectorSize.x;
 	m_AABB.height = selectorSize.y;
@@ -91,11 +65,11 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 		{
 			if (m_AABB.intersects(ship.getAABB(map)))
 			{
-				addToSelector(ShipOnTile(ship.getFactionName(), ship.getID()), ship.getCurrentPosition());
+				addToSelector({ ship.getFactionName(), ship.getID() }, ship.getCurrentPosition());
 			}
 			else
 			{
-				removeFromSelector(ShipOnTile(ship.getFactionName(), ship.getID()));
+				removeFromSelector({ ship.getFactionName(), ship.getID() });
 			}
 		}
 	}
@@ -105,10 +79,7 @@ void Selector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
 {
 	for (auto& selectedShip : m_selectedShips)
 	{
-		if (selectedShip.m_shipOnTile.isValid())
-		{
-			selectedShip.m_sprite.render(window, map);
-		}
+		selectedShip.m_sprite.render(window, map);	
 	}
 }
 
@@ -123,13 +94,7 @@ void Selector::reset()
 	m_AABB.width = 0;
 	m_AABB.height = 0;
 
-	for (auto& selectedShip : m_selectedShips)
-	{
-		if (selectedShip.m_shipOnTile.isValid())
-		{
-			selectedShip.clear();
-		}
-	}
+	m_selectedShips.clear();
 }
 
 void Selector::resetShape()
@@ -139,33 +104,25 @@ void Selector::resetShape()
 	m_AABB.height = 0;
 }
 
-void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i position)
+void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
 {
-	for (SelectedShip& selectedShip : m_selectedShips)
+	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [shipToAdd](const auto& selectedShip)
+		{ return selectedShip.m_shipOnTile.shipID == shipToAdd.shipID; });
+	
+	if (cIter == m_selectedShips.cend())
 	{
-		//Ship to add already exists
-		if (shipToAdd == selectedShip.m_shipOnTile)
-		{
-			break;
-		}
-
-		if (!selectedShip.m_shipOnTile.isValid())
-		{
-			selectedShip.add(shipToAdd, position);
-			break;
-		}
+		m_selectedShips.emplace_back(shipToAdd, shipPosition);
+		assert(m_selectedShips.size() > MAX_SHIPS_PER_FACTION);
 	}
 }
 
 void Selector::removeFromSelector(ShipOnTile shipToRemove)
 {
-	for (SelectedShip& selectedShip : m_selectedShips)
+	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [shipToRemove](const auto& selectedShip)
+		{ return selectedShip.m_shipOnTile.shipID == shipToRemove.shipID; });
+	
+	if (cIter != m_selectedShips.cend())
 	{
-		//Remove ship from selected
-		if (shipToRemove == selectedShip.m_shipOnTile)
-		{
-			selectedShip.clear();
-			break;
-		}
+		m_selectedShips.erase(cIter);
 	}
 }

@@ -3,18 +3,11 @@
 #include "ShipOnTile.h"
 #include "Sprite.h"
 #include <SFML/Graphics.hpp>
-#include <array>
 #include <vector>
-
-constexpr size_t MAX_SHIPS_SELECT = 6;
 
 struct SelectedShip
 {
-	SelectedShip();
-
-	bool isValid() const;
-	void add(ShipOnTile shipOnTile, sf::Vector2i position);
-	void clear();
+	SelectedShip(ShipOnTile shipOnTile, sf::Vector2i shipPosition);
 
 	ShipOnTile m_shipOnTile;
 	Sprite m_sprite;
@@ -31,9 +24,8 @@ public:
 	Selector(Selector&&) = delete;
 	Selector&& operator=(Selector&&) = delete;
 
-	bool isShipsSelected() const;
-	const std::array<SelectedShip, MAX_SHIPS_SELECT>& getSelectedShips() const;
-	ShipOnTile getSelectedShip();
+	const std::vector<SelectedShip>& getSelectedShips() const;
+	ShipOnTile removeSelectedShip();
 
 	void setPosition(sf::Vector2i position);
 	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);
@@ -43,10 +35,10 @@ public:
 	void resetShape();
 
 private:
-	std::array<SelectedShip, MAX_SHIPS_SELECT> m_selectedShips;
+	std::vector<SelectedShip> m_selectedShips;
 	sf::RectangleShape m_shape;
 	sf::FloatRect m_AABB;
 	
-	void addToSelector(ShipOnTile shipToAdd, sf::Vector2i position);
+	void addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition);
 	void removeFromSelector(ShipOnTile shipToRemove);
 };
