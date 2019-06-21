@@ -75,7 +75,7 @@ posi turnLeft(const posi& currentTile);
 posi turnRight(const posi& currentTile);
 
 //This is the recursive algorithm that hunts for the assigned tile
-posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, posi destination, const eDirection windDirection, const float windStrength)
+bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, const posi destination, const eDirection windDirection, const float windStrength)
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
@@ -86,7 +86,10 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 	{
 		//Check if this is the destination
 		if (tile.pair() == destination.pair())
-			return tile;
+		{
+			finalPoint = tile;
+			return true;
+		}
 		//Check if any movements are unexplored and movable, if so set those to true and set their parent to this tile
 		//Then enqueue left, right, and forward as appropriate:
 		//Left
@@ -117,11 +120,7 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 				queue.emplace(queueTile, tether - 1);
 		}
 	}
-	//If queue is not empty run algorithm again
-	posi final{ NO_TILE };
-	if (!queue.empty())
-		final = pathExplorer(exploreArea, queue, destination, windDirection, windStrength);
-	return final;
+	return false;
 }
 
 std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float maxMovement)
@@ -138,7 +137,12 @@ std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float
 	exploreQueue.emplace(startPos, maxMovement);
 	exploreArea.access(startPos).parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
-	posi trace = pathExplorer(exploreArea, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength());
+	posi trace{ NO_TILE };
+	while (!exploreQueue.empty())
+	{
+		if (pathExplorer(trace, exploreArea, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength()))
+			break;
+	}
 	if (trace == NO_TILE)
 		return std::queue<posi>();
 	//Trace path back from destination via parents
