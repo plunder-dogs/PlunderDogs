@@ -136,11 +136,6 @@ void Ship::disableAction()
 
 void Ship::startMovement(Map& map)
 {
-	if (m_movementArea.m_tileArea.empty())
-	{
-		return;
-	}
-
 	if (!m_destinationSet)
 	{
 		m_destinationSet = true;
