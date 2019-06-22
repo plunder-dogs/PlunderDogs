@@ -296,10 +296,10 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 	}
 }
 
-void Battle::setShipDeploymentAtPosition(sf::Vector2i position)
+void Battle::setShipDeploymentAtPosition(sf::Vector2i position, eDirection direction)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
-	m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position);
+	m_factions[m_currentFactionTurn]->setShipDeploymentAtPosition(position, direction);
 }
 
 void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea)

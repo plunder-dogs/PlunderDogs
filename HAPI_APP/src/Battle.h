@@ -44,7 +44,7 @@ public:
 
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
-	void setShipDeploymentAtPosition(sf::Vector2i position);
+	void setShipDeploymentAtPosition(sf::Vector2i position, eDirection direction = eDirection::eNorth);
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);

@@ -147,7 +147,6 @@ void BattleUI::generateTargetArea(const Tile & source)
 		break;
 
 	case eShipType::eTurtle :
-		// make so where ever the place presses get radius called talk adrais about size of that
 		m_battle.getMap().getTileRadius(m_targetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(), true);
 		break;
@@ -176,6 +175,7 @@ void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEv
 	if (currentEvent.key.code == sf::Keyboard::Escape)
 	{
 		m_leftClickHeld = false;
+		m_rightClickHeld = false;
 
 		switch (m_battle.getCurrentBattlePhase())
 		{
@@ -406,6 +406,11 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 	if (!m_tileOnMouse->isShipOnTile() && !m_rightClickHeld)
 	{
 		m_battle.setShipDeploymentAtPosition(m_tileOnMouse->m_tileCoordinate);
+	}
+	else if (!m_tileOnMouse->isShipOnTile() && m_rightClickHeld)
+	{
+		auto mouseDirection = Math::calculateDirection(m_rightClickPosition, mousePosition);
+		m_battle.setShipDeploymentAtPosition(m_tileOnRightClick->m_tileCoordinate, mouseDirection.second);
 	}
 }
 

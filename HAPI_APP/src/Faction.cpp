@@ -139,13 +139,13 @@ void Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDir
 	}
 }
 
-void Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition)
+void Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition, eDirection direction)
 {
 	for (auto& ship : m_ships)
 	{
 		if (!ship.isDeployed())
 		{
-			ship.setDeploymentPosition(startingPosition);
+			ship.setDeploymentPosition(startingPosition, direction);
 			break;
 		}
 	}

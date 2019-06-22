@@ -440,9 +440,10 @@ void Ship::renderMovementArea(sf::RenderWindow & window, const Map & map)
 	m_movementArea.render(window, map);
 }
 
-void Ship::setDeploymentPosition(sf::Vector2i position)
+void Ship::setDeploymentPosition(sf::Vector2i position, eDirection direction)
 {
 	m_currentPosition = position;
+	m_sprite.setRotation(direction * ROTATION_ANGLE % 360);
 }
 
 void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)

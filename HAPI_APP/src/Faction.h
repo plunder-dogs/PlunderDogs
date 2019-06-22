@@ -20,7 +20,7 @@ struct Faction
 	bool isAllShipsDeployed() const;
 	void createSpawnArea(Map& map);
 	void deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
-	void setShipDeploymentAtPosition(sf::Vector2i startingPosition);
+	void setShipDeploymentAtPosition(sf::Vector2i startingPosition, eDirection direction);
 	//Movement Phase
 	void moveShipToPosition(Map& map, int shipID);
 	void moveShipToPosition(Map& map, int shipID, eDirection endDirection);

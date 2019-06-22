@@ -45,7 +45,7 @@ public:
 	void disableAction();
 
 	//Deployment Phase
-	void setDeploymentPosition(sf::Vector2i position);
+	void setDeploymentPosition(sf::Vector2i position, eDirection direction);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
 	void generateMovementArea(const Map& map, sf::Vector2i destination);
 	void clearMovementArea();
