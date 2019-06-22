@@ -337,7 +337,10 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
-	m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
+	if (m_leftClickHeld)
+	{
+		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
+	}
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -576,10 +579,14 @@ void BattleUI::handleOnMouseMoveShipSelector()
 
 void BattleUI::onNewBattlePhase(GameEvent gameEvent)
 {
+	m_tileOnRightClick = nullptr;
 	m_tileOnLeftClick = nullptr;
 	m_tileOnPreviousLeftClick = nullptr;
 	m_tileOnMouse = nullptr;
+	m_leftClickHeld = false;
+	m_rightClickHeld = false;
 	m_spriteOnTileClick.deactivate();
 	m_targetArea.clearTileArea();
 	m_movementArea.clearTileArea();
+	m_shipSelector.reset();
 }
