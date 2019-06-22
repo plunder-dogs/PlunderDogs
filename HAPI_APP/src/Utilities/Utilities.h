@@ -10,6 +10,7 @@
 namespace Utilities
 {
 	int getRandomNumber(int min, int max);
+	eDirection getOppositeDirection(eDirection direction);
 }
 
 struct Tile;

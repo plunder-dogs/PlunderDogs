@@ -11,6 +11,33 @@ int Utilities::getRandomNumber(int min, int max)
 	return dis(gen);
 }
 
+eDirection Utilities::getOppositeDirection(eDirection direction)
+{
+	eDirection oppositeDirection;
+	switch (direction)
+	{
+	case eNorth:
+		oppositeDirection = eSouth;
+		break;
+	case eNorthEast:
+		oppositeDirection = eSouthWest;
+		break;
+	case eSouthEast:
+		oppositeDirection = eNorthWest;
+		break;
+	case eSouth:
+		oppositeDirection = eNorth;
+		break;
+	case eSouthWest:
+		oppositeDirection = eNorthEast;
+		break;
+	case eNorthWest:
+		oppositeDirection = eSouthEast;
+		break;
+	}
+
+	return oppositeDirection;
+}
 
 double Math::radsToDeg(double angle)
 {
