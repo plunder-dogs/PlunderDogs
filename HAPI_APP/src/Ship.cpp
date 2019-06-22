@@ -141,6 +141,9 @@ void Ship::startMovement(Map& map)
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
+		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
+			sf::Vector2i(m_movementArea.m_tileArea.back().x, m_movementArea.m_tileArea.back().y));
+
 		m_actionSprite.deactivate();
 	}
 }

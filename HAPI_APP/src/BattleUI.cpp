@@ -255,8 +255,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 
 	m_leftClickPosition = mousePosition;
 	
-	m_shipSelector.resetShape();
-	m_shipSelector.setPosition(mousePosition);
+	m_shipSelector.resetShape(mousePosition);
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
 	if (!tileOnMouse)
@@ -290,14 +289,16 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		}
 	}
 
-	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
-	for (int i = 0; i < selectedShipCount; ++i)
+	if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
 	{
-		ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-		m_battle.moveFactionShipToPosition(selectedShip);
+		size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+		for (int i = 0; i < selectedShipCount; ++i)
+		{
+			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+			m_battle.moveFactionShipToPosition(selectedShip);
+		}
 	}
-
-	if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
+	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
 	{
 		onLeftClickAttackPhase(mousePosition);
 	}
@@ -334,7 +335,8 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
 	moveCamera(mousePosition);
 
-	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
+	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() == BattlePhase::Movement
+		|| m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
 	}
@@ -363,8 +365,6 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 	{
 		m_tileOnMouse = tileOnMouse;
 		
-		handleOnMouseMoveShipSelector();
-
 		switch (m_battle.getCurrentBattlePhase())
 		{
 		case BattlePhase::Deployment:
@@ -374,6 +374,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		}
 		case BattlePhase::Movement:
 		{
+			handleOnMouseMoveShipSelector();
 			onMouseMoveMovementPhase(mousePosition);
 			break;
 		}
@@ -583,6 +584,7 @@ void BattleUI::handleOnMouseMoveShipSelector()
 				}
 			}
 		}
+		int i = 0;
 	}
 }
 
