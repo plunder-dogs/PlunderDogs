@@ -127,53 +127,30 @@ void BattleUI::generateTargetArea(const Tile & source)
 	m_targetArea.clearTileArea();
 
 	const Ship& ship = m_battle.getFactionShip(source.m_shipOnTile);
-	if (ship.getShipType() == eShipType::eFrigate)
+	switch (ship.getShipType())
 	{
+	case eShipType::eFrigate: 
 		m_battle.getMap().getTileCone(m_targetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(),
 			ship.getCurrentDirection(), true);
+		break;
 
-	}
-	else if (ship.getShipType() == eShipType::eSniper)
-	{
+	case eShipType::eSniper :
 		m_battle.getMap().getTileLine(m_targetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(),
 			ship.getCurrentDirection(), true);
+		break;
 
-	}
-	else if (ship.getShipType() == eShipType::eTurtle)
-	{
+	case eShipType::eTurtle :
 		// make so where ever the place presses get radius called talk adrais about size of that
 		m_battle.getMap().getTileRadius(m_targetArea.m_tileArea, source.m_tileCoordinate,
 			ship.getRange(), true);
-	}
-	else if (ship.getShipType() == eShipType::eFire)
-	{
-		eDirection directionOfFire = eNorth;
-		switch (ship.getCurrentDirection())
-		{
-		case eNorth:
-			directionOfFire = eSouth;
-			break;
-		case eNorthEast:
-			directionOfFire = eSouthWest;
-			break;
-		case eSouthEast:
-			directionOfFire = eNorthWest;
-			break;
-		case eSouth:
-			directionOfFire = eNorth;
-			break;
-		case eSouthWest:
-			directionOfFire = eNorthEast;
-			break;
-		case eNorthWest:
-			directionOfFire = eSouthEast;
-			break;
-		}
+		break;
 
+	case eShipType::eFire :
 		m_battle.getMap().getTileLine(m_targetArea.m_tileArea, source.m_tileCoordinate,
-			ship.getRange(), directionOfFire, true);	
+			ship.getRange(), Utilities::getOppositeDirection(ship.getCurrentDirection()), true);
+		break;
 	}
 
 	m_targetArea.activateGraph();

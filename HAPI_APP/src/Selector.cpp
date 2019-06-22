@@ -112,7 +112,6 @@ void Selector::resetShape(sf::Vector2i position)
 	m_AABB.height = 0;
 }
 
-
 void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
 {
 	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [shipToAdd](const auto& selectedShip)
