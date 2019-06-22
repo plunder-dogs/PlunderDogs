@@ -30,6 +30,7 @@ private:
 	Battle& m_battle;
 	const Tile* m_tileOnPreviousLeftClick;
 	const Tile* m_tileOnLeftClick;
+	const Tile* m_tileOnRightClick;
 	const Tile* m_tileOnMouse;
 	Sprite m_spriteOnTileClick;
 	Sprite m_spriteOnMouse;
@@ -38,6 +39,8 @@ private:
 	
 	bool m_leftClickHeld;
 	sf::Vector2i m_leftClickPosition;
+	bool m_rightClickHeld = false;
+	sf::Vector2i m_rightClickPosition;
 
 	//Camera
 	sf::Vector2i m_maxCameraOffset;
@@ -51,12 +54,15 @@ private:
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
 	
+	//KeyPress
+	void onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent);
+
 	//ClickReleased
-	void onClickReleased(sf::Vector2i mousePosition);
+	void onLeftClickReleased(sf::Vector2i mousePosition);
+	void onRightClickReleased(sf::Vector2i mousePosition);
 
 	//LeftClick
 	void onLeftClick(sf::Vector2i mousePosition);
-	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
 	void onLeftClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 	//MouseMove
@@ -68,6 +74,7 @@ private:
 	void handleOnMouseMoveShipSelector();
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
-	void onRightClickMovementPhase(sf::Vector2i mousePosition);
-	void onRightClickAttackPhase(sf::Vector2i mousePosition);
+	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+	void onCancelMovementPhase(sf::Vector2i mousePosition);
+	void onCancelAttackPhase(sf::Vector2i mousePosition);
 };
