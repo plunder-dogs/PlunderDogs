@@ -241,6 +241,10 @@ void BattleUI::updateCamera()
 void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
+	if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
+	{
+
+	}
 }
 
 void BattleUI::onRightClickReleased(sf::Vector2i mousePosition)

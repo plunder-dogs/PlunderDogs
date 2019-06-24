@@ -55,6 +55,7 @@ void PosiArea::activateGraph()
 	}
 }
 
+//TILE AREA
 TileArea::TileArea(size_t maxTileAreaSize)
 	: m_tileAreaGraph(),
 	m_tileArea()
@@ -96,12 +97,12 @@ void TileArea::render(sf::RenderWindow & window, const Map & map)
 
 void TileArea::clearTileArea()
 {
-	m_tileArea.clear();
-
-	for (auto& tile : m_tileAreaGraph)
+	for (int i = 0; i < m_tileArea.size(); ++i)
 	{
-		tile.deactivate();
+		m_tileAreaGraph[i].deactivate();
 	}
+
+	m_tileArea.clear();
 }
 
 void TileArea::activateGraph()
@@ -110,7 +111,6 @@ void TileArea::activateGraph()
 
 	for (int i = 0; i < m_tileArea.size(); i++)
 	{
-		assert(m_tileArea[i]);
 		m_tileAreaGraph[i].setPosition(m_tileArea[i]->m_tileCoordinate);
 		m_tileAreaGraph[i].activate();
 	}

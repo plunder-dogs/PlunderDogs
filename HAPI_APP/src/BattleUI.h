@@ -75,6 +75,7 @@ private:
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+	void onRightClickMovementPhase();
 	void onCancelMovementPhase(sf::Vector2i mousePosition);
 	void onCancelAttackPhase(sf::Vector2i mousePosition);
 };
