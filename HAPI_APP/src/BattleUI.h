@@ -75,11 +75,10 @@ private:
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
 	void handleOnMouseMoveShipSelector();
+	
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
 	void onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
 	void onRightClickAttackPhase(sf::Vector2i mousePosition);
-
-
 };

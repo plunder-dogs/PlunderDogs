@@ -310,26 +310,16 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		m_tileOnLeftClick = tileOnMouse;
 		m_tileOnMouse = tileOnMouse;
 	}
-
-	if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
-	{
-		size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
-		for (int i = 0; i < selectedShipCount; ++i)
-		{
-			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-			m_battle.moveFactionShipToPosition(selectedShip);
-		}
-	}
 }
 
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {
-	//On first Ship Selection
 	if (m_tileOnLeftClick->isShipOnTile())
 	{
 		const Ship& ship = m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile);
 		if (!ship.isDestinationSet())
 		{
+
 			generateMovementArea(ship);
 		}
 	}
@@ -459,27 +449,40 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
-	if(m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
-	{	
-		if (!m_tileOnRightClick->isShipOnTile() && m_movementArea.isPositionInTileArea(m_tileOnRightClick->m_tileCoordinate))
+
+	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+	if (selectedShipCount > 0)
+	{
+		for (int i = 0; i < selectedShipCount; ++i)
 		{
-			if (Math::isFacingDifferentTile(mouseDirection.first))
+			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+			m_battle.moveFactionShipToPosition(selectedShip);
+		}
+	}
+	else
+	{
+		if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
+		{
+			if (!m_tileOnRightClick->isShipOnTile() && m_movementArea.isPositionInTileArea(m_tileOnRightClick->m_tileCoordinate))
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnLeftClick->m_shipOnTile, mouseDirection.second);
+				if (Math::isFacingDifferentTile(mouseDirection.first))
+				{
+					m_battle.moveFactionShipToPosition(m_tileOnLeftClick->m_shipOnTile, mouseDirection.second);
+				}
+				else
+				{
+					m_battle.moveFactionShipToPosition(m_tileOnLeftClick->m_shipOnTile);
+				}
 			}
 			else
 			{
-				m_battle.moveFactionShipToPosition(m_tileOnLeftClick->m_shipOnTile);
+				m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
 			}
-		}
-		else
-		{
-			m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
-		}
 
-		m_tileOnLeftClick = nullptr;
-		m_tileOnRightClick = nullptr;
-		m_movementArea.clearTileArea();
+			m_tileOnLeftClick = nullptr;
+			m_tileOnRightClick = nullptr;
+			m_movementArea.clearTileArea();
+		}
 	}
 }
 
