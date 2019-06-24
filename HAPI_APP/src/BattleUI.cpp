@@ -335,13 +335,25 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnRightClick->isShipOnTile() && !m_battle.isShipBelongToFactionInPlay(m_tileOnRightClick->m_shipOnTile))
+	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+	if (selectedShipCount > 0)
 	{
-		m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnRightClick, m_targetArea.m_tileArea);
+		for (int i = 0; i < selectedShipCount; ++i)
+		{
+			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+			m_battle.fireFactionShipAtPosition(selectedShip, *m_tileOnRightClick, m_targetArea.m_tileArea);
+		}
 	}
-	else if (m_tileOnLeftClick->isShipOnTile() && !m_tileOnRightClick->isShipOnTile())
+	else
 	{
-		m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnLeftClick, m_targetArea.m_tileArea);
+		if (m_tileOnRightClick->isShipOnTile() && !m_battle.isShipBelongToFactionInPlay(m_tileOnRightClick->m_shipOnTile))
+		{
+			m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnRightClick, m_targetArea.m_tileArea);
+		}
+		else if (m_tileOnLeftClick->isShipOnTile() && !m_tileOnRightClick->isShipOnTile())
+		{
+			m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnLeftClick, m_targetArea.m_tileArea);
+		}
 	}
 
 	m_targetArea.clearTileArea();
@@ -449,7 +461,6 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
-
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
 	{
@@ -584,7 +595,6 @@ void BattleUI::handleOnMouseMoveShipSelector()
 				for (int i = shipIndex; i < m_shipSelector.getSelectedShips().size();)
 				{
 					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
-
 					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate);
 				
 					++i;
