@@ -11,6 +11,8 @@
 //Stack Frames
 //https://www.youtube.com/channel/UCSX3MR0gnKDxyXAyljWzm0Q/playlists
 //https://www.reddit.com/r/cpp/comments/byi5m3/books_on_memory_management_techniques/
+//branch misprediction 
+//pipeline stall - https://gameprogrammingpatterns.com/data-locality.html
 #endif // C++_NOTES
 
 int main()

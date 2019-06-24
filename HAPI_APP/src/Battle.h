@@ -26,7 +26,7 @@ public:
 	~Battle();
 
 	bool isRunning() const;
-	bool isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const;
+	bool isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	BattlePhase getCurrentBattlePhase() const;
 	FactionName getCurrentFaction() const;

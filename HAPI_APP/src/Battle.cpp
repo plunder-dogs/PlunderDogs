@@ -642,7 +642,7 @@ bool Battle::isRunning() const
 	return m_isRunning;
 }
 
-bool Battle::isShipBelongToCurrentFactionInPlay(ShipOnTile shipOnTile) const
+bool Battle::isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].get());
 	return shipOnTile.factionName == getCurrentFaction();
