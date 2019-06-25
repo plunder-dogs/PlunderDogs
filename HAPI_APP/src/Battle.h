@@ -12,6 +12,10 @@
 //Simplest way is running it as a simulation
 //Update remote clients on most update to date data of the game
 
+//QUESTIONS
+//But I'd like to know what his suggestions are for automatic delay based on users ping
+//What calculation should be done on the pings, how often etc
+
 //Events that'll be sent over the networking + used by local plaeyr and AI
 enum class GameMessageEvent
 {
