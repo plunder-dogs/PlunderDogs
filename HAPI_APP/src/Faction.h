@@ -6,6 +6,7 @@ struct Faction
 {
 	Faction(FactionName factionName, ePlayerType playerType);
 
+	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;
 	const std::vector<Ship>& getAllShips() const;
 	const Ship& getShip(int shipID) const;

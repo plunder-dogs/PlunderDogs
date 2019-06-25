@@ -340,13 +340,11 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 			generateMovementArea(ship);
 		}
 	}
-
-	if (m_tileOnLeftClick->isShipOnTile())
+	else if (m_tileOnLeftClick->isShipOnTile())
 	{
 		const Ship& ship = m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile);
 		if (!ship.isDestinationSet())
 		{
-
 			generateMovementArea(ship);
 		}
 	}
@@ -354,7 +352,12 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnLeftClick->isShipOnTile() && !m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile).isWeaponFired())
+	if (m_shipSelector.getSelectedShips().size() == 1)
+	{
+		const Ship& selectedShip = m_battle.getFactionShip(m_shipSelector.getSelectedShips()[0].m_shipOnTile);
+		generateTargetArea(*m_battle.getMap().getTile(selectedShip.getCurrentPosition()));
+	}
+	else if (m_tileOnLeftClick->isShipOnTile() && !m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile).isWeaponFired())
 	{
 		generateTargetArea(*m_tileOnLeftClick);
 	}
@@ -635,11 +638,13 @@ void BattleUI::onCancelAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 {
-	if (!m_shipSelector.getSelectedShips().empty())
+	//Multiple ships selected
+	if (m_shipSelector.getSelectedShips().size() > 1)
 	{
 		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
 		m_spriteOnMouse.activate();
 	}
+	//Singular ship selected
 	else
 	{
 		auto tileCoordinate = m_tileOnMouse->m_tileCoordinate;
