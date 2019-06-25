@@ -318,7 +318,7 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 	const Ship& enemyShipInPlay = getFactionShip(firingPosition.m_shipOnTile);
 
 	//Disallow attacking same team
-	if (enemyShipInPlay.getFactionName() != getCurrentFaction() && !enemyShipInPlay.isDead())
+	if (enemyShipInPlay.getFactionName() != getCurrentFaction()->m_factionName && !enemyShipInPlay.isDead())
 	{
 		//Find Enemy Ship 
 		sf::Vector2i enemyShipInPlayPosition = enemyShipInPlay.getCurrentPosition();
@@ -645,7 +645,7 @@ bool Battle::isRunning() const
 bool Battle::isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].get());
-	return shipOnTile.factionName == getCurrentFaction();
+	return shipOnTile.factionName == getCurrentFaction()->m_factionName;
 }
 
 const Map & Battle::getMap() const
@@ -658,10 +658,10 @@ BattlePhase Battle::getCurrentBattlePhase() const
 	return m_currentBattlePhase;
 }
 
-FactionName Battle::getCurrentFaction() const
+const std::unique_ptr<Faction>& Battle::getCurrentFaction() const
 {
 	assert(m_factions[m_currentFactionTurn].get());
-	return m_factions[m_currentFactionTurn]->m_factionName;
+	return m_factions[m_currentFactionTurn];
 }
 
 ePlayerType Battle::getCurrentPlayerType() const
@@ -682,10 +682,10 @@ const std::vector<Ship>& Battle::getCurrentFactionShips() const
 	return m_factions[m_currentFactionTurn]->getAllShips();
 }
 
-const Faction & Battle::getFaction(FactionName factionName) const
+const std::unique_ptr<Faction> & Battle::getFaction(FactionName factionName) const
 {
 	assert(m_factions[static_cast<int>(factionName)]);
-	return *m_factions[static_cast<int>(factionName)].get();
+	return m_factions[static_cast<int>(factionName)];
 }
 
 void Battle::onEndBattlePhaseEarly(GameEvent gameEvent)

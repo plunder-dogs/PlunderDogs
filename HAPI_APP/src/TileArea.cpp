@@ -36,12 +36,14 @@ void PosiArea::render(sf::RenderWindow & window, const Map & map)
 
 void PosiArea::clearTileArea()
 {
-	m_tileArea.clear();
+	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
-	for (auto& tile : m_tileAreaGraph)
+	for (int i = 0; i < m_tileArea.size(); ++i)
 	{
-		tile.deactivate();
+		m_tileAreaGraph[i].deactivate();
 	}
+
+	m_tileArea.clear();
 }
 
 void PosiArea::activateGraph()

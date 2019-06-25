@@ -15,6 +15,11 @@ Faction::Faction(FactionName factionName, ePlayerType playerType)
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
 }
 
+bool Faction::isPositionInSpawnArea(sf::Vector2i position) const
+{
+	return m_spawnArea.isPositionInTileArea(position);
+}
+
 const std::vector<Ship>& Faction::getAllShips() const
 {
 	return m_ships;

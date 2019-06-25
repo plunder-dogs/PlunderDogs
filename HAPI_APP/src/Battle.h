@@ -29,12 +29,12 @@ public:
 	bool isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	BattlePhase getCurrentBattlePhase() const;
-	FactionName getCurrentFaction() const;
+	const std::unique_ptr<Faction>& getCurrentFaction() const;
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
 	const std::vector<Ship>& getCurrentFactionShips() const;
-	const Faction& getFaction(FactionName factionName) const;
+	const std::unique_ptr<Faction>& getFaction(FactionName factionName) const;
 
 	void start(const std::string& newMapName);
 	void render(sf::RenderWindow& window);

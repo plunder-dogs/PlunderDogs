@@ -171,7 +171,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i 
 		if (i == static_cast<int>(ourFaction))
 			continue;
 
-		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i)).m_ships;
+		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i))->m_ships;
 
 		for (int j = 0; j < factionShips.size(); j++)
 		{

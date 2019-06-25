@@ -7,6 +7,7 @@ struct Faction
 {
 	Faction(FactionName factionName, ePlayerType playerType);
 
+	bool isPositionInSpawnArea(sf::Vector2i position) const;
 	const std::vector<Ship>& getAllShips() const;
 	const Ship& getShip(int shipID) const;
 	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase);
