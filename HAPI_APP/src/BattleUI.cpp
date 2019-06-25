@@ -304,9 +304,24 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		m_tileOnMouse = tileOnMouse;
 	}
 
+	BattlePhase currentBattlePhase = m_battle.getCurrentBattlePhase();
+
 	//Clicked on new tile
 	if (m_tileOnLeftClick->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
 	{
+		if (currentBattlePhase == BattlePhase::Movement)
+		{
+			m_movementArea.clearTileArea();
+			if (m_tileOnLeftClick->isShipOnTile())
+			{
+				m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
+			}
+		}
+		else if (currentBattlePhase == BattlePhase::Attack)
+		{
+			m_targetArea.clearTileArea();
+		}
+
 		m_tileOnLeftClick = tileOnMouse;
 		m_tileOnMouse = tileOnMouse;
 	}
@@ -318,7 +333,10 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		for (int i = 0; i < selectedShipCount; ++i)
 		{
 			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-			m_battle.clearFactionShipMovementArea(selectedShip);
+			if (currentBattlePhase == BattlePhase::Movement)
+			{
+				m_battle.clearFactionShipMovementArea(selectedShip);
+			}
 		}
 	}
 }
