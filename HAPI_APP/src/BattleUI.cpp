@@ -310,6 +310,17 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		m_tileOnLeftClick = tileOnMouse;
 		m_tileOnMouse = tileOnMouse;
 	}
+
+	//Cancel movement for selected ships
+	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
+	if (selectedShipCount > 0)
+	{
+		for (int i = 0; i < selectedShipCount; ++i)
+		{
+			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
+			m_battle.clearFactionShipMovementArea(selectedShip);
+		}
+	}
 }
 
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
