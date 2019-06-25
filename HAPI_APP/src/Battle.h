@@ -6,6 +6,34 @@
 #include "Particle.h"
 #include <array>
 
+//All messages can be TCP
+//UDP messages not needed because turn based
+//One computer can run a server and other clients will connect to it
+//Simplest way is running it as a simulation
+//Update remote clients on most update to date data of the game
+
+enum class GameMessageEvent
+{
+	eMoveToPosition = 0,
+	eAttackAtPosition,
+	Ready,
+	Quit,
+	ShipDestroyed,
+	FactionEliminated
+};
+
+struct GameMessage
+{
+	FactionName factionName;
+	ShipOnTile shipOnTile;
+	sf::Vector2f position;
+	ePlayerType senderType;
+	GameMessageEvent messageEvent;
+	//More Data
+	//Timestamp - Maybe
+	//Other networking stuff
+};
+
 struct GameEvent;
 class Battle
 {
@@ -40,6 +68,34 @@ public:
 	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
+
+	
+	void addMessage(GameMessage gameMessage)
+	{
+		//Add to buffer
+		//Callers of this function will be Player, AI & Remote Players
+	}
+
+	void handleMessageBuffer()
+	{
+		//Iterate over each message
+		//Act on it accordingly
+		GameMessage gameMessage;
+		switch (gameMessage.senderType)
+		{
+		case ePlayerType::eHuman :
+			//Inform remote players
+			break;
+
+		case ePlayerType::eAI :
+			//Issue in AI will have to act same across all clients
+			break;
+
+		case ePlayerType::eRemotePlayer :
+			//Receive inform from remote players
+			break;
+		}
+	}
 
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
