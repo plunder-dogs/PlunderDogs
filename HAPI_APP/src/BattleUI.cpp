@@ -384,7 +384,7 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
-	if (m_leftClickHeld)
+	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
 	}
