@@ -50,7 +50,6 @@ private:
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
 	void generateMovementArea(const Ship& ship);
-	void reset();
 
 	//KeyPress
 	void onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent);

@@ -165,17 +165,6 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	m_movementArea.activateGraph();
 }
 
-void BattleUI::reset()
-{
-	m_targetArea.clearTileArea();
-	m_movementArea.clearTileArea();
-	m_tileOnLeftClick = nullptr;
-	m_tileOnRightClick = nullptr;
-	m_tileOnMouse = nullptr;
-	m_spriteOnTileClick.deactivate();
-	m_spriteOnMouse.deactivate();
-}
-
 void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent)
 {
 	if (currentEvent.key.code == sf::Keyboard::Escape)
@@ -601,18 +590,26 @@ void BattleUI::onCancelAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 {
-	auto tileCoordinate = m_tileOnMouse->m_tileCoordinate;
-	auto cIter = std::find_if(m_targetArea.m_tileArea.cbegin(), m_targetArea.m_tileArea.cend(),
-		[tileCoordinate](const auto& tile) { return tileCoordinate == tile->m_tileCoordinate; });
-	
-	if (cIter != m_targetArea.m_tileArea.cend())
+	if (!m_shipSelector.getSelectedShips().empty())
 	{
 		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
 		m_spriteOnMouse.activate();
 	}
 	else
 	{
-		m_spriteOnMouse.deactivate();
+		auto tileCoordinate = m_tileOnMouse->m_tileCoordinate;
+		auto cIter = std::find_if(m_targetArea.m_tileArea.cbegin(), m_targetArea.m_tileArea.cend(),
+			[tileCoordinate](const auto& tile) { return tileCoordinate == tile->m_tileCoordinate; });
+
+		if (cIter != m_targetArea.m_tileArea.cend())
+		{
+			m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
+			m_spriteOnMouse.activate();
+		}
+		else
+		{
+			m_spriteOnMouse.deactivate();
+		}
 	}
 }
 
