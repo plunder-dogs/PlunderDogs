@@ -66,12 +66,11 @@ private:
 	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
 
 	//MouseMove
-	void onMouseMove(sf::Vector2i mousePosition);
 	void moveCamera(sf::Vector2i mousePosition);
+	void onMouseMove(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
 	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
-	void handleOnMouseMoveShipSelector();
 	
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);

@@ -332,6 +332,15 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 
 void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 {
+	if (m_shipSelector.getSelectedShips().size() == 1)
+	{
+		const Ship& ship = m_battle.getFactionShip(m_shipSelector.getSelectedShips()[0].m_shipOnTile);
+		if (!ship.isDestinationSet())
+		{
+			generateMovementArea(ship);
+		}
+	}
+
 	if (m_tileOnLeftClick->isShipOnTile())
 	{
 		const Ship& ship = m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile);
@@ -414,7 +423,6 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		}
 		case BattlePhase::Movement:
 		{
-			handleOnMouseMoveShipSelector();
 			onMouseMoveMovementPhase(mousePosition);
 			break;
 		}
@@ -477,14 +485,51 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
-	if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile() &&
-		(m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean))
+	//Multiple ships selected
+	if (m_shipSelector.getSelectedShips().size() > 1 && !m_leftClickHeld)
 	{
-		m_battle.generateFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+		m_movementArea.clearTileArea();
+		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
+		if (m_shipSelector.getSelectedShips().size() > m_movementArea.m_tileArea.size())
+		{
+			return;
+		}
+
+		int shipIndex = 0;
+		for (const auto& tile : m_movementArea.m_tileArea)
+		{
+			if (tile && !tile->isShipOnTile())
+			{
+				for (int i = shipIndex; i < m_shipSelector.getSelectedShips().size();)
+				{
+					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
+					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
+
+					++i;
+					shipIndex = i;
+					break;
+				}
+			}
+		}
 	}
-	else if(m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
+	//Singular ship selected with ship selector
+	else if (m_shipSelector.getSelectedShips().size() == 1 && !m_leftClickHeld)
 	{
-		m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
+		ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[0].m_shipOnTile;
+		m_battle.generateFactionShipMovementArea(selectedShip, m_tileOnMouse->m_tileCoordinate);
+	}
+	//Singular ship selected with left click
+	else
+	{
+		if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile() &&
+			(m_tileOnMouse->m_type == eTileType::eSea || m_tileOnMouse->m_type == eTileType::eOcean))
+		{
+			m_battle.generateFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile, m_tileOnMouse->m_tileCoordinate);
+		}
+		else if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
+		{
+			m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
+		}
 	}
 }
 
@@ -609,36 +654,6 @@ void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
 		else
 		{
 			m_spriteOnMouse.deactivate();
-		}
-	}
-}
-
-void BattleUI::handleOnMouseMoveShipSelector()
-{
-	if (!m_shipSelector.getSelectedShips().empty() && !m_leftClickHeld)
-	{
-		m_movementArea.clearTileArea();
-		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
-		if (m_shipSelector.getSelectedShips().size() > m_movementArea.m_tileArea.size())
-		{
-			return;
-		}
-
-		int shipIndex = 0;
-		for (const auto& tile : m_movementArea.m_tileArea)
-		{
-			if (tile && !tile->isShipOnTile())
-			{
-				for (int i = shipIndex; i < m_shipSelector.getSelectedShips().size();)
-				{
-					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
-					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
-				
-					++i;
-					shipIndex = i;
-					break;
-				}
-			}
 		}
 	}
 }
