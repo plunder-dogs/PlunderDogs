@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Global.h"
 #include "Map.h"
 #include "BattleUI.h"
 #include "Faction.h"

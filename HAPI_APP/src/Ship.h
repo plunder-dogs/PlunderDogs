@@ -1,11 +1,8 @@
 #pragma once
 
-#include <memory>
 #include "Timer.h"
 #include "Global.h"
-#include <queue>
 #include "Sprite.h"
-#include <array>
 #include "TileArea.h"
 
 constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };

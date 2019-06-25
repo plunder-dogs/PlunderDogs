@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Ship.h"
-#include "TileArea.h"
 
 struct Faction
 {

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "ShipOnTile.h"
 #include "TileArea.h"
 #include "Selector.h"
-#include <array>
 
 struct Tile;
 class Ship;
