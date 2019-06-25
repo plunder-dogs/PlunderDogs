@@ -12,6 +12,7 @@
 //Simplest way is running it as a simulation
 //Update remote clients on most update to date data of the game
 
+//Events that'll be sent over the networking + used by local plaeyr and AI
 enum class GameMessageEvent
 {
 	eMoveToPosition = 0,
