@@ -632,7 +632,7 @@ void BattleUI::handleOnMouseMoveShipSelector()
 				for (int i = shipIndex; i < m_shipSelector.getSelectedShips().size();)
 				{
 					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
-					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate);
+					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
 				
 					++i;
 					shipIndex = i;

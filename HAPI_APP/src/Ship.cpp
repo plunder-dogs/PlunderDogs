@@ -88,7 +88,7 @@ int Ship::getID() const
 	return m_ID;
 }
 
-void Ship::generateMovementArea(const Map & map, sf::Vector2i destination)
+void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	if (isMovingToDestination() || isDestinationSet())
 	{
@@ -109,10 +109,17 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination)
 		m_movementArea.m_tileArea.push_back(pathToTile.front());
 		pathToTile.pop();
 	}
-	
-	sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
-	m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
-	m_movementArea.m_tileAreaGraph[0].activate();
+
+	if (displayOnlyLastPosition)
+	{
+		sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
+		m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
+		m_movementArea.m_tileAreaGraph[0].activate();
+	}
+	else
+	{
+		m_movementArea.activateGraph();
+	}
 }
 
 void Ship::clearMovementArea()

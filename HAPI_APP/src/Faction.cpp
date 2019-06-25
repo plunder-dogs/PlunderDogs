@@ -195,10 +195,10 @@ void Faction::moveShipToPosition(Map& map, int shipID, eDirection endDirection)
 	m_ships[shipID].startMovement(map, endDirection);
 }
 
-void Faction::generateShipMovementArea(const Map & map, int shipID, sf::Vector2i destination)
+void Faction::generateShipMovementArea(const Map & map, int shipID, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].generateMovementArea(map, destination);
+	m_ships[shipID].generateMovementArea(map, destination, displayOnlyLastPosition);
 }
 
 void Faction::clearShipMovementArea(int shipID)

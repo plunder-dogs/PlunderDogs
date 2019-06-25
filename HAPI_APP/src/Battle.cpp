@@ -279,10 +279,10 @@ void Battle::clearFactionShipMovementArea(ShipOnTile shipOnTile)
 	getFaction(shipOnTile.factionName).clearShipMovementArea(shipOnTile.shipID);
 }
 
-void Battle::generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination)
+void Battle::generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).generateShipMovementArea(m_map, shipOnTile.shipID, destination);
+	getFaction(shipOnTile.factionName).generateShipMovementArea(m_map, shipOnTile.shipID, destination, displayOnlyLastPosition);
 }
 
 void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)
