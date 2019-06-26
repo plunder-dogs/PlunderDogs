@@ -7,7 +7,7 @@ class Map;
 enum eDirection;
 struct Particle
 {
-	Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale);
+	Particle(float lifespan, const Texture& texture, float scale);
 
 	void setPosition(sf::Vector2i position);
 	void update(float deltaTime, const Map& map);

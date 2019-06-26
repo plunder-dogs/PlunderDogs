@@ -26,26 +26,14 @@ Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool acti
 	setOriginAtCenter();
 }
 
-Sprite::Sprite(std::unique_ptr<Texture>& texture, bool active)
-	: m_texture(texture.get()),
+Sprite::Sprite(const Texture& texture, bool active)
+	: m_texture(&texture),
 	m_sprite(),
 	m_position(),
 	m_currentFrameID(0),
 	m_isActive(active)
 {
 	m_sprite.setTexture(m_texture->m_texture);
-	setFrameID(m_currentFrameID);
-	setOriginAtCenter();
-}
-
-Sprite::Sprite(std::unique_ptr<Texture>& texture, sf::Vector2f startingPosition, bool active)
-	: m_texture(texture.get()),
-	m_sprite(),
-	m_position(startingPosition),
-	m_currentFrameID(0),
-	m_isActive(active)
-{
-	m_sprite.setTexture(texture->m_texture);
 	setFrameID(m_currentFrameID);
 	setOriginAtCenter();
 }
@@ -153,10 +141,9 @@ void Sprite::render(sf::RenderWindow & window, const Map & map)
 	}
 }
 
-void Sprite::setTexture(std::unique_ptr<Texture>& texture, int frameID)
+void Sprite::setTexture(const Texture& texture, int frameID)
 {
-	assert(!m_texture);
-	m_texture = texture.get();
+	m_texture = &texture;
 	m_sprite.setTexture(m_texture->m_texture);
 	setFrameID(frameID);
 	setOriginAtCenter();

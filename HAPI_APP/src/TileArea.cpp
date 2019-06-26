@@ -3,13 +3,13 @@
 #include "Texture.h"
 #include <assert.h>
 
-PosiArea::PosiArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph)
+PosiArea::PosiArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph)
 {
 	m_tileAreaGraph.reserve(maxTileAreaSize);
 
 	for (int i = 0; i < maxTileAreaSize; ++i)
 	{
-		m_tileAreaGraph.emplace_back(texture, sf::Vector2f(2, 2), activeGraph);
+		m_tileAreaGraph.emplace_back(texture, sf::Vector2i(2, 2), activeGraph);
 	}
 }
 
@@ -66,7 +66,7 @@ TileArea::TileArea(size_t maxTileAreaSize)
 	m_tileAreaGraph.reserve(maxTileAreaSize);
 }
 
-TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph)
+TileArea::TileArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph)
 	: m_tileAreaGraph(),
 	m_tileArea()
 {
@@ -75,7 +75,7 @@ TileArea::TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bo
 
 	for (int i = 0; i < maxTileAreaSize; ++i)
 	{
-		m_tileAreaGraph.emplace_back(texture, sf::Vector2f(2, 2), activeGraph);
+		m_tileAreaGraph.emplace_back(texture, sf::Vector2i(2, 2), activeGraph);
 	}
 }
 

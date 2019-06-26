@@ -70,7 +70,7 @@ void Battle::handleAIMovementPhaseTimer(float deltaTime)
 			if (!ship.isDead() &&
 				!ship.isDestinationSet())
 			{
-				AI::handleMovementPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
+				AI::handleMovementPhase(*this, m_map, *m_factions[m_currentFactionTurn], i);
 				m_timeBetweenAIUnits.reset();
 				return;
 			}
@@ -99,7 +99,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 		{
 			if (!ship.isDead() && !ship.isWeaponFired())
 			{
-				AI::handleShootingPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
+				AI::handleShootingPhase(*this, m_map, *m_factions[m_currentFactionTurn].get(), i);
 				m_timeBetweenAIUnits.reset();
 				return;
 			}
@@ -138,8 +138,8 @@ Battle::Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionN
 	m_fireParticles.reserve(MAX_PARTICLES);
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		m_explosionParticles.emplace_back(0.10, Textures::getInstance().m_explosionParticles, 2.5f);
-		m_fireParticles.emplace_back(0.05, Textures::getInstance().m_fireParticles, 2.0f);
+		m_explosionParticles.emplace_back(0.10, *Textures::getInstance().m_explosionParticles, 2.5f);
+		m_fireParticles.emplace_back(0.05, *Textures::getInstance().m_fireParticles, 2.0f);
 	}
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndBattlePhaseEarly, this, std::placeholders::_1), eGameEvent::eEndBattlePhaseEarly);

@@ -16,13 +16,13 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const T
 void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
 void attemptShot(Battle& battle, const Map& mapPtr, Ship& firingShip);
 
-void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Faction>& battlePlayer, int currentUnit)
+void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlayer, int currentUnit)
 {
-	auto& ships = battlePlayer->m_ships;
+	auto& ships = battlePlayer.m_ships;
 
 	//if (ships[currentUnit]->m_battleProperties.isDead()) return;
 	//find the nearest enemy ship
-	const Tile* enemyPosition{ findClosestEnemy(battle, map, ships[currentUnit].getCurrentPosition(), battlePlayer->m_factionName) };
+	const Tile* enemyPosition{ findClosestEnemy(battle, map, ships[currentUnit].getCurrentPosition(), battlePlayer.m_factionName) };
 	if (!enemyPosition)
 	{
 		ships[currentUnit].setDestination();
@@ -63,11 +63,11 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Fac
 	//}
 }
 
-void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Faction>& player, int currentUnit)
+void AI::handleShootingPhase(Battle& battle, const Map& map, Faction& player, int currentUnit)
 {
 	//if (player.m_entities[i]->m_battleProperties.isDead()) continue;
 	//check if the ship is able to fire upon any enemies and fire if possible
-	attemptShot(battle, map, player->m_ships[currentUnit]);
+	attemptShot(battle, map, player.m_ships[currentUnit]);
 
 	//loop through all the ships in the faction
 	//for (int i = 0; i < player.m_entities.size(); i++)

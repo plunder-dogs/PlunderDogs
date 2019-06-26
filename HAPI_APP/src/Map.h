@@ -8,7 +8,7 @@
 
 struct Tile
 {
-	Tile(std::unique_ptr<Texture>& dayTexture,
+	Tile(const Texture& dayTexture,
 		sf::Vector2i coord, int tileID) :
 		m_type(static_cast<eTileType>(tileID)),
 		m_shipOnTile(),

@@ -325,7 +325,7 @@ void Map::loadmap(const std::string & mapName)
 			const int tileID = mapDetails.tileData[y][x];
 			assert(tileID != -1);
 
-			m_data.emplace_back(Textures::getInstance().m_hexTiles, sf::Vector2i(x, y), tileID);
+			m_data.emplace_back(*Textures::getInstance().m_hexTiles, sf::Vector2i(x, y), tileID);
 		}
 	}
 }

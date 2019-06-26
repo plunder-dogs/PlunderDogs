@@ -2,7 +2,7 @@
 #include "Global.h"
 #include "Map.h"
 
-Particle::Particle(float lifespan, std::unique_ptr<Texture>& texture, float scale)
+Particle::Particle(float lifespan, const Texture& texture, float scale)
 	: m_lifeSpan(lifespan),
 	m_sprite(texture, false),
 	m_scale(scale)

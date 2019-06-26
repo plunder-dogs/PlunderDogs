@@ -10,7 +10,7 @@ class Map;
 struct Texture;
 struct PosiArea
 {
-	PosiArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph = false);
+	PosiArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph = false);
 
 	void disableNode(sf::Vector2i position);
 	
@@ -26,7 +26,7 @@ struct Tile;
 struct TileArea
 {
 	TileArea(size_t maxTileAreaSize);
-	TileArea(std::unique_ptr<Texture>& texture, size_t maxTileAreaSize, bool activeGraph = false);
+	TileArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph = false);
 
 	bool isPositionInTileArea(sf::Vector2i position) const;
 
