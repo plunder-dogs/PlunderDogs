@@ -93,8 +93,10 @@ void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 	}
 }
 
-void AI::loadInPlayerShips(Faction& player)
+void AI::loadShips(Faction& player)
 {
+	assert(player.m_playerType == ePlayerType::eAI);
+
 	int randomNumber{ std::rand() % 8 };
 	int numSideCannons{ 0 };
 	int numTurtle{ 0 };
@@ -171,7 +173,7 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i 
 		if (i == static_cast<int>(ourFaction))
 			continue;
 
-		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i))->m_ships;
+		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i)).m_ships;
 
 		for (int j = 0; j < factionShips.size(); j++)
 		{

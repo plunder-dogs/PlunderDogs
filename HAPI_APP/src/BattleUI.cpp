@@ -464,7 +464,7 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
 	//Handle whether or not to show marker that factions ship is within spawn range
-	if (m_battle.getCurrentFaction()->isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
+	if (m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
 	{
 		m_spriteOnMouse.deactivate();
 	}

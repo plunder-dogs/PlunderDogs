@@ -4,7 +4,7 @@
 
 struct Faction
 {
-	Faction(FactionName factionName, ePlayerType playerType);
+	Faction();
 
 	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;
@@ -31,7 +31,7 @@ struct Faction
 	void shipTakeDamage(int shipID, int damage);
 	
 	std::vector<Ship> m_ships;
-	const FactionName m_factionName;
-	const ePlayerType m_playerType;
+	FactionName m_factionName;
+	ePlayerType m_playerType;
 	TileArea m_spawnArea;
 };

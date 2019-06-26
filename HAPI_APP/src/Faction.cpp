@@ -6,13 +6,18 @@
 constexpr size_t MAX_SPAWN_AREA = 75;
 
 //BATTLE PLAYER
-Faction::Faction(FactionName factionName, ePlayerType playerType)
+Faction::Faction()
 	: m_ships(),
-	m_factionName(factionName),
-	m_playerType(playerType),
+	m_factionName(),
+	m_playerType(),
 	m_spawnArea(MAX_SPAWN_AREA)
 {
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
+}
+
+bool Faction::isActive() const
+{
+	return !m_ships.empty();
 }
 
 bool Faction::isPositionInSpawnArea(sf::Vector2i position) const

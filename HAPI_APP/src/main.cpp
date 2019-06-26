@@ -23,14 +23,16 @@ int main()
 	
 	Textures::getInstance().loadAllTextures();
 
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)> players;
+	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> players;
 
-	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].m_factionName = FactionName::eYellow;
+	players[static_cast<int>(FactionName::eYellow)].m_playerType = ePlayerType::eHuman;
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 
-	players[static_cast<int>(FactionName::eRed)] = std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI);
-	AI::loadInPlayerShips(*players.back().get());
+	players[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
+	players[static_cast<int>(FactionName::eRed)].m_playerType = ePlayerType::eAI;
+	AI::loadShips(players[static_cast<int>(FactionName::eRed)]);
 
 	Battle battle(players);
 	battle.start("Level1.tmx");

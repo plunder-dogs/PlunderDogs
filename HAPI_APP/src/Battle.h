@@ -17,7 +17,7 @@ class Battle
 	};
 
 public:
-	Battle(std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& players);
+	Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& players);
 	Battle(const Battle&) = delete;
 	Battle& operator=(const Battle&) = delete;
 	Battle(Battle&&) = delete;
@@ -28,12 +28,12 @@ public:
 	bool isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	BattlePhase getCurrentBattlePhase() const;
-	const std::unique_ptr<Faction>& getCurrentFaction() const;
+	const Faction& getCurrentFaction() const;
 	ePlayerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
 	const std::vector<Ship>& getCurrentFactionShips() const;
-	const std::unique_ptr<Faction>& getFaction(FactionName factionName) const;
+	const Faction& getFaction(FactionName factionName) const;
 
 	void start(const std::string& newMapName);
 	void render(sf::RenderWindow& window);
@@ -53,7 +53,7 @@ public:
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::eTotal)>& m_factions;
+	std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& m_factions;
 	int m_currentFactionTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
@@ -68,7 +68,7 @@ private:
 	eLightIntensity m_currentLightIntensity;
 	bool m_isRunning;
 
-	std::unique_ptr<Faction>& getCurrentPlayer();
+	Faction& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);
 	
 	void playFireAnimation(eDirection orientation, sf::Vector2i position);
