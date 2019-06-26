@@ -13,6 +13,11 @@
 //https://www.reddit.com/r/cpp/comments/byi5m3/books_on_memory_management_techniques/
 //branch misprediction 
 //pipeline stall - https://gameprogrammingpatterns.com/data-locality.html
+//Pointer Chasing
+//L1,L2,L3, L4 cache
+//Pointer Prediction
+//Branch Prediction
+//Memory prefeching
 #endif // C++_NOTES
 
 int main()
