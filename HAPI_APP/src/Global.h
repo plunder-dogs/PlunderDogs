@@ -12,6 +12,26 @@ const std::string DATA_DIRECTORY = "Data\\";
 const std::string SHIP_DATA_DIRECTORY = "Data\\Ships\\";
 const std::string LEVEL_DATA_DIRECTORY = "Data\\Levels\\";
 
+//enum class eGameMessage
+//{
+//	eDeployAtPosition = 0,
+//	eMoveToPosition,
+//	eFireAtPosition
+//};
+//
+//struct Message
+//{
+//	Message(eGameMessage message, ShipOnTile shipOnTile, sf::Vector2i target)
+//		: message(message),
+//		shipOnTile(shipOnTile),
+//		target(target)
+//	{}
+//
+//	eGameMessage message;
+//	ShipOnTile shipOnTile;
+//	sf::Vector2f target;
+//};
+
 enum FactionName
 {
 	eYellow = 0,
