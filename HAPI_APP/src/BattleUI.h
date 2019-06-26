@@ -1,76 +1,14 @@
 #pragma once
 
-#include "BattleGUI.h"
-#include <vector>
-#include <deque>
+#include "TileArea.h"
+#include "Selector.h"
 
 struct Tile;
+class Ship;
 class Battle;
-class Map;
-class BattleUI : public IHapiSpritesInputListener
+struct GameEvent;
+class BattleUI
 {
-	//For displaying and remembering the location of the movement area of a selected ship
-	struct MovementArea
-	{
-		MovementArea(std::shared_ptr<HAPISPACE::SpriteSheet>& texturePtr, const Map& map);
-		MovementArea(const MovementArea&) = delete;
-		MovementArea& operator=(const MovementArea&) = delete;
-		MovementArea(MovementArea&&) = delete;
-		MovementArea&& operator=(MovementArea&&) = delete;
-
-		void render(const Map& map) const;
-		void newArea(const Map& map, const Ship& ship);
-		void clear();
-
-		bool m_display;
-		int m_displaySize;
-		std::vector<std::pair<std::pair<int, int>, std::unique_ptr<HAPISPACE::Sprite>>> m_tileOverlays;
-	};
-
-	struct TargetArea
-	{
-		struct HighlightNode
-		{
-			HighlightNode();
-			std::unique_ptr<Sprite> sprite;
-			bool activate;
-			std::pair<int, int> position;
-		};
-
-		TargetArea();
-		void render(const Map& map) const;
-		void generateTargetArea(Battle& battle, const Tile& source, BattlePhase phase = BattlePhase::Attack);
-		void clearTargetArea();
-		void onReset();
-
-		std::vector<HighlightNode> m_targetAreaSprites;
-		std::vector<const Tile*> m_targetArea;
-	};
-
-	struct InvalidPosition
-	{
-		InvalidPosition();
-
-		void render(const Map& map) const;
-		void setPosition(std::pair<int, int> newPosition, const Map& map);
-		void onReset();
-
-		std::unique_ptr<Sprite> m_sprite;
-		bool m_activate;
-		std::pair<int, int> m_position;
-	};
-
-	struct SelectedTile
-	{
-		SelectedTile();
-
-		void render(const Map& map) const;
-
-		std::unique_ptr<Sprite> m_sprite;
-		const Tile* m_tile;
-		std::pair<int, int> m_position;
-	};
-
 public:
 	BattleUI(Battle& battles);
 	BattleUI(const BattleUI&) = delete;
@@ -79,64 +17,64 @@ public:
 	BattleUI&& operator=(BattleUI&&) = delete;
 	~BattleUI();
 
-	std::pair<int, int> getCameraPositionOffset() const;
+	sf::Vector2i getCameraPositionOffset() const;
 
-	void renderUI() const;
-	void renderGUI() const;
-	void loadGUI(std::pair<int, int> mapDimensions);
-	void onFactionWin(FactionName winningFaction);
-	void onEnteringBattlePhase(BattlePhase currentBattlePhase);
-
-	void drawTargetArea() const;
-
+	void render(sf::RenderWindow& window);
+	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
+	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
-
-	void clearSelectedTile();
-	void FactionUpdateGUI(FactionName faction);
-
-	void OnKeyEvent(EKeyEvent keyEvent, BYTE keyCode) override final {}
-	void OnMouseEvent(EMouseEvent mouseEvent, const HAPI_TMouseData& mouseData) override final;
-	void OnMouseMove(const HAPI_TMouseData& mouseData) override final;
-	void setCurrentFaction(FactionName faction);
-	bool isPaused();
 
 private:
 	Battle& m_battle;
-	SelectedTile m_selectedTile;
-	//This stores the position at which the mouse event "eLeftMouseButtonDown" last occured while giving an entity a move command, 
-	//it's used to calculate what direction the mouse moved during that input.
-	std::pair<int, int> m_leftMouseDownPosition;
-	//This is used to determine if an entity is currently being given a move command, it gets set to true in the "handleOnLeftClickMovementPhase()" and false after "eLeftMouseButtonUp" is detected.
-	bool m_isMovingEntity;
-	//Used to store the tile selected for movement when the lmb is depressed, so that it can be used for moveEntity input on mouse up
-	const Tile* m_mouseDownTile;
-	BattleGUI m_gui;
-	InvalidPosition m_invalidPosition;
-	//std::deque<std::unique_ptr<DeploymentPhase>> m_shipDeployment;
-	//Directional arrow
-	std::pair<int, int> m_lastMouseData;
-	bool m_arrowActive;
-	std::unique_ptr<Sprite> m_arrowSprite;
+	const Tile* m_tileOnLeftClick;
+	const Tile* m_tileOnRightClick;
+	const Tile* m_tileOnMouse;
+	Sprite m_spriteOnTileClick;
+	Sprite m_spriteOnMouse;
+	TileArea m_movementArea;
+	TileArea m_targetArea;
+	
+	bool m_leftClickHeld;
+	sf::Vector2i m_leftClickPosition;
+	bool m_rightClickHeld = false;
+	sf::Vector2i m_rightClickPosition;
 
-	void renderArrow() const;
+	//Camera
+	sf::Vector2i m_maxCameraOffset;
+	sf::Vector2f m_pendingCameraMovement;
+	sf::Vector2i m_cameraPositionOffset;
+	void updateCamera();
+	
+	Selector m_shipSelector;
 
-	//Deployment Phase
-	void onMouseMoveDeploymentPhase();
-	void onLeftClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+	void onNewBattlePhase(GameEvent gameEvent);
+	void generateTargetArea(const Tile& source);
+	void generateMovementArea(const Ship& ship);
 
-	//Movement Phase
-	void onMouseMoveMovementPhase();
-	void onLeftClickMovementPhase();
-	void onRightClickMovementPhase();
-	MovementArea m_movementArea;
+	//KeyPress
+	void onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent);
+	void onCancelMovementPhase(sf::Vector2i mousePosition);
+	void onCancelAttackPhase(sf::Vector2i mousePosition);
 
-	//Attack Phase
-	void onLeftClickAttackPhase();
-	void onRightClickAttackPhase();
-	void onMouseMoveAttackPhase();
-	TargetArea m_targetArea;
+	//ClickReleased
+	void onLeftClickReleased(sf::Vector2i mousePosition);
+	void onRightClickReleased(sf::Vector2i mousePosition);
 
-	void onResetBattle();
-	void onNewTurn();
-	void clearTargetArea();
+	//LeftClick
+	void onLeftClick(sf::Vector2i mousePosition);
+	void onLeftClickMovementPhase(sf::Vector2i mousePosition);
+	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
+
+	//MouseMove
+	void moveCamera(sf::Vector2i mousePosition);
+	void onMouseMove(sf::Vector2i mousePosition);
+	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
+	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
+	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
+	
+	//RightClick
+	void onRightClick(sf::Vector2i mousePosition);
+	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+	void onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
+	void onRightClickAttackPhase(sf::Vector2i mousePosition);
 };

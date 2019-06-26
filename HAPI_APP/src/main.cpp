@@ -2,57 +2,69 @@
 #include "Battle.h"
 #include "AI.h"
 #include <array>
+#include "SFML/Graphics.hpp"
+#include "Utilities/XMLParser.h"
 
-using namespace HAPISPACE;
+#ifdef C++_NOTES
+//Copy Ellision
+//Return Value Optimzation
+//Stack Frames
+//https://www.youtube.com/channel/UCSX3MR0gnKDxyXAyljWzm0Q/playlists
+//https://www.reddit.com/r/cpp/comments/byi5m3/books_on_memory_management_techniques/
+//branch misprediction 
+//pipeline stall - https://gameprogrammingpatterns.com/data-locality.html
+//Pointer Chasing
+//L1,L2,L3, L4 cache
+//Pointer Prediction
+//Branch Prediction
+//Memory prefeching
+#endif // C++_NOTES
 
-float getDeltaTime(int frameStart, int lastFrameStart)
+int main()
 {
-	return static_cast<float>(frameStart - lastFrameStart) / 1000.0f;
-}
-
-void HAPI_Sprites_Main()
-{
-	std::pair<int, int> windowSize(1920, 1080);
-	if (!HAPI_Sprites.Initialise(windowSize.first, windowSize.second, "Plunder Dogs", eHSEnableUI))
-		return;
-
-	if (!Textures::loadAllTextures())
-	{
-		HAPI_Sprites.UserMessage("Could not pre-load all textures", "Texture Error");
-		return;
-	}
-
-	HAPI_Sprites.SetShowFPS(true);
-	HAPI_Sprites.LimitFrameRate(150);
-	int lastFrameStart = HAPI_Sprites.GetTime();
+	sf::Vector2u windowSize(1920, 1080);
+	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
+	window.setFramerateLimit(120);
 	
-	std::array<std::unique_ptr<Faction>, static_cast<size_t>(FactionName::MAX)> players;
+	Textures::getInstance().loadAllTextures();
 
-	players[static_cast<int>(FactionName::eYellow)] = std::make_unique<Faction>(FactionName::eYellow, ePlayerType::eHuman);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
-	players[static_cast<int>(FactionName::eYellow)]->addShip(FactionName::eYellow, eShipType::eFrigate);
+	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> players;
 
-	players[static_cast<int>(FactionName::eRed)] = std::make_unique<Faction>(FactionName::eRed, ePlayerType::eAI);
-	AI::loadInPlayerShips(*players.back().get());
+	players[static_cast<int>(FactionName::eYellow)].m_factionName = FactionName::eYellow;
+	players[static_cast<int>(FactionName::eYellow)].m_playerType = ePlayerType::eHuman;
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 
+	players[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
+	players[static_cast<int>(FactionName::eRed)].m_playerType = ePlayerType::eAI;
+	AI::loadShips(players[static_cast<int>(FactionName::eRed)]);
 
 	Battle battle(players);
-
 	battle.start("Level1.tmx");
 
-	while (HAPI_Sprites.Update())
+	sf::Clock gameClock;
+	sf::Event currentEvent;
+	float deltaTime = gameClock.restart().asSeconds();
+	while (battle.isRunning())
 	{
-		int frameStart = HAPI_Sprites.GetTime();
+		while (window.pollEvent(currentEvent))
+		{
+			if (currentEvent.type == sf::Event::Closed)
+			{
+				window.close();
+			}
 
-		SCREEN_SURFACE->Clear();
-
-		battle.update(getDeltaTime(frameStart, lastFrameStart));
-		battle.render();
+			battle.handleInput(window, currentEvent);
+		}
 		
-		lastFrameStart = frameStart;
+		battle.update(deltaTime);
+
+		window.clear();
+		battle.render(window);
+		window.display();
+
+		deltaTime = gameClock.restart().asSeconds();
 	}
+
+	return 0;
 }

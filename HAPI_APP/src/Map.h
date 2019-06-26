@@ -2,140 +2,108 @@
 #include <utility>
 #include <vector>
 #include <string>
-#include <HAPISprites_lib.h>
-#include <HAPISprites_UI.h>
-#include "global.h"
+#include <SFML/Graphics.hpp>
+#include "Sprite.h"
+#include "ShipOnTile.h"
 
-struct ShipOnTile
-{
-	ShipOnTile()
-		: factionName(FactionName::Invalid),
-		shipID(INVALID_SHIP_ID)
-	{}
-	ShipOnTile(FactionName factionName, int shipID)
-		: factionName(factionName),
-		shipID(shipID)
-	{}
-
-	bool isValid() const
-	{
-		return (factionName != FactionName::Invalid && shipID != INVALID_SHIP_ID);
-	}
-
-	void reset()
-	{
-		factionName = FactionName::Invalid;
-		shipID = INVALID_SHIP_ID;
-	}
-
-	FactionName factionName;
-	int shipID;
-};
-
-class Ship;
 struct Tile
 {
-	const enum eTileType m_type;
-	//TODO: Dangerous exposure of raw pointer
-	ShipOnTile m_shipOnTile;
-	FactionName m_shipOnTileFaction;
-	std::unique_ptr<HAPISPACE::Sprite> m_daySprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_aftersprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_eveningSprite;
-	std::unique_ptr<HAPISPACE::Sprite> m_nightSprite;
-	const std::pair<int, int> m_tileCoordinate;
-
-	Tile(eTileType type, std::shared_ptr<HAPISPACE::SpriteSheet> daySpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> afternoonSpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> eveningSpriteSheet,
-						std::shared_ptr<HAPISPACE::SpriteSheet> nightSpriteSheet,
-						std::pair<int, int> coord) :
-		m_type(type),
+	Tile(const Texture& dayTexture,
+		sf::Vector2i coord, int tileID) :
+		m_type(static_cast<eTileType>(tileID)),
 		m_shipOnTile(),
-		m_daySprite(),
-		m_aftersprite(),
-		m_eveningSprite(),
-		m_nightSprite(),
+		m_sprite(dayTexture),
 		m_tileCoordinate(coord)
 	{
-		//HAPI's make sprite takes a pointer to an existing spritesheet
-		m_daySprite = HAPI_Sprites.MakeSprite(daySpriteSheet);
-		m_aftersprite = HAPI_Sprites.MakeSprite(afternoonSpriteSheet);
-		m_eveningSprite = HAPI_Sprites.MakeSprite(eveningSpriteSheet);
-		m_nightSprite = HAPI_Sprites.MakeSprite(nightSpriteSheet);
+		m_sprite.setFrameID(tileID);
 	}
+
+	bool isShipOnTile() const { return m_shipOnTile.isValid(); }
+
+	const enum eTileType m_type;
+	ShipOnTile m_shipOnTile;
+	Sprite m_sprite;
+	const sf::Vector2i m_tileCoordinate;
 };
 
 class Map
 {
 	struct SpawnPosition
 	{
-		SpawnPosition(std::pair<int, int> spawnPosition);
+		SpawnPosition(sf::Vector2i spawnPosition);
 
-		std::pair<int, int> position;
+		sf::Vector2i position;
 		bool inUse;
 	};
+
 private:
-	std::pair<int, int> m_mapDimensions;
+	sf::Vector2i m_mapDimensions;
 	float m_windStrength;
 	eDirection m_windDirection;
 
 	float m_drawScale;
-	std::pair<int, int> m_drawOffset;
+	sf::Vector2i m_drawOffset;
 	std::vector<Tile> m_data;
 	std::vector<SpawnPosition> m_spawnPositions;
 
-	std::pair<int, int> offsetToCube(std::pair<int, int> offset) const;
-	std::pair<int, int> cubeToOffset(std::pair<int, int> cube) const;
-	int cubeDistance(std::pair<int, int> a, std::pair<int, int> b) const;
-	bool inCone(std::pair<int, int> orgHex, std::pair<int, int> testHex, eDirection dir) const;
+	sf::Vector2i offsetToCube(sf::Vector2i offset) const;
+	sf::Vector2i cubeToOffset(sf::Vector2i cube) const;
+	int cubeDistance(sf::Vector2i a, sf::Vector2i b) const;
+	bool inCone(sf::Vector2i orgHex, sf::Vector2i testHex, eDirection dir) const;
 	//Finds the euclidean distance from a point to a tile's centre, used by getMouseClickCoord
-	float tileDistanceMag(std::pair<int, int> tileCoord, std::pair<int, int> mouseClick) const;
-	void onReset();
+	float tileDistanceMag(sf::Vector2i tileCoord, sf::Vector2i mouseClick) const;
 public:
 	//Returns a pointer to a given tile, returns nullptr if there is no tile there
-	Tile* getTile(std::pair<int, int> coordinate);
-	const Tile* getTile(std::pair<int, int> coordinate) const;
+	Tile* getTile(sf::Vector2i coordinate);
+	const Tile* getTile(sf::Vector2i coordinate) const;
 	Tile* getTile(posi coordinate);
 	const Tile* getTile(posi coordinate) const;
+
 	//An n = 1 version of getTileRadius for use in pathfinding, 
 	//returns nullptr for each tile out of bounds
-	std::vector<Tile*> getAdjacentTiles(std::pair<int, int> coord);
-	std::vector<const Tile*> cGetAdjacentTiles(std::pair<int, int> coord) const;
+	//std::vector<Tile*> getAdjacentTiles(sf::Vector2i coord);
+	std::vector<const Tile*> getAdjacentTiles(sf::Vector2i coord) const;
+	void getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
+	void getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
+
 	//Returns tiles in a radius around a given tile, skipping the tile itself
-	std::vector<Tile*> getTileRadius(std::pair<int, int> coord, int range, bool avoidInvalid = false, bool includeSource = false);
-	std::vector<const Tile*> cGetTileRadius(std::pair<int, int> coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	std::vector<const Tile*> getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	void getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
+	
 	//Returns tiles in two cones emanating from a given tile, skipping the tile itself
-	std::vector<Tile*> getTileCone(std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid = false);
-	std::vector<const Tile*> cGetTileCone(std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	std::vector<const Tile*> getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+	void getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+
 	//Returns tiles in a line from a given direction,
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<Tile*> getTileLine(std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid = false);
-	std::vector<const Tile*> cGetTileLine(std::pair<int, int> coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	std::vector<const Tile*> getTileLine(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false)const;
+	void getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
+
 	//Returns a ring of tiles at a certain radius from a specified tile
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<Tile*> getTileRing(std::pair<int, int> coord, int range);
-	std::vector<const Tile*> cGetTileRing(std::pair<int, int> coord, int range)const;
+	std::vector<const Tile*> getTileRing(sf::Vector2i coord, int range)const;
+	void getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const;
 
-	std::pair<int, int> getRandomSpawnPosition();
+	sf::Vector2i getRandomSpawnPosition();
+
 	//For finding the location on the screen a given tile is being drawn
-	std::pair<int, int> getTileScreenPos(std::pair<int, int> coord) const;
+	sf::Vector2i getTileScreenPos(sf::Vector2i coord) const;
 
 	//For finding the closest tile to the current mouse location, 
 	//can give values that aren't valid tiles if you click off the map 
 	//so check if getTile is null before using
-	std::pair<int, int> getMouseClickCoord(std::pair<int, int> mouseCoord) const;
+	sf::Vector2i getMouseClickCoord(sf::Vector2i mouseCoord) const;
 
 	//Moves an entitys position on the map, returns false if the position is already taken
-	bool updateShipOnTile(ShipOnTile ship, std::pair<int, int> currentPosition, std::pair<int, int> newPosition);
+	bool updateShipOnTile(ShipOnTile ship, sf::Vector2i currentPosition, sf::Vector2i newPosition);
 	//Places a new entity on the map (no check for duplicates yet so try to avoid creating multiples)
-	void setShipOnTile(ShipOnTile ship, std::pair<int, int> shipPosition);
+	void setShipOnTile(ShipOnTile ship, sf::Vector2i shipPosition);
 
-	void drawMap(eLightIntensity lightIntensity) const;
-	std::pair<int, int> getDrawOffset() const { return m_drawOffset; }
-	void setDrawOffset(std::pair<int, int> newOffset) { m_drawOffset = newOffset; }
+	void renderMap(sf::RenderWindow& window);
+	sf::Vector2i getDrawOffset() const { return m_drawOffset; }
+	void setDrawOffset(sf::Vector2i newOffset) { m_drawOffset = newOffset; }
 
-	std::pair<int, int> getDimensions() const { return m_mapDimensions; }
+	sf::Vector2i getDimensions() const { return m_mapDimensions; }
 
 	float getDrawScale() const { return m_drawScale; }
 	void setDrawScale(float scale) { if (scale > 0.0) m_drawScale = scale; }
@@ -145,18 +113,16 @@ public:
 
 	eDirection getWindDirection() const { return m_windDirection; }
 	void setWindDirection(eDirection direction) { m_windDirection = direction; }
-	//TODO: Find out what this is
-	//std::vector<std::pair<int, int>> getSpawnPositions() const { return m_spawnPositions; }
 
 	void loadmap(const std::string& mapName);
 
-	//Only for pathfinding
 	const std::vector<Tile>& getData()const { return m_data; }
+
+	bool isTileCollidable(const Tile* tile) const;
 
 	Map();
 	Map(const Map&) = delete;
 	Map& operator=(const Map&) = delete;
 	Map(Map&&) = delete;
 	Map&& operator=(Map&&) = delete;
-	~Map();
 };

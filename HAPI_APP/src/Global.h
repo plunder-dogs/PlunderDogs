@@ -1,20 +1,24 @@
 #pragma once
 #include <utility>
+#include <string>
+#include <SFML/Graphics.hpp>
 
 constexpr int INVALID_SHIP_ID = -1;
 constexpr float DRAW_OFFSET_X{ 16 };
 constexpr float DRAW_OFFSET_Y{ 32 };
 
-const size_t TOTAL_SHIPS = 6;
+const size_t MAX_SHIPS_PER_FACTION = 6;
+const std::string DATA_DIRECTORY = "Data\\";
+const std::string SHIP_DATA_DIRECTORY = "Data\\Ships\\";
+const std::string LEVEL_DATA_DIRECTORY = "Data\\Levels\\";
 
 enum FactionName
 {
-	Invalid = -1,
 	eYellow = 0,
-	eBlue,
-	eGreen,
-	eRed,
-	MAX = 4
+	eBlue = 1,
+	eGreen  = 2,
+	eRed = 3,
+	eTotal = eRed + 1
 };
 
 enum eDirection
@@ -47,8 +51,7 @@ enum BattlePhase
 
 enum ePlayerType
 {
-	eNone = 0,
-	eHuman,
+	eHuman = 0,
 	eAI
 };
 
@@ -132,9 +135,9 @@ struct posi
 	eDirection dir;
 
 	posi(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
-	posi(std::pair<int, int> pair, eDirection direction = eNorth) : x(pair.first), y(pair.second), dir(direction) {}
+	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
 
-	std::pair<int, int> pair() { return { x, y }; }
+	sf::Vector2i pair() { return { x, y }; }
 	int dirDiff(const posi& compare)
 	{
 		int diff = std::abs(static_cast<int>(this->dir) - static_cast<int>(compare.dir));

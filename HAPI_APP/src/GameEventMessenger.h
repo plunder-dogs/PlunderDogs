@@ -1,42 +1,51 @@
 #pragma once
 
 #include <functional>
-#include <string>
 #include <unordered_map>
 #include <vector>
 #include <assert.h>
-#include <utility>
-#include <algorithm>
 
-enum GameEvent
+enum eGameEvent
 {
-	eResetBattle = 0,
-	eNewTurn,
-	eYellowShipDestroyed,
-	eBlueShipDestroyed,
-	eGreenShipDestroyed,
-	eRedShipDestroyed,
-	eEndMovementPhaseEarly,
-	eEndAttackPhaseEarly,
+	eEnteredNewBattlePhase,
+	eFactionShipDestroyed,
+	eEndBattlePhaseEarly,
 	eUnableToSkipPhase,
 	eEnteredAITurn,
 	eLeftAITurn
 };
 
-class Listener
+struct GameEvent
 {
-public:
-	Listener(const std::function<void(GameEvent)>& fp, std::string&& listenerName)
-		: m_listener(fp),
-		m_name(std::move(listenerName))
+	GameEvent(const void* data = nullptr)
+		: data(data)
 	{}
 
-	std::function<void(GameEvent)> m_listener;
-	std::string m_name;
+	const void* data;
+};
+
+struct FactionShipDestroyedEvent
+{
+	FactionShipDestroyedEvent(FactionName factionName, int shipID)
+		: factionName(factionName),
+		shipID(shipID)
+	{}
+
+	const FactionName factionName;
+	const int shipID;
 };
 
 class GameEventMessenger
 {
+	struct Listener
+	{
+		Listener(const std::function<void(GameEvent)>& fp)
+			: m_listener(fp)
+		{}
+
+		std::function<void(GameEvent)> m_listener;
+	};
+
 public:
 	static GameEventMessenger& getInstance()
 	{
@@ -44,22 +53,22 @@ public:
 		return instance;
 	}
 
-	static void subscribe(const std::function<void(GameEvent)>& fp, std::string&& listenerName, GameEvent message)
+	void subscribe(const std::function<void(GameEvent)>& fp, eGameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		if (iter != m_listeners.cend())
 		{
-			iter->second.emplace_back(fp, std::move(listenerName));
+			iter->second.emplace_back(fp);
 		}
 		else
 		{
-			m_listeners.emplace(message, std::vector<Listener>{Listener(fp, std::move(listenerName))});
+			m_listeners.emplace(message, std::vector<Listener>{Listener(fp)});
 		}
 	}
 
-	static void broadcast(GameEvent message)
+	void broadcast(GameEvent message, eGameEvent gameEvent)
 	{
-		auto iter = m_listeners.find(message);
+		auto iter = m_listeners.find(gameEvent);
 		assert(iter != m_listeners.cend());
 
 		for (const auto& listener : iter->second)
@@ -68,15 +77,12 @@ public:
 		}
 	}
 
-	static void unsubscribe(const std::string& listenerName, GameEvent message)
+	void unsubscribe(eGameEvent message)
 	{
 		auto iter = m_listeners.find(message);
 		assert(iter != m_listeners.cend());
 
-		auto listener = std::find_if(iter->second.begin(), iter->second.end(),
-			[&listenerName](const auto& listener) { return listener.m_name == listenerName; });
-		assert(listener != iter->second.cend());
-		iter->second.erase(listener);
+		iter->second.pop_back();
 
 		if (iter->second.empty())
 		{
@@ -85,5 +91,5 @@ public:
 	}
 
 private:
-	static std::unordered_map<GameEvent, std::vector<Listener>> m_listeners;
+	std::unordered_map<eGameEvent, std::vector<Listener>> m_listeners;
 };

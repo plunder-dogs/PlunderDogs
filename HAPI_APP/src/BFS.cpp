@@ -41,7 +41,7 @@ struct byteStore
 		else
 			byte &= ~(1 << 7);
 	}
-	//Second bit
+	//y bit
 	bool encountered() { return byte & 64; }
 	void setEncountered(bool isEncountered)
 	{
@@ -75,7 +75,7 @@ posi turnLeft(const posi& currentTile);
 posi turnRight(const posi& currentTile);
 
 //This is the recursive algorithm that hunts for the assigned tile
-posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, posi destination, const eDirection windDirection, const float windStrength)
+bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair<posi, float>>& queue, posi destination, const eDirection windDirection, const float windStrength)
 {
 	//Dequeue a tile
 	posi tile = queue.front().first;
@@ -86,7 +86,10 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 	{
 		//Check if this is the destination
 		if (tile.pair() == destination.pair())
-			return tile;
+		{
+			finalPoint = tile;
+			return true;
+		}
 		//Check if any movements are unexplored and movable, if so set those to true and set their parent to this tile
 		//Then enqueue left, right, and forward as appropriate:
 		//Left
@@ -117,11 +120,7 @@ posi pathExplorer(finderMap& exploreArea, std::queue<std::pair<posi, float>>& qu
 				queue.emplace(queueTile, tether - 1);
 		}
 	}
-	//If queue is not empty run algorithm again
-	posi final{ NO_TILE };
-	if (!queue.empty())
-		final = pathExplorer(exploreArea, queue, destination, windDirection, windStrength);
-	return final;
+	return false;
 }
 
 std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float maxMovement)
@@ -138,7 +137,12 @@ std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float
 	exploreQueue.emplace(startPos, maxMovement);
 	exploreArea.access(startPos).parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
-	posi trace = pathExplorer(exploreArea, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength());
+	posi trace{ NO_TILE };
+	while (!exploreQueue.empty())
+	{
+		if (pathExplorer(trace, exploreArea, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength()))
+			break;
+	}
 	if (trace == NO_TILE)
 		return std::queue<posi>();
 	//Trace path back from destination via parents
@@ -236,9 +240,43 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 	return allowedArea;
 }
 
-finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
+void BFS::findArea(std::vector<const Tile*>& tileArea, const Map& map, posi startPos, float maxMovement)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().second);
+	//No bullshit
+	if (!map.getTile(startPos))
+	{
+		return;
+	}
+	
+	//Initialise variables
+	boolMap exploreArea(map);
+	std::queue<std::pair<posi, float>> exploreQueue;
+	//Add first element and set it to explored
+	exploreQueue.emplace(startPos, maxMovement);
+	exploreArea.access(startPos).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
+	//Start recursion
+	int areaSize{ 1 };
+	const eDirection windDir = { map.getWindDirection() };
+	const float windStr = { map.getWindStrength() };
+	while (!exploreQueue.empty())
+	{
+		if (areaExplorer(exploreArea, exploreQueue, windDir, windStr))
+			areaSize++;
+	}
+
+	//Iterate through exploreArea and pushback to the return vector
+	for (int i = 0; i < exploreArea.data.size(); i++)
+	{
+		if (exploreArea.data[i].encountered())
+		{
+			tileArea.push_back(map.getTile(posi(i % exploreArea.width, i / exploreArea.width)));
+		}
+	}
+}
+
+finderMap::finderMap(const Map& map) : width(map.getDimensions().x)
+{
+	data.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = (it.m_type == eSea || it.m_type == eOcean);
@@ -247,9 +285,9 @@ finderMap::finderMap(const Map& map) : width(map.getDimensions().first)
 	}
 }
 
-boolMap::boolMap(const Map& map) : width(map.getDimensions().first)
+boolMap::boolMap(const Map& map) : width(map.getDimensions().x)
 {
-	data.reserve(map.getDimensions().first * map.getDimensions().second);
+	data.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& it : map.getData())
 	{
 		bool traversable = ((it.m_type == eSea || it.m_type == eOcean) && !static_cast<bool>(it.m_shipOnTile.isValid()));

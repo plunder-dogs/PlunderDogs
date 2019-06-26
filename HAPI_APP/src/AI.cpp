@@ -1,27 +1,28 @@
 #include <vector>
 #include "AI.h"
-#include "MouseSelection.h"
+#include "Utilities/Utilities.h"
 #include "BFS.h"
 #include "Battle.h"
 #include "Map.h"
 #include "Global.h"
 #include <ctime>
 #include <cstdlib>
+#include <assert.h>
 
 //Finds closest living enemy, returns nullptr if none found
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName faction);
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName faction);
 //Finds nearest firing position to ship, if none are found will return the tile the ship is on
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range);
 void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
 void attemptShot(Battle& battle, const Map& mapPtr, Ship& firingShip);
 
-void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Faction>& battlePlayer, int currentUnit)
+void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlayer, int currentUnit)
 {
-	auto& ships = battlePlayer->m_ships;
+	auto& ships = battlePlayer.m_ships;
 
 	//if (ships[currentUnit]->m_battleProperties.isDead()) return;
 	//find the nearest enemy ship
-	const Tile* enemyPosition{ findClosestEnemy(battle, map, ships[currentUnit].getCurrentPosition(), battlePlayer->m_factionName) };
+	const Tile* enemyPosition{ findClosestEnemy(battle, map, ships[currentUnit].getCurrentPosition(), battlePlayer.m_factionName) };
 	if (!enemyPosition)
 	{
 		ships[currentUnit].setDestination();
@@ -62,11 +63,11 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, std::unique_ptr<Fac
 	//}
 }
 
-void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Faction>& player, int currentUnit)
+void AI::handleShootingPhase(Battle& battle, const Map& map, Faction& player, int currentUnit)
 {
 	//if (player.m_entities[i]->m_battleProperties.isDead()) continue;
 	//check if the ship is able to fire upon any enemies and fire if possible
-	attemptShot(battle, map, player->m_ships[currentUnit]);
+	attemptShot(battle, map, player.m_ships[currentUnit]);
 
 	//loop through all the ships in the faction
 	//for (int i = 0; i < player.m_entities.size(); i++)
@@ -77,26 +78,25 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, std::unique_ptr<Fac
 	//}
 }
 
-void AI::handleDeploymentPhase(Battle& battle, Map& map, const Faction& currentPlayer)
-{
-	std::vector<const Tile*> spawnArea{ map.cGetTileRadius(currentPlayer.m_spawnArea.begin()->m_position, 3, true, true) };
-	assert(spawnArea.size() > 6);
-	
-	int location = static_cast<int>(std::rand() % (spawnArea.size() - 6));
+void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
+{	
+	auto& factionSpawnArea = currentPlayer.m_spawnArea.m_tileArea;
+	int location = static_cast<int>(std::rand() % (factionSpawnArea.size() - 6));
 	int spawnPoint{ location };
 	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
 	
-	assert(currentPlayer.m_playerType == ePlayerType::eAI);
 	size_t currentPlayerTotalShips = currentPlayer.m_ships.size();
 	for (int i = 0; i < currentPlayerTotalShips; ++i)
 	{
-		battle.deployFactionShipAtPosition(spawnArea[spawnPoint]->m_tileCoordinate, randomDir);
+		battle.deployFactionShipAtPosition(factionSpawnArea[spawnPoint]->m_tileCoordinate, randomDir);
 		spawnPoint++;
 	}
 }
 
-void AI::loadInPlayerShips(Faction& player)
+void AI::loadShips(Faction& player)
 {
+	assert(player.m_playerType == ePlayerType::eAI);
+
 	int randomNumber{ std::rand() % 8 };
 	int numSideCannons{ 0 };
 	int numTurtle{ 0 };
@@ -162,11 +162,11 @@ void AI::loadInPlayerShips(Faction& player)
 	}
 }
 
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int, int> alliedShipPosition, FactionName ourFaction)
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName ourFaction)
 {
 	const Tile* closestEnemy{ nullptr };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShipPosition) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShipPosition) };
 	auto activeFactions = battle.getAllFactionsInPlay();
 	for (FactionName i : activeFactions)
 	{
@@ -180,12 +180,12 @@ const Tile* findClosestEnemy(const Battle& battle, const Map& map, std::pair<int
 			if (factionShips[j].isDead()) continue;
 			//Find the distance^2 from the allied ship to the enemy ship, 
 			//then set closestEnemy to that enemy if it's the closest yet found
-			std::pair<int, int> enemyPos = MouseSelection::coordToHexPos(
+			sf::Vector2i enemyPos = Math::coordToHexPos(
 				factionShips[j].getCurrentPosition());
 
-			std::pair<int, int> diff(
-				{ enemyPos.first - alliedPos.first, enemyPos.second - alliedPos.second });
-			int enemyDistance = diff.first * diff.first + diff.second * diff.second;
+			sf::Vector2i diff(
+				{ enemyPos.x - alliedPos.x, enemyPos.y - alliedPos.y });
+			int enemyDistance = diff.x * diff.x + diff.y * diff.y;
 			
 			if (enemyDistance < closestDistance)
 			{
@@ -203,8 +203,8 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
-	std::vector<const Tile*> availableTiles{ map.cGetTileRing(targetShip->m_tileCoordinate, range) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShip->m_tileCoordinate) };
+	std::vector<const Tile*> availableTiles{ map.getTileRing(targetShip->m_tileCoordinate, range) };
 	for (const Tile* it : availableTiles)
 	{
 		//Ensure it's a valid tile, if not skip this one
@@ -212,10 +212,10 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 		if (it->m_type != eSea && it->m_type != eOcean) continue;
 		if (it->m_shipOnTile.isValid()) continue;
 		//Determine distance
-		std::pair<int, int> tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
-		std::pair<int, int> diff(
-			{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
-		int tempDistance = diff.first * diff.first + diff.second * diff.second;
+		sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
+		sf::Vector2i diff(
+			{ tempPos.x - alliedPos.x, tempPos.y - alliedPos.y });
+		int tempDistance = diff.x * diff.x + diff.y * diff.y;
 		//If distance is smallest, set as new target tile
 		if (tempDistance < closestDistance)
 		{
@@ -232,14 +232,14 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 {
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
-	std::pair<int, int> alliedPos{ MouseSelection::coordToHexPos(alliedShip->m_tileCoordinate) };
+	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShip->m_tileCoordinate) };
 	//TODO: can't use const Tile* for some reason
 	std::vector<const Tile*> availableTiles;
 	availableTiles.reserve(range);
 	//Iterate through all 6 possible lines
 	for (int i = 0; i < 6; i++)
 	{
-		availableTiles = map.cGetTileLine(targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
+		availableTiles = map.getTileLine(targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
 		for (const Tile* it : availableTiles)
 		{
 			//Ensure it's a valid tile, if not skip this one
@@ -247,10 +247,10 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 			if (it->m_type != eSea && it->m_type != eOcean) continue;
 			if (it->m_shipOnTile.isValid()) continue;
 			//Determine distance
-			std::pair<int, int> tempPos = MouseSelection::coordToHexPos(it->m_tileCoordinate);
-			std::pair<int, int> diff(
-				{ tempPos.first - alliedPos.first, tempPos.second - alliedPos.second });
-			int tempDistance = diff.first * diff.first + diff.second * diff.second;
+			sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
+			sf::Vector2i diff(
+				{ tempPos.x - alliedPos.x, tempPos.y - alliedPos.y });
+			int tempDistance = diff.x * diff.x + diff.y * diff.y;
 			//If distance is smallest, set as new target tile
 			if (tempDistance < closestDistance)
 			{
@@ -271,7 +271,7 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eFrigate:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch (facingDirection)
 		{
 		case eNorth: facingDirection = eNorthEast;
@@ -292,19 +292,19 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	case eShipType::eSniper:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		break;
 	}
 	case eShipType::eTurtle:
 	{
 		closestTile = firePosRadial(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		break;
 	}
 	case eShipType::eFire:
 	{
 		closestTile = firePosLine(map, targetShip, alliedShip, range);
-		facingDirection = MouseSelection::calculateDirection(closestTile, targetShip).second;
+		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch(facingDirection)
 		{
 		case eNorth: facingDirection = eSouth;
@@ -330,21 +330,21 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 {
 	//Call generate path
 	const Tile* tile{ map.getTile(currentShip.getCurrentPosition()) };
-	//int pathLength = currentShip->m_battleProperties.generateMovementGraph(map, *tile, *targetTile.first);
+	//int pathLength = currentShip->m_battleProperties.generateMovementGraph(map, *tile, *targetTile.x);
 	auto availableTiles = BFS::findArea(
 		map,
 		posi(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
 		static_cast<float>(currentShip.getMovementPoints()));
 	//Loop to find the closest tile to the target tile
-	std::pair<int, int> targetPos = targetTile.first->m_tileCoordinate;
-	std::pair<int, int> currentPos = currentShip.getCurrentPosition();
+	sf::Vector2i targetPos = targetTile.first->m_tileCoordinate;
+	sf::Vector2i currentPos = currentShip.getCurrentPosition();
 	int closestDistance{ INT_MAX };
 	posi bestTile{ -1, -1, eNorth };
 	for (posi it : availableTiles)
 	{
-		std::pair<int, int> diff(
-			{ targetPos.first - it.x, targetPos.second - it.y });
-		int tileDistance = diff.first * diff.first + diff.second * diff.second;
+		sf::Vector2i diff(
+			{ targetPos.x - it.x, targetPos.y - it.y });
+		int tileDistance = diff.x * diff.x + diff.y * diff.y;
 
 		if (tileDistance < closestDistance)
 		{
@@ -355,59 +355,55 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	//If a tile is found
 	if (bestTile != posi(-1, -1, eNorth))
 	{
-		currentShip.generateMovementPath(map, map.getTile(bestTile.pair())->m_tileCoordinate);
-		currentShip.move(map, map.getTile(bestTile.pair())->m_tileCoordinate, targetTile.second);		
+		currentShip.generateMovementArea(map, map.getTile(bestTile.pair())->m_tileCoordinate);
+		currentShip.startMovement(map, targetTile.second);		
 	}
 	currentShip.setDestination();
 }
 
 void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 {
-	std::vector< const Tile*> firingArea;
+	std::vector<const Tile*> firingArea;
 	switch (firingShip.getShipType())
 	{
 	case eShipType::eTurtle:
 	{
-		firingArea = map.cGetTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
+		firingArea = map.getTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
 	}
 	case eShipType::eSniper:
 	{
-		firingArea = map.cGetTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
+		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-			
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
 	}
 	case eShipType::eFrigate:
 	{
-		firingArea = map.cGetTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
+		firingArea = map.getTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;
@@ -431,16 +427,14 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			break;
 		}
 			
-		firingArea = map.cGetTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
+		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
 		for (int i = 0; i < firingArea.size(); i++)
 		{
 			if (!firingArea[i]) continue;
 			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
 			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, firingArea[i]->m_shipOnTile, firingArea);
-
-			//battle.fireEntityWeaponAtPosition(*firingShip, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
 			break;
 		}
 		break;

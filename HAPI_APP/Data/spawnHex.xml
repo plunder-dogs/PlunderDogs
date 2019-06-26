@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="spawnHex_surface.png">
+	<SubTexture name="spawnHex.png_0" x="0" y="0" width="40" height="36">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="40" top="0" bottom="36" />
+			<Circle name="BoundingCircle" type="0" radius="26.907248" y="18.000000" x="20.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

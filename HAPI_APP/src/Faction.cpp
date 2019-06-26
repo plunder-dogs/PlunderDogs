@@ -3,16 +3,31 @@
 #include "Textures.h"
 #include "Map.h"
 
+constexpr size_t MAX_SPAWN_AREA = 75;
+
 //BATTLE PLAYER
-Faction::Faction(FactionName name, ePlayerType playerType)
+Faction::Faction()
 	: m_ships(),
-	m_factionName(name),
-	m_playerType(playerType),
-	m_eliminated(false),
-	m_shipToDeploy(nullptr),
-	m_spawnArea()
+	m_factionName(),
+	m_playerType(),
+	m_spawnArea(MAX_SPAWN_AREA)
 {
-	m_ships.reserve(size_t(6));
+	m_ships.reserve(MAX_SHIPS_PER_FACTION);
+}
+
+bool Faction::isActive() const
+{
+	return !m_ships.empty();
+}
+
+bool Faction::isPositionInSpawnArea(sf::Vector2i position) const
+{
+	return m_spawnArea.isPositionInTileArea(position);
+}
+
+const std::vector<Ship>& Faction::getAllShips() const
+{
+	return m_ships;
 }
 
 const Ship & Faction::getShip(int shipID) const
@@ -21,37 +36,58 @@ const Ship & Faction::getShip(int shipID) const
 	return m_ships[shipID];
 }
 
-void Faction::render(const Map & map) const
+void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase)
 {
-	for (const auto& spawnArea : m_spawnArea)
+	for (auto& spawnArea : m_spawnArea.m_tileAreaGraph)
 	{
-		spawnArea.render(map);
+		spawnArea.render(window, map);
 	}
 
-	for (const auto& ship : m_ships)
+	if (currentBattlePhase == BattlePhase::Deployment && m_playerType == ePlayerType::eHuman)
 	{
-		if (ship.isDeployed())
+		for (auto& ship : m_ships)
 		{
-			ship.render(map);
+			if (ship.isDeployed())
+			{
+				ship.render(window, map);
+			}
+			else
+			{
+				ship.render(window, map);
+				break;
+			}
+		}		
+	}
+	else if(currentBattlePhase != BattlePhase::Deployment)
+	{
+		for (auto& ship : m_ships)
+		{
+			ship.render(window, map);
 		}
 	}
+}
 
-	if (m_shipToDeploy)
+void Faction::renderShipsMovementGraphs(sf::RenderWindow & window, const Map & map)
+{
+	for (auto& ship : m_ships)
 	{
-		m_shipToDeploy->render(map);
+		ship.renderMovementArea(window, map);
 	}
+}
+
+bool Faction::isPositionInDeploymentArea(sf::Vector2i position) const
+{
+	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
+		[position](const auto& tile) { return position == tile->m_tileCoordinate; });
+	return cIter != m_spawnArea.m_tileArea.cend();
 }
 
 void Faction::addShip(FactionName factionName, eShipType shipType)
 {
 	assert(m_ships.size() < size_t(6));
 	int shipID = static_cast<int>(m_ships.size());
-	m_ships.emplace_back(factionName, shipType, shipID);
 
-	if (!m_shipToDeploy)
-	{
-		m_shipToDeploy = &m_ships.back();
-	}
+	m_ships.emplace_back(factionName, shipType, shipID);
 }
 
 bool Faction::isAllShipsDeployed() const
@@ -69,59 +105,81 @@ bool Faction::isAllShipsDeployed() const
 
 void Faction::createSpawnArea(Map & map)
 {
-	std::vector<const Tile*> tileRadius = map.cGetTileRadius(map.getRandomSpawnPosition(), 3, true, true);
-	m_spawnArea.reserve(tileRadius.size());
-	for (const auto& tile : tileRadius)
+	const Texture* texture = nullptr;
+	switch (m_factionName)
 	{
-		m_spawnArea.emplace_back(m_factionName, tile->m_tileCoordinate);
+	case eYellow:
+		texture = Textures::getInstance().m_yellowSpawnHex.get();
+		break;
+	case eBlue:
+		texture = Textures::getInstance().m_blueSpawnHex.get();
+		break;
+	case eGreen:
+		texture = Textures::getInstance().m_greenSpawnHex.get();
+		break;
+	case eRed:
+		texture = Textures::getInstance().m_redSpawnHex.get();
+		break;
+	};
+
+	assert(texture);
+	map.getTileRadius(m_spawnArea.m_tileArea, map.getRandomSpawnPosition(), 3, true, true);
+	for (const auto& tile : m_spawnArea.m_tileArea)
+	{
+		m_spawnArea.m_tileAreaGraph.emplace_back(*texture, tile->m_tileCoordinate, true);
+		m_spawnArea.m_tileAreaGraph.back().setScale(sf::Vector2f(2.0f, 2.0f));
 	}
 }
 
-bool Faction::deployShipAtPosition(Map& map, std::pair<int, int> startingPosition, eDirection startingDirection)
+void Faction::deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection)
 {
-	assert(m_shipToDeploy);
-	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
-		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
-	if (cIter != m_spawnArea.cend())
+	auto cIter = std::find_if(m_spawnArea.m_tileArea.cbegin(), m_spawnArea.m_tileArea.cend(),
+		[startingPosition](const auto& tile) { return startingPosition == tile->m_tileCoordinate; });
+	if (cIter != m_spawnArea.m_tileArea.cend())
 	{
-		m_shipToDeploy->deployAtPosition(startingPosition, startingDirection);
-		map.setShipOnTile({ m_factionName, m_shipToDeploy->getID() }, startingPosition);
-		//Select new Ship
 		for (auto& ship : m_ships)
 		{
 			if (!ship.isDeployed())
 			{
-				m_shipToDeploy = &ship;
+				ship.deployAtPosition(startingPosition, startingDirection);
+				map.setShipOnTile({ m_factionName, ship.getID() }, startingPosition);
 				break;
 			}
 		}
-		return true;
-	}
-	else
-	{
-		return false;
 	}
 }
 
-bool Faction::setShipDeploymentAtPosition(std::pair<int, int> startingPosition)
-{
-	if (!m_shipToDeploy)
-	{
-		return false;
-	}
-	auto cIter = std::find_if(m_spawnArea.cbegin(), m_spawnArea.cend(),
-		[startingPosition](const auto& spawnArea) { return startingPosition == spawnArea.m_position; });
-	
-	m_shipToDeploy->setDeploymentPosition(startingPosition);
-	return cIter != m_spawnArea.end();
-}
-
-void Faction::onNewTurn()
+void Faction::setShipDeploymentAtPosition(sf::Vector2i startingPosition, eDirection direction)
 {
 	for (auto& ship : m_ships)
 	{
-		ship.onNewTurn();
+		if (!ship.isDeployed())
+		{
+			ship.setDeploymentPosition(startingPosition, direction);
+			break;
+		}
 	}
+}
+
+bool Faction::isEliminated() const
+{
+	bool allShipsDestroyed = true;
+	for (const auto& ship : m_ships)
+	{
+		if (!ship.isDead())
+		{
+			allShipsDestroyed = false;
+			break;
+		}
+	}
+
+	return allShipsDestroyed;
+}
+
+void Faction::clearSpawnArea()
+{
+	m_spawnArea.m_tileAreaGraph.clear();
+	m_spawnArea.m_tileArea.clear();
 }
 
 void Faction::shipTakeDamage(int shipID, int damage)
@@ -130,59 +188,26 @@ void Faction::shipTakeDamage(int shipID, int damage)
 	m_ships[shipID].takeDamage(damage);
 }
 
-bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination)
+void Faction::moveShipToPosition(Map& map, int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	return m_ships[shipID].move(map, destination);
+	m_ships[shipID].startMovement(map);
 }
 
-bool Faction::moveShipToPosition(Map& map, int shipID, std::pair<int, int> destination, eDirection endDirection)
+void Faction::moveShipToPosition(Map& map, int shipID, eDirection endDirection)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	return m_ships[shipID].move(map, destination, endDirection);
+	m_ships[shipID].startMovement(map, endDirection);
 }
 
-void Faction::generateShipMovementPath(const Map & map, int shipID, std::pair<int, int> destination)
+void Faction::generateShipMovementArea(const Map & map, int shipID, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].generateMovementPath(map, destination);
+	m_ships[shipID].generateMovementArea(map, destination, displayOnlyLastPosition);
 }
 
-void Faction::disableShipMovementPath(int shipID)
+void Faction::clearShipMovementArea(int shipID)
 {
 	assert(static_cast<size_t>(shipID) <= m_ships.size());
-	m_ships[shipID].disableMovementPath();
-}
-
-SpawnNode::SpawnNode(FactionName factionName, std::pair<int, int> position)
-	: m_position(position),
-	m_sprite()
-{
-	switch (factionName)
-	{
-	case eYellow:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_yellowSpawnHex);
-		break;
-	case eBlue:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_blueSpawnHex);
-		break;
-	case eGreen:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_greenSpawnHex);
-		break;
-	case eRed:
-		m_sprite = HAPI_Sprites.MakeSprite(Textures::m_redSpawnHex);
-		break;
-	};
-
-	m_sprite->GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite->GetTransformComp().SetScaling({ 2.f, 2.f });
-}
-
-void SpawnNode::render(const Map & map) const
-{
-	auto screenPosition = map.getTileScreenPos(m_position);
-	m_sprite->GetTransformComp().SetPosition({
-	(float)screenPosition.first + DRAW_OFFSET_X * map.getDrawScale(),
-	(float)screenPosition.second + DRAW_OFFSET_Y * map.getDrawScale() });
-	m_sprite->Render(SCREEN_SURFACE);
+	m_ships[shipID].clearMovementArea();
 }
