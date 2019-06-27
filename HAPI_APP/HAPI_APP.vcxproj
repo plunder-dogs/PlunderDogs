@@ -122,7 +122,7 @@
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <EntryPointSymbol>
       </EntryPointSymbol>
@@ -173,6 +173,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\CircularBuffer.cpp" />
+    <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Selector.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
@@ -198,6 +199,7 @@
   <ItemGroup>
     <ClInclude Include="src\CircularBuffer.h" />
     <ClInclude Include="src\Battle.h" />
+    <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Selector.h" />
     <ClInclude Include="src\ShipOnTile.h" />

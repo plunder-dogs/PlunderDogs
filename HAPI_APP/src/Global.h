@@ -71,8 +71,10 @@ enum BattlePhase
 
 enum ePlayerType
 {
-	eHuman = 0,
-	eAI
+	eLocalPlayer = 0,
+	eAI,
+	eRemotePlayer,
+	None
 };
 
 enum ShipType

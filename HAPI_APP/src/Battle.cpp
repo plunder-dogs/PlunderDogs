@@ -172,7 +172,7 @@ void Battle::start(const std::string & newMapName)
 	bool humanPlayerFound = false;
 	for (const auto& faction : m_factions)
 	{
-		if (faction.isActive() && faction.m_playerType == ePlayerType::eHuman)
+		if (faction.isActive() && faction.m_playerType == ePlayerType::eLocalPlayer)
 		{
 			humanPlayerFound = true;
 			break;
@@ -356,7 +356,7 @@ void Battle::advanceToNextBattlePhase()
 					continue;
 				}
 
-				if (m_factions[i].m_playerType != ePlayerType::eHuman)
+				if (m_factions[i].m_playerType != ePlayerType::eLocalPlayer)
 				{
 					continue;
 				}
@@ -476,7 +476,7 @@ void Battle::advanceToNextBattlePhase()
 			//TODO: Refactor		
 			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
-		else if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eHuman)
+		else if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eLocalPlayer)
 		{
 			//TODO: Refactor
 			//GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
