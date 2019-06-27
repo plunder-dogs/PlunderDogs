@@ -95,7 +95,7 @@ void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 
 void AI::loadShips(Faction& player)
 {
-	assert(player.m_playerType == ePlayerType::eAI);
+	assert(player.m_controllerType == eControllerType::eAI);
 
 	int randomNumber{ std::rand() % 8 };
 	int numSideCannons{ 0 };

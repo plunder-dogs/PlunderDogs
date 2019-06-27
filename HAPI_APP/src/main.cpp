@@ -23,21 +23,23 @@
 //Memory prefeching
 #endif // C++_NOTES
 
-void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, ePlayerType playerType)
+void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType playerType)
 {
 	factions[static_cast<int>(factionName)].m_factionName = factionName;
-	factions[static_cast<int>(factionName)].m_playerType = playerType;
+	factions[static_cast<int>(factionName)].m_controllerType = playerType;
+	factions[static_cast<int>(factionName)].addShip(factionName, eShipType::eFrigate);
+	factions[static_cast<int>(factionName)].addShip(factionName, eShipType::eFrigate);
 }
 
 void startSinglePlayer(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	factions[static_cast<int>(FactionName::eYellow)].m_factionName = FactionName::eYellow;
-	factions[static_cast<int>(FactionName::eYellow)].m_playerType = ePlayerType::eLocalPlayer;
+	factions[static_cast<int>(FactionName::eYellow)].m_controllerType = eControllerType::eLocalPlayer;
 	factions[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 	factions[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 
 	factions[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
-	factions[static_cast<int>(FactionName::eRed)].m_playerType = ePlayerType::eAI;
+	factions[static_cast<int>(FactionName::eRed)].m_controllerType = eControllerType::eAI;
 
 	AI::loadShips(factions[static_cast<int>(FactionName::eRed)]);
 }
@@ -58,23 +60,6 @@ int main()
 		NetworkHandler::getInstance().connect();
 	}
 
-	bool gameLobby = true;
-	while (gameLobby)
-	{
-		if (!NetworkHandler::getInstance().getServerMessages().empty())
-		{
-			for (auto message : NetworkHandler::getInstance().getServerMessages())
-			{
-				if (message.type == eMessageType::eEstablishConnection)
-				{
-					assignFaction(factions, message.factionName, ePlayerType::eLocalPlayer);
-				}
-			}
-
-			NetworkHandler::getInstance().getServerMessages().clear();
-		}
-	}
-
 	sf::Vector2u windowSize(1920, 1080);
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
 	window.setFramerateLimit(120);
@@ -84,6 +69,7 @@ int main()
 	Battle battle(factions);
 	battle.start("Level1.tmx");
 
+	bool gameLobby = true;
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
@@ -95,18 +81,58 @@ int main()
 			{
 				window.close();
 			}
+			else if (currentEvent.type == sf::Event::KeyPressed)
+			{
+				if (currentEvent.key.code == sf::Keyboard::R)
+				{
+					for (auto& faction : factions)
+					{
+						if (faction.m_controllerType == eControllerType::eLocalPlayer)
+						{
+							NetworkHandler::getInstance().sendServerMessage({ eMessageType::RemotePlayerReady, faction.m_factionName });
+						}
+					}
+				}
+			}
 
 			battle.handleInput(window, currentEvent);
 		}
-		
-		battle.update(deltaTime);
+	
+		if (gameLobby)
+		{
+			if (!NetworkHandler::getInstance().getServerMessages().empty())
+			{
+				for (auto message : NetworkHandler::getInstance().getServerMessages())
+				{
+					if (message.type == eMessageType::eEstablishConnection)
+					{
+						assignFaction(factions, message.factionName, eControllerType::eLocalPlayer);
+					}
+					else if (message.type == eMessageType::eNewRemoteConnection)
+					{
+						assignFaction(factions, message.factionName, eControllerType::eRemotePlayer);
+					}
+				}
 
-		window.clear();
-		battle.render(window);
-		window.display();
+				NetworkHandler::getInstance().getServerMessages().clear();
+			}
+
+
+		}
+		else
+		{
+			battle.update(deltaTime);
+
+			window.clear();
+			battle.render(window);
+			window.display();
+
+		}
 
 		deltaTime = gameClock.restart().asSeconds();
 	}
+
+	NetworkHandler::getInstance().disconnect();
 
 	return 0;
 }

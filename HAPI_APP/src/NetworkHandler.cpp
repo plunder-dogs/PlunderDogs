@@ -13,6 +13,16 @@ NetworkHandler::~NetworkHandler()
 	m_listeningThread.join();
 }
 
+void NetworkHandler::sendServerMessage(Message message)
+{
+	sf::Packet packetToSend;
+	packetToSend << static_cast<int>(message.type) << static_cast<int>(message.factionName);
+	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+	{
+		std::cout << "Unable to send message to server\n";
+	}
+}
+
 std::vector<Message>& NetworkHandler::getServerMessages()
 {
 	return m_serverMessages;

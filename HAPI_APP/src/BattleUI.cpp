@@ -102,7 +102,7 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		break;
 
 	case sf::Event::MouseButtonReleased:
-		if (m_battle.getCurrentPlayerType() == ePlayerType::eLocalPlayer)
+		if (m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
 		{
 			if (m_leftClickHeld)
 			{
@@ -188,9 +188,9 @@ void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEv
 
 		m_shipSelector.reset();
 	}
-	else if (currentEvent.key.code == sf::Keyboard::Enter && m_battle.getCurrentPlayerType() == ePlayerType::eLocalPlayer)
+	else if (currentEvent.key.code == sf::Keyboard::Enter && m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
 	{
-		if (m_battle.getCurrentPlayerType() == ePlayerType::eLocalPlayer)
+		if (m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
 		{
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
 		}

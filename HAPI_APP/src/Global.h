@@ -69,7 +69,7 @@ enum BattlePhase
 	Attack
 };
 
-enum ePlayerType
+enum eControllerType
 {
 	eLocalPlayer = 0,
 	eAI,

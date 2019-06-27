@@ -172,7 +172,7 @@ void Battle::start(const std::string & newMapName)
 	bool humanPlayerFound = false;
 	for (const auto& faction : m_factions)
 	{
-		if (faction.isActive() && faction.m_playerType == ePlayerType::eLocalPlayer)
+		if (faction.isActive() && faction.m_controllerType == eControllerType::eLocalPlayer)
 		{
 			humanPlayerFound = true;
 			break;
@@ -246,7 +246,7 @@ void Battle::update(float deltaTime)
 	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
 		updateMovementPhase(deltaTime);
-		if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eAI)
+		if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			handleAIMovementPhaseTimer(deltaTime);
 		}			
@@ -254,7 +254,7 @@ void Battle::update(float deltaTime)
 	else if (m_currentBattlePhase == BattlePhase::Attack)
 	{
 		updateAttackPhase();
-		if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eAI)
+		if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			handleAIAttackPhaseTimer(deltaTime);
 		}
@@ -356,7 +356,7 @@ void Battle::advanceToNextBattlePhase()
 					continue;
 				}
 
-				if (m_factions[i].m_playerType != ePlayerType::eLocalPlayer)
+				if (m_factions[i].m_controllerType != eControllerType::eLocalPlayer)
 				{
 					continue;
 				}
@@ -394,7 +394,7 @@ void Battle::advanceToNextBattlePhase()
 					}
 				}
 
-				if (m_factions[i].m_playerType != ePlayerType::eAI)
+				if (m_factions[i].m_controllerType != eControllerType::eAI)
 				{
 					continue;
 				}
@@ -430,7 +430,7 @@ void Battle::advanceToNextBattlePhase()
 				ship.enableAction();
 			}
 
-			if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eAI)
+			if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
 				//TODO: Refactor
@@ -447,7 +447,7 @@ void Battle::advanceToNextBattlePhase()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eAI)
+		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			//TODO: Refactor
@@ -470,13 +470,13 @@ void Battle::advanceToNextBattlePhase()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eAI)
+		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
 			//TODO: Refactor		
 			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
-		else if (m_factions[m_currentFactionTurn].m_playerType == ePlayerType::eLocalPlayer)
+		else if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eLocalPlayer)
 		{
 			//TODO: Refactor
 			//GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
@@ -664,10 +664,10 @@ const Faction& Battle::getCurrentFaction() const
 	return m_factions[m_currentFactionTurn];
 }
 
-ePlayerType Battle::getCurrentPlayerType() const
+eControllerType Battle::getCurrentPlayerType() const
 {
 	assert(m_factions[m_currentFactionTurn].isActive());
-	return m_factions[m_currentFactionTurn].m_playerType;
+	return m_factions[m_currentFactionTurn].m_controllerType;
 }
 
 const Ship & Battle::getFactionShip(ShipOnTile shipOnTile) const

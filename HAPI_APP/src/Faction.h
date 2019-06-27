@@ -32,6 +32,6 @@ struct Faction
 	
 	std::vector<Ship> m_ships;
 	FactionName m_factionName;
-	ePlayerType m_playerType;
+	eControllerType m_controllerType;
 	TileArea m_spawnArea;
 };

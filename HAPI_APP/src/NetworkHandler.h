@@ -10,7 +10,8 @@
 enum class eMessageType
 {
 	eEstablishConnection = 0,
-	eRemoteConnection
+	eNewRemoteConnection,
+	RemotePlayerReady
 };
 
 struct Message
@@ -36,6 +37,7 @@ public:
 		return instance;
 	}
 
+	void sendServerMessage(Message message);
 	std::vector<Message>& getServerMessages();
 	void connect();
 	void disconnect();

@@ -9,7 +9,7 @@ constexpr size_t MAX_SPAWN_AREA = 75;
 Faction::Faction()
 	: m_ships(),
 	m_factionName(),
-	m_playerType(ePlayerType::None),
+	m_controllerType(eControllerType::None),
 	m_spawnArea(MAX_SPAWN_AREA)
 {
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
@@ -43,7 +43,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 		spawnArea.render(window, map);
 	}
 
-	if (currentBattlePhase == BattlePhase::Deployment && m_playerType == ePlayerType::eLocalPlayer)
+	if (currentBattlePhase == BattlePhase::Deployment && m_controllerType == eControllerType::eLocalPlayer)
 	{
 		for (auto& ship : m_ships)
 		{

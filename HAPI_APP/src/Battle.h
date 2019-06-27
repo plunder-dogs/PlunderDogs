@@ -29,7 +29,7 @@ public:
 	const Map& getMap() const;
 	BattlePhase getCurrentBattlePhase() const;
 	const Faction& getCurrentFaction() const;
-	ePlayerType getCurrentPlayerType() const;
+	eControllerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
 	const std::vector<Ship>& getCurrentFactionShips() const;
