@@ -62,6 +62,11 @@ void NetworkHandler::listen()
 				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType),
 					static_cast<FactionName>(factionName));
 			}
+			else if (static_cast<eMessageType>(messageType) == eMessageType::eStartGame)
+			{
+				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
+				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
+			}
 		}
 	}
 }

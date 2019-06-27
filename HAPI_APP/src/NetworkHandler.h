@@ -11,11 +11,16 @@ enum class eMessageType
 {
 	eEstablishConnection = 0,
 	eNewRemoteConnection,
-	RemotePlayerReady
+	ePlayerReady,
+	eStartGame
 };
 
 struct Message
 {
+	Message(eMessageType type)
+		: type(type)
+	{}
+
 	Message(eMessageType type, FactionName factionName)
 		: type(type),
 		factionName(factionName)

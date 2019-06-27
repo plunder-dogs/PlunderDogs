@@ -5,7 +5,6 @@
 #include "SFML/Graphics.hpp"
 #include "Utilities/XMLParser.h"
 #include <iostream>
-#include <SFML/Network.hpp>
 #include "NetworkHandler.h"
 
 #ifdef C++_NOTES
@@ -46,14 +45,19 @@ void startSinglePlayer(std::array<Faction, static_cast<size_t>(FactionName::eTot
 
 int main()
 {
+	Textures::getInstance().loadAllTextures();
 	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> factions;
+	Battle battle(factions);
 	std::cout << "1. Single Player\n";
 	std::cout << "2. Multiplayer\n";
 	int userInput = 0;
 	std::cin >> userInput;
+	bool gameLobby = true;
 	if (userInput == 1)
 	{
 		startSinglePlayer(factions);
+		gameLobby = false;
+		battle.start("Level1.tmx");
 	}
 	else if (userInput == 2)
 	{
@@ -64,12 +68,6 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
 	window.setFramerateLimit(120);
 
-	Textures::getInstance().loadAllTextures();
-
-	Battle battle(factions);
-	battle.start("Level1.tmx");
-
-	bool gameLobby = true;
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
@@ -89,13 +87,16 @@ int main()
 					{
 						if (faction.m_controllerType == eControllerType::eLocalPlayer)
 						{
-							NetworkHandler::getInstance().sendServerMessage({ eMessageType::RemotePlayerReady, faction.m_factionName });
+							NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
 						}
 					}
 				}
 			}
 
-			battle.handleInput(window, currentEvent);
+			if (!gameLobby)
+			{
+				battle.handleInput(window, currentEvent);
+			}
 		}
 	
 		if (gameLobby)
@@ -112,12 +113,15 @@ int main()
 					{
 						assignFaction(factions, message.factionName, eControllerType::eRemotePlayer);
 					}
+					else if (message.type == eMessageType::eStartGame)
+					{
+						gameLobby = false;
+						battle.start("Level1.tmx");
+					}
 				}
 
 				NetworkHandler::getInstance().getServerMessages().clear();
 			}
-
-
 		}
 		else
 		{
