@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ShipOnTile.h"
+
 #include "Sprite.h"
+#include "Global.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 

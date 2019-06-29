@@ -3,6 +3,7 @@
 #include "GameEventMessenger.h"
 #include "AI.h"
 #include "Textures.h"
+#include "NetworkHandler.h"
 #include <iostream>
 
 constexpr size_t MAX_PARTICLES = 6;
@@ -49,6 +50,20 @@ void Battle::updateWindDirection()
 	}
 
 	m_map.setWindDirection(windDirection);
+}
+
+void Battle::handleServerMessages()
+{
+	for (auto message : NetworkHandler::getInstance().getServerMessages())
+	{
+		if (static_cast<eMessageType>(message.type) == eMessageType::eDeployShip)
+		{
+			deployFactionShipAtPosition(message.position, message.direction);
+		}
+	}
+
+	NetworkHandler::getInstance().getServerMessages().clear();
+
 }
 
 void Battle::handleAIMovementPhaseTimer(float deltaTime)
@@ -152,10 +167,11 @@ Battle::~Battle()
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
-void Battle::start(const std::string & newMapName)
+void Battle::start(const std::string & newMapName, bool onlineGame)
 {
 	assert(!m_factions.empty());
 
+	m_onlineGame = onlineGame;
 	m_map.loadmap(newMapName);
 	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
 
@@ -288,6 +304,24 @@ void Battle::generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i
 void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
+
+	if (m_onlineGame)
+	{
+		ShipOnTile shipToDeploy;
+		for (auto& ship : m_factions[m_currentFactionTurn].getAllShips())
+		{
+			if (!ship.isDeployed())
+			{
+				shipToDeploy.factionName = ship.getFactionName();
+				shipToDeploy.shipID = ship.getID();
+				break;
+			}
+		}
+
+		NetworkHandler::getInstance().sendServerMessage({ eMessageType::eDeployShip, shipToDeploy, 
+			startingPosition, startingDirection });
+	}
+
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
@@ -343,6 +377,7 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 
 void Battle::advanceToNextBattlePhase()
 {
+	//Send server message
 	if (m_currentBattlePhase == BattlePhase::Deployment)
 	{
 		bool allPlayersDeployed = true;

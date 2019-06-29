@@ -3,12 +3,12 @@
 #include <mutex>
 #include <queue>
 
-struct Message
+struct ServerMessage
 {
 	//Put something in here
 };
 
-#define NO_MESSAGE Message()
+#define NO_MESSAGE ServerMessage()
 
 class CircularBuffer
 {
@@ -17,12 +17,12 @@ public:
 
 	~CircularBuffer() { delete[] buffer; }
 
-	void deposit(Message data);
+	void deposit(ServerMessage data);
 
-	Message fetch();
+	ServerMessage fetch();
 
 private:
-	Message* buffer;
+	ServerMessage* buffer;
 	const int bufferSize;
 
 	int front;
@@ -31,5 +31,5 @@ private:
 
 	std::mutex lock;
 
-	std::queue<Message> overspill;
+	std::queue<ServerMessage> overspill;
 };

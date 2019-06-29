@@ -5,10 +5,10 @@
 CircularBuffer::CircularBuffer(int capacity) : 
 	bufferSize(capacity), front(0), rear(0), count(0), overspill()
 {
-	buffer = new Message[bufferSize];
+	buffer = new ServerMessage[bufferSize];
 }
 
-void CircularBuffer::deposit(Message data)
+void CircularBuffer::deposit(ServerMessage data)
 {
 	std::unique_lock<std::mutex> l(lock);
 
@@ -24,11 +24,11 @@ void CircularBuffer::deposit(Message data)
 	}
 }
 
-Message CircularBuffer::fetch()
+ServerMessage CircularBuffer::fetch()
 {
 	std::unique_lock<std::mutex> l(lock);
 
-	Message result{ NO_MESSAGE };
+	ServerMessage result{ NO_MESSAGE };
 
 	if (!overspill.empty())
 	{

@@ -7,29 +7,6 @@
 #include <mutex>
 #include <vector>
 
-enum class eMessageType
-{
-	eEstablishConnection = 0,
-	eNewRemoteConnection,
-	ePlayerReady,
-	eStartGame
-};
-
-struct Message
-{
-	Message(eMessageType type)
-		: type(type)
-	{}
-
-	Message(eMessageType type, FactionName factionName)
-		: type(type),
-		factionName(factionName)
-	{}
-
-	eMessageType type;
-	FactionName factionName;
-};
-
 class NetworkHandler
 {
 public:
@@ -42,8 +19,8 @@ public:
 		return instance;
 	}
 
-	void sendServerMessage(Message message);
-	std::vector<Message>& getServerMessages();
+	void sendServerMessage(ServerMessage message);
+	std::vector<ServerMessage>& getServerMessages();
 	void connect();
 	void disconnect();
 
@@ -51,7 +28,7 @@ private:
 	sf::TcpSocket m_tcpSocket;
 	std::thread m_listeningThread;
 	bool m_connected = false;
-	std::vector<Message> m_serverMessages;
+	std::vector<ServerMessage> m_serverMessages;
 	std::mutex m_serverMessageMutex;
 
 	void listen();

@@ -22,12 +22,28 @@
 //Memory prefeching
 #endif // C++_NOTES
 
-void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType playerType)
+void assignRemoteFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName remoteFactionName,
+	std::vector<eShipType>& remoteFactionShips)
+{
+	factions[static_cast<int>(remoteFactionName)].m_factionName = remoteFactionName;
+	factions[static_cast<int>(remoteFactionName)].m_controllerType = eControllerType::eRemotePlayer;
+
+	for (eShipType shipToAdd : remoteFactionShips)
+	{
+		factions[static_cast<int>(remoteFactionName)].addShip(remoteFactionName, shipToAdd);
+	}
+}
+
+void assignLocalFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName,
+	std::vector<eShipType>& remoteFactionShips)
 {
 	factions[static_cast<int>(factionName)].m_factionName = factionName;
-	factions[static_cast<int>(factionName)].m_controllerType = playerType;
-	factions[static_cast<int>(factionName)].addShip(factionName, eShipType::eFrigate);
-	factions[static_cast<int>(factionName)].addShip(factionName, eShipType::eFrigate);
+	factions[static_cast<int>(factionName)].m_controllerType = eControllerType::eLocalPlayer;
+	
+	for (eShipType shipToAdd : remoteFactionShips)
+	{
+		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
+	}
 }
 
 void startSinglePlayer(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
@@ -57,7 +73,7 @@ int main()
 	{
 		startSinglePlayer(factions);
 		gameLobby = false;
-		battle.start("Level1.tmx");
+		battle.start("Level1.tmx", gameLobby);
 	}
 	else if (userInput == 2)
 	{
@@ -107,16 +123,16 @@ int main()
 				{
 					if (message.type == eMessageType::eEstablishConnection)
 					{
-						assignFaction(factions, message.factionName, eControllerType::eLocalPlayer);
+						assignLocalFaction(factions, message.factionSentFrom, message.shipsToAdd);
 					}
 					else if (message.type == eMessageType::eNewRemoteConnection)
 					{
-						assignFaction(factions, message.factionName, eControllerType::eRemotePlayer);
+						assignRemoteFaction(factions, message.factionSentFrom, message.shipsToAdd);
 					}
 					else if (message.type == eMessageType::eStartGame)
 					{
 						gameLobby = false;
-						battle.start("Level1.tmx");
+						battle.start("Level1.tmx", gameLobby);
 					}
 				}
 

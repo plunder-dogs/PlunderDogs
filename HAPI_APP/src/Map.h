@@ -4,7 +4,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "Sprite.h"
-#include "ShipOnTile.h"
+#include "Global.h"
 
 struct Tile
 {

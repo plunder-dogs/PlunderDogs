@@ -13,17 +13,17 @@ NetworkHandler::~NetworkHandler()
 	m_listeningThread.join();
 }
 
-void NetworkHandler::sendServerMessage(Message message)
+void NetworkHandler::sendServerMessage(ServerMessage message)
 {
 	sf::Packet packetToSend;
-	packetToSend << static_cast<int>(message.type) << static_cast<int>(message.factionName);
+	packetToSend << message;
 	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
 	{
 		std::cout << "Unable to send message to server\n";
 	}
 }
 
-std::vector<Message>& NetworkHandler::getServerMessages()
+std::vector<ServerMessage>& NetworkHandler::getServerMessages()
 {
 	return m_serverMessages;
 }
@@ -66,6 +66,14 @@ void NetworkHandler::listen()
 			{
 				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
 				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
+			}
+			else if (static_cast<eMessageType>(messageType) == eMessageType::eNewRemoteConnection)
+			{
+				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
+				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
+				std::vector<eShipType> shipsToAdd;
+				receivedPacket >> shipsToAdd;
+				m_serverMessages.back().shipsToAdd = shipsToAdd;
 			}
 		}
 	}

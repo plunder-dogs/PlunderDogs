@@ -77,14 +77,6 @@ enum eControllerType
 	None
 };
 
-enum ShipType
-{
-	eFrigate,
-	eTurtle,
-	eFire,
-	eSniper
-};
-
 enum eTileType
 {
 	eGrass = 0,
@@ -148,6 +140,82 @@ enum eLightIntensity
 	//eHigh,
 	//eLow,
 	eMinimum
+};
+
+struct ShipOnTile
+{
+	ShipOnTile()
+		: factionName(),
+		shipID(INVALID_SHIP_ID)
+	{}
+	ShipOnTile(FactionName factionName, int shipID)
+		: factionName(factionName),
+		shipID(shipID)
+	{}
+
+	bool operator==(const ShipOnTile& orig)
+	{
+		return (factionName == orig.factionName && shipID == orig.shipID);
+	}
+
+	bool isValid() const
+	{
+		return (shipID != INVALID_SHIP_ID);
+	}
+
+	void clear()
+	{
+		shipID = INVALID_SHIP_ID;
+	}
+
+	FactionName factionName;
+	int shipID;
+};
+
+enum class eMessageType
+{
+	eEstablishConnection = 0,
+	eNewRemoteConnection,
+	ePlayerReady,
+	eStartGame,
+	eDeployShip
+};
+
+//NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
+
+struct ServerMessage
+{
+	ServerMessage()
+	{}
+
+	ServerMessage(eMessageType type)
+		: type(type)
+	{}
+
+	ServerMessage(eMessageType type, FactionName factionName)
+		: type(type),
+		factionSentFrom(factionName)
+	{}
+
+	ServerMessage(eMessageType type, ShipOnTile shipOnTile, sf::Vector2i position)
+		: type(type),
+		shipOnTile(shipOnTile),
+		position(position)
+	{}
+
+	ServerMessage(eMessageType type, ShipOnTile shipOnTile, sf::Vector2i position, eDirection direction)
+		: type(type),
+		shipOnTile(shipOnTile),
+		position(position),
+		direction(direction)
+	{}
+
+	eMessageType type;
+	ShipOnTile shipOnTile;
+	sf::Vector2i position;
+	eDirection direction;
+	FactionName factionSentFrom;
+	std::vector<eShipType> shipsToAdd;
 };
 
 struct posi

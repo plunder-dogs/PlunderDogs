@@ -35,7 +35,7 @@ public:
 	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
-	void start(const std::string& newMapName);
+	void start(const std::string& newMapName, bool onlineGame);
 	void render(sf::RenderWindow& window);
 	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
@@ -67,6 +67,7 @@ private:
 	Timer m_timeUntilGameOver;
 	eLightIntensity m_currentLightIntensity;
 	bool m_isRunning;
+	bool m_onlineGame = false;
 
 	Faction& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);
@@ -80,6 +81,7 @@ private:
 	void updateAttackPhase();
 	void incrementFactionTurn();
 	void updateWindDirection();
+	void handleServerMessages();
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
