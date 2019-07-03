@@ -6,6 +6,7 @@
 #include "Utilities/XMLParser.h"
 #include <iostream>
 #include "NetworkHandler.h"
+#include <assert.h>
 
 #ifdef C++_NOTES
 //Copy Ellision
@@ -22,29 +23,52 @@
 //Memory prefeching
 #endif // C++_NOTES
 
-void assignRemoteFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName remoteFactionName,
-	std::vector<eShipType>& remoteFactionShips)
+FactionName getLocalFactionName(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
-	factions[static_cast<int>(remoteFactionName)].m_factionName = remoteFactionName;
-	factions[static_cast<int>(remoteFactionName)].m_controllerType = eControllerType::eRemotePlayer;
-
-	for (eShipType shipToAdd : remoteFactionShips)
+	for (auto& faction : factions)
 	{
-		factions[static_cast<int>(remoteFactionName)].addShip(remoteFactionName, shipToAdd);
+		if (faction.m_controllerType == eControllerType::eLocalPlayer)
+		{
+			return faction.m_factionName;
+		}
 	}
 }
 
-void assignLocalFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName,
+void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType controllerType,
 	std::vector<eShipType>& remoteFactionShips)
 {
 	factions[static_cast<int>(factionName)].m_factionName = factionName;
-	factions[static_cast<int>(factionName)].m_controllerType = eControllerType::eLocalPlayer;
-	
+	factions[static_cast<int>(factionName)].m_controllerType = controllerType;
+
 	for (eShipType shipToAdd : remoteFactionShips)
 	{
 		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
 	}
 }
+
+//void assignRemoteFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName remoteFactionName,
+//	std::vector<eShipType>& remoteFactionShips)
+//{
+//	factions[static_cast<int>(remoteFactionName)].m_factionName = remoteFactionName;
+//	factions[static_cast<int>(remoteFactionName)].m_controllerType = eControllerType::eRemotePlayer;
+//
+//	for (eShipType shipToAdd : remoteFactionShips)
+//	{
+//		factions[static_cast<int>(remoteFactionName)].addShip(remoteFactionName, shipToAdd);
+//	}
+//}
+//
+//void assignLocalFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName,
+//	std::vector<eShipType>& remoteFactionShips)
+//{
+//	factions[static_cast<int>(factionName)].m_factionName = factionName;
+//	factions[static_cast<int>(factionName)].m_controllerType = eControllerType::eLocalPlayer;
+//	
+//	for (eShipType shipToAdd : remoteFactionShips)
+//	{
+//		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
+//	}
+//}
 
 void startSinglePlayer(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
@@ -66,17 +90,22 @@ int main()
 	Battle battle(factions);
 	std::cout << "1. Single Player\n";
 	std::cout << "2. Multiplayer\n";
-	int userInput = 0;
-	std::cin >> userInput;
+	int gameType = 0;
+	std::cin >> gameType;
+	assert(gameType == 1 || gameType == 2);
 	bool gameLobby = true;
-	if (userInput == 1)
+	int shipLoadout = 0;
+	if (gameType == 1)
 	{
 		startSinglePlayer(factions);
 		gameLobby = false;
 		battle.start("Level1.tmx", gameLobby);
 	}
-	else if (userInput == 2)
+	else if (gameType == 2)
 	{
+		std::cout << "Selected Ship Loadout: " << "\n";
+		std::cin >> shipLoadout;
+		assert(shipLoadout == 1 || shipLoadout == 2);
 		NetworkHandler::getInstance().connect();
 	}
 
@@ -123,11 +152,31 @@ int main()
 				{
 					if (message.type == eMessageType::eEstablishConnection)
 					{
-						assignLocalFaction(factions, message.factionSentFrom, message.shipsToAdd);
+						std::vector<eShipType> shipsToAdd;
+						if (shipLoadout == 1)
+						{
+							shipsToAdd.push_back(eShipType::eFrigate);
+							shipsToAdd.push_back(eShipType::eFrigate);
+							shipsToAdd.push_back(eShipType::eFrigate);
+						}
+						else if (shipLoadout == 2)
+						{
+							shipsToAdd.push_back(eShipType::eTurtle);
+							shipsToAdd.push_back(eShipType::eTurtle);
+							shipsToAdd.push_back(eShipType::eTurtle);
+						}
+
+						assignFaction(factions, message.factionSentFrom, eControllerType::eLocalPlayer, shipsToAdd);
+						sf::Packet packetToSend;
+						packetToSend << static_cast<int>(eMessageType::eNewPlayer) << shipsToAdd;
+						NetworkHandler::getInstance().sendServerMessage(packetToSend);
 					}
-					else if (message.type == eMessageType::eNewRemoteConnection)
+					else if (message.type == eMessageType::eNewPlayer)
 					{
-						assignRemoteFaction(factions, message.factionSentFrom, message.shipsToAdd);
+						if (message.factionSentFrom != getLocalFactionName(factions))
+						{
+							assignFaction(factions, message.factionSentFrom, eControllerType::eRemotePlayer, message.shipsToAdd);
+						}
 					}
 					else if (message.type == eMessageType::eStartGame)
 					{

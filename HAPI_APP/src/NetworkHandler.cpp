@@ -13,6 +13,14 @@ NetworkHandler::~NetworkHandler()
 	m_listeningThread.join();
 }
 
+void NetworkHandler::sendServerMessage(sf::Packet & packetToSend)
+{
+	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+	{
+		std::cout << "Unable to send message to server\n";
+	}
+}
+
 void NetworkHandler::sendServerMessage(ServerMessage message)
 {
 	sf::Packet packetToSend;
@@ -67,7 +75,7 @@ void NetworkHandler::listen()
 				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
 				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
 			}
-			else if (static_cast<eMessageType>(messageType) == eMessageType::eNewRemoteConnection)
+			else if (static_cast<eMessageType>(messageType) == eMessageType::eNewPlayer)
 			{
 				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
 				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));

@@ -175,13 +175,11 @@ struct ShipOnTile
 enum class eMessageType
 {
 	eEstablishConnection = 0,
-	eNewRemoteConnection,
+	eNewPlayer,
 	ePlayerReady,
 	eStartGame,
 	eDeployShip
 };
-
-//NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
 
 struct ServerMessage
 {
