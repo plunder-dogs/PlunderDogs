@@ -178,7 +178,8 @@ enum class eMessageType
 	eNewPlayer,
 	ePlayerReady,
 	eStartGame,
-	eDeployShip
+	eDeployShip,
+	eDisconnect
 };
 
 struct ServerMessage
@@ -192,7 +193,7 @@ struct ServerMessage
 
 	ServerMessage(eMessageType type, FactionName factionName)
 		: type(type),
-		factionSentFrom(factionName)
+		faction(factionName)
 	{}
 
 	ServerMessage(eMessageType type, ShipOnTile shipOnTile, sf::Vector2i position)
@@ -212,7 +213,7 @@ struct ServerMessage
 	ShipOnTile shipOnTile;
 	sf::Vector2i position;
 	eDirection direction;
-	FactionName factionSentFrom;
+	FactionName faction;
 	std::vector<eShipType> shipsToAdd;
 };
 

@@ -19,6 +19,7 @@ public:
 		return instance;
 	}
 
+	void clearServerMessages();
 	void sendServerMessage(sf::Packet& packetToSend);
 	void sendServerMessage(ServerMessage message);
 	std::vector<ServerMessage>& getServerMessages();

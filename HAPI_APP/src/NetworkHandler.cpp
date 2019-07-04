@@ -13,6 +13,12 @@ NetworkHandler::~NetworkHandler()
 	m_listeningThread.join();
 }
 
+void NetworkHandler::clearServerMessages()
+{
+	std::unique_lock<std::mutex> lock(m_serverMessageMutex);
+	m_serverMessages.clear();
+}
+
 void NetworkHandler::sendServerMessage(sf::Packet & packetToSend)
 {
 	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
@@ -33,6 +39,7 @@ void NetworkHandler::sendServerMessage(ServerMessage message)
 
 std::vector<ServerMessage>& NetworkHandler::getServerMessages()
 {
+	std::unique_lock<std::mutex> lock(m_serverMessageMutex);
 	return m_serverMessages;
 }
 
@@ -78,10 +85,15 @@ void NetworkHandler::listen()
 			else if (static_cast<eMessageType>(messageType) == eMessageType::eNewPlayer)
 			{
 				std::unique_lock<std::mutex> lock(m_serverMessageMutex);
-				m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
+				int factionName = -1;
+				receivedPacket >> factionName;
+				ServerMessage message(static_cast<eMessageType>(messageType), static_cast<FactionName>(factionName));
+
 				std::vector<eShipType> shipsToAdd;
 				receivedPacket >> shipsToAdd;
-				m_serverMessages.back().shipsToAdd = shipsToAdd;
+				message.shipsToAdd = shipsToAdd;
+
+				m_serverMessages.push_back(message);
 			}
 		}
 	}

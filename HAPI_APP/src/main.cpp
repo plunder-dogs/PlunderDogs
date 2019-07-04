@@ -116,7 +116,7 @@ int main()
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
-	while (battle.isRunning())
+	while (window.isOpen())
 	{
 		while (window.pollEvent(currentEvent))
 		{
@@ -146,9 +146,10 @@ int main()
 	
 		if (gameLobby)
 		{
-			if (!NetworkHandler::getInstance().getServerMessages().empty())
+			auto& messages = NetworkHandler::getInstance().getServerMessages();
+			if (!messages.empty())
 			{
-				for (auto message : NetworkHandler::getInstance().getServerMessages())
+				for (auto& message : messages)
 				{
 					if (message.type == eMessageType::eEstablishConnection)
 					{
@@ -166,16 +167,18 @@ int main()
 							shipsToAdd.push_back(eShipType::eTurtle);
 						}
 
-						assignFaction(factions, message.factionSentFrom, eControllerType::eLocalPlayer, shipsToAdd);
+						assignFaction(factions, message.faction, eControllerType::eLocalPlayer, shipsToAdd);
 						sf::Packet packetToSend;
-						packetToSend << static_cast<int>(eMessageType::eNewPlayer) << shipsToAdd;
+						FactionName localFactionName = getLocalFactionName(factions);
+						packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) << 
+							static_cast<int>(shipsToAdd.size()) << shipsToAdd;
 						NetworkHandler::getInstance().sendServerMessage(packetToSend);
 					}
 					else if (message.type == eMessageType::eNewPlayer)
 					{
-						if (message.factionSentFrom != getLocalFactionName(factions))
+						if (message.faction != getLocalFactionName(factions))
 						{
-							assignFaction(factions, message.factionSentFrom, eControllerType::eRemotePlayer, message.shipsToAdd);
+							assignFaction(factions, message.faction, eControllerType::eRemotePlayer, message.shipsToAdd);
 						}
 					}
 					else if (message.type == eMessageType::eStartGame)
@@ -185,7 +188,7 @@ int main()
 					}
 				}
 
-				NetworkHandler::getInstance().getServerMessages().clear();
+				NetworkHandler::getInstance().clearServerMessages();
 			}
 		}
 		else
