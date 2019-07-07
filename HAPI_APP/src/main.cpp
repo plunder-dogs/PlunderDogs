@@ -34,6 +34,10 @@ int main()
 	players[static_cast<int>(FactionName::eYellow)].m_playerType = ePlayerType::eHuman;
 	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
+	players[static_cast<int>(FactionName::eYellow)].addShip(FactionName::eYellow, eShipType::eFrigate);
 
 	players[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
 	players[static_cast<int>(FactionName::eRed)].m_playerType = ePlayerType::eAI;

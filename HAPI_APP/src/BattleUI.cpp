@@ -489,13 +489,18 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
 	//Multiple ships selected
-	if (m_shipSelector.getSelectedShips().size() > 1 && !m_leftClickHeld)
+	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
 	{
 		m_movementArea.clearTileArea();
 		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
-		if (m_shipSelector.getSelectedShips().size() > m_movementArea.m_tileArea.size())
+
+		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			return;
+			const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea);
+			//TODO: For temporary debug purposes
+			//std::cout << adjacentTile->m_tileCoordinate.x << " " << adjacentTile->m_tileCoordinate.y << "\n";
+			assert(adjacentTile);
+			m_movementArea.m_tileArea.push_back(adjacentTile);	
 		}
 
 		int shipIndex = 0;
