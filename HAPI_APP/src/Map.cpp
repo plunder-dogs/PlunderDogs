@@ -530,6 +530,92 @@ void Map::getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::
 	}
 }
 
+const Tile * Map::getNonCollidableAdjacentTile(const std::vector<const Tile*>& tileArea) const
+{
+	for (const auto& tile : tileArea)
+	{
+		//If odd
+		if (tile->m_tileCoordinate.x & 1)
+		{
+			const Tile* adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x, tile->m_tileCoordinate.y - 1));//N
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x + 1, tile->m_tileCoordinate.y - 1));//NE
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x + 1, tile->m_tileCoordinate.y));//SE
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x, tile->m_tileCoordinate.y + 1));//S
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x - 1, tile->m_tileCoordinate.y));//SW
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x - 1, tile->m_tileCoordinate.y - 1));//NW
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+		}
+		//If even
+		else
+		{
+			const Tile* adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x, tile->m_tileCoordinate.y - 1));//N
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x + 1, tile->m_tileCoordinate.y));//NE
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x + 1, tile->m_tileCoordinate.y + 1));//SE
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x, tile->m_tileCoordinate.y + 1));//S
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x - 1, tile->m_tileCoordinate.y + 1));//SW
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+			adjacentTile = getTile(sf::Vector2i(tile->m_tileCoordinate.x - 1, tile->m_tileCoordinate.y));//NW
+			if (!isTileCollidable(adjacentTile) && !Utilities::isPositionFound(tileArea, adjacentTile->m_tileCoordinate))
+			{
+				return adjacentTile;
+			}
+
+		}
+	}
+}
+
 std::vector<const Tile*> Map::getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
 	int reserveSize{ 0 };
