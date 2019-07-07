@@ -6,10 +6,11 @@
 #include <cmath>    //asin()
 #include <utility>
 
-
+struct Tile;
 namespace Utilities
 {
 	int getRandomNumber(int min, int max);
+	bool isPositionFound(const std::vector<const Tile*>& tileArea, sf::Vector2i position);
 	eDirection getOppositeDirection(eDirection direction);
 }
 
