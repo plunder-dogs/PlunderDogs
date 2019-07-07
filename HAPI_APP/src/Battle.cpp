@@ -54,15 +54,15 @@ void Battle::updateWindDirection()
 
 void Battle::handleServerMessages()
 {
-	for (auto message : NetworkHandler::getInstance().getServerMessages())
-	{
-		if (static_cast<eMessageType>(message.type) == eMessageType::eDeployShip)
-		{
-			deployFactionShipAtPosition(message.position, message.direction);
-		}
-	}
+	//for (auto message : NetworkHandler::getInstance().getServerMessages())
+	//{
+	//	if (static_cast<eMessageType>(message.type) == eMessageType::eDeployShip)
+	//	{
+	//		deployFactionShipAtPosition(message.position, message.direction);
+	//	}
+	//}
 
-	NetworkHandler::getInstance().getServerMessages().clear();
+	//NetworkHandler::getInstance().getServerMessages().clear();
 
 }
 
@@ -318,8 +318,8 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 			}
 		}
 
-		NetworkHandler::getInstance().sendServerMessage({ eMessageType::eDeployShip, shipToDeploy, 
-			startingPosition, startingDirection });
+		//NetworkHandler::getInstance().sendServerMessage({ eMessageType::eDeployShip, shipToDeploy, 
+		//	startingPosition, startingDirection });
 	}
 
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);

@@ -14,6 +14,7 @@
 //Stack Frames
 //https://www.youtube.com/channel/UCSX3MR0gnKDxyXAyljWzm0Q/playlists
 //https://www.reddit.com/r/cpp/comments/byi5m3/books_on_memory_management_techniques/
+//https://stackoverflow.com/questions/37960797/threads-termination-of-infinite-loop-thread-in-c
 //branch misprediction 
 //pipeline stall - https://gameprogrammingpatterns.com/data-locality.html
 //Pointer Chasing
@@ -87,27 +88,15 @@ int main()
 {
 	Textures::getInstance().loadAllTextures();
 	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> factions;
-	Battle battle(factions);
-	std::cout << "1. Single Player\n";
-	std::cout << "2. Multiplayer\n";
-	int gameType = 0;
-	std::cin >> gameType;
-	assert(gameType == 1 || gameType == 2);
+	//Battle battle(factions);
 	bool gameLobby = true;
 	int shipLoadout = 0;
-	if (gameType == 1)
-	{
-		startSinglePlayer(factions);
-		gameLobby = false;
-		battle.start("Level1.tmx", gameLobby);
-	}
-	else if (gameType == 2)
-	{
-		std::cout << "Selected Ship Loadout: " << "\n";
-		std::cin >> shipLoadout;
-		assert(shipLoadout == 1 || shipLoadout == 2);
-		NetworkHandler::getInstance().connect();
-	}
+
+	std::cout << "Selected Ship Loadout: " << "\n";
+	std::cin >> shipLoadout;
+	assert(shipLoadout == 1 || shipLoadout == 2);
+	NetworkHandler networkHandler;
+	networkHandler.connect();
 
 	sf::Vector2u windowSize(1920, 1080);
 	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
@@ -132,7 +121,7 @@ int main()
 					{
 						if (faction.m_controllerType == eControllerType::eLocalPlayer)
 						{
-							NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
+							//NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
 						}
 					}
 				}
@@ -140,63 +129,59 @@ int main()
 
 			if (!gameLobby)
 			{
-				battle.handleInput(window, currentEvent);
+				//battle.handleInput(window, currentEvent);
 			}
 		}
 	
 		if (gameLobby)
 		{
-			auto& messages = NetworkHandler::getInstance().getServerMessages();
-			if (!messages.empty())
+			while (networkHandler.isMessages())
 			{
-				for (auto& message : messages)
+				ServerMessage serverMessage = networkHandler.getServerMessage();
+				if (serverMessage.type == eMessageType::eEstablishConnection)
 				{
-					if (message.type == eMessageType::eEstablishConnection)
+					std::vector<eShipType> shipsToAdd;
+					if (shipLoadout == 1)
 					{
-						std::vector<eShipType> shipsToAdd;
-						if (shipLoadout == 1)
-						{
-							shipsToAdd.push_back(eShipType::eFrigate);
-							shipsToAdd.push_back(eShipType::eFrigate);
-							shipsToAdd.push_back(eShipType::eFrigate);
-						}
-						else if (shipLoadout == 2)
-						{
-							shipsToAdd.push_back(eShipType::eTurtle);
-							shipsToAdd.push_back(eShipType::eTurtle);
-							shipsToAdd.push_back(eShipType::eTurtle);
-						}
+						shipsToAdd.push_back(eShipType::eFrigate);
+						shipsToAdd.push_back(eShipType::eFrigate);
+						shipsToAdd.push_back(eShipType::eFrigate);
+					}
+					else if (shipLoadout == 2)
+					{
+						shipsToAdd.push_back(eShipType::eTurtle);
+						shipsToAdd.push_back(eShipType::eTurtle);
+						shipsToAdd.push_back(eShipType::eTurtle);
+					}
 
-						assignFaction(factions, message.faction, eControllerType::eLocalPlayer, shipsToAdd);
-						sf::Packet packetToSend;
-						FactionName localFactionName = getLocalFactionName(factions);
-						packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) << 
-							static_cast<int>(shipsToAdd.size()) << shipsToAdd;
-						NetworkHandler::getInstance().sendServerMessage(packetToSend);
-					}
-					else if (message.type == eMessageType::eNewPlayer)
+					assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
+					//sf::Packet packetToSend;
+					//FactionName localFactionName = getLocalFactionName(factions);
+					//packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) <<
+					//	static_cast<int>(shipsToAdd.size()) << shipsToAdd;
+
+					//NetworkHandler::getInstance().sendServerMessage(packetToSend);
+				}
+				else if (serverMessage.type == eMessageType::eNewPlayer)
+				{
+					if (serverMessage.faction != getLocalFactionName(factions))
 					{
-						if (message.faction != getLocalFactionName(factions))
-						{
-							assignFaction(factions, message.faction, eControllerType::eRemotePlayer, message.shipsToAdd);
-						}
-					}
-					else if (message.type == eMessageType::eStartGame)
-					{
-						gameLobby = false;
-						battle.start("Level1.tmx", gameLobby);
+						assignFaction(factions, serverMessage.faction, eControllerType::eRemotePlayer, serverMessage.shipsToAdd);
 					}
 				}
-
-				NetworkHandler::getInstance().clearServerMessages();
+				else if (serverMessage.type == eMessageType::eStartGame)
+				{
+					gameLobby = false;
+					//battle.start("Level1.tmx", gameLobby);
+				}
 			}
 		}
 		else
 		{
-			battle.update(deltaTime);
+			//battle.update(deltaTime);
 
 			window.clear();
-			battle.render(window);
+			//battle.render(window);
 			window.display();
 
 		}
@@ -204,7 +189,9 @@ int main()
 		deltaTime = gameClock.restart().asSeconds();
 	}
 
-	NetworkHandler::getInstance().disconnect();
+	networkHandler.disconnect(getLocalFactionName(factions));
+
+	int i = 0;
 
 	return 0;
 }
