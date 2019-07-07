@@ -503,6 +503,8 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 			m_movementArea.m_tileArea.push_back(adjacentTile);	
 		}
 
+		//TODO: Implement check to make sure movement area cant be less than 6
+
 		int shipIndex = 0;
 		for (const auto& tile : m_movementArea.m_tileArea)
 		{

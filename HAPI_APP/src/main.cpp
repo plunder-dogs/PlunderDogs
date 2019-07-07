@@ -44,7 +44,7 @@ int main()
 	AI::loadShips(players[static_cast<int>(FactionName::eRed)]);
 
 	Battle battle(players);
-	battle.start("Level1.tmx");
+	battle.start("Level3.tmx");
 
 	sf::Clock gameClock;
 	sf::Event currentEvent;
