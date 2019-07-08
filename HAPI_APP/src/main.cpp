@@ -109,6 +109,7 @@ int main()
 	float deltaTime = gameClock.restart().asSeconds();
 	while (window.isOpen())
 	{
+		networkHandler.listenToServer();
 		while (window.pollEvent(currentEvent))
 		{
 			if (currentEvent.type == sf::Event::Closed)
@@ -137,7 +138,7 @@ int main()
 	
 		if (gameLobby)
 		{
-			while (networkHandler.isMessages())
+			while (networkHandler.hasMessages())
 			{
 				ServerMessage serverMessage = networkHandler.getServerMessage();
 				if (serverMessage.type == eMessageType::eEstablishConnection)
@@ -192,8 +193,6 @@ int main()
 	}
 
 	networkHandler.disconnect(getLocalFactionName(factions));
-
-	int i = 0;
 
 	return 0;
 }

@@ -173,7 +173,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SFML\include\SFML\Network\Packet.cpp" />
-    <ClCompile Include="src\CircularBuffer.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Selector.cpp" />
@@ -198,7 +197,6 @@
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\CircularBuffer.h" />
     <ClInclude Include="src\Battle.h" />
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Particle.h" />
