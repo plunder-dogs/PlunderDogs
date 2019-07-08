@@ -13,6 +13,7 @@ constexpr int FRAME_WIDTH{ 32 };
 constexpr float FRAME_CENTRE_X{ 15.5 };
 constexpr float FRAME_CENTRE_Y{ 32.5 };
 constexpr float WIND_STRENGTH{ 0.3 };
+constexpr int MAX_ADJACENT_TILE_RANGE{ 10 };
 
 //SpawnPosition
 Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
@@ -527,7 +528,7 @@ void Map::getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::
 
 const Tile * Map::getNonCollidableAdjacentTile(const std::vector<const Tile*>& tileArea, sf::Vector2i coord) const
 {
-	for(int range = 1; range <= 10; ++range)
+	for(int range = 1; range <= MAX_ADJACENT_TILE_RANGE; ++range)
 	{ 
 		//If odd
 		if (coord.x & 1)
