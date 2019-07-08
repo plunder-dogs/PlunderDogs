@@ -18,6 +18,20 @@ bool Utilities::isPositionFound(const std::vector<const Tile*>& tileArea, sf::Ve
 	return cIter != tileArea.cend();
 }
 
+int Utilities::numbOfPositionFound(const std::vector<const Tile*>& tileArea, sf::Vector2i position)
+{
+	int i = 0;
+	for (int i = 0; i < tileArea.size(); ++i)
+	{
+		if (tileArea[i]->m_tileCoordinate == position)
+		{
+			++i;
+		}
+	}
+
+	return i;
+}
+
 eDirection Utilities::getOppositeDirection(eDirection direction)
 {
 	eDirection oppositeDirection;
