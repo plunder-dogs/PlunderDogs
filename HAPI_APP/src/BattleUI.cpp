@@ -493,17 +493,24 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	{
 		m_movementArea.clearTileArea();
 		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
-
 		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea);
-			//TODO: For temporary debug purposes
-			//std::cout << adjacentTile->m_tileCoordinate.x << " " << adjacentTile->m_tileCoordinate.y << "\n";
-			assert(adjacentTile);
-			m_movementArea.m_tileArea.push_back(adjacentTile);	
-		}
+			for (int i = 0; i < 5; ++i)
+			{
+				const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea, i);
+				if (adjacentTile)
+				{
+					std::cout << adjacentTile->m_tileCoordinate.x << " " << adjacentTile->m_tileCoordinate.y << "\n";
+					m_movementArea.m_tileArea.push_back(adjacentTile);
+					break;
+				}
+			}
 
-		//TODO: Implement check to make sure movement area cant be less than 6
+			if (m_movementArea.m_tileArea.empty())
+			{
+				break;
+			}
+		}
 
 		int shipIndex = 0;
 		for (const auto& tile : m_movementArea.m_tileArea)

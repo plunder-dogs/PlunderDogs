@@ -18,6 +18,8 @@
 //Pointer Prediction
 //Branch Prediction
 //Memory prefeching
+//Threading debug confusing for timings
+//debug by printing, if statements
 #endif // C++_NOTES
 
 int main()
