@@ -12,6 +12,11 @@ class NetworkHandler
 {
 public:
 	NetworkHandler();
+	static NetworkHandler& getInstance()
+	{
+		static NetworkHandler instance;
+		return instance;
+	}
 
 	bool hasMessages();
 	ServerMessage getServerMessage();
