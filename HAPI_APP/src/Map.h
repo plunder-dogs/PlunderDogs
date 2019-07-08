@@ -65,7 +65,7 @@ public:
 	std::vector<const Tile*> getAdjacentTiles(sf::Vector2i coord) const;
 	void getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
 	void getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
-	//Get adjacent tile from tile area
+	//Get adjacent tile from tile area within certain range
 	const Tile* getNonCollidableAdjacentTile(const std::vector<const Tile*>& tileArea, int range) const;
 
 	//Returns tiles in a radius around a given tile, skipping the tile itself

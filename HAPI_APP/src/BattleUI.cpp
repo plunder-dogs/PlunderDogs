@@ -495,7 +495,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
 		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			for (int i = 0; i < 5; ++i)
+			for (int i = 0; i < 15; ++i)
 			{
 				const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea, i);
 				if (adjacentTile)
@@ -510,6 +510,11 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 			{
 				break;
 			}
+		}
+
+		if (m_movementArea.m_tileArea.size() != 6 && m_movementArea.m_tileArea.size() > 0)
+		{
+			int i = 0;
 		}
 
 		int shipIndex = 0;
