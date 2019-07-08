@@ -493,30 +493,43 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	{
 		m_movementArea.clearTileArea();
 		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
+		//Movement Area given not equal to amount of ships selected
 		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			for (int i = 0; i < 15; ++i)
-			{
-				const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea, i);
-				if (adjacentTile)
-				{
-					std::cout << adjacentTile->m_tileCoordinate.x << " " << adjacentTile->m_tileCoordinate.y << "\n";
-					m_movementArea.m_tileArea.push_back(adjacentTile);
-					break;
-				}
-			}
-
+			//Fill movement area to equate to amount of ships selected
 			if (m_movementArea.m_tileArea.empty())
 			{
+				for (int i = 0; i < m_shipSelector.getSelectedShips().size(); ++i)
+				{
+					const Tile* adjacentTile = m_battle.getMap().
+						getNonCollidableAdjacentTile(m_movementArea.m_tileArea, m_battle.getMap().getMouseClickCoord(mousePosition));
+					if (adjacentTile)
+					{
+						m_movementArea.m_tileArea.push_back(adjacentTile);
+					}
+				}
 				break;
+			}
+
+			//Fill remaining movement area to equate to ships selected
+			for (int i = 0; i < m_movementArea.m_tileArea.size(); ++i)
+			{
+				const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(m_movementArea.m_tileArea, 
+					m_movementArea.m_tileArea[i]->m_tileCoordinate);
+				if (adjacentTile)
+				{
+					m_movementArea.m_tileArea.push_back(adjacentTile);
+					if (m_movementArea.m_tileArea.size() == m_shipSelector.getSelectedShips().size())
+					{
+						break;
+					}
+				}
 			}
 		}
 
-		if (m_movementArea.m_tileArea.size() != 6 && m_movementArea.m_tileArea.size() > 0)
-		{
-			int i = 0;
-		}
+		assert(m_movementArea.m_tileArea.size() == size_t(m_shipSelector.getSelectedShips().size()));
 
+		//Generate ship movement paths to positions
 		int shipIndex = 0;
 		for (const auto& tile : m_movementArea.m_tileArea)
 		{
@@ -526,7 +539,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 				{
 					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
 					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
-
+					
 					++i;
 					shipIndex = i;
 					break;
