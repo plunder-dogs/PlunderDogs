@@ -52,6 +52,8 @@ private:
 	bool inCone(sf::Vector2i orgHex, sf::Vector2i testHex, eDirection dir) const;
 	//Finds the euclidean distance from a point to a tile's centre, used by getMouseClickCoord
 	float tileDistanceMag(sf::Vector2i tileCoord, sf::Vector2i mouseClick) const;
+
+	bool isTileCollidable(const Tile& tile) const;
 public:
 	//Returns a pointer to a given tile, returns nullptr if there is no tile there
 	Tile* getTile(sf::Vector2i coordinate);
@@ -120,7 +122,6 @@ public:
 
 	const std::vector<Tile>& getData()const { return m_data; }
 
-	bool isTileCollidable(const Tile* tile) const;
 
 	Map();
 	Map(const Map&) = delete;
