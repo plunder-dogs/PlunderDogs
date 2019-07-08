@@ -22,6 +22,8 @@
 //Pointer Prediction
 //Branch Prediction
 //Memory prefeching
+//Threading debug confusing for timings
+//debug by printing, if statements
 #endif // C++_NOTES
 
 FactionName getLocalFactionName(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)

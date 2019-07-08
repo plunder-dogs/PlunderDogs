@@ -3,10 +3,8 @@
 #include <mutex>
 #include <queue>
 
-struct ServerMessage
-{
-	//Put something in here
-};
+struct ServerMessage;
+
 
 #define NO_MESSAGE ServerMessage()
 
@@ -23,6 +21,7 @@ public:
 
 private:
 	ServerMessage* buffer;
+
 	const int bufferSize;
 
 	int front;

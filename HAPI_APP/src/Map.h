@@ -52,6 +52,8 @@ private:
 	bool inCone(sf::Vector2i orgHex, sf::Vector2i testHex, eDirection dir) const;
 	//Finds the euclidean distance from a point to a tile's centre, used by getMouseClickCoord
 	float tileDistanceMag(sf::Vector2i tileCoord, sf::Vector2i mouseClick) const;
+
+	bool isTileCollidable(const Tile& tile) const;
 public:
 	//Returns a pointer to a given tile, returns nullptr if there is no tile there
 	Tile* getTile(sf::Vector2i coordinate);
@@ -64,7 +66,8 @@ public:
 	//std::vector<Tile*> getAdjacentTiles(sf::Vector2i coord);
 	std::vector<const Tile*> getAdjacentTiles(sf::Vector2i coord) const;
 	void getAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
-	void getNonCollidableAdjacentTiles(std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
+	//Get adjacent tile from tile area within certain range
+	const Tile* getNonCollidableAdjacentTile(const std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
 
 	//Returns tiles in a radius around a given tile, skipping the tile itself
 	std::vector<const Tile*> getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
@@ -117,8 +120,6 @@ public:
 	void loadmap(const std::string& mapName);
 
 	const std::vector<Tile>& getData()const { return m_data; }
-
-	bool isTileCollidable(const Tile* tile) const;
 
 	Map();
 	Map(const Map&) = delete;

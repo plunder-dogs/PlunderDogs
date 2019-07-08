@@ -489,15 +489,31 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
 	//Multiple ships selected
-	if (m_shipSelector.getSelectedShips().size() > 1 && !m_leftClickHeld)
+	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
 	{
 		m_movementArea.clearTileArea();
-		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate);
-		if (m_shipSelector.getSelectedShips().size() > m_movementArea.m_tileArea.size())
+		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			return;
+			//Fill movement area to equate to amount of ships selected
+			if (m_movementArea.m_tileArea.empty())
+			{
+				for (int i = 0; i < m_shipSelector.getSelectedShips().size(); ++i)
+				{
+					const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(
+						m_movementArea.m_tileArea, m_battle.getMap().getMouseClickCoord(mousePosition));
+
+					if (adjacentTile)
+					{
+						m_movementArea.m_tileArea.push_back(adjacentTile);
+					}
+				}
+				break;
+			}
 		}
 
+		assert(m_movementArea.m_tileArea.size() == m_shipSelector.getSelectedShips().size());
+
+		//Generate ship movement paths to positions
 		int shipIndex = 0;
 		for (const auto& tile : m_movementArea.m_tileArea)
 		{
@@ -507,7 +523,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 				{
 					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
 					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
-
+					
 					++i;
 					shipIndex = i;
 					break;

@@ -1,6 +1,7 @@
 #include "Utilities.h"
 #include <random>
 #include "../Map.h"
+#include <algorithm>
 
 int Utilities::getRandomNumber(int min, int max)
 {
@@ -9,6 +10,26 @@ int Utilities::getRandomNumber(int min, int max)
 	std::uniform_int_distribution<> dis(min, max);
 
 	return dis(gen);
+}
+
+bool Utilities::isPositionFound(const std::vector<const Tile*>& tileArea, sf::Vector2i position)
+{
+	auto cIter = std::find_if(tileArea.cbegin(), tileArea.cend(), [position](const auto& tile) { return tile->m_tileCoordinate == position; });
+	return cIter != tileArea.cend();
+}
+
+int Utilities::numbOfPositionFound(const std::vector<const Tile*>& tileArea, sf::Vector2i position)
+{
+	int i = 0;
+	for (int i = 0; i < tileArea.size(); ++i)
+	{
+		if (tileArea[i]->m_tileCoordinate == position)
+		{
+			++i;
+		}
+	}
+
+	return i;
 }
 
 eDirection Utilities::getOppositeDirection(eDirection direction)
