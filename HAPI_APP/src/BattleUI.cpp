@@ -12,7 +12,7 @@
 
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
-const sf::Vector2i MOUSE_POSITION_OFFSET{ 25, 45 };
+
 
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
@@ -204,10 +204,10 @@ void BattleUI::updateCamera()
 	//camera pan
 	if (m_pendingCameraMovement != sf::Vector2f(0, 0))
 	{
-		m_cameraPositionOffset.x += m_pendingCameraMovement.x;//translates the camera position
+		m_cameraPositionOffset.x += m_pendingCameraMovement.x;
 		m_cameraPositionOffset.y += m_pendingCameraMovement.y;
 
-		if (m_cameraPositionOffset.x < -120)//checks for if its reached any of the 4 boundries, need to change it to a width variable
+		if (m_cameraPositionOffset.x < -120)
 		{
 			m_cameraPositionOffset.x = -120;
 		}
@@ -398,8 +398,6 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
-	std::cout << "Mouse: ";
-	std::cout << "x: " << mousePosition.x << " y: " << mousePosition.y << "\n";
 	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());

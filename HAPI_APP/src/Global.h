@@ -12,6 +12,7 @@ const size_t MAX_SHIPS_PER_FACTION = 6;
 const std::string DATA_DIRECTORY = "Data\\";
 const std::string SHIP_DATA_DIRECTORY = "Data\\Ships\\";
 const std::string LEVEL_DATA_DIRECTORY = "Data\\Levels\\";
+const sf::Vector2i MOUSE_POSITION_OFFSET{ 25, 45 };
 
 enum FactionName
 {
