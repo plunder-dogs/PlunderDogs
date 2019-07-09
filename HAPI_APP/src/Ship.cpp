@@ -143,6 +143,12 @@ void Ship::disableAction()
 
 void Ship::startMovement(Map& map)
 {
+	//No adaquete area to move to
+	if (m_movementArea.m_tileArea.empty())
+	{
+		return;
+	}
+
 	if (!m_destinationSet)
 	{
 		m_destinationSet = true;
@@ -158,11 +164,18 @@ void Ship::startMovement(Map& map)
 
 void Ship::startMovement(Map& map, eDirection endDirection)
 {
+	//No adaquete area to move to
+	if (m_movementArea.m_tileArea.empty())
+	{
+		return;
+	}
+
 	if (!m_destinationSet)
 	{
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
+		assert(!m_movementArea.m_tileArea.empty());
 		m_movementArea.m_tileArea.emplace_back(m_movementArea.m_tileArea.back().pair(), endDirection);
 
 		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
@@ -260,7 +273,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 15;
+		m_movementPoints = 10;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;
