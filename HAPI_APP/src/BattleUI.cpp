@@ -12,6 +12,7 @@
 
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
+const sf::Vector2i MOUSE_POSITION_OFFSET{ 25, 45 };
 
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
@@ -78,6 +79,7 @@ void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	mousePosition += MOUSE_POSITION_OFFSET;
 
 	switch (currentEvent.type)
 	{
@@ -396,6 +398,8 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
+	std::cout << "Mouse: ";
+	std::cout << "x: " << mousePosition.x << " y: " << mousePosition.y << "\n";
 	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
 	{
 		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
@@ -446,7 +450,7 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ -1,0 };
 	}
-	else if (mousePosition.x > 1820)
+	else if (mousePosition.x > SCREEN_RESOLUTION.x - 100)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 1,0 };
 	}
@@ -455,7 +459,7 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 0 , -1 };
 	}
-	else if (mousePosition.y > 980)
+	else if (mousePosition.y > SCREEN_RESOLUTION.y - 100)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 0, 1 };
 	}

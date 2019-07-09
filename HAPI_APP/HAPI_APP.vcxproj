@@ -172,7 +172,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\CircularBuffer.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Selector.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
@@ -196,7 +195,6 @@
     <ClCompile Include="src\Utilities\Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\CircularBuffer.h" />
     <ClInclude Include="src\Battle.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Selector.h" />

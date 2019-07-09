@@ -24,8 +24,7 @@
 
 int main()
 {
-	sf::Vector2u windowSize(1920, 1080);
-	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(SCREEN_RESOLUTION.x, SCREEN_RESOLUTION.y), "Plunder Dogs", sf::Style::Close);
 	window.setFramerateLimit(120);
 	
 	Textures::getInstance().loadAllTextures();
@@ -46,7 +45,7 @@ int main()
 	AI::loadShips(players[static_cast<int>(FactionName::eRed)]);
 
 	Battle battle(players);
-	battle.start("Level1.tmx");
+	battle.start("Level3.tmx");
 
 	sf::Clock gameClock;
 	sf::Event currentEvent;

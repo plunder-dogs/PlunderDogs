@@ -148,6 +148,7 @@ void Ship::startMovement(Map& map)
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
+		assert(!m_movementArea.m_tileArea.empty());
 		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
 			sf::Vector2i(m_movementArea.m_tileArea.back().x, m_movementArea.m_tileArea.back().y));
 
@@ -259,7 +260,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 18;
+		m_movementPoints = 15;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;
