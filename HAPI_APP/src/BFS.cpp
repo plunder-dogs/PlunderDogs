@@ -211,10 +211,9 @@ bool areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queu
 
 std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos))
 		return std::vector<posi>();
-	//Initialise variables
+
 	boolMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored
@@ -242,13 +241,11 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 
 void BFS::findArea(std::vector<const Tile*>& tileArea, const Map& map, posi startPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos))
 	{
 		return;
 	}
 	
-	//Initialise variables
 	boolMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored
