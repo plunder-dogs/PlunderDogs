@@ -587,9 +587,11 @@ void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDire
 
 			m_tileOnLeftClick = nullptr;
 			m_tileOnRightClick = nullptr;
-			m_movementArea.clearTileArea();
+			
 		}
 	}
+
+	m_movementArea.clearTileArea();
 }
 
 void BattleUI::onRightClick(sf::Vector2i mousePosition)
