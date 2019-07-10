@@ -13,7 +13,7 @@
 const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName faction);
 //Finds nearest firing position to ship, if none are found will return the tile the ship is on
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range);
-void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
+void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
 void attemptShot(Battle& battle, const Map& mapPtr, Ship& firingShip);
 
 void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlayer, int currentUnit)
@@ -37,7 +37,7 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlay
 		ships[currentUnit].getRange())};
 
 	//move as far as possible on the path to the chosen position
-	attemptMove(map, ships[currentUnit], firingPosition);
+	attemptMove(battle.getCurrentFaction(), map, ships[currentUnit], firingPosition);
 
 	////loop through all the ships in the faction
 	//for (int i = 0; i < ships.size(); i++)
@@ -326,7 +326,7 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	return { closestTile, facingDirection };
 }
 
-void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile)
+void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile)
 {
 	//Call generate path
 	const Tile* tile{ map.getTile(currentShip.getCurrentPosition()) };
@@ -355,7 +355,7 @@ void attemptMove(Map& map, Ship& currentShip, std::pair<const Tile*, eDirection>
 	//If a tile is found
 	if (bestTile != posi(-1, -1, eNorth))
 	{
-		currentShip.generateMovementArea(map, map.getTile(bestTile.pair())->m_tileCoordinate);
+		currentShip.generateMovementArea(faction, map, map.getTile(bestTile.pair())->m_tileCoordinate);
 		currentShip.startMovement(map, targetTile.second);		
 	}
 	currentShip.setDestination();

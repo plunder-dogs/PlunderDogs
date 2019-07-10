@@ -125,12 +125,11 @@ bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair
 
 std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
 		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
 		return std::queue<posi>();
-	//Initialise variables
+
 	finderMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored

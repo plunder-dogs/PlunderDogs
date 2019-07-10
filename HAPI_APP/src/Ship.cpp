@@ -11,6 +11,11 @@
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
 
+const std::deque<posi>& Ship::getMovementArea() const
+{
+	return m_movementArea.m_tileArea;
+}
+
 sf::FloatRect Ship::getAABB(const Map& map) const
 {
 	sf::Vector2i position = map.getTileScreenPos(m_currentPosition);
@@ -88,7 +93,7 @@ int Ship::getID() const
 	return m_ID;
 }
 
-void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
+void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	if (isMovingToDestination() || isDestinationSet())
 	{
@@ -108,6 +113,34 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool 
 	{
 		m_movementArea.m_tileArea.push_back(pathToTile.front());
 		pathToTile.pop();
+	}
+
+	//Make sure not to overlap destination with over same faction ships destinations
+	bool destinationOverlap = true;
+	int nodeFromEnd = 1;
+	while (destinationOverlap)
+	{
+		destinationOverlap = false;
+		for (auto& ship : faction.getAllShips())
+		{
+			const auto& shipMovementArea = ship.getMovementArea();
+			if (ship.getID() == m_ID || shipMovementArea.empty())
+			{
+				continue;
+			}
+
+			if (m_movementArea.m_tileArea.back().pair() == shipMovementArea.back().pair())
+			{
+				destinationOverlap = true;
+				m_movementArea.m_tileArea.pop_back();
+
+				if (m_movementArea.m_tileArea.empty())
+				{
+					return;
+				}
+				break;
+			}
+		}
 	}
 
 	if (displayOnlyLastPosition)
@@ -273,7 +306,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 10;
+		m_movementPoints = 5;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;

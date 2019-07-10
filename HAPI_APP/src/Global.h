@@ -139,7 +139,7 @@ struct posi
 	posi(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
 	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
 
-	sf::Vector2i pair() { return { x, y }; }
+	sf::Vector2i pair() const { return { x, y }; }
 	int dirDiff(const posi& compare)
 	{
 		int diff = std::abs(static_cast<int>(this->dir) - static_cast<int>(compare.dir));

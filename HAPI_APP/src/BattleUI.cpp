@@ -13,7 +13,6 @@
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
 
-
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
 	m_tileOnLeftClick(nullptr),
@@ -587,7 +586,6 @@ void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDire
 
 			m_tileOnLeftClick = nullptr;
 			m_tileOnRightClick = nullptr;
-			
 		}
 	}
 

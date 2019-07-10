@@ -7,6 +7,7 @@
 
 constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
 
+struct Faction;
 struct GameEvent;
 struct Tile;
 struct Weapons;
@@ -18,6 +19,7 @@ public:
 	Ship(Ship& orig);
 	~Ship();
 
+	const std::deque<posi>& getMovementArea() const;
 	sf::FloatRect getAABB(const Map& map) const;
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
@@ -44,7 +46,7 @@ public:
 	//Deployment Phase
 	void setDeploymentPosition(sf::Vector2i position, eDirection direction);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
-	void generateMovementArea(const Map& map, sf::Vector2i destination, bool displayOnlyLastPosition = false);
+	void generateMovementArea(const Faction& faction, const Map& map, sf::Vector2i destination, bool displayOnlyLastPosition = false);
 	void clearMovementArea();
 	//Movement Phase
 	void startMovement(Map& map);
