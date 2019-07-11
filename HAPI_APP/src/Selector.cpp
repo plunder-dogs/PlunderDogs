@@ -65,7 +65,7 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 		for (const auto& ship : currentFactionShips)
 		{
 			//Do not add destroyed ships to the selector
-			if (ship.isDead())
+			if (ship.isDead() || ship.isDestinationSet())
 			{
 				continue;
 			}
