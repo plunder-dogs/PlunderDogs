@@ -115,7 +115,22 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 		pathToTile.pop();
 	}
 
-	//Make sure not to overlap destination with over same faction ships destinations
+	m_displayOnlyLastPosition = displayOnlyLastPosition;
+	if (m_displayOnlyLastPosition)
+	{
+		sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
+		m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
+		m_movementArea.m_tileAreaGraph[0].activate();
+	}
+	else
+	{
+		m_movementArea.activateGraph();
+	}
+}
+
+void Ship::rectifyMovementArea(const Faction & faction)
+{
+	//Disallow overlapping of destination for ships belonging to same Faction
 	bool destinationOverlap = true;
 	int nodeFromEnd = 1;
 	while (destinationOverlap)
@@ -129,6 +144,7 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 				continue;
 			}
 
+			//Found matching destination for two ships belonging to same Faction
 			if (m_movementArea.m_tileArea.back().pair() == shipMovementArea.back().pair())
 			{
 				destinationOverlap = true;
@@ -138,20 +154,16 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 				{
 					return;
 				}
+
+				if (m_displayOnlyLastPosition)
+				{
+					sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
+					m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
+					m_movementArea.m_tileAreaGraph[0].activate();
+				}
 				break;
 			}
 		}
-	}
-
-	if (displayOnlyLastPosition)
-	{
-		sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
-		m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
-		m_movementArea.m_tileAreaGraph[0].activate();
-	}
-	else
-	{
-		m_movementArea.activateGraph();
 	}
 }
 
@@ -273,6 +285,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_actionSprite(),
 	m_movingToDestination(false),
 	m_destinationSet(false),
+	m_displayOnlyLastPosition(false),
 	m_maxHealth(0),
 	m_health(0),
 	m_damage(0),
@@ -306,7 +319,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
-		m_movementPoints = 5;
+		m_movementPoints = 18;
 		m_maxHealth = 5;
 		m_health = 5;
 		m_range = 5;
@@ -413,11 +426,6 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
 	m_sprite.setOriginAtCenter();
-
-#ifdef HAPI_SPRITES
-	m_sprite.GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite.GetTransformComp().SetScaling({ 1, 1 });
-#endif // SFML_REFACTOR
 }
 
 Ship::Ship(Ship & orig)

@@ -46,11 +46,14 @@ public:
 	//Deployment Phase
 	void setDeploymentPosition(sf::Vector2i position, eDirection direction);
 	void deployAtPosition(sf::Vector2i position, eDirection startingDirection = eDirection::eNorth);
-	void generateMovementArea(const Faction& faction, const Map& map, sf::Vector2i destination, bool displayOnlyLastPosition = false);
-	void clearMovementArea();
 	//Movement Phase
 	void startMovement(Map& map);
 	void startMovement(Map& map, eDirection endDirection);
+	void generateMovementArea(const Faction& faction, const Map& map, sf::Vector2i destination, bool displayOnlyLastPosition = false);
+	//Disallow ending position of ships movement area to overlap with 
+	//ship belonging to same faction
+	void rectifyMovementArea(const Faction& faction);
+	void clearMovementArea();
 	//Attack Phase
 	void takeDamage(int damageAmount);
 	void fireWeapon();
@@ -68,6 +71,7 @@ private:
 	Sprite m_actionSprite;
 	bool m_movingToDestination;
 	bool m_destinationSet;
+	bool m_displayOnlyLastPosition;
 	int m_maxHealth;
 	int m_health;
 	int m_damage;
