@@ -11,6 +11,7 @@ NetworkHandler::NetworkHandler()
 
 void NetworkHandler::sendServerMessage(sf::Packet & packetToSend)
 {
+	assert(m_connectedToServer);
 	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
 	{
 		std::cout << "Unable to send message to server\n";
@@ -19,6 +20,7 @@ void NetworkHandler::sendServerMessage(sf::Packet & packetToSend)
 
 void NetworkHandler::sendServerMessage(ServerMessage message)
 {
+	assert(m_connectedToServer);
 	sf::Packet packetToSend;
 	packetToSend << message;
 	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
@@ -50,11 +52,12 @@ void NetworkHandler::connect()
 
 void NetworkHandler::disconnect(FactionName localFactionName)
 {
+	assert(m_connectedToServer);
+	m_connectedToServer = false;
 	sf::Packet packetToSend;
 	packetToSend << static_cast<int>(eMessageType::eDisconnect) << static_cast<int>(localFactionName);
 	m_tcpSocket.send(packetToSend);
 	m_tcpSocket.disconnect();
-	m_connectedToServer = false;
 }
 
 void NetworkHandler::listenToServer()
