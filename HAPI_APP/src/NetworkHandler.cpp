@@ -50,13 +50,10 @@ void NetworkHandler::connect()
 	m_connectedToServer = true;
 }
 
-void NetworkHandler::disconnect(FactionName localFactionName)
+void NetworkHandler::disconnect()
 {
 	assert(m_connectedToServer);
 	m_connectedToServer = false;
-	sf::Packet packetToSend;
-	packetToSend << static_cast<int>(eMessageType::eDisconnect) << static_cast<int>(localFactionName);
-	m_tcpSocket.send(packetToSend);
 	m_tcpSocket.disconnect();
 }
 

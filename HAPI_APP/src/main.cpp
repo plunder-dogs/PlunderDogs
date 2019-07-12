@@ -152,7 +152,10 @@ int main()
 		deltaTime = gameClock.restart().asSeconds();
 	}
 
-	NetworkHandler::getInstance().disconnect(getLocalFactionName(factions));
+	sf::Packet packetToSend;
+	packetToSend << static_cast<int>(eMessageType::eDisconnect) << static_cast<int>(getLocalFactionName(factions));
+	NetworkHandler::getInstance().sendServerMessage(packetToSend);
+	NetworkHandler::getInstance().disconnect();
 
 	return 0;
 }
