@@ -45,8 +45,8 @@ void NetworkHandler::connect()
 {
 	assert(!m_connectedToServer);
 	sf::Socket::Status status = m_tcpSocket.connect(sf::IpAddress::LocalHost, 55001);
-	m_tcpSocket.setBlocking(false);
 	assert(status == sf::Socket::Done);
+	m_tcpSocket.setBlocking(false);
 	m_connectedToServer = true;
 }
 

@@ -11,7 +11,6 @@ enum FactionName;
 class NetworkHandler
 {
 public:
-	NetworkHandler();
 	static NetworkHandler& getInstance()
 	{
 		static NetworkHandler instance;
@@ -28,6 +27,7 @@ public:
 	void disconnect(FactionName localFactionName);
 
 private:
+	NetworkHandler();
 	sf::TcpSocket m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
 	bool m_connectedToServer = false;
