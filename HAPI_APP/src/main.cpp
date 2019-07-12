@@ -37,6 +37,7 @@ FactionName getLocalFactionName(std::array<Faction, static_cast<size_t>(FactionN
 	}
 }
 
+
 void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType controllerType,
 	std::vector<eShipType>& remoteFactionShips)
 {

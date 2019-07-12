@@ -49,6 +49,9 @@ public:
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
 	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
 	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition = false);
+	//Disallow ending position of ships movement area to overlap with 
+	//ship belonging to same faction
+	void rectifyFactionShipMovementArea(ShipOnTile shipOnTile);
 	//Attack Phase
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 

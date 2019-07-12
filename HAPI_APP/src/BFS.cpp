@@ -125,12 +125,11 @@ bool pathExplorer(posi& finalPoint, finderMap& exploreArea, std::queue<std::pair
 
 std::queue<posi> BFS::findPath(const Map& map, posi startPos, posi endPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
 		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
 		return std::queue<posi>();
-	//Initialise variables
+
 	finderMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored
@@ -211,10 +210,9 @@ bool areaExplorer(boolMap& exploreArea, std::queue<std::pair<posi, float>>& queu
 
 std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos))
 		return std::vector<posi>();
-	//Initialise variables
+
 	boolMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored
@@ -242,13 +240,11 @@ std::vector<posi> BFS::findArea(const Map & map, posi startPos, float maxMovemen
 
 void BFS::findArea(std::vector<const Tile*>& tileArea, const Map& map, posi startPos, float maxMovement)
 {
-	//No bullshit
 	if (!map.getTile(startPos))
 	{
 		return;
 	}
 	
-	//Initialise variables
 	boolMap exploreArea(map);
 	std::queue<std::pair<posi, float>> exploreQueue;
 	//Add first element and set it to explored

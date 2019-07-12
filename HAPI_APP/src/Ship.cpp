@@ -11,6 +11,11 @@
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
 
+const std::deque<posi>& Ship::getMovementArea() const
+{
+	return m_movementArea.m_tileArea;
+}
+
 sf::FloatRect Ship::getAABB(const Map& map) const
 {
 	sf::Vector2i position = map.getTileScreenPos(m_currentPosition);
@@ -88,7 +93,7 @@ int Ship::getID() const
 	return m_ID;
 }
 
-void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
+void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
 	if (isMovingToDestination() || isDestinationSet())
 	{
@@ -110,7 +115,8 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool 
 		pathToTile.pop();
 	}
 
-	if (displayOnlyLastPosition)
+	m_displayOnlyLastPosition = displayOnlyLastPosition;
+	if (m_displayOnlyLastPosition)
 	{
 		sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
 		m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
@@ -119,6 +125,45 @@ void Ship::generateMovementArea(const Map & map, sf::Vector2i destination, bool 
 	else
 	{
 		m_movementArea.activateGraph();
+	}
+}
+
+void Ship::rectifyMovementArea(const Faction & faction)
+{
+	//Disallow overlapping of destination for ships belonging to same Faction
+	bool destinationOverlap = true;
+	int nodeFromEnd = 1;
+	while (destinationOverlap)
+	{
+		destinationOverlap = false;
+		for (auto& ship : faction.getAllShips())
+		{
+			const auto& shipMovementArea = ship.getMovementArea();
+			if (ship.getID() == m_ID || shipMovementArea.empty())
+			{
+				continue;
+			}
+
+			//Found matching destination for two ships belonging to same Faction
+			if (m_movementArea.m_tileArea.back().pair() == shipMovementArea.back().pair())
+			{
+				destinationOverlap = true;
+				m_movementArea.m_tileArea.pop_back();
+
+				if (m_movementArea.m_tileArea.empty())
+				{
+					return;
+				}
+
+				if (m_displayOnlyLastPosition)
+				{
+					sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
+					m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
+					m_movementArea.m_tileAreaGraph[0].activate();
+				}
+				break;
+			}
+		}
 	}
 }
 
@@ -143,11 +188,18 @@ void Ship::disableAction()
 
 void Ship::startMovement(Map& map)
 {
+	//No adaquete area to move to
+	if (m_movementArea.m_tileArea.empty())
+	{
+		return;
+	}
+
 	if (!m_destinationSet)
 	{
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
+		assert(!m_movementArea.m_tileArea.empty());
 		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
 			sf::Vector2i(m_movementArea.m_tileArea.back().x, m_movementArea.m_tileArea.back().y));
 
@@ -157,11 +209,18 @@ void Ship::startMovement(Map& map)
 
 void Ship::startMovement(Map& map, eDirection endDirection)
 {
+	//No adaquete area to move to
+	if (m_movementArea.m_tileArea.empty())
+	{
+		return;
+	}
+
 	if (!m_destinationSet)
 	{
 		m_destinationSet = true;
 		m_movingToDestination = true;
 
+		assert(!m_movementArea.m_tileArea.empty());
 		m_movementArea.m_tileArea.emplace_back(m_movementArea.m_tileArea.back().pair(), endDirection);
 
 		map.updateShipOnTile({ m_factionName, m_ID }, m_currentPosition,
@@ -226,6 +285,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_actionSprite(),
 	m_movingToDestination(false),
 	m_destinationSet(false),
+	m_displayOnlyLastPosition(false),
 	m_maxHealth(0),
 	m_health(0),
 	m_damage(0),
@@ -366,11 +426,6 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
 	m_sprite.setOriginAtCenter();
-
-#ifdef HAPI_SPRITES
-	m_sprite.GetTransformComp().SetOriginToCentreOfFrame();
-	m_sprite.GetTransformComp().SetScaling({ 1, 1 });
-#endif // SFML_REFACTOR
 }
 
 Ship::Ship(Ship & orig)

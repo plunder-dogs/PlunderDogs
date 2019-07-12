@@ -53,7 +53,6 @@ void BattleUI::render(sf::RenderWindow& window)
 	}
 
 	m_spriteOnMouse.render(window, m_battle.getMap());
-
 	m_shipSelector.renderShipHighlight(window, m_battle.getMap());
 
 	if (m_leftClickHeld)
@@ -78,6 +77,7 @@ void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	mousePosition += MOUSE_POSITION_OFFSET;
 
 	switch (currentEvent.type)
 	{
@@ -202,10 +202,10 @@ void BattleUI::updateCamera()
 	//camera pan
 	if (m_pendingCameraMovement != sf::Vector2f(0, 0))
 	{
-		m_cameraPositionOffset.x += m_pendingCameraMovement.x;//translates the camera position
+		m_cameraPositionOffset.x += m_pendingCameraMovement.x;
 		m_cameraPositionOffset.y += m_pendingCameraMovement.y;
 
-		if (m_cameraPositionOffset.x < -120)//checks for if its reached any of the 4 boundries, need to change it to a width variable
+		if (m_cameraPositionOffset.x < -120)
 		{
 			m_cameraPositionOffset.x = -120;
 		}
@@ -446,7 +446,7 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ -1,0 };
 	}
-	else if (mousePosition.x > 1820)
+	else if (mousePosition.x > SCREEN_RESOLUTION.x - 100)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 1,0 };
 	}
@@ -455,7 +455,7 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 0 , -1 };
 	}
-	else if (mousePosition.y > 980)
+	else if (mousePosition.y > SCREEN_RESOLUTION.y - 100)
 	{
 		m_pendingCameraMovement += sf::Vector2f{ 0, 1 };
 	}
@@ -492,22 +492,21 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
 	{
 		m_movementArea.clearTileArea();
+		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, 
+			m_tileOnMouse->m_tileCoordinate);
+
+		if (m_movementArea.m_tileArea.empty())
+		{
+			return;
+		}
 		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			//Fill movement area to equate to amount of ships selected
-			if (m_movementArea.m_tileArea.empty())
-			{
-				for (int i = 0; i < m_shipSelector.getSelectedShips().size(); ++i)
-				{
-					const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(
-						m_movementArea.m_tileArea, m_battle.getMap().getMouseClickCoord(mousePosition));
+			const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(
+				m_movementArea.m_tileArea, m_movementArea.m_tileArea.back()->m_tileCoordinate);
 
-					if (adjacentTile)
-					{
-						m_movementArea.m_tileArea.push_back(adjacentTile);
-					}
-				}
-				break;
+			if (adjacentTile)
+			{
+				m_movementArea.m_tileArea.push_back(adjacentTile);
 			}
 		}
 
@@ -528,7 +527,13 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 					shipIndex = i;
 					break;
 				}
+
 			}
+		}
+		//Fix ship movement graphs after generation
+		for (SelectedShip selectedShip : m_shipSelector.getSelectedShips())
+		{
+			m_battle.rectifyFactionShipMovementArea(selectedShip.m_shipOnTile);
 		}
 	}
 	//Singular ship selected with ship selector
@@ -585,9 +590,10 @@ void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDire
 
 			m_tileOnLeftClick = nullptr;
 			m_tileOnRightClick = nullptr;
-			m_movementArea.clearTileArea();
 		}
 	}
+
+	m_movementArea.clearTileArea();
 }
 
 void BattleUI::onRightClick(sf::Vector2i mousePosition)

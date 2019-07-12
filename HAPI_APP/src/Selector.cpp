@@ -50,6 +50,7 @@ void Selector::setPosition(sf::Vector2i position)
 void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map)
 {
 	//Change Size
+	mousePosition -= MOUSE_POSITION_OFFSET;
 	sf::Vector2f selectorSize(static_cast<float>(mousePosition.x) - m_shape.getPosition().x,
 		static_cast<float>(mousePosition.y) - m_shape.getPosition().y);
 
@@ -63,8 +64,8 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	{
 		for (const auto& ship : currentFactionShips)
 		{
-			//Do not add destroyed ships to the selector
-			if (ship.isDead())
+			//Do not add these ships to selector
+			if (ship.isDead() || ship.isDestinationSet())
 			{
 				continue;
 			}
@@ -112,6 +113,7 @@ void Selector::resetShape()
 
 void Selector::resetShape(sf::Vector2i position)
 {
+	position -= MOUSE_POSITION_OFFSET;
 	setPosition(position);
 	m_shape.setSize(sf::Vector2f(0, 0));
 	m_AABB.width = 0;
