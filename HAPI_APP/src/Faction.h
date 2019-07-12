@@ -26,6 +26,7 @@ struct Faction
 	void moveShipToPosition(Map& map, int shipID);
 	void moveShipToPosition(Map& map, int shipID, eDirection endDirection);
 	void generateShipMovementArea(const Map& map, int shipID, sf::Vector2i destination, bool displayOnlyLastPosition = false);
+	void rectifyShipMovementArea(int shipID);
 	void clearShipMovementArea(int shipID);
 	//Attack Phase
 	void shipTakeDamage(int shipID, int damage);

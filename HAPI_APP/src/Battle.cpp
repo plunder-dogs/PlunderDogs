@@ -285,6 +285,12 @@ void Battle::generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i
 	getFaction(shipOnTile.factionName).generateShipMovementArea(m_map, shipOnTile.shipID, destination, displayOnlyLastPosition);
 }
 
+void Battle::rectifyFactionShipMovementArea(ShipOnTile shipOnTile)
+{
+	assert(m_currentBattlePhase == BattlePhase::Movement);
+	getFaction(shipOnTile.factionName).rectifyShipMovementArea(shipOnTile.shipID);
+}
+
 void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
