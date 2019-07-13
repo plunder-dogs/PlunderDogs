@@ -81,7 +81,7 @@ int main()
 	Battle battle(factions);
 	NetworkHandler::getInstance().connect();
 	bool gameLobby = true;
-
+	bool ready = false;
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
@@ -150,18 +150,14 @@ int main()
 			}
 			else if (currentEvent.type == sf::Event::KeyPressed)
 			{
-				if (currentEvent.key.code == sf::Keyboard::R)
+				if (currentEvent.key.code == sf::Keyboard::R && !ready)
 				{
-					for (auto& faction : factions)
-					{
-						if (faction.m_controllerType == eControllerType::eLocalPlayer)
-						{
-							NetworkHandler::getInstance().sendServerMessage({ eMessageType::ePlayerReady, faction.m_factionName });
-						}
-					}
+					sf::Packet packetToSend;
+					packetToSend << static_cast<int>(eMessageType::ePlayerReady) << static_cast<int>(getLocalFactionName(factions));
+					NetworkHandler::getInstance().sendServerMessage(packetToSend);
+					ready = true;
 				}
 			}
-
 			if (!gameLobby)
 			{
 				battle.handleInput(window, currentEvent);
