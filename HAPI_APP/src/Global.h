@@ -177,6 +177,7 @@ struct ShipOnTile
 enum class eMessageType
 {
 	eEstablishConnection = 0,
+	eRefuseConnection,
 	eNewPlayer,
 	ePlayerReady,
 	eStartGame,

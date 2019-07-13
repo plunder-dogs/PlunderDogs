@@ -87,5 +87,9 @@ void NetworkHandler::listenToServer()
 			message.shipsToAdd = shipsToAdd;
 			m_serverMessages.push_back(message);
 		}
+		else if (static_cast<eMessageType>(messageType) == eMessageType::eRefuseConnection)
+		{
+			m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
+		}
 	}
 }

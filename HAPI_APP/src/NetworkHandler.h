@@ -24,7 +24,7 @@ public:
 	void sendServerMessage(ServerMessage message);
 	void listenToServer();
 	void connect();
-	void disconnect(FactionName localFactionName);
+	void disconnect();
 
 private:
 	NetworkHandler();
