@@ -26,7 +26,25 @@
 //debug by printing, if statements
 #endif // C++_NOTES
 
-FactionName getLocalFactionName(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
+void printFactions(const std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
+{
+	for (auto& faction : factions)
+	{
+		if (faction.m_controllerType == eControllerType::None)
+		{
+			continue;
+		}
+
+		std::cout << static_cast<int>(faction.m_factionName) << "\n";
+		std::cout << "Ships:\n";
+		for (auto& ship : faction.getAllShips())
+		{
+			std::cout << static_cast<int>(ship.getShipType()) << "\n";
+		}
+	}
+}
+
+FactionName getLocalFactionName(const std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	auto cIter = std::find_if(factions.cbegin(), factions.cend(), [](const auto& faction) 
 		{ return faction.m_controllerType == eControllerType::eLocalPlayer; });
@@ -94,8 +112,9 @@ int main()
 
 				sf::Packet packetToSend;
 				FactionName localFactionName = getLocalFactionName(factions);
-				packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) <<
-					static_cast<int>(shipsToAdd.size()) << shipsToAdd;
+				packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) << shipsToAdd;
+
+				printFactions(factions);
 
 				NetworkHandler::getInstance().sendServerMessage(packetToSend);
 			}
@@ -104,6 +123,8 @@ int main()
 				if (serverMessage.faction != getLocalFactionName(factions))
 				{
 					assignFaction(factions, serverMessage.faction, eControllerType::eRemotePlayer, serverMessage.shipsToAdd);
+
+					printFactions(factions);
 				}
 			}
 			else if (serverMessage.type == eMessageType::eStartGame)
