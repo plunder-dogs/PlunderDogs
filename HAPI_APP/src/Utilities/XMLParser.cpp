@@ -27,7 +27,7 @@ void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string
 	assert(fileLoaded);
 
 	const auto& rootElement = file.RootElement();
-	std::string imagePath = rootElement->Attribute("imagePath");
+	
 
 	std::vector<FrameDetails> frameDetails;
 	int i = 0; //Acts as the frame ID for each iteration
@@ -47,6 +47,7 @@ void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string
 		frameDetails.emplace_back(height, width, y, x, frameID);	
 	}
 
+	std::string imagePath = rootElement->Attribute("imagePath");
 	texture = std::make_unique<Texture>(directory + imagePath, std::move(frameDetails));
 }
 
