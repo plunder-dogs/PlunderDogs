@@ -35,6 +35,8 @@ public:
 	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
+	void receiveServerMessage(const ServerMessage serverMessage);
+
 	void start(const std::string& newMapName, bool onlineGame);
 	void render(sf::RenderWindow& window);
 	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);

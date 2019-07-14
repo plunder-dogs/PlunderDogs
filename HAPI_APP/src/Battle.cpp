@@ -729,6 +729,30 @@ const Faction& Battle::getFaction(FactionName factionName) const
 	return m_factions[static_cast<int>(factionName)];
 }
 
+void Battle::receiveServerMessage(const ServerMessage serverMessage)
+{
+	switch (serverMessage.type)
+	{
+	case eMessageType::eDeployShipAtPosition :
+		deployFactionShipAtPosition(serverMessage.positions.back(), eDirection::eNorth);
+		break;
+	case eMessageType::eMoveShipToPosition :
+		for (int i = 0; i < serverMessage.ships.size(); ++i)
+		{
+			ShipOnTile shipToMove(serverMessage.faction, serverMessage.ships[i]);
+			generateFactionShipMovementArea(shipToMove, serverMessage.positions[i], true);
+			moveFactionShipToPosition({ serverMessage.faction, serverMessage.ships[i] });
+		}
+		break;
+	case eMessageType::eAttackShipAtPosition :
+		for (int i = 0; i < serverMessage.ships.size(); ++i)
+		{
+
+		}
+		break;
+	}
+}
+
 void Battle::onEndBattlePhaseEarly(GameEvent gameEvent)
 {
 	if (m_currentBattlePhase == BattlePhase::Movement)
