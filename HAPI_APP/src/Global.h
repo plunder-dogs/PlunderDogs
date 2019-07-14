@@ -2,6 +2,7 @@
 #include <utility>
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 constexpr int INVALID_SHIP_ID = -1;
 constexpr float DRAW_OFFSET_X{ 0 };
@@ -181,7 +182,9 @@ enum class eMessageType
 	eNewPlayer,
 	ePlayerReady,
 	eStartGame,
-	eDeployShip,
+	eDeployShipAtPosition,
+	eMoveShipToPosition,
+	eAttackShipAtPosition,
 	eDisconnect
 };
 
@@ -191,32 +194,36 @@ struct ServerMessage
 	{}
 
 	ServerMessage(eMessageType type)
-		: type(type)
+		: type(type),
+		faction(),
+		ships(),
+		positions()
 	{}
 
 	ServerMessage(eMessageType type, FactionName factionName)
 		: type(type),
-		faction(factionName)
+		faction(factionName),
+		ships(),
+		positions()
 	{}
 
-	ServerMessage(eMessageType type, ShipOnTile shipOnTile, sf::Vector2i position)
+	ServerMessage(eMessageType type, FactionName factionName, std::vector<eShipType>&& shipsToAdd)
 		: type(type),
-		shipOnTile(shipOnTile),
-		position(position)
+		faction(factionName),
+		shipsToAdd(std::move(shipsToAdd))
 	{}
 
-	ServerMessage(eMessageType type, ShipOnTile shipOnTile, sf::Vector2i position, eDirection direction)
+	ServerMessage(eMessageType type, FactionName factionName, std::vector<int>&& ships, std::vector<sf::Vector2i>&& positions)
 		: type(type),
-		shipOnTile(shipOnTile),
-		position(position),
-		direction(direction)
+		faction(factionName),
+		ships(std::move(ships)),
+		positions(std::move(positions))
 	{}
 
 	eMessageType type;
-	ShipOnTile shipOnTile;
-	sf::Vector2i position;
-	eDirection direction;
 	FactionName faction;
+	std::vector<int> ships;
+	std::vector<sf::Vector2i> positions;
 	std::vector<eShipType> shipsToAdd;
 };
 
