@@ -201,7 +201,6 @@
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Selector.h" />
-    <ClInclude Include="src\ServerMessages.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
