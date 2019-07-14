@@ -54,12 +54,12 @@ FactionName getLocalFactionName(const std::array<Faction, static_cast<size_t>(Fa
 }
 
 void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType controllerType,
-	std::vector<eShipType>& remoteFactionShips)
+	std::vector<eShipType>& factionShips)
 {
 	factions[static_cast<int>(factionName)].m_factionName = factionName;
 	factions[static_cast<int>(factionName)].m_controllerType = controllerType;
 
-	for (eShipType shipToAdd : remoteFactionShips)
+	for (eShipType shipToAdd : factionShips)
 	{
 		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
 	}
@@ -109,14 +109,10 @@ int main()
 				}
 
 				assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
-
-				sf::Packet packetToSend;
-				FactionName localFactionName = getLocalFactionName(factions);
-				packetToSend << static_cast<int>(eMessageType::eNewPlayer) << static_cast<int>(localFactionName) << shipsToAdd;
-
 				printFactions(factions);
 
-				NetworkHandler::getInstance().sendServerMessage(packetToSend);
+				ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(factions), std::move(shipsToAdd));
+				NetworkHandler::getInstance().sendServerMessage(messageToSend);
 			}
 			else if (serverMessage.type == eMessageType::eNewPlayer)
 			{
@@ -139,6 +135,12 @@ int main()
 				window.close();
 				return 0;
 			}
+			else if (!gameLobby && serverMessage.type == eMessageType::eDeployShipAtPosition,
+				serverMessage.type == eMessageType::eMoveShipToPosition,
+				serverMessage.type == eMessageType::eAttackShipAtPosition)
+			{
+				battle.receiveServerMessage(serverMessage);
+			}
 		}
 
 		//Handle Input
@@ -152,9 +154,8 @@ int main()
 			{
 				if (currentEvent.key.code == sf::Keyboard::R && !ready)
 				{
-					sf::Packet packetToSend;
-					packetToSend << static_cast<int>(eMessageType::ePlayerReady) << static_cast<int>(getLocalFactionName(factions));
-					NetworkHandler::getInstance().sendServerMessage(packetToSend);
+					ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName(factions));
+					NetworkHandler::getInstance().sendServerMessage(messageToSend);
 					ready = true;
 				}
 			}
@@ -176,9 +177,8 @@ int main()
 		deltaTime = gameClock.restart().asSeconds();
 	}
 
-	sf::Packet packetToSend;
-	packetToSend << static_cast<int>(eMessageType::eDisconnect) << static_cast<int>(getLocalFactionName(factions));
-	NetworkHandler::getInstance().sendServerMessage(packetToSend);
+	ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName(factions));
+	NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	NetworkHandler::getInstance().disconnect();
 
 	return 0;

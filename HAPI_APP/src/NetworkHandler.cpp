@@ -4,18 +4,12 @@
 #include <string>
 #include <iostream>
 
+//Approximately the maximum amount of messages a client will receive
+constexpr size_t APPROX_MAX_MESSAGES = 12;
+
 NetworkHandler::NetworkHandler()
 {
-
-}
-
-void NetworkHandler::sendServerMessage(sf::Packet & packetToSend)
-{
-	assert(m_connectedToServer);
-	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
-	{
-		std::cout << "Unable to send message to server\n";
-	}
+	m_serverMessages.reserve(APPROX_MAX_MESSAGES);
 }
 
 void NetworkHandler::sendServerMessage(ServerMessage message)
@@ -63,33 +57,9 @@ void NetworkHandler::listenToServer()
 	sf::Packet receivedPacket;
 	if (m_tcpSocket.receive(receivedPacket) == sf::Socket::Done && receivedPacket)
 	{
-		std::cout << "Received Packet\n";
-		int messageType = -1;
-		receivedPacket >> messageType;
-		if (static_cast<eMessageType>(messageType) == eMessageType::eEstablishConnection)
-		{
-			int factionName = -1;
-			receivedPacket >> factionName;
-			m_serverMessages.emplace_back(static_cast<eMessageType>(messageType), static_cast<FactionName>(factionName));
-		}
-		else if (static_cast<eMessageType>(messageType) == eMessageType::eStartGame)
-		{
-			m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
-		}
-		else if (static_cast<eMessageType>(messageType) == eMessageType::eNewPlayer)
-		{	
-			int factionName = -1;
-			receivedPacket >> factionName;
-			ServerMessage message(static_cast<eMessageType>(messageType), static_cast<FactionName>(factionName));
+		ServerMessage receivedServerMessage;
+		receivedPacket >> receivedServerMessage;
 
-			std::vector<eShipType> shipsToAdd;
-			receivedPacket >> shipsToAdd;
-			message.shipsToAdd = shipsToAdd;
-			m_serverMessages.push_back(message);
-		}
-		else if (static_cast<eMessageType>(messageType) == eMessageType::eRefuseConnection)
-		{
-			m_serverMessages.emplace_back(static_cast<eMessageType>(messageType));
-		}
+		m_serverMessages.push_back(receivedServerMessage);
 	}
 }

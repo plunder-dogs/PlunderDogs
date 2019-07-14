@@ -20,7 +20,6 @@ public:
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
-	void sendServerMessage(sf::Packet& packetToSend);
 	void sendServerMessage(ServerMessage message);
 	void listenToServer();
 	void connect();
