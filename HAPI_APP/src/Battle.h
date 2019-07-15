@@ -37,7 +37,8 @@ public:
 
 	void receiveServerMessage(const ServerMessage serverMessage);
 
-	void start(const std::string& newMapName, bool onlineGame);
+	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
+	void startSinglePlayerGame(const std::string& levelName);
 	void render(sf::RenderWindow& window);
 	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);

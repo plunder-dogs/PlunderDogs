@@ -167,35 +167,77 @@ Battle::~Battle()
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
-void Battle::start(const std::string & newMapName, bool onlineGame)
+void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
 	assert(!m_factions.empty());
 
-	m_onlineGame = onlineGame;
+	m_onlineGame = true;
 	m_map.loadmap(newMapName);
 	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
-
-	//Assign Spawn Position
+	
 	for (auto& faction : m_factions)
 	{
 		if (faction.isActive())
 		{
-			faction.createSpawnArea(m_map);
+			auto factionName = faction.m_factionName;
+			auto cIter = std::find_if(factionSpawnPositions.cbegin(), factionSpawnPositions.cend(), 
+				[factionName](const auto& faction) { return faction.factionName == factionName; });
+			assert(cIter != factionSpawnPositions.cend());
+			
+			faction.createSpawnArea(m_map, cIter->position);
 		}
 	}
 
 	//Set initial deployment state
-	bool humanPlayerFound = false;
+	bool playerFound = false;
 	for (const auto& faction : m_factions)
 	{
-		if (faction.isActive() && faction.m_controllerType == eControllerType::eLocalPlayer)
+		if (faction.isActive() && faction.m_controllerType == eControllerType::eLocalPlayer ||
+			faction.m_controllerType == eControllerType::eRemotePlayer)
 		{
-			humanPlayerFound = true;
+			playerFound = true;
 			break;
 		}
 	}
 
-	if (humanPlayerFound)
+	if (playerFound)
+	{
+		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
+	}
+	else
+	{
+		m_currentDeploymentState = eDeploymentState::DeployingAI;
+	}
+}
+
+void Battle::startSinglePlayerGame(const std::string & levelName)
+{
+	assert(!m_factions.empty());
+
+	m_onlineGame = false;
+	m_map.loadmap(levelName);
+	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
+
+	for (auto& faction : m_factions)
+	{
+		if (faction.isActive())
+		{
+			faction.createSpawnArea(m_map, m_map.getRandomSpawnPosition());
+		}
+	}
+
+	//Set initial deployment state
+	bool playerFound = false;
+	for (const auto& faction : m_factions)
+	{
+		if (faction.isActive() && faction.m_controllerType == eControllerType::eLocalPlayer)
+		{
+			playerFound = true;
+			break;
+		}
+	}
+
+	if (playerFound)
 	{
 		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
 	}
@@ -240,6 +282,10 @@ void Battle::renderFactionShipsMovementGraphs(sf::RenderWindow & window)
 
 void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
+	if (getCurrentFaction().m_controllerType == eControllerType::eRemotePlayer)
+	{
+		return;
+	}
 	m_battleUI.handleInput(window, currentEvent);
 }
 
@@ -397,7 +443,8 @@ void Battle::advanceToNextBattlePhase()
 					continue;
 				}
 
-				if (m_factions[i].m_controllerType != eControllerType::eLocalPlayer)
+				if (m_factions[i].m_controllerType != eControllerType::eLocalPlayer &&
+					m_factions[i].m_controllerType != eControllerType::eRemotePlayer)
 				{
 					continue;
 				}
@@ -731,25 +778,24 @@ const Faction& Battle::getFaction(FactionName factionName) const
 
 void Battle::receiveServerMessage(const ServerMessage serverMessage)
 {
-	switch (serverMessage.type)
+	for (int i = 0; i < serverMessage.shipActions.size(); ++i)
 	{
-	case eMessageType::eDeployShipAtPosition :
-		deployFactionShipAtPosition(serverMessage.positions.back(), eDirection::eNorth);
-		break;
-	case eMessageType::eMoveShipToPosition :
-		for (int i = 0; i < serverMessage.ships.size(); ++i)
+		switch (serverMessage.type)
 		{
-			ShipOnTile shipToMove(serverMessage.faction, serverMessage.ships[i]);
-			generateFactionShipMovementArea(shipToMove, serverMessage.positions[i], true);
-			moveFactionShipToPosition({ serverMessage.faction, serverMessage.ships[i] });
-		}
-		break;
-	case eMessageType::eAttackShipAtPosition :
-		for (int i = 0; i < serverMessage.ships.size(); ++i)
-		{
+		case eMessageType::eDeployShipAtPosition:
+			deployFactionShipAtPosition(serverMessage.shipActions[i].position, eDirection::eNorth);
+			break;
 
+		case eMessageType::eMoveShipToPosition :
+		{
+			ShipOnTile shipToMove(serverMessage.faction, serverMessage.shipActions[i].shipID);
+			generateFactionShipMovementArea(shipToMove, serverMessage.shipActions[i].position, true);
+			moveFactionShipToPosition(shipToMove);
+			break;
 		}
-		break;
+		case eMessageType::eAttackShipAtPosition:
+			break;
+		}
 	}
 }
 
