@@ -188,23 +188,39 @@ enum class eMessageType
 	eDisconnect
 };
 
+struct ServerMessageShipAction
+{
+	ServerMessageShipAction(int shipID, int x, int y)
+		: shipID(shipID),
+		position(x, y)
+	{}
+
+	int shipID;
+	sf::Vector2i position;
+};
+
+struct ServerMessageSpawnPosition
+{
+	ServerMessageSpawnPosition(FactionName factionName, int x, int y)
+		:factionName(factionName),
+		position(x, y)
+	{}
+
+	FactionName factionName;
+	sf::Vector2i position;
+};
+
 struct ServerMessage
 {
 	ServerMessage()
 	{}
 
 	ServerMessage(eMessageType type)
-		: type(type),
-		faction(),
-		ships(),
-		positions()
+		: type(type)
 	{}
 
 	ServerMessage(eMessageType type, FactionName factionName)
-		: type(type),
-		faction(factionName),
-		ships(),
-		positions()
+		: type(type)
 	{}
 
 	ServerMessage(eMessageType type, FactionName factionName, std::vector<eShipType>&& shipsToAdd)
@@ -213,18 +229,13 @@ struct ServerMessage
 		shipsToAdd(std::move(shipsToAdd))
 	{}
 
-	ServerMessage(eMessageType type, FactionName factionName, std::vector<int>&& ships, std::vector<sf::Vector2i>&& positions)
-		: type(type),
-		faction(factionName),
-		ships(std::move(ships)),
-		positions(std::move(positions))
-	{}
 
 	eMessageType type;
 	FactionName faction;
-	std::vector<int> ships;
-	std::vector<sf::Vector2i> positions;
+	std::string levelName;
 	std::vector<eShipType> shipsToAdd;
+	std::vector<ServerMessageShipAction> shipActions;
+	std::vector<ServerMessageSpawnPosition> spawnPositions;
 };
 
 struct posi

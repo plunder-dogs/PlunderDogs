@@ -5,6 +5,10 @@
 struct Faction
 {
 	Faction();
+	Faction(const Faction&) = delete;
+	Faction& operator=(const Faction&) = delete;
+	Faction(Faction&&) = delete;
+	Faction&& operator=(Faction&&) = delete;
 
 	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;
@@ -19,7 +23,7 @@ struct Faction
 	bool isPositionInDeploymentArea(sf::Vector2i position) const;
 	void addShip(FactionName factionName, eShipType shipType);
 	bool isAllShipsDeployed() const;
-	void createSpawnArea(Map& map);
+	void createSpawnArea(const Map& map, sf::Vector2i spawnPosition );
 	void deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
 	void setShipDeploymentAtPosition(sf::Vector2i startingPosition, eDirection direction);
 	//Movement Phase

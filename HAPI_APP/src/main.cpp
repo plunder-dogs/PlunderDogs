@@ -54,12 +54,12 @@ FactionName getLocalFactionName(const std::array<Faction, static_cast<size_t>(Fa
 }
 
 void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType controllerType,
-	std::vector<eShipType>& factionShips)
+	std::vector<eShipType>& shipsToAdd)
 {
 	factions[static_cast<int>(factionName)].m_factionName = factionName;
 	factions[static_cast<int>(factionName)].m_controllerType = controllerType;
-
-	for (eShipType shipToAdd : factionShips)
+	
+	for (eShipType shipToAdd : shipsToAdd)
 	{
 		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
 	}
@@ -80,8 +80,8 @@ int main()
 	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> factions;
 	Battle battle(factions);
 	NetworkHandler::getInstance().connect();
-	bool gameLobby = true;
-	bool ready = false;
+	bool gameLobbyActive = true;
+	bool localPlayerReady = false;
 	sf::Clock gameClock;
 	sf::Event currentEvent;
 	float deltaTime = gameClock.restart().asSeconds();
@@ -125,8 +125,8 @@ int main()
 			}
 			else if (serverMessage.type == eMessageType::eStartGame)
 			{
-				gameLobby = false;
-				battle.start("Level1.tmx", gameLobby);
+				gameLobbyActive = false;
+				battle.startOnlineGame("Level1.tmx", serverMessage.spawnPositions);
 			}
 			else if (serverMessage.type == eMessageType::eRefuseConnection)
 			{
@@ -135,7 +135,7 @@ int main()
 				window.close();
 				return 0;
 			}
-			else if (!gameLobby && serverMessage.type == eMessageType::eDeployShipAtPosition,
+			else if (!gameLobbyActive && serverMessage.type == eMessageType::eDeployShipAtPosition,
 				serverMessage.type == eMessageType::eMoveShipToPosition,
 				serverMessage.type == eMessageType::eAttackShipAtPosition)
 			{
@@ -152,20 +152,20 @@ int main()
 			}
 			else if (currentEvent.type == sf::Event::KeyPressed)
 			{
-				if (currentEvent.key.code == sf::Keyboard::R && !ready)
+				if (currentEvent.key.code == sf::Keyboard::R && !localPlayerReady)
 				{
 					ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName(factions));
 					NetworkHandler::getInstance().sendServerMessage(messageToSend);
-					ready = true;
+					localPlayerReady = true;
 				}
 			}
-			if (!gameLobby)
+			if (!gameLobbyActive)
 			{
 				battle.handleInput(window, currentEvent);
 			}
 		}
 	
-		if (!gameLobby)
+		if (!gameLobbyActive)
 		{
 			battle.update(deltaTime);
 

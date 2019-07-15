@@ -17,7 +17,7 @@ std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, con
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
-std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
+std::vector<sf::Vector2i> parseFactionSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
 void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string& directory, const std::string& fileName)
 {
@@ -61,7 +61,7 @@ MapDetails XMLParser::parseMapDetails(const std::string& name)
 	sf::Vector2i mapSize = parseMapSize(*rootElement);
 	sf::Vector2i tileSize = parseTileSize(*rootElement);
 	std::vector<std::vector<int>> tileData = parseTileData(*rootElement, mapSize);
-	std::vector<sf::Vector2i> spawnPositions = parseSpawnPositions(*rootElement, tileSize);
+	std::vector<sf::Vector2i> spawnPositions = parseFactionSpawnPositions(*rootElement, tileSize);
 
 	return MapDetails(mapSize, std::move(tileData), std::move(spawnPositions));
 }
@@ -140,9 +140,9 @@ sf::Vector2i parseTileSize(const TiXmlElement & rootElement)
 	return tileSize;
 }
 
-std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
+std::vector<sf::Vector2i> parseFactionSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
 {
-	std::vector<sf::Vector2i> entityStartingPositions;
+	std::vector<sf::Vector2i> factionSpawnPositions;
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
 		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("SpawnPositionLayer"))
@@ -152,15 +152,15 @@ std::vector<sf::Vector2i> parseSpawnPositions(const TiXmlElement & rootElement, 
 
 		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
 		{
-			sf::Vector2i startingPosition;
-			entityElement->Attribute("x", &startingPosition.x);
-			entityElement->Attribute("y", &startingPosition.y);
+			sf::Vector2i spawnPosition;
+			entityElement->Attribute("x", &spawnPosition.x);
+			entityElement->Attribute("y", &spawnPosition.y);
 			//startingPosition.y -= tileSize; //Tiled Hack
-			startingPosition.x /= 24;
-			startingPosition.y /= 28;
-			entityStartingPositions.push_back(startingPosition);
+			spawnPosition.x /= 24;
+			spawnPosition.y /= 28;
+			factionSpawnPositions.push_back(spawnPosition);
 		}
 	}
-	assert(!entityStartingPositions.empty());
-	return entityStartingPositions;
+	assert(!factionSpawnPositions.empty());
+	return factionSpawnPositions;
 }

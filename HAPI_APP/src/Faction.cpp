@@ -4,6 +4,7 @@
 #include "Map.h"
 
 constexpr size_t MAX_SPAWN_AREA = 75;
+constexpr size_t SPAWN_AREA_RANGE = 3;
 
 //BATTLE PLAYER
 Faction::Faction()
@@ -103,7 +104,7 @@ bool Faction::isAllShipsDeployed() const
 	return true;
 }
 
-void Faction::createSpawnArea(Map & map)
+void Faction::createSpawnArea(const Map & map, sf::Vector2i spawnPosition)
 {
 	const Texture* texture = nullptr;
 	switch (m_factionName)
@@ -123,7 +124,7 @@ void Faction::createSpawnArea(Map & map)
 	};
 
 	assert(texture);
-	map.getTileRadius(m_spawnArea.m_tileArea, map.getRandomSpawnPosition(), 3, true, true);
+	map.getTileRadius(m_spawnArea.m_tileArea, spawnPosition, SPAWN_AREA_RANGE, true, true);
 	for (const auto& tile : m_spawnArea.m_tileArea)
 	{
 		m_spawnArea.m_tileAreaGraph.emplace_back(*texture, tile->m_tileCoordinate, true);
