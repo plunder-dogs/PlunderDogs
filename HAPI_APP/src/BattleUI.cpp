@@ -510,8 +510,6 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 			}
 		}
 
-		assert(m_movementArea.m_tileArea.size() == m_shipSelector.getSelectedShips().size());
-
 		//Generate ship movement paths to positions
 		int shipIndex = 0;
 		for (const auto& tile : m_movementArea.m_tileArea)
