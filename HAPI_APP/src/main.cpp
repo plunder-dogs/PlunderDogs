@@ -109,7 +109,10 @@ int main()
 				}
 
 				assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
-				printFactions(factions);
+				for (auto& existingFaction : serverMessage.existingFactions)
+				{
+					assignFaction(factions, existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
+				}
 
 				ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(factions), std::move(shipsToAdd));
 				NetworkHandler::getInstance().sendServerMessage(messageToSend);
@@ -123,7 +126,7 @@ int main()
 					printFactions(factions);
 				}
 			}
-			else if (serverMessage.type == eMessageType::eStartGame)
+			else if (serverMessage.type == eMessageType::eStartOnlineGame)
 			{
 				gameLobbyActive = false;
 				battle.startOnlineGame("Level1.tmx", serverMessage.spawnPositions);

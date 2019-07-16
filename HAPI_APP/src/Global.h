@@ -181,7 +181,7 @@ enum class eMessageType
 	eRefuseConnection,
 	eNewPlayer,
 	ePlayerReady,
-	eStartGame,
+	eStartOnlineGame,
 	eDeployShipAtPosition,
 	eMoveShipToPosition,
 	eAttackShipAtPosition,
@@ -210,6 +210,17 @@ struct ServerMessageSpawnPosition
 	sf::Vector2i position;
 };
 
+struct ServerMessageExistingFaction
+{
+	ServerMessageExistingFaction(FactionName factionName, std::vector<eShipType>&& existingShips)
+		: factionName(factionName),
+		existingShips(std::move(existingShips))
+	{}
+
+	FactionName factionName;
+	std::vector<eShipType> existingShips;
+};
+
 struct ServerMessage
 {
 	ServerMessage()
@@ -220,7 +231,8 @@ struct ServerMessage
 	{}
 
 	ServerMessage(eMessageType type, FactionName factionName)
-		: type(type)
+		: type(type),
+		faction(factionName)
 	{}
 
 	ServerMessage(eMessageType type, FactionName factionName, std::vector<eShipType>&& shipsToAdd)
@@ -229,13 +241,13 @@ struct ServerMessage
 		shipsToAdd(std::move(shipsToAdd))
 	{}
 
-
 	eMessageType type;
 	FactionName faction;
 	std::string levelName;
 	std::vector<eShipType> shipsToAdd;
 	std::vector<ServerMessageShipAction> shipActions;
 	std::vector<ServerMessageSpawnPosition> spawnPositions;
+	std::vector<ServerMessageExistingFaction> existingFactions;
 };
 
 struct posi

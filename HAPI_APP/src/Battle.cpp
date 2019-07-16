@@ -282,11 +282,11 @@ void Battle::renderFactionShipsMovementGraphs(sf::RenderWindow & window)
 
 void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
-	if (getCurrentFaction().m_controllerType == eControllerType::eRemotePlayer)
+	if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eRemotePlayer)
 	{
 		return;
 	}
-	m_battleUI.handleInput(window, currentEvent);
+	//m_battleUI.handleInput(window, currentEvent);
 }
 
 void Battle::update(float deltaTime)
