@@ -44,7 +44,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 		spawnArea.render(window, map);
 	}
 
-	if (currentBattlePhase == BattlePhase::Deployment && m_controllerType == eControllerType::eLocalPlayer)
+	if (currentBattlePhase == BattlePhase::Deployment)
 	{
 		for (auto& ship : m_ships)
 		{
@@ -59,7 +59,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 			}
 		}		
 	}
-	else if(currentBattlePhase != BattlePhase::Deployment)
+	else
 	{
 		for (auto& ship : m_ships)
 		{

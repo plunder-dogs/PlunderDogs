@@ -100,9 +100,15 @@ int main()
 					shipsToAdd.push_back(eShipType::eFrigate);
 					shipsToAdd.push_back(eShipType::eFrigate);
 					shipsToAdd.push_back(eShipType::eFrigate);
+					shipsToAdd.push_back(eShipType::eFrigate);
+					shipsToAdd.push_back(eShipType::eFrigate);
+					shipsToAdd.push_back(eShipType::eFrigate);
 				}
 				else if (shipLoadout == 2)
 				{
+					shipsToAdd.push_back(eShipType::eTurtle);
+					shipsToAdd.push_back(eShipType::eTurtle);
+					shipsToAdd.push_back(eShipType::eTurtle);
 					shipsToAdd.push_back(eShipType::eTurtle);
 					shipsToAdd.push_back(eShipType::eTurtle);
 					shipsToAdd.push_back(eShipType::eTurtle);
@@ -111,7 +117,10 @@ int main()
 				assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
 				for (auto& existingFaction : serverMessage.existingFactions)
 				{
-					assignFaction(factions, existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
+					if (!existingFaction.existingShips.empty())
+					{
+						assignFaction(factions, existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
+					}
 				}
 
 				ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(factions), std::move(shipsToAdd));
@@ -138,11 +147,15 @@ int main()
 				window.close();
 				return 0;
 			}
-			else if (!gameLobbyActive && serverMessage.type == eMessageType::eDeployShipAtPosition,
-				serverMessage.type == eMessageType::eMoveShipToPosition,
-				serverMessage.type == eMessageType::eAttackShipAtPosition)
+			else if (!gameLobbyActive && (serverMessage.type == eMessageType::eDeployShipAtPosition ||
+				serverMessage.type == eMessageType::eMoveShipToPosition ||
+				serverMessage.type == eMessageType::eAttackShipAtPosition))
 			{
-				battle.receiveServerMessage(serverMessage);
+				//Don't operate on same faction
+				if (getLocalFactionName(factions) != serverMessage.faction)
+				{
+					battle.receiveServerMessage(serverMessage);
+				}
 			}
 		}
 

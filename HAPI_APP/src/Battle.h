@@ -35,7 +35,7 @@ public:
 	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
-	void receiveServerMessage(const ServerMessage serverMessage);
+	void receiveServerMessage(const ServerMessage& serverMessage);
 
 	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
 	void startSinglePlayerGame(const std::string& levelName);
@@ -46,6 +46,7 @@ public:
 
 	//Deploy Phase
 	void deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection);
+	
 	void setShipDeploymentAtPosition(sf::Vector2i position, eDirection direction = eDirection::eNorth);
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile);
@@ -95,4 +96,6 @@ private:
 
 	void onEndBattlePhaseEarly(GameEvent gameEvent);
 	void onFactionShipDestroyed(GameEvent gameEvent);
+
+	void deployFactionShipAtPosition(const ServerMessage& receivedServerMessage);
 };

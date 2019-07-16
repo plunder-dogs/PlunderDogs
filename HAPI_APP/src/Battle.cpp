@@ -286,7 +286,8 @@ void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & curre
 	{
 		return;
 	}
-	//m_battleUI.handleInput(window, currentEvent);
+	
+	m_battleUI.handleInput(window, currentEvent);
 }
 
 void Battle::update(float deltaTime)
@@ -357,10 +358,11 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 
+	//Inform remote clients on Deployment
 	if (m_onlineGame)
 	{
 		ShipOnTile shipToDeploy;
-		for (auto& ship : m_factions[m_currentFactionTurn].getAllShips())
+		for (const auto& ship : m_factions[m_currentFactionTurn].getAllShips())
 		{
 			if (!ship.isDeployed())
 			{
@@ -369,12 +371,27 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 				break;
 			}
 		}
-
-		//NetworkHandler::getInstance().sendServerMessage({ eMessageType::eDeployShip, shipToDeploy, 
-		//	startingPosition, startingDirection });
+		
+		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, shipToDeploy.factionName);
+		sf::Vector2i deployAtPosition = m_factions[m_currentFactionTurn].getShip(shipToDeploy.shipID).getCurrentPosition();
+		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, deployAtPosition.x, deployAtPosition.y);
+		
+		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
 
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
+
+	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
+	{
+		advanceToNextBattlePhase();
+	}
+}
+
+void Battle::deployFactionShipAtPosition(const ServerMessage & receivedServerMessage)
+{
+	assert(m_currentBattlePhase == BattlePhase::Deployment);
+
+	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, receivedServerMessage.shipActions.back().position, eDirection::eNorth);
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
 	{
@@ -776,26 +793,20 @@ const Faction& Battle::getFaction(FactionName factionName) const
 	return m_factions[static_cast<int>(factionName)];
 }
 
-void Battle::receiveServerMessage(const ServerMessage serverMessage)
+void Battle::receiveServerMessage(const ServerMessage& serverMessage)
 {
-	for (int i = 0; i < serverMessage.shipActions.size(); ++i)
+	switch (serverMessage.type)
 	{
-		switch (serverMessage.type)
-		{
-		case eMessageType::eDeployShipAtPosition:
-			deployFactionShipAtPosition(serverMessage.shipActions[i].position, eDirection::eNorth);
-			break;
+	case eMessageType::eDeployShipAtPosition:
+		deployFactionShipAtPosition(serverMessage);
+		break;
 
-		case eMessageType::eMoveShipToPosition :
-		{
-			ShipOnTile shipToMove(serverMessage.faction, serverMessage.shipActions[i].shipID);
-			generateFactionShipMovementArea(shipToMove, serverMessage.shipActions[i].position, true);
-			moveFactionShipToPosition(shipToMove);
-			break;
-		}
-		case eMessageType::eAttackShipAtPosition:
-			break;
-		}
+	case eMessageType::eMoveShipToPosition :
+	{
+		break;
+	}
+	case eMessageType::eAttackShipAtPosition:
+		break;
 	}
 }
 
