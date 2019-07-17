@@ -328,12 +328,28 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
+
+	if (m_onlineGame)
+	{
+		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
+		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
+		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y);
+		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+	}
 }
 
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
+
+	if (m_onlineGame)
+	{
+		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
+		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
+		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y);
+		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+	}
 }
 
 void Battle::clearFactionShipMovementArea(ShipOnTile shipOnTile)
@@ -399,6 +415,41 @@ void Battle::deployFactionShipAtPosition(const ServerMessage & receivedServerMes
 	}
 }
 
+void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessage)
+{
+	assert(m_currentBattlePhase == BattlePhase::Movement);
+	for (const auto& shipAction : receivedServerMessage.shipActions)
+	{
+		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
+		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
+		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID);
+	}
+}
+
+void Battle::fireFactionShipAtPosition(const ServerMessage & receivedServerMessage)
+{
+	assert(m_currentBattlePhase == BattlePhase::Attack);
+	std::cout << "Fire From Server\n";
+	for (const auto& shipAction : receivedServerMessage.shipActions)
+	{
+		const Ship& firingShip = getCurrentFaction().getShip(shipAction.shipID);
+		if (firingShip.getShipType() == eShipType::eFire)
+		{
+			playFireAnimation(firingShip.getCurrentDirection(), firingShip.getCurrentPosition());
+		}
+		else
+		{
+			playExplosionAnimation(shipAction.position);
+		}
+
+		m_factions[firingShip.getFactionName()].m_ships[firingShip.getID()].fireWeapon();
+
+		assert(m_map.getTile(shipAction.position)->isShipOnTile());
+		ShipOnTile shipOnFiringPosition = m_map.getTile(shipAction.position)->m_shipOnTile;
+		getFaction(shipOnFiringPosition.factionName).shipTakeDamage(shipOnFiringPosition.shipID, firingShip.getDamage());
+	}
+}
+
 void Battle::setShipDeploymentAtPosition(sf::Vector2i position, eDirection direction)
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
@@ -437,6 +488,15 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 			else
 			{
 				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
+			}
+
+			if (m_onlineGame)
+			{
+				ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
+				messageToSend.shipActions.emplace_back(firingShip.shipID, 
+					firingPosition.m_tileCoordinate.x, firingPosition.m_tileCoordinate.y);
+
+				NetworkHandler::getInstance().sendServerMessage(messageToSend);
 			}
 
 			getFaction(enemyShipInPlay.getFactionName()).shipTakeDamage(enemyShipInPlay.getID(), firingShipInPlay.getDamage());
@@ -793,19 +853,26 @@ const Faction& Battle::getFaction(FactionName factionName) const
 	return m_factions[static_cast<int>(factionName)];
 }
 
-void Battle::receiveServerMessage(const ServerMessage& serverMessage)
+void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage, FactionName localPlayerFaction)
 {
-	switch (serverMessage.type)
+	switch (receivedServerMessage.type)
 	{
-	case eMessageType::eDeployShipAtPosition:
-		deployFactionShipAtPosition(serverMessage);
+	case eMessageType::eDeployShipAtPosition :
+		if (receivedServerMessage.faction != localPlayerFaction)
+		{
+			deployFactionShipAtPosition(receivedServerMessage);
+		}
 		break;
 
 	case eMessageType::eMoveShipToPosition :
-	{
+		if (receivedServerMessage.faction != localPlayerFaction)
+		{
+			moveFactionShipToPosition(receivedServerMessage);
+		}
 		break;
-	}
-	case eMessageType::eAttackShipAtPosition:
+
+	case eMessageType::eAttackShipAtPosition :
+		fireFactionShipAtPosition(receivedServerMessage);
 		break;
 	}
 }

@@ -151,11 +151,7 @@ int main()
 				serverMessage.type == eMessageType::eMoveShipToPosition ||
 				serverMessage.type == eMessageType::eAttackShipAtPosition))
 			{
-				//Don't operate on same faction
-				if (getLocalFactionName(factions) != serverMessage.faction)
-				{
-					battle.receiveServerMessage(serverMessage);
-				}
+				battle.receiveServerMessage(serverMessage, getLocalFactionName(factions));
 			}
 		}
 
