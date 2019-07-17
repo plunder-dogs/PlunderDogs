@@ -824,32 +824,11 @@ void Battle::incrementFactionTurn()
 
 	assert(m_currentFactionTurn < static_cast<int>(m_factions.size()));
 
-	bool nextFactionSelected = false;
-	while (!nextFactionSelected)
+	//Select next available faction
+	do
 	{
-		//Start from beginning
-		if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
-		{
-			for (int i = 0; i < m_factions.size(); ++i)
-			{
-				if (m_factions[i].isActive())
-				{
-					m_currentFactionTurn = i;
-					nextFactionSelected = true;
-					break;
-				}
-			}
-		}
-		//Search subsequent factions
-		else if (m_currentFactionTurn < static_cast<int>(m_factions.size()) - 1)
-		{
-			++m_currentFactionTurn;
-			if (m_factions[m_currentFactionTurn].isActive())
-			{
-				nextFactionSelected = true;
-			}
-		}
-	}
+		m_currentFactionTurn = (m_currentFactionTurn + 1) & static_cast<int>(m_factions.size());
+	} while (!m_factions[m_currentFactionTurn].isActive());
 }
 
 bool Battle::isRunning() const
