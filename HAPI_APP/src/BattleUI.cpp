@@ -35,6 +35,11 @@ BattleUI::~BattleUI()
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
 }
 
+TileArea & BattleUI::getTargetArea()
+{
+	return m_targetArea;
+}
+
 sf::Vector2i BattleUI::getCameraPositionOffset() const
 {
 	return m_cameraPositionOffset;

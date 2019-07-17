@@ -17,6 +17,7 @@ public:
 	BattleUI&& operator=(BattleUI&&) = delete;
 	~BattleUI();
 
+	TileArea& getTargetArea();
 	sf::Vector2i getCameraPositionOffset() const;
 
 	void render(sf::RenderWindow& window);

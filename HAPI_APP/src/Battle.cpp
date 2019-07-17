@@ -5,6 +5,7 @@
 #include "Textures.h"
 #include "NetworkHandler.h"
 #include <iostream>
+#include "Utilities/Utilities.h"
 
 constexpr size_t MAX_PARTICLES = 6;
 
@@ -432,21 +433,67 @@ void Battle::fireFactionShipAtPosition(const ServerMessage & receivedServerMessa
 	std::cout << "Fire From Server\n";
 	for (const auto& shipAction : receivedServerMessage.shipActions)
 	{
+		TileArea& targetArea = m_battleUI.getTargetArea();
+		targetArea.clearTileArea();
+
 		const Ship& firingShip = getCurrentFaction().getShip(shipAction.shipID);
-		if (firingShip.getShipType() == eShipType::eFire)
+		switch (firingShip .getShipType())
 		{
-			playFireAnimation(firingShip.getCurrentDirection(), firingShip.getCurrentPosition());
-		}
-		else
-		{
-			playExplosionAnimation(shipAction.position);
+		case eShipType::eFrigate:
+			m_map.getTileCone(targetArea.m_tileArea, firingShip.getCurrentPosition(),
+				firingShip.getRange(),
+				firingShip.getCurrentDirection(), true);
+			break;
+
+		case eShipType::eSniper:
+			m_map.getTileLine(targetArea.m_tileArea, firingShip.getCurrentPosition(),
+				firingShip.getRange(),
+				firingShip.getCurrentDirection(), true);
+			break;
+
+		case eShipType::eTurtle:
+			m_map.getTileRadius(targetArea.m_tileArea, firingShip.getCurrentPosition(),
+				firingShip.getRange(), true);
+			break;
+
+		case eShipType::eFire:
+			m_map.getTileLine(targetArea.m_tileArea, firingShip.getCurrentPosition(),
+				firingShip.getRange(), Utilities::getOppositeDirection(firingShip.getCurrentDirection()), true);
+			break;
 		}
 
-		m_factions[firingShip.getFactionName()].m_ships[firingShip.getID()].fireWeapon();
+		m_factions[receivedServerMessage.faction].m_ships[shipAction.shipID].fireWeapon();
 
-		assert(m_map.getTile(shipAction.position)->isShipOnTile());
 		ShipOnTile shipOnFiringPosition = m_map.getTile(shipAction.position)->m_shipOnTile;
-		getFaction(shipOnFiringPosition.factionName).shipTakeDamage(shipOnFiringPosition.shipID, firingShip.getDamage());
+		if (!shipOnFiringPosition.isValid())
+		{
+			return;
+		}
+
+		const Ship& enemyShip = getFaction(shipOnFiringPosition.factionName).getShip(shipOnFiringPosition.shipID);
+		//Disallow attacking same team
+		if (enemyShip.getFactionName() != getCurrentFaction().m_factionName && !enemyShip.isDead())
+		{
+			//Find Enemy Ship 
+			sf::Vector2i enemyShipInPlayPosition = enemyShip.getCurrentPosition();
+			auto cIter = std::find_if(targetArea.m_tileArea.cbegin(), targetArea.m_tileArea.cend(),
+				[enemyShipInPlayPosition](const auto& tile) { return enemyShipInPlayPosition == tile->m_tileCoordinate; });
+			//Enemy Ship within range of weapon
+			if (cIter != targetArea.m_tileArea.cend())
+			{
+				//const Ship& firingShipInPlay = getFactionShip(firingShip);
+				if (firingShip.getShipType() == eShipType::eFire)
+				{
+					playFireAnimation(firingShip.getCurrentDirection(), firingShip.getCurrentPosition());
+				}
+				else
+				{
+					playExplosionAnimation(enemyShip.getCurrentPosition());
+				}
+
+				getFaction(enemyShip.getFactionName()).shipTakeDamage(enemyShip.getID(), firingShip.getDamage());
+			}
+		}
 	}
 }
 
@@ -461,6 +508,15 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 	assert(m_currentBattlePhase == BattlePhase::Attack);
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
+	if (m_onlineGame)
+	{
+		ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
+		messageToSend.shipActions.emplace_back(firingShip.shipID,
+			firingPosition.m_tileCoordinate.x, firingPosition.m_tileCoordinate.y);
+
+		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+	}
+
 	m_factions[firingShip.factionName].m_ships[firingShip.shipID].fireWeapon();
 
 	if (!firingPosition.isShipOnTile())
@@ -468,10 +524,8 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 		return;
 	}
 
-	const Ship& firingShipInPlay = getFactionShip(firingShip);
-	const Ship& enemyShipInPlay = getFactionShip(firingPosition.m_shipOnTile);
-
 	//Disallow attacking same team
+	const Ship& enemyShipInPlay = getFactionShip(firingPosition.m_shipOnTile);
 	if (enemyShipInPlay.getFactionName() != getCurrentFaction().m_factionName && !enemyShipInPlay.isDead())
 	{
 		//Find Enemy Ship 
@@ -481,6 +535,7 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 		//Enemy Ship within range of weapon
 		if (cIter != targetArea.cend())
 		{
+			const Ship& firingShipInPlay = getFactionShip(firingShip);
 			if (firingShipInPlay.getShipType() == eShipType::eFire)
 			{
 				playFireAnimation(firingShipInPlay.getCurrentDirection(), targetArea[0]->m_tileCoordinate);
@@ -488,15 +543,6 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 			else
 			{
 				playExplosionAnimation(enemyShipInPlay.getCurrentPosition());
-			}
-
-			if (m_onlineGame)
-			{
-				ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
-				messageToSend.shipActions.emplace_back(firingShip.shipID, 
-					firingPosition.m_tileCoordinate.x, firingPosition.m_tileCoordinate.y);
-
-				NetworkHandler::getInstance().sendServerMessage(messageToSend);
 			}
 
 			getFaction(enemyShipInPlay.getFactionName()).shipTakeDamage(enemyShipInPlay.getID(), firingShipInPlay.getDamage());
@@ -872,7 +918,10 @@ void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage, Fa
 		break;
 
 	case eMessageType::eAttackShipAtPosition :
-		fireFactionShipAtPosition(receivedServerMessage);
+		if (receivedServerMessage.faction != localPlayerFaction)
+		{
+			fireFactionShipAtPosition(receivedServerMessage);
+		}
 		break;
 	}
 }
