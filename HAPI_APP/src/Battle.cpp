@@ -822,27 +822,31 @@ void Battle::incrementFactionTurn()
 	int wind = rand() % eDirection::Max;
 	m_map.setWindDirection((eDirection)wind);
 
-	//Select first faction available
-	if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
+	assert(m_currentFactionTurn < static_cast<int>(m_factions.size()));
+
+	bool nextFactionSelected = false;
+	while (!nextFactionSelected)
 	{
-		for (int i = 0; i < m_factions.size(); ++i)
+		//Start from beginning
+		if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
 		{
-			if (m_factions[i].isActive())
+			for (int i = 0; i < m_factions.size(); ++i)
 			{
-				m_currentFactionTurn = i;
-				break;
+				if (m_factions[i].isActive())
+				{
+					m_currentFactionTurn = i;
+					nextFactionSelected = true;
+					break;
+				}
 			}
 		}
-	}
-	else
-	{
-		//Select next faction available
-		for (int i = m_currentFactionTurn + 1; i < m_factions.size(); ++i)
+		//Search subsequent factions
+		else if (m_currentFactionTurn < static_cast<int>(m_factions.size()) - 1)
 		{
-			if (m_factions[i].isActive())
+			++m_currentFactionTurn;
+			if (m_factions[m_currentFactionTurn].isActive())
 			{
-				m_currentFactionTurn = i;
-				break;
+				nextFactionSelected = true;
 			}
 		}
 	}

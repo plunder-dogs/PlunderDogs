@@ -130,6 +130,11 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 
 void Ship::rectifyMovementArea(const Faction & faction)
 {
+	//TODO: Not sure if it should be empty
+	if (m_movementArea.m_tileArea.empty())
+	{
+		return;
+	}
 	//Disallow overlapping of destination for ships belonging to same Faction
 	bool destinationOverlap = true;
 	int nodeFromEnd = 1;
@@ -143,7 +148,8 @@ void Ship::rectifyMovementArea(const Faction & faction)
 			{
 				continue;
 			}
-
+		
+			assert(!m_movementArea.m_tileArea.empty());
 			//Found matching destination for two ships belonging to same Faction
 			if (m_movementArea.m_tileArea.back().pair() == shipMovementArea.back().pair())
 			{
