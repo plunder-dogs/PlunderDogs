@@ -117,7 +117,11 @@ int main()
 				assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
 				for (auto& existingFaction : serverMessage.existingFactions)
 				{
-					if (!existingFaction.existingShips.empty())
+					if (!existingFaction.existingShips.empty() && existingFaction.AIControlled)
+					{
+						assignFaction(factions, existingFaction.factionName, eControllerType::eAI, existingFaction.existingShips);
+					}
+					else if(!existingFaction.existingShips.empty())
 					{
 						assignFaction(factions, existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
 					}

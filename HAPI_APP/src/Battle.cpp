@@ -330,7 +330,7 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 
-	if (m_onlineGame)
+	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
@@ -344,7 +344,7 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 
-	if (m_onlineGame)
+	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
@@ -376,7 +376,7 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 
 	//Inform remote clients on Deployment
-	if (m_onlineGame)
+	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
 		ShipOnTile shipToDeploy;
 		for (const auto& ship : m_factions[m_currentFactionTurn].getAllShips())
@@ -508,7 +508,7 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 	assert(m_currentBattlePhase == BattlePhase::Attack);
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
-	if (m_onlineGame)
+	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
 		ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
 		messageToSend.shipActions.emplace_back(firingShip.shipID,
@@ -824,12 +824,40 @@ void Battle::incrementFactionTurn()
 
 	assert(m_currentFactionTurn < static_cast<int>(m_factions.size()));
 
-	//Select next available faction
-	do
+	////Select next available faction
+	//do
+	//{
+	//	m_currentFactionTurn = (m_currentFactionTurn + 1) & static_cast<int>(m_factions.size());
+	//} while (!m_factions[m_currentFactionTurn].isActive());
+
+	bool nextFactionSelected = false;
+	while (!nextFactionSelected)
 	{
-		m_currentFactionTurn = (m_currentFactionTurn + 1) & static_cast<int>(m_factions.size());
-	} while (!m_factions[m_currentFactionTurn].isActive());
+		//Start from beginning
+		if (m_currentFactionTurn == static_cast<int>(m_factions.size()) - 1)
+		{
+			for (int i = 0; i < m_factions.size(); ++i)
+			{
+				if (m_factions[i].isActive())
+				{
+					m_currentFactionTurn = i;
+					nextFactionSelected = true;
+					break;
+				}
+			}
+		}
+		//Search subsequent factions
+		else if (m_currentFactionTurn < static_cast<int>(m_factions.size()) - 1)
+		{
+			++m_currentFactionTurn;
+			if (m_factions[m_currentFactionTurn].isActive())
+			{
+				nextFactionSelected = true;
+			}
+		}
+	}
 }
+
 
 bool Battle::isRunning() const
 {
