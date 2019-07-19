@@ -174,6 +174,7 @@
   <ItemGroup>
     <ClCompile Include="SFML\include\SFML\Network\Packet.cpp" />
     <ClCompile Include="src\BattleUI.cpp" />
+    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Selector.cpp" />
@@ -198,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle.h" />
+    <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Selector.h" />
