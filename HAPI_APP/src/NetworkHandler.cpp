@@ -40,13 +40,17 @@ ServerMessage NetworkHandler::getServerMessage()
 	return serverMessage;
 }
 
-void NetworkHandler::connect()
+bool NetworkHandler::connect()
 {
 	assert(!m_connectedToServer);
-	sf::Socket::Status status = m_tcpSocket.connect(sf::IpAddress::LocalHost, 55001);
-	assert(status == sf::Socket::Done);
+	if (m_tcpSocket.connect(sf::IpAddress::LocalHost, 55001) != sf::Socket::Done)
+	{
+		return false;
+	}
+
 	m_tcpSocket.setBlocking(false);
 	m_connectedToServer = true;
+	return true;
 }
 
 void NetworkHandler::disconnect()

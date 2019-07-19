@@ -1,12 +1,4 @@
-#include "Textures.h"
-#include "Battle.h"
-#include "AI.h"
-#include <array>
-#include "SFML/Graphics.hpp"
-#include "Utilities/XMLParser.h"
-#include <iostream>
-#include "NetworkHandler.h"
-#include <assert.h>
+#include "Game.h"
 
 #ifdef C++_NOTES
 //Copy Ellision
@@ -26,158 +18,31 @@
 //debug by printing, if statements
 #endif // C++_NOTES
 
-FactionName getLocalFactionName(const std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
-{
-	auto cIter = std::find_if(factions.cbegin(), factions.cend(), [](const auto& faction) 
-		{ return faction.m_controllerType == eControllerType::eLocalPlayer; });
-	
-	assert(cIter != factions.cend());
-	return cIter->m_factionName;
-}
-
-void assignFaction(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions, FactionName factionName, eControllerType controllerType,
-	std::vector<eShipType>& shipsToAdd)
-{
-	factions[static_cast<int>(factionName)].m_factionName = factionName;
-	factions[static_cast<int>(factionName)].m_controllerType = controllerType;
-	
-	for (eShipType shipToAdd : shipsToAdd)
-	{
-		factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
-	}
-}
-
 int main()
 {
-	std::cout << "Selected Ship Loadout: " << "\n";
-	int shipLoadout = 0;
-	std::cin >> shipLoadout;
-	assert(shipLoadout == 1 || shipLoadout == 2);
-
-	sf::Vector2u windowSize(1920, 1080);
-	sf::RenderWindow window(sf::VideoMode(windowSize.x, windowSize.y), "SFML_WINDOW", sf::Style::Default);
-	window.setFramerateLimit(120);
-
-	Textures::getInstance().loadAllTextures();
-	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> factions;
-	Battle battle(factions);
-	NetworkHandler::getInstance().connect();
-	bool gameLobbyActive = true;
-	bool localPlayerReady = false;
-	sf::Clock gameClock;
-	sf::Event currentEvent;
-	float deltaTime = gameClock.restart().asSeconds();
-	while (window.isOpen())
+	std::cout << "Select Game Mode: \n";
+	std::cout << "Single Player: '1'\n";
+	std::cout << "Multiplayer: '2'\n";
+	int gameModeInput = 0;
+	std::cin >> gameModeInput;
+	assert(gameModeInput == 1 || gameModeInput == 2);
+	bool onlineGame = false;
+	if (gameModeInput == 1)
 	{
-		//Handle Server Messages
-		NetworkHandler::getInstance().listenToServer();
-		while (NetworkHandler::getInstance().hasMessages())
-		{
-			ServerMessage receivedServerMessage = NetworkHandler::getInstance().getServerMessage();
-			if (receivedServerMessage.type == eMessageType::eEstablishConnection)
-			{
-				std::vector<eShipType> shipsToAdd;
-				if (shipLoadout == 1)
-				{
-					shipsToAdd.push_back(eShipType::eFrigate);
-					shipsToAdd.push_back(eShipType::eFrigate);
-					shipsToAdd.push_back(eShipType::eFrigate);
-					shipsToAdd.push_back(eShipType::eFrigate);
-					shipsToAdd.push_back(eShipType::eFrigate);
-					shipsToAdd.push_back(eShipType::eFrigate);
-				}
-				else if (shipLoadout == 2)
-				{
-					shipsToAdd.push_back(eShipType::eTurtle);
-					shipsToAdd.push_back(eShipType::eTurtle);
-					shipsToAdd.push_back(eShipType::eTurtle);
-					shipsToAdd.push_back(eShipType::eTurtle);
-					shipsToAdd.push_back(eShipType::eTurtle);
-					shipsToAdd.push_back(eShipType::eTurtle);
-				}
-
-				assignFaction(factions, receivedServerMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
-				for (auto& existingFaction : receivedServerMessage.existingFactions)
-				{
-					if (!existingFaction.existingShips.empty() && existingFaction.AIControlled)
-					{
-						assignFaction(factions, existingFaction.factionName, eControllerType::eAI, existingFaction.existingShips);
-					}
-					else if(!existingFaction.existingShips.empty())
-					{
-						assignFaction(factions, existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
-					}
-				}
-
-				ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(factions), std::move(shipsToAdd));
-				NetworkHandler::getInstance().sendServerMessage(messageToSend);
-			}
-			else if (receivedServerMessage.type == eMessageType::eNewPlayer)
-			{
-				if (receivedServerMessage.faction != getLocalFactionName(factions))
-				{
-					assignFaction(factions, receivedServerMessage.faction, eControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
-				}
-			}
-			else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
-			{
-				gameLobbyActive = false;
-				battle.startOnlineGame("Level1.tmx", receivedServerMessage.spawnPositions);
-			}
-			else if (receivedServerMessage.type == eMessageType::eRefuseConnection)
-			{
-				//Exit Game
-				std::cout << "Connection Refused\n";
-				window.close();
-				return 0;
-			}
-			else if (!gameLobbyActive && (receivedServerMessage.type == eMessageType::eDeployShipAtPosition ||
-				receivedServerMessage.type == eMessageType::eMoveShipToPosition ||
-				receivedServerMessage.type == eMessageType::eAttackShipAtPosition ||
-				receivedServerMessage.type == eMessageType::eClientDisconnected))
-			{
-				battle.receiveServerMessage(receivedServerMessage, getLocalFactionName(factions));
-			}
-		}
-
-		//Handle Input
-		while (window.pollEvent(currentEvent))
-		{
-			if (currentEvent.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-			else if (currentEvent.type == sf::Event::KeyPressed)
-			{
-				if (currentEvent.key.code == sf::Keyboard::R && !localPlayerReady)
-				{
-					ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName(factions));
-					NetworkHandler::getInstance().sendServerMessage(messageToSend);
-					localPlayerReady = true;
-				}
-			}
-			if (!gameLobbyActive)
-			{
-				battle.handleInput(window, currentEvent);
-			}
-		}
-	
-		if (!gameLobbyActive)
-		{
-			battle.update(deltaTime);
-
-			window.clear();
-			battle.render(window);
-			window.display();
-		}
-
-		deltaTime = gameClock.restart().asSeconds();
+		onlineGame = false;
 	}
-
-	NetworkHandler::getInstance().setBlocking();
-	ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName(factions));
-	NetworkHandler::getInstance().sendServerMessage(messageToSend);
-	NetworkHandler::getInstance().disconnect();
+	else if (gameModeInput == 2)
+	{
+		onlineGame = true;
+		if (!NetworkHandler::getInstance().connect())
+		{
+			return -1;
+		}
+	}
+	
+	Textures::getInstance().loadAllTextures();
+	Game game(onlineGame);
+	game.run();
 
 	return 0;
 }

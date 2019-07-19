@@ -23,7 +23,7 @@ public:
 	void setBlocking();
 	void sendServerMessage(ServerMessage message);
 	void listenToServer();
-	void connect();
+	bool connect();
 	void disconnect();
 
 private:
