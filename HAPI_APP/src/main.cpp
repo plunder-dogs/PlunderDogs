@@ -26,24 +26,6 @@
 //debug by printing, if statements
 #endif // C++_NOTES
 
-void printFactions(const std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
-{
-	for (auto& faction : factions)
-	{
-		if (faction.m_controllerType == eControllerType::None)
-		{
-			continue;
-		}
-
-		std::cout << static_cast<int>(faction.m_factionName) << "\n";
-		std::cout << "Ships:\n";
-		for (auto& ship : faction.getAllShips())
-		{
-			std::cout << static_cast<int>(ship.getShipType()) << "\n";
-		}
-	}
-}
-
 FactionName getLocalFactionName(const std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& factions)
 {
 	auto cIter = std::find_if(factions.cbegin(), factions.cend(), [](const auto& faction) 
@@ -135,8 +117,6 @@ int main()
 				if (receivedServerMessage.faction != getLocalFactionName(factions))
 				{
 					assignFaction(factions, receivedServerMessage.faction, eControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
-
-					printFactions(factions);
 				}
 			}
 			else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
