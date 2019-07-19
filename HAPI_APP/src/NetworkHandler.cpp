@@ -43,7 +43,7 @@ ServerMessage NetworkHandler::getServerMessage()
 bool NetworkHandler::connect()
 {
 	assert(!m_connectedToServer);
-	if (m_tcpSocket.connect(sf::IpAddress::LocalHost, 55001) != sf::Socket::Done)
+	if (m_tcpSocket.connect("81.97.212.79", 55001) != sf::Socket::Done)
 	{
 		return false;
 	}

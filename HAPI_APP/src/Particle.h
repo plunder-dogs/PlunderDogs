@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Sprite.h>
+#include "Sprite.h"
 #include "Timer.h"
 
 class Map;

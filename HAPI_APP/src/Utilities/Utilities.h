@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Global.h"
+#include "../Global.h"
 #include <cmath>    //asin()
 #include <utility>
 

@@ -3,7 +3,7 @@
 #include "Global.h"
 #include <memory>
 #include <vector>
-#include <Sprite.h>
+#include "Sprite.h"
 #include <deque>
 
 class Map;

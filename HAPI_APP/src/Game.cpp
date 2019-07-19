@@ -13,7 +13,11 @@ Game::Game(bool onlineGame)
 {
 	m_window.setFramerateLimit(120);
 
-	if (!onlineGame)
+	if (onlineGame)
+	{
+		m_gameLobbyActive = true;
+	}
+	else
 	{
 		assignFaction(FactionName::eYellow, eControllerType::eLocalPlayer,
 			{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
@@ -23,10 +27,6 @@ Game::Game(bool onlineGame)
 		m_factions[static_cast<int>(FactionName::eRed)].m_controllerType = eControllerType::eAI;
 		AI::loadShips(m_factions[static_cast<int>(FactionName::eRed)]);
 		m_battle.startSinglePlayerGame("level1.tmx");
-	}
-	else
-	{
-		m_gameLobbyActive = true;
 	}
 }
 
