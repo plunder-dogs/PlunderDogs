@@ -53,20 +53,6 @@ void Battle::updateWindDirection()
 	m_map.setWindDirection(windDirection);
 }
 
-void Battle::handleServerMessages()
-{
-	//for (auto message : NetworkHandler::getInstance().getServerMessages())
-	//{
-	//	if (static_cast<eMessageType>(message.type) == eMessageType::eDeployShip)
-	//	{
-	//		deployFactionShipAtPosition(message.position, message.direction);
-	//	}
-	//}
-
-	//NetworkHandler::getInstance().getServerMessages().clear();
-
-}
-
 void Battle::handleAIMovementPhaseTimer(float deltaTime)
 {
 	m_timeUntilAITurn.update(deltaTime);
