@@ -100,7 +100,7 @@ void Game::handleServerMessages()
 		else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
 		{
 			m_gameLobbyActive = false;
-			m_battle.startOnlineGame("Level1.tmx", receivedServerMessage.spawnPositions);
+			m_battle.startOnlineGame(receivedServerMessage.levelName, receivedServerMessage.spawnPositions);
 		}
 		else if (receivedServerMessage.type == eMessageType::eRefuseConnection)
 		{
