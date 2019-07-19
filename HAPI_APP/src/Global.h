@@ -185,7 +185,8 @@ enum class eMessageType
 	eDeployShipAtPosition,
 	eMoveShipToPosition,
 	eAttackShipAtPosition,
-	eDisconnect
+	eDisconnect,
+	eClientDisconnected
 };
 
 struct ServerMessageShipAction

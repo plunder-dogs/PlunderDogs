@@ -20,6 +20,7 @@ public:
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
+	void setBlocking();
 	void sendServerMessage(ServerMessage message);
 	void listenToServer();
 	void connect();

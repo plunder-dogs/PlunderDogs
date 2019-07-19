@@ -12,6 +12,11 @@ NetworkHandler::NetworkHandler()
 	m_serverMessages.reserve(APPROX_MAX_MESSAGES);
 }
 
+void NetworkHandler::setBlocking()
+{
+	m_tcpSocket.setBlocking(true);
+}
+
 void NetworkHandler::sendServerMessage(ServerMessage message)
 {
 	assert(m_connectedToServer);

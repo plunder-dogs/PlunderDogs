@@ -91,8 +91,8 @@ int main()
 		NetworkHandler::getInstance().listenToServer();
 		while (NetworkHandler::getInstance().hasMessages())
 		{
-			ServerMessage serverMessage = NetworkHandler::getInstance().getServerMessage();
-			if (serverMessage.type == eMessageType::eEstablishConnection)
+			ServerMessage receivedServerMessage = NetworkHandler::getInstance().getServerMessage();
+			if (receivedServerMessage.type == eMessageType::eEstablishConnection)
 			{
 				std::vector<eShipType> shipsToAdd;
 				if (shipLoadout == 1)
@@ -114,8 +114,8 @@ int main()
 					shipsToAdd.push_back(eShipType::eTurtle);
 				}
 
-				assignFaction(factions, serverMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
-				for (auto& existingFaction : serverMessage.existingFactions)
+				assignFaction(factions, receivedServerMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
+				for (auto& existingFaction : receivedServerMessage.existingFactions)
 				{
 					if (!existingFaction.existingShips.empty() && existingFaction.AIControlled)
 					{
@@ -130,32 +130,33 @@ int main()
 				ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(factions), std::move(shipsToAdd));
 				NetworkHandler::getInstance().sendServerMessage(messageToSend);
 			}
-			else if (serverMessage.type == eMessageType::eNewPlayer)
+			else if (receivedServerMessage.type == eMessageType::eNewPlayer)
 			{
-				if (serverMessage.faction != getLocalFactionName(factions))
+				if (receivedServerMessage.faction != getLocalFactionName(factions))
 				{
-					assignFaction(factions, serverMessage.faction, eControllerType::eRemotePlayer, serverMessage.shipsToAdd);
+					assignFaction(factions, receivedServerMessage.faction, eControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
 
 					printFactions(factions);
 				}
 			}
-			else if (serverMessage.type == eMessageType::eStartOnlineGame)
+			else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
 			{
 				gameLobbyActive = false;
-				battle.startOnlineGame("Level1.tmx", serverMessage.spawnPositions);
+				battle.startOnlineGame("Level1.tmx", receivedServerMessage.spawnPositions);
 			}
-			else if (serverMessage.type == eMessageType::eRefuseConnection)
+			else if (receivedServerMessage.type == eMessageType::eRefuseConnection)
 			{
 				//Exit Game
 				std::cout << "Connection Refused\n";
 				window.close();
 				return 0;
 			}
-			else if (!gameLobbyActive && (serverMessage.type == eMessageType::eDeployShipAtPosition ||
-				serverMessage.type == eMessageType::eMoveShipToPosition ||
-				serverMessage.type == eMessageType::eAttackShipAtPosition))
+			else if (!gameLobbyActive && (receivedServerMessage.type == eMessageType::eDeployShipAtPosition ||
+				receivedServerMessage.type == eMessageType::eMoveShipToPosition ||
+				receivedServerMessage.type == eMessageType::eAttackShipAtPosition ||
+				receivedServerMessage.type == eMessageType::eClientDisconnected))
 			{
-				battle.receiveServerMessage(serverMessage, getLocalFactionName(factions));
+				battle.receiveServerMessage(receivedServerMessage, getLocalFactionName(factions));
 			}
 		}
 
@@ -193,6 +194,7 @@ int main()
 		deltaTime = gameClock.restart().asSeconds();
 	}
 
+	NetworkHandler::getInstance().setBlocking();
 	ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName(factions));
 	NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	NetworkHandler::getInstance().disconnect();

@@ -934,6 +934,13 @@ void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage, Fa
 			fireFactionShipAtPosition(receivedServerMessage);
 		}
 		break;
+	case eMessageType::eClientDisconnected:
+		m_factions[static_cast<int>(receivedServerMessage.faction)].m_controllerType = eControllerType::eAI;
+		if (m_factions[m_currentFactionTurn].m_factionName == receivedServerMessage.faction)
+		{
+			m_timeUntilAITurn.setActive(true);
+		}
+		break;
 	}
 }
 
