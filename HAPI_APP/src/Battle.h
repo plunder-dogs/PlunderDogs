@@ -87,7 +87,6 @@ private:
 	void updateAttackPhase();
 	void incrementFactionTurn();
 	void updateWindDirection();
-	void handleServerMessages();
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);

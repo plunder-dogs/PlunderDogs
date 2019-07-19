@@ -85,7 +85,7 @@ bool Faction::isPositionInDeploymentArea(sf::Vector2i position) const
 
 void Faction::addShip(FactionName factionName, eShipType shipType)
 {
-	assert(m_ships.size() < size_t(6));
+	assert(m_ships.size() < size_t(MAX_SHIPS_PER_FACTION));
 	int shipID = static_cast<int>(m_ships.size());
 
 	m_ships.emplace_back(factionName, shipType, shipID);

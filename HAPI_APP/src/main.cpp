@@ -1,5 +1,5 @@
 #include "Game.h"
-#include <Windows.h>
+
 #ifdef C++_NOTES
 //Copy Ellision
 //Return Value Optimzation
@@ -17,21 +17,6 @@
 //Threading debug confusing for timings
 //debug by printing, if statements
 #endif // C++_NOTES
-//
-//int __clrcall WinMain(
-//	HINSTANCE hInstance,
-//	HINSTANCE hPrevInstance,
-//	LPSTR     lpCmdLine,
-//	int       nShowCmd
-//)
-//{
-//	std::cout << "Select Game Mode: \n";
-//	std::cout << "Single Player: '1'\n";
-//	std::cout << "Multiplayer: '2'\n";
-//	int gameModeInput = 0;
-//	std::cin >> gameModeInput;
-//	assert(gameModeInput == 1 || gameModeInput == 2);
-//}
 
 int main()
 {
