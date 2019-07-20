@@ -38,29 +38,6 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlay
 
 	//move as far as possible on the path to the chosen position
 	attemptMove(battle.getCurrentFaction(), map, ships[currentUnit], firingPosition);
-
-	////loop through all the ships in the faction
-	//for (int i = 0; i < ships.size(); i++)
-	//{
-	//	if (ships[i]->m_battleProperties.isDead()) continue;
-	//	//find the nearest enemy ship
-	//	const Tile* enemyPosition{ findClosestEnemy(battle, map, ships[i]->m_battleProperties.getCurrentPosition(), battlePlayer.m_factionName) };
-	//	if (!enemyPosition)
-	//	{
-	//		ships[i]->m_battleProperties.setDestination();
-	//		continue;
-	//	}
-	//	//find the nearest tile and facing that can fire upon the chosen enemy ship
-	//	std::pair<const Tile*, eDirection>  firingPosition{ AI::findFiringPosition(
-	//		map, 
-	//		enemyPosition, 
-	//		map.getTile(ships[i]->m_battleProperties.getCurrentPosition()), 
-	//		static_cast<eWeaponType>(ships[i]->getProperties().m_weaponType), 
-	//		ships[i]->getProperties().m_range) };
-
-	//	//move as far as possible on the path to the chosen position
-	//	attemptMove(map, ships[i], firingPosition);
-	//}
 }
 
 void AI::handleShootingPhase(Battle& battle, const Map& map, Faction& player, int currentUnit)
@@ -68,28 +45,19 @@ void AI::handleShootingPhase(Battle& battle, const Map& map, Faction& player, in
 	//if (player.m_entities[i]->m_battleProperties.isDead()) continue;
 	//check if the ship is able to fire upon any enemies and fire if possible
 	attemptShot(battle, map, player.m_ships[currentUnit]);
-
-	//loop through all the ships in the faction
-	//for (int i = 0; i < player.m_entities.size(); i++)
-	//{
-	//	if (player.m_entities[i]->m_battleProperties.isDead()) continue;
-	//	//check if the ship is able to fire upon any enemies and fire if possible
-	//	attemptShot(battle, map, player.m_entities[i]);
-	//}
 }
 
 void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 {	
-	auto& factionSpawnArea = currentPlayer.m_spawnArea.m_tileArea;
-	int location = static_cast<int>(std::rand() % (factionSpawnArea.size() - 6));
-	int spawnPoint{ location };
-	eDirection randomDir = static_cast<eDirection>(std::rand() % 6);
-	
-	size_t currentPlayerTotalShips = currentPlayer.m_ships.size();
-	for (int i = 0; i < currentPlayerTotalShips; ++i)
+	assert(currentPlayer.m_controllerType == eControllerType::eAI);
+
+	for (const auto& i : currentPlayer.m_spawnArea.m_tileArea)
 	{
-		battle.deployFactionShipAtPosition(factionSpawnArea[spawnPoint]->m_tileCoordinate, randomDir);
-		spawnPoint++;
+		battle.deployFactionShipAtPosition(i->m_tileCoordinate, eDirection::eNorth);
+		if (currentPlayer.isAllShipsDeployed())
+		{
+			break;
+		}
 	}
 }
 

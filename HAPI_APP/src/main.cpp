@@ -33,11 +33,12 @@ int main()
 	}
 	else if (gameModeInput == 2)
 	{
-		onlineGame = true;
 		if (!NetworkHandler::getInstance().connect())
 		{
 			return -1;
 		}
+
+		onlineGame = true;
 	}
 	
 	Textures::getInstance().loadAllTextures();
