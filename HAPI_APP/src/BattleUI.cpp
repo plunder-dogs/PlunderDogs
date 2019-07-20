@@ -257,20 +257,21 @@ void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 void BattleUI::onRightClickReleased(sf::Vector2i mousePosition)
 {
 	m_rightClickHeld = false;
+	m_spriteOnMouse.deactivate();
 
 	auto mouseDirection = Math::calculateDirection(m_rightClickPosition, mousePosition);
 	switch (m_battle.getCurrentBattlePhase())
 	{
 	case BattlePhase::Deployment:
-		onRightClickDeploymentPhase(mouseDirection.second);
+		onRightClickReleasedDeploymentPhase(mouseDirection.second);
 		break;
 
 	case BattlePhase::Movement:
-		onRightClickMovementPhase(mouseDirection, mousePosition);
+		onRightClickReleasedMovementPhase(mouseDirection, mousePosition);
 		break;
 
 	case BattlePhase::Attack:
-		onRightClickAttackPhase();
+		onRightClickReleasedAttackPhase();
 		break;
 	}
 }
@@ -365,7 +366,7 @@ void BattleUI::onLeftClickAttackPhase()
 	}
 }
 
-void BattleUI::onRightClickAttackPhase()
+void BattleUI::onRightClickReleasedAttackPhase()
 {
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
@@ -433,7 +434,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		}
 		case BattlePhase::Movement:
 		{
-			onMouseMoveMovementPhase();
+			onMouseMoveMovementPhase(mousePosition);
 			break;
 		}
 		case BattlePhase::Attack:
@@ -470,15 +471,23 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 
 void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
-	//Handle whether or not to show marker that factions ship is within spawn range
-	if (m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
+	if (!m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
 	{
-		m_spriteOnMouse.deactivate();
+		m_spriteOnMouse.activate();
+		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
 	}
-	else
+	else if (m_rightClickHeld && m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
 	{
 		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
 		m_spriteOnMouse.activate();
+	}
+	else if (m_rightClickHeld && !m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
+	{
+		m_spriteOnMouse.deactivate();
+	}
+	else if (m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
+	{
+		m_spriteOnMouse.deactivate();
 	}
 
 	//Only place ship on non occupied tile
@@ -493,8 +502,14 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onMouseMoveMovementPhase()
+void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
+	if (m_rightClickHeld)
+	{
+		m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
+		return;
+	}
+
 	//Multiple ships selected
 	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
 	{
@@ -562,7 +577,7 @@ void BattleUI::onMouseMoveMovementPhase()
 	}
 }
 
-void BattleUI::onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
+void BattleUI::onRightClickReleasedMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
@@ -611,14 +626,20 @@ void BattleUI::onRightClick(sf::Vector2i mousePosition)
 	if (tileOnMouse)
 	{
 		m_tileOnRightClick = tileOnMouse;
+		if (m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
+		{
+			m_spriteOnMouse.activate();
+			m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);
+		}
 	}
 	else
 	{
 		m_rightClickHeld = false;
+		m_spriteOnMouse.deactivate();
 	}
 }
 
-void BattleUI::onRightClickDeploymentPhase(eDirection startingDirection)
+void BattleUI::onRightClickReleasedDeploymentPhase(eDirection startingDirection)
 {
 	if ((m_tileOnRightClick->m_type == eTileType::eSea || m_tileOnRightClick->m_type == eTileType::eOcean))
 	{

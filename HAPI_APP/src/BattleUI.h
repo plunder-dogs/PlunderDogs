@@ -70,12 +70,12 @@ private:
 	//MouseMove
 	void onMouseMove(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
-	void onMouseMoveMovementPhase();
+	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
 	void onMouseMoveAttackPhase();
 	
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
-	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
-	void onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
-	void onRightClickAttackPhase();
+	void onRightClickReleasedDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
+	void onRightClickReleasedMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
+	void onRightClickReleasedAttackPhase();
 };
