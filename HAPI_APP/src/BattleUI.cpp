@@ -385,7 +385,7 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 		{
 			m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnRightClick, m_targetArea.m_tileArea);
 		}
-		else if (m_tileOnLeftClick->isShipOnTile() && !m_tileOnRightClick->isShipOnTile())
+		else if (m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile() && !m_tileOnRightClick->isShipOnTile())
 		{
 			m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnLeftClick, m_targetArea.m_tileArea);
 		}
