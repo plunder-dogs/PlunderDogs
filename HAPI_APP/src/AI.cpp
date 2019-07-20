@@ -355,7 +355,7 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 	//If a tile is found
 	if (bestTile != posi(-1, -1, eNorth))
 	{
-		currentShip.generateMovementArea(faction, map, map.getTile(bestTile.pair())->m_tileCoordinate);
+		currentShip.generateMovementArea(faction, map, map.getTile(bestTile.pair())->m_tileCoordinate, true);
 		currentShip.startMovement(map, targetTile.second);		
 	}
 	currentShip.setDestination();
