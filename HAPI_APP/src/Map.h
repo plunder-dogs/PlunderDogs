@@ -115,7 +115,7 @@ public:
 	float getWindStrength() const { return m_windStrength; }
 	void setWindStrength(float strength) { if (strength > 0.0) m_windStrength = strength; }
 
-	eDirection getWindDirection() const { return m_windDirection; }
+	eDirection getWindDirection() const { return eDirection::eNorth; }
 	void setWindDirection(eDirection direction) { m_windDirection = direction; }
 
 	void loadmap(const std::string& mapName);
