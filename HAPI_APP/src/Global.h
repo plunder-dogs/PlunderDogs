@@ -173,7 +173,8 @@ struct ServerMessageShipAction
 {
 	ServerMessageShipAction(int shipID, int x, int y)
 		: shipID(shipID),
-		position(x, y)
+		position(x, y),
+		direction(eDirection::eNorth)
 	{}
 
 	ServerMessageShipAction(int shipID, int x, int y, eDirection direction)

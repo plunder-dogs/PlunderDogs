@@ -345,7 +345,7 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
-		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y);
+		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
 }
@@ -388,7 +388,7 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 		
 		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, shipToDeploy.factionName);
 		sf::Vector2i deployAtPosition = m_factions[m_currentFactionTurn].getShip(shipToDeploy.shipID).getCurrentPosition();
-		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, deployAtPosition.x, deployAtPosition.y);
+		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, deployAtPosition.x, deployAtPosition.y, startingDirection);
 		
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
@@ -405,7 +405,9 @@ void Battle::deployFactionShipAtPosition(const ServerMessage & receivedServerMes
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 
-	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, receivedServerMessage.shipActions.back().position, eDirection::eNorth);
+	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, receivedServerMessage.shipActions.back().position, 
+		receivedServerMessage.shipActions.back().direction);
+	std::cout << static_cast<int>(receivedServerMessage.shipActions.back().direction);
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
 	{
@@ -420,7 +422,8 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 	{
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
-		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID);
+		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
+		std::cout << static_cast<int>(shipAction.direction);
 	}
 }
 
