@@ -20,9 +20,10 @@ public:
 	TileArea& getTargetArea();
 	sf::Vector2i getCameraPositionOffset() const;
 
+	void moveCamera(sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
 	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
-	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
+	void handleInput(const sf::Event& currentEvent, sf::Vector2i mousePosition);
 	void update(float deltaTime);
 
 private:
@@ -54,8 +55,8 @@ private:
 
 	//KeyPress
 	void onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent);
-	void onCancelMovementPhase(sf::Vector2i mousePosition);
-	void onCancelAttackPhase(sf::Vector2i mousePosition);
+	void onCancelMovementPhase();
+	void onCancelAttackPhase();
 
 	//ClickReleased
 	void onLeftClickReleased(sf::Vector2i mousePosition);
@@ -63,19 +64,18 @@ private:
 
 	//LeftClick
 	void onLeftClick(sf::Vector2i mousePosition);
-	void onLeftClickMovementPhase(sf::Vector2i mousePosition);
-	void onLeftClickAttackPhase(sf::Vector2i mousePosition);
+	void onLeftClickMovementPhase();
+	void onLeftClickAttackPhase();
 
 	//MouseMove
-	void moveCamera(sf::Vector2i mousePosition);
 	void onMouseMove(sf::Vector2i mousePosition);
 	void onMouseMoveDeploymentPhase(sf::Vector2i mousePosition);
-	void onMouseMoveMovementPhase(sf::Vector2i mousePosition);
-	void onMouseMoveAttackPhase(sf::Vector2i mousePosition);
+	void onMouseMoveMovementPhase();
+	void onMouseMoveAttackPhase();
 	
 	//RightClick
 	void onRightClick(sf::Vector2i mousePosition);
 	void onRightClickDeploymentPhase(eDirection startingDirection = eDirection::eNorth);
 	void onRightClickMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition);
-	void onRightClickAttackPhase(sf::Vector2i mousePosition);
+	void onRightClickAttackPhase();
 };

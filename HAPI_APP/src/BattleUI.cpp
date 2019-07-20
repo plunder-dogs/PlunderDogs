@@ -12,6 +12,7 @@
 
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
+const sf::Vector2f CAMERA_MOVE_SPEED{ 1.0f, 1.0f };
 
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
@@ -79,11 +80,8 @@ void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)
 	}
 }
 
-void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
+void BattleUI::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosition)
 {
-	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-	mousePosition += MOUSE_POSITION_OFFSET;
-
 	switch (currentEvent.type)
 	{
 	case sf::Event::MouseButtonPressed:
@@ -98,7 +96,6 @@ void BattleUI::handleInput(const sf::RenderWindow& window, const sf::Event & cur
 		break;
 
 	case sf::Event::MouseMoved:
-		moveCamera(mousePosition);
 		onMouseMove(mousePosition);
 		break;
 
@@ -181,12 +178,12 @@ void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEv
 		{
 		case BattlePhase::Movement:
 		{
-			onCancelMovementPhase(mousePosition);
+			onCancelMovementPhase();
 			break;
 		}
 		case BattlePhase::Attack:
 		{
-			onCancelAttackPhase(mousePosition);
+			onCancelAttackPhase();
 			break;
 		}
 		}
@@ -249,11 +246,11 @@ void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 
 	if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
 	{
-		onLeftClickMovementPhase(mousePosition);
+		onLeftClickMovementPhase();
 	}
 	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
 	{
-		onLeftClickAttackPhase(mousePosition);
+		onLeftClickAttackPhase();
 	}
 }
 
@@ -273,7 +270,7 @@ void BattleUI::onRightClickReleased(sf::Vector2i mousePosition)
 		break;
 
 	case BattlePhase::Attack:
-		onRightClickAttackPhase(mousePosition);
+		onRightClickAttackPhase();
 		break;
 	}
 }
@@ -335,7 +332,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
+void BattleUI::onLeftClickMovementPhase()
 {
 	if (m_shipSelector.getSelectedShips().size() == 1)
 	{
@@ -355,7 +352,7 @@ void BattleUI::onLeftClickMovementPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
+void BattleUI::onLeftClickAttackPhase()
 {
 	if (m_shipSelector.getSelectedShips().size() == 1)
 	{
@@ -368,7 +365,7 @@ void BattleUI::onLeftClickAttackPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
+void BattleUI::onRightClickAttackPhase()
 {
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
@@ -436,12 +433,12 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 		}
 		case BattlePhase::Movement:
 		{
-			onMouseMoveMovementPhase(mousePosition);
+			onMouseMoveMovementPhase();
 			break;
 		}
 		case BattlePhase::Attack:
 		{
-			onMouseMoveAttackPhase(mousePosition);
+			onMouseMoveAttackPhase();
 			break;
 		}
 		}
@@ -454,20 +451,20 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 
 	if (mousePosition.x < 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ -1,0 };
+		m_pendingCameraMovement += sf::Vector2f{ -CAMERA_MOVE_SPEED.x , 0.0f };
 	}
 	else if (mousePosition.x > SCREEN_RESOLUTION.x - 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ 1,0 };
+		m_pendingCameraMovement += sf::Vector2f{ CAMERA_MOVE_SPEED.x, 0.0f };
 	}
 
 	if (mousePosition.y < 50)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ 0 , -1 };
+		m_pendingCameraMovement += sf::Vector2f{ 0, -CAMERA_MOVE_SPEED.y };
 	}
 	else if (mousePosition.y > SCREEN_RESOLUTION.y - 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ 0, 1 };
+		m_pendingCameraMovement += sf::Vector2f{ 0, CAMERA_MOVE_SPEED.y };
 	}
 }
 
@@ -496,7 +493,7 @@ void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
+void BattleUI::onMouseMoveMovementPhase()
 {
 	//Multiple ships selected
 	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
@@ -634,7 +631,7 @@ void BattleUI::onRightClickDeploymentPhase(eDirection startingDirection)
 	}
 }
 
-void BattleUI::onCancelMovementPhase(sf::Vector2i mousePosition)
+void BattleUI::onCancelMovementPhase()
 {
 	//Cancel selected ships within box
 	if (!m_shipSelector.getSelectedShips().empty())
@@ -659,14 +656,14 @@ void BattleUI::onCancelMovementPhase(sf::Vector2i mousePosition)
 	m_movementArea.clearTileArea();
 }
 
-void BattleUI::onCancelAttackPhase(sf::Vector2i mousePosition)
+void BattleUI::onCancelAttackPhase()
 {
 	m_tileOnLeftClick = nullptr;
 	m_spriteOnTileClick.deactivate();
 	m_targetArea.clearTileArea();
 }
 
-void BattleUI::onMouseMoveAttackPhase(sf::Vector2i mousePosition)
+void BattleUI::onMouseMoveAttackPhase()
 {
 	//Multiple ships selected
 	if (m_shipSelector.getSelectedShips().size() > 1)

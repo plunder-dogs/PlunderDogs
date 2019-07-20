@@ -62,21 +62,21 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	if (std::abs(m_shape.getSize().x) >= MIN_SHIP_SELECT_SIZE &&
 		std::abs(m_shape.getSize().y) >= MIN_SHIP_SELECT_SIZE)
 	{
-		for (const auto& ship : currentFactionShips)
+		for (const auto& shipToSelect : currentFactionShips)
 		{
 			//Do not add these ships to selector
-			if (ship.isDead() || ship.isDestinationSet() || ship.isWeaponFired())
+			if (shipToSelect.isDead() || shipToSelect.isDestinationSet() || shipToSelect.isWeaponFired())
 			{
 				continue;
 			}
 
-			if (m_AABB.intersects(ship.getAABB(map)))
+			if (m_AABB.intersects(shipToSelect.getAABB(map)))
 			{
-				addToSelector({ ship.getFactionName(), ship.getID() }, ship.getCurrentPosition());
+				addToSelector({ shipToSelect.getFactionName(), shipToSelect.getID() }, shipToSelect.getCurrentPosition());
 			}
 			else
 			{
-				removeFromSelector({ ship.getFactionName(), ship.getID() });
+				removeFromSelector({ shipToSelect.getFactionName(), shipToSelect.getID() });
 			}
 		}
 	}

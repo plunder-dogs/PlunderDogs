@@ -269,12 +269,18 @@ void Battle::renderFactionShipsMovementGraphs(sf::RenderWindow & window)
 
 void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
-	if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eRemotePlayer)
+	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	mousePosition += MOUSE_POSITION_OFFSET;
+
+	if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		return;
+		m_battleUI.moveCamera(mousePosition);
 	}
-	
-	m_battleUI.handleInput(window, currentEvent);
+
+	if (m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eRemotePlayer)
+	{
+		m_battleUI.handleInput(currentEvent, mousePosition);
+	}
 }
 
 void Battle::update(float deltaTime)
@@ -960,8 +966,9 @@ void Battle::onFactionShipDestroyed(GameEvent gameEvent)
 			++factionsWithShipsRemaining;
 		}
 	}
-	assert(factionsWithShipsRemaining > 0);
+
 	//Found winning faction
+	assert(factionsWithShipsRemaining > 0);
 	if (factionsWithShipsRemaining == 1)
 	{
 		for (const auto& faction : m_factions)
