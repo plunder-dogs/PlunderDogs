@@ -373,11 +373,16 @@ void BattleUI::onRightClickAttackPhase(sf::Vector2i mousePosition)
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
 	{
-		for (int i = 0; i < selectedShipCount; ++i)
+		for (const auto& selectedShip : m_shipSelector.getSelectedShips())
 		{
-			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-			m_battle.fireFactionShipAtPosition(selectedShip, *m_tileOnRightClick, m_targetArea.m_tileArea);
+			const Tile* tileOnSelectedShip = m_battle.getMap().getTile(selectedShip.m_sprite.getPosition());
+			assert(tileOnSelectedShip);
+			generateTargetArea(*tileOnSelectedShip);
+
+			m_battle.fireFactionShipAtPosition(selectedShip.m_shipOnTile, *m_tileOnRightClick, m_targetArea.m_tileArea);
 		}
+
+		m_shipSelector.reset();
 	}
 	else
 	{
