@@ -17,7 +17,8 @@ public:
 		return instance;
 	}
 
-	bool hasMessages();
+	bool isConnected() const;
+	bool hasMessages() const;
 	ServerMessage getServerMessage();
 	
 	void setBlocking();

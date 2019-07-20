@@ -28,7 +28,12 @@ void NetworkHandler::sendServerMessage(ServerMessage message)
 	}
 }
 
-bool NetworkHandler::hasMessages()
+bool NetworkHandler::isConnected() const
+{
+	return m_connectedToServer;
+}
+
+bool NetworkHandler::hasMessages() const
 {
 	return !m_serverMessages.empty();
 }

@@ -14,7 +14,6 @@ class Game
 {
 public:
 	Game(bool onlineGame);
-	~Game();
 	Game(const Game&) = delete;
 	Game& operator=(const Game&) = delete;
 	Game(Game&&) = delete;

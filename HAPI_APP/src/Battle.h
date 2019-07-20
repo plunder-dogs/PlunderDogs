@@ -37,6 +37,7 @@ public:
 
 	void receiveServerMessage(const ServerMessage& receivedServerMessage, FactionName localPlayerFaction);
 
+	void quitGame();
 	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
 	void startSinglePlayerGame(const std::string& levelName);
 	void render(sf::RenderWindow& window);

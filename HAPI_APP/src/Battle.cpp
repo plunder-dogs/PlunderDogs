@@ -154,6 +154,11 @@ Battle::~Battle()
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
+void Battle::quitGame()
+{
+	m_isRunning = false;
+}
+
 void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
 	assert(!m_factions.empty());
@@ -422,7 +427,7 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 void Battle::fireFactionShipAtPosition(const ServerMessage & receivedServerMessage)
 {
 	assert(m_currentBattlePhase == BattlePhase::Attack);
-	std::cout << "Fire From Server\n";
+
 	for (const auto& shipAction : receivedServerMessage.shipActions)
 	{
 		TileArea& targetArea = m_battleUI.getTargetArea();

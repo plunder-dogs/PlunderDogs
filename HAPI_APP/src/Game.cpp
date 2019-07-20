@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "GameEventMessenger.h"
 
 Game::Game(bool onlineGame)
 	: m_factions(),
@@ -30,17 +31,6 @@ Game::Game(bool onlineGame)
 	}
 }
 
-Game::~Game()
-{
-	if (m_onlineGame)
-	{
-		NetworkHandler::getInstance().setBlocking();
-		ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
-		NetworkHandler::getInstance().disconnect();
-	}
-}
-
 void Game::run()
 {
 	while (m_battle.isRunning())
@@ -50,6 +40,14 @@ void Game::run()
 		handleGameLoop();
 
 		m_deltaTime = m_gameClock.restart().asSeconds();
+	}
+
+	if (NetworkHandler::getInstance().isConnected() && m_onlineGame)
+	{
+		NetworkHandler::getInstance().setBlocking();
+		ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
+		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().disconnect();
 	}
 }
 
@@ -123,6 +121,14 @@ void Game::handleInput()
 	{
 		if (m_currentSFMLEvent.type == sf::Event::Closed)
 		{
+			if (m_onlineGame)
+			{
+				NetworkHandler::getInstance().setBlocking();
+				ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
+				NetworkHandler::getInstance().sendServerMessage(messageToSend);
+				NetworkHandler::getInstance().disconnect();
+				m_battle.quitGame();
+			}
 			m_window.close();
 		}
 		else if (m_currentSFMLEvent.type == sf::Event::KeyPressed)
@@ -134,7 +140,7 @@ void Game::handleInput()
 				m_ready = true;
 			}
 		}
-		if (!m_onlineGame || (m_onlineGame && !m_gameLobbyActive))
+		if (m_battle.isRunning() && (!m_onlineGame || (m_onlineGame && !m_gameLobbyActive)))
 		{
 			m_battle.handleInput(m_window, m_currentSFMLEvent);
 		}
@@ -143,6 +149,11 @@ void Game::handleInput()
 
 void Game::handleGameLoop()
 {
+	if (!m_battle.isRunning())
+	{
+		return;
+	}
+
 	if (m_onlineGame && !m_gameLobbyActive)
 	{
 		m_battle.update(m_deltaTime);
