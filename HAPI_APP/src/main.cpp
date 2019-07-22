@@ -24,23 +24,20 @@ int main()
 	std::cout << "Single Player: '1'\n";
 	std::cout << "Multiplayer: '2'\n";
 	int gameModeInput = 0;
-	std::cin >> gameModeInput;
-	assert(gameModeInput == 1 || gameModeInput == 2);
 	bool onlineGame = false;
-	if (gameModeInput == 1)
+	while (gameModeInput != 1 || gameModeInput != 2)
 	{
-		onlineGame = false;
-	}
-	else if (gameModeInput == 2)
-	{
-		if (!NetworkHandler::getInstance().connect())
+		std::cin >> gameModeInput;
+		if (gameModeInput == 2)
 		{
-			return -1;
-		}
+			if (!NetworkHandler::getInstance().connect())
+			{
+				return -1;
+			}
 
-		onlineGame = true;
+			onlineGame = true;
+		}
 	}
-	
 	Textures::getInstance().loadAllTextures();
 	Game game(onlineGame);
 	game.run();
