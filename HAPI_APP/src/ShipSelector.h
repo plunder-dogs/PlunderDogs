@@ -16,21 +16,21 @@ struct SelectedShip
 
 class Map;
 class Ship;
-class Selector
+class ShipSelector
 {
 public:
-	Selector();
-	Selector(const Selector&) = delete;
-	Selector& operator=(const Selector&) = delete;
-	Selector(Selector&&) = delete;
-	Selector&& operator=(Selector&&) = delete;
+	ShipSelector();
+	ShipSelector(const ShipSelector&) = delete;
+	ShipSelector& operator=(const ShipSelector&) = delete;
+	ShipSelector(ShipSelector&&) = delete;
+	ShipSelector&& operator=(ShipSelector&&) = delete;
 
 	const std::vector<SelectedShip>& getSelectedShips() const;
+	//Get selected ship that has been removed
 	ShipOnTile removeSelectedShip();
 
 	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);
-	void renderShipHighlight(sf::RenderWindow& window, const Map& map);
-	void renderSelector(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window, const Map& map, bool leftClickHeld);
 	
 	void reset();
 	void resetShape();

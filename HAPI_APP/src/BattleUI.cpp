@@ -59,12 +59,7 @@ void BattleUI::render(sf::RenderWindow& window)
 	}
 
 	m_spriteOnMouse.render(window, m_battle.getMap());
-	m_shipSelector.renderShipHighlight(window, m_battle.getMap());
-
-	if (m_leftClickHeld)
-	{
-		m_shipSelector.renderSelector(window);
-	}
+	m_shipSelector.render(window, m_battle.getMap(), m_leftClickHeld);
 }
 
 void BattleUI::setMaxCameraOffset(sf::Vector2i maxCameraOffset)

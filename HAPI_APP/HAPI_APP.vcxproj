@@ -180,7 +180,7 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Particle.cpp" />
-    <ClCompile Include="src\Selector.cpp" />
+    <ClCompile Include="src\ShipSelector.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\Faction.cpp" />
     <ClCompile Include="src\Ship.cpp" />
@@ -205,7 +205,7 @@
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Particle.h" />
-    <ClInclude Include="src\Selector.h" />
+    <ClInclude Include="src\ShipSelector.h" />
     <ClInclude Include="src\ShipOnTile.h" />
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Faction.h" />

@@ -1,4 +1,4 @@
-#include "Selector.h"
+#include "ShipSelector.h"
 #include "Textures.h"
 #include "Ship.h"
 #include <assert.h>
@@ -13,7 +13,7 @@ SelectedShip::SelectedShip(ShipOnTile shipOnTile, sf::Vector2i shipPosition)
 	m_sprite.setPosition(shipPosition);
 }
 
-Selector::Selector()
+ShipSelector::ShipSelector()
 	: m_selectedShips(),
 	m_shape(),
 	m_AABB()
@@ -25,12 +25,12 @@ Selector::Selector()
 	m_shape.setOutlineThickness(1.5f);
 }
 
-const std::vector<SelectedShip>& Selector::getSelectedShips() const
+const std::vector<SelectedShip>& ShipSelector::getSelectedShips() const
 {
 	return m_selectedShips;
 }
 
-ShipOnTile Selector::removeSelectedShip()
+ShipOnTile ShipSelector::removeSelectedShip()
 {
 	assert(!m_selectedShips.empty());
 
@@ -40,14 +40,14 @@ ShipOnTile Selector::removeSelectedShip()
 	return removedSelectedShip;
 }
 
-void Selector::setPosition(sf::Vector2i position)
+void ShipSelector::setPosition(sf::Vector2i position)
 {
 	m_shape.setPosition(sf::Vector2f(position.x, position.y));
 	m_AABB.left = position.x;
 	m_AABB.top = position.y;
 }
 
-void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map)
+void ShipSelector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map)
 {
 	//Change Size
 	mousePosition -= MOUSE_POSITION_OFFSET;
@@ -82,7 +82,20 @@ void Selector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i
 	}
 }
 
-void Selector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
+void ShipSelector::render(sf::RenderWindow & window, const Map & map, bool leftClickHeld)
+{
+	for (auto& selectedShip : m_selectedShips)
+	{
+		selectedShip.m_sprite.render(window, map);
+	}
+
+	if (leftClickHeld)
+	{
+		window.draw(m_shape);
+	}
+}
+
+void ShipSelector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
 {
 	for (auto& selectedShip : m_selectedShips)
 	{
@@ -90,12 +103,12 @@ void Selector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
 	}
 }
 
-void Selector::renderSelector(sf::RenderWindow & window)
+void ShipSelector::renderSelector(sf::RenderWindow & window)
 {
-	window.draw(m_shape);
+	
 }
 
-void Selector::reset()
+void ShipSelector::reset()
 {
 	m_shape.setSize(sf::Vector2f(0, 0));
 	m_AABB.width = 0;
@@ -104,14 +117,14 @@ void Selector::reset()
 	m_selectedShips.clear();
 }
 
-void Selector::resetShape()
+void ShipSelector::resetShape()
 {
 	m_shape.setSize(sf::Vector2f(0, 0));
 	m_AABB.width = 0;
 	m_AABB.height = 0;
 }
 
-void Selector::resetShape(sf::Vector2i position)
+void ShipSelector::resetShape(sf::Vector2i position)
 {
 	position -= MOUSE_POSITION_OFFSET;
 	setPosition(position);
@@ -120,7 +133,7 @@ void Selector::resetShape(sf::Vector2i position)
 	m_AABB.height = 0;
 }
 
-void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
+void ShipSelector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
 {
 	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [shipToAdd](const auto& selectedShip)
 		{ return selectedShip.m_shipOnTile.shipID == shipToAdd.shipID; });
@@ -132,7 +145,7 @@ void Selector::addToSelector(ShipOnTile shipToAdd, sf::Vector2i shipPosition)
 	}
 }
 
-void Selector::removeFromSelector(ShipOnTile shipToRemove)
+void ShipSelector::removeFromSelector(ShipOnTile shipToRemove)
 {
 	auto cIter = std::find_if(m_selectedShips.cbegin(), m_selectedShips.cend(), [shipToRemove](const auto& selectedShip)
 		{ return selectedShip.m_shipOnTile.shipID == shipToRemove.shipID; });

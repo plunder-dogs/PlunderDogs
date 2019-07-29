@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TileArea.h"
-#include "Selector.h"
+#include "ShipSelector.h"
 
 struct Tile;
 class Ship;
@@ -47,7 +47,7 @@ private:
 	sf::Vector2i m_cameraPositionOffset;
 	void updateCamera();
 	
-	Selector m_shipSelector;
+	ShipSelector m_shipSelector;
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
