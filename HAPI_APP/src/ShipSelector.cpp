@@ -4,7 +4,8 @@
 #include <assert.h>
 #include <math.h>
 
-constexpr int MIN_SHIP_SELECT_SIZE = 25;
+constexpr int MIN_SHAPE_WIDTH_SIZE = 25;
+constexpr int MIN_SHAPE_HEIGHT_SIZE = 25;
 
 SelectedShip::SelectedShip(ShipOnTile shipOnTile, sf::Vector2i shipPosition)
 	: m_shipOnTile(shipOnTile),
@@ -59,8 +60,8 @@ void ShipSelector::update(const std::vector<Ship>& currentFactionShips, sf::Vect
 	m_AABB.height = selectorSize.y;
 
 	//Add/Remove ships
-	if (std::abs(m_shape.getSize().x) >= MIN_SHIP_SELECT_SIZE &&
-		std::abs(m_shape.getSize().y) >= MIN_SHIP_SELECT_SIZE)
+	if (std::abs(m_shape.getSize().x) >= MIN_SHAPE_WIDTH_SIZE &&
+		std::abs(m_shape.getSize().y) >= MIN_SHAPE_HEIGHT_SIZE)
 	{
 		for (const auto& shipToSelect : currentFactionShips)
 		{
@@ -93,19 +94,6 @@ void ShipSelector::render(sf::RenderWindow & window, const Map & map, bool leftC
 	{
 		window.draw(m_shape);
 	}
-}
-
-void ShipSelector::renderShipHighlight(sf::RenderWindow & window, const Map& map)
-{
-	for (auto& selectedShip : m_selectedShips)
-	{
-		selectedShip.m_sprite.render(window, map);	
-	}
-}
-
-void ShipSelector::renderSelector(sf::RenderWindow & window)
-{
-	
 }
 
 void ShipSelector::reset()
