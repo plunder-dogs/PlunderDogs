@@ -25,7 +25,7 @@ int main()
 	std::cout << "Multiplayer: '2'\n";
 	int gameModeInput = 0;
 	bool onlineGame = false;
-	while (gameModeInput != 1 || gameModeInput != 2)
+	while (gameModeInput != 1 && gameModeInput != 2)
 	{
 		std::cin >> gameModeInput;
 		if (gameModeInput == 2)
