@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "Sprite.h"
 #include "Global.h"
+#include "Utilities/NonCopyable.h"
 
 struct Tile
 {
@@ -26,7 +27,7 @@ struct Tile
 	const sf::Vector2i m_tileCoordinate;
 };
 
-class Map
+class Map : private NonCopyable
 {
 	struct SpawnPosition
 	{
@@ -123,8 +124,4 @@ public:
 	const std::vector<Tile>& getData()const { return m_data; }
 
 	Map();
-	Map(const Map&) = delete;
-	Map& operator=(const Map&) = delete;
-	Map(Map&&) = delete;
-	Map&& operator=(Map&&) = delete;
 };

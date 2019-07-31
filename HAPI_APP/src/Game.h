@@ -10,14 +10,10 @@
 #include "NetworkHandler.h"
 #include <assert.h>
 
-class Game
+class Game : private NonCopyable
 {
 public:
 	Game(bool onlineGame);
-	Game(const Game&) = delete;
-	Game& operator=(const Game&) = delete;
-	Game(Game&&) = delete;
-	Game&& operator=(Game&&) = delete;
 
 	void run();
 

@@ -2,19 +2,16 @@
 
 #include "TileArea.h"
 #include "ShipSelector.h"
+#include "Utilities/NonCopyable.h"
 
 struct Tile;
 class Ship;
 class Battle;
 struct GameEvent;
-class BattleUI
+class BattleUI : private NonCopyable
 {
 public:
 	BattleUI(Battle& battles);
-	BattleUI(const BattleUI&) = delete;
-	BattleUI& operator=(const BattleUI&) = delete;
-	BattleUI(BattleUI&&) = delete;
-	BattleUI&& operator=(BattleUI&&) = delete;
 	~BattleUI();
 
 	TileArea& getTargetArea();

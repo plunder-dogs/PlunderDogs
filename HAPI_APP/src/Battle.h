@@ -7,7 +7,7 @@
 #include <array>
 
 struct GameEvent;
-class Battle
+class Battle : private NonCopyable
 {
 	enum class eDeploymentState
 	{
@@ -18,10 +18,6 @@ class Battle
 
 public:
 	Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& players);
-	Battle(const Battle&) = delete;
-	Battle& operator=(const Battle&) = delete;
-	Battle(Battle&&) = delete;
-	Battle&& operator=(Battle&&) = delete;
 	~Battle();
 
 	bool isRunning() const;

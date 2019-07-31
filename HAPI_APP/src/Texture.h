@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include "Utilities/NonCopyable.h"
 
 struct FrameDetails
 {
@@ -15,13 +16,9 @@ struct FrameDetails
 	int ID;
 };
 
-struct Texture
+struct Texture : NonCopyable
 {
 	Texture(const std::string& name, std::vector<FrameDetails>&& frames);
-	Texture(const Texture&) = delete;
-	Texture& operator=(const Texture&) = delete;
-	Texture(Texture&&) = delete;
-	Texture&& operator=(Texture&&) = delete;
 	
 	const FrameDetails& getFrame(int frameID) const;
 

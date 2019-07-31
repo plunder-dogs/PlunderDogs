@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "Global.h"
 #include <SFML/Graphics.hpp>
+#include "Utilities/NonCopyable.h"
 #include <vector>
 
 struct SelectedShip
@@ -15,14 +16,10 @@ struct SelectedShip
 
 class Map;
 class Ship;
-class ShipSelector
+class ShipSelector : private NonCopyable
 {
 public:
 	ShipSelector();
-	ShipSelector(const ShipSelector&) = delete;
-	ShipSelector& operator=(const ShipSelector&) = delete;
-	ShipSelector(ShipSelector&&) = delete;
-	ShipSelector&& operator=(ShipSelector&&) = delete;
 
 	const std::vector<SelectedShip>& getSelectedShips() const;
 	//Get selected ship that has been removed

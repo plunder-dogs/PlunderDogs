@@ -220,6 +220,7 @@
     <ClInclude Include="src\TileArea.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Utilities\Base64.h" />
+    <ClInclude Include="src\Utilities\NonCopyable.h" />
     <ClInclude Include="src\Utilities\XMLParser.h" />
     <ClInclude Include="src\Utilities\tinyxml.h" />
     <ClInclude Include="src\Utilities\Utilities.h" />
