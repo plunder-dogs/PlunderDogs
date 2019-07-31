@@ -27,8 +27,6 @@ void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string
 	assert(fileLoaded);
 
 	const auto& rootElement = file.RootElement();
-	
-
 	std::vector<FrameDetails> frameDetails;
 	int i = 0; //Acts as the frame ID for each iteration
 	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())

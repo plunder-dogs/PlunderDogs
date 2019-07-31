@@ -1,14 +1,11 @@
 #pragma once
 
 #include "Ship.h"
+#include "Utilities/NonCopyable.h"
 
-struct Faction
+struct Faction : private NonCopyable
 {
 	Faction();
-	Faction(const Faction&) = delete;
-	Faction& operator=(const Faction&) = delete;
-	Faction(Faction&&) = delete;
-	Faction&& operator=(Faction&&) = delete;
 
 	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;

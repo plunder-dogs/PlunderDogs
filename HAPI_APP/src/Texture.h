@@ -20,6 +20,7 @@ struct Texture : NonCopyable
 {
 	Texture(const std::string& name, std::vector<FrameDetails>&& frames);
 	
+	static std::unique_ptr<Texture> load(const std::string& fileName);
 	const FrameDetails& getFrame(int frameID) const;
 
 	sf::Texture m_texture;
