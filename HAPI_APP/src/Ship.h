@@ -16,7 +16,6 @@ class Ship
 {
 public:
 	Ship(FactionName playerName, eShipType shipType, int ID);
-	Ship(Ship& orig);
 	~Ship();
 
 	const std::deque<posi>& getMovementArea() const;

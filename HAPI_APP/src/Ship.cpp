@@ -434,29 +434,6 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_sprite.setOriginAtCenter();
 }
 
-Ship::Ship(Ship & orig)
-	: m_factionName(orig.m_factionName),
-	m_shipType(orig.m_shipType),
-	m_ID(orig.m_ID),
-	m_currentPosition(),
-	m_movementTimer(MOVEMENT_ANIMATION_TIME),
-	m_movementPathSize(0),
-	m_currentDirection(orig.m_currentDirection),
-	m_weaponFired(false),
-	m_isDead(false),
-	m_actionSprite(orig.m_actionSprite),
-	m_movingToDestination(false),
-	m_destinationSet(false),
-	m_maxHealth(orig.m_maxHealth),
-	m_health(orig.m_health),
-	m_damage(orig.m_damage),
-	m_range(orig.m_range),
-	m_movementPoints(orig.m_movementPoints),
-	m_sprite(orig.m_sprite),
-	m_deployed(false),
-	m_movementArea(orig.m_movementArea)
-{}
-
 Ship::~Ship()
 {
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
