@@ -8,6 +8,7 @@ void Textures::loadAllTextures()
 	assert(!m_allTexturesLoaded);
 
 	XMLParser::loadTexture(m_hexTiles, DATA_DIRECTORY, "hexTiles.xml");
+	XMLParser::loadTexture(m_verticalHealthBar, DATA_DIRECTORY, "verticalHealthBar.xml");
 	XMLParser::loadTexture(m_mouseCrossHair, DATA_DIRECTORY, "crossHair.xml");
 	XMLParser::loadTexture(m_cross, DATA_DIRECTORY, "cross.xml");
 	XMLParser::loadTexture(m_spawnHex, DATA_DIRECTORY,"spawnHex.xml");

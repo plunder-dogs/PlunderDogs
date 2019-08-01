@@ -76,7 +76,8 @@ private:
 	int m_damage;
 	int m_range;
 	int m_movementPoints;
-	Sprite m_sprite;
+	Sprite m_shipSprite;
+	Sprite m_healthBarSprite;
 	bool m_deployed;
 	PosiArea m_movementArea;
 

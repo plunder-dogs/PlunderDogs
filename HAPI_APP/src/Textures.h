@@ -13,6 +13,7 @@ public:
 
 	void loadAllTextures();	
 
+	std::unique_ptr<Texture> m_verticalHealthBar;
 	std::unique_ptr<Texture> m_mouseCrossHair;
 	std::unique_ptr<Texture> m_enemyTerritoryHexSheet;
 	std::unique_ptr<Texture> m_levelSelectBackground;

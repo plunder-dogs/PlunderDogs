@@ -19,7 +19,7 @@ const std::deque<posi>& Ship::getMovementArea() const
 sf::FloatRect Ship::getAABB(const Map& map) const
 {
 	sf::Vector2i position = map.getTileScreenPos(m_currentPosition);
-	sf::FloatRect AABB(sf::Vector2f(position.x, position.y), m_sprite.getSize());
+	sf::FloatRect AABB(sf::Vector2f(position.x, position.y), m_shipSprite.getSize());
 	return AABB;
 }
 
@@ -242,17 +242,17 @@ void Ship::takeDamage(int damageAmount)
 	int healthPercentage = ((float)m_health / m_maxHealth) * 100;
 	if (healthPercentage < 100 && healthPercentage >= 50)
 	{
-		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eLowDamage));
+		m_shipSprite.setFrameID(static_cast<int>(eShipSpriteFrame::eLowDamage));
 	}
 	else if (healthPercentage < 50 && healthPercentage >= 1)
 	{
-		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eHighDamage));
+		m_shipSprite.setFrameID(static_cast<int>(eShipSpriteFrame::eHighDamage));
 	}
 	else
 	{
 		m_health = 0;
 		m_isDead = true;
-		m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eDead));
+		m_shipSprite.setFrameID(static_cast<int>(eShipSpriteFrame::eDead));
 		m_actionSprite.deactivate();
 
 		FactionShipDestroyedEvent shipDestroyedEvent(m_factionName, m_ID);
@@ -297,7 +297,8 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_damage(0),
 	m_range(0),
 	m_movementPoints(0),
-	m_sprite(),
+	m_shipSprite(),
+	m_healthBarSprite(*Textures::getInstance().m_verticalHealthBar, true),
 	m_deployed(false),
 	m_movementArea(*Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE)
 {
@@ -360,16 +361,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipSideCannons); 
+			m_shipSprite.setTexture(*Textures::getInstance().m_yellowShipSideCannons); 
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipBomb);
+			m_shipSprite.setTexture(*Textures::getInstance().m_yellowShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipMelee); 
+			m_shipSprite.setTexture(*Textures::getInstance().m_yellowShipMelee); 
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipSnipe);
+			m_shipSprite.setTexture(*Textures::getInstance().m_yellowShipSnipe);
 			break;
 		}
 		break;
@@ -378,16 +379,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipSideCannons);
+			m_shipSprite.setTexture(*Textures::getInstance().m_blueShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipBomb);
+			m_shipSprite.setTexture(*Textures::getInstance().m_blueShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipMelee);
+			m_shipSprite.setTexture(*Textures::getInstance().m_blueShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipSnipe);
+			m_shipSprite.setTexture(*Textures::getInstance().m_blueShipSnipe);
 			break;
 		}
 		break;
@@ -395,16 +396,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipSideCannons);
+			m_shipSprite.setTexture(*Textures::getInstance().m_redShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipBomb);
+			m_shipSprite.setTexture(*Textures::getInstance().m_redShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipMelee);
+			m_shipSprite.setTexture(*Textures::getInstance().m_redShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipSnipe);
+			m_shipSprite.setTexture(*Textures::getInstance().m_redShipSnipe);
 			break;
 		default:
 			break;
@@ -414,24 +415,24 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipSideCannons);
+			m_shipSprite.setTexture(*Textures::getInstance().m_greenShipSideCannons);
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipBomb);
+			m_shipSprite.setTexture(*Textures::getInstance().m_greenShipBomb);
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipMelee);
+			m_shipSprite.setTexture(*Textures::getInstance().m_greenShipMelee);
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipSnipe);
+			m_shipSprite.setTexture(*Textures::getInstance().m_greenShipSnipe);
 			break;
 		}
 		break;
 	}
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&Ship::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
-	m_sprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
-	m_sprite.setOriginAtCenter();
+	m_shipSprite.setFrameID(static_cast<int>(eShipSpriteFrame::eMaxHealth));
+	m_shipSprite.setOriginAtCenter();
 }
 
 Ship::~Ship()
@@ -451,7 +452,7 @@ void Ship::update(float deltaTime)
 			m_movementArea.disableNode(m_currentPosition);
 			
 			int directionToTurn = static_cast<int>(m_movementArea.m_tileArea.front().dir);
-			m_sprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);
+			m_shipSprite.setRotation(directionToTurn * ROTATION_ANGLE % 360);
 			m_currentDirection = (eDirection)directionToTurn;
 
 			m_movementArea.m_tileArea.pop_front();
@@ -470,14 +471,17 @@ void Ship::render(sf::RenderWindow& window, const Map & map)
 	//Render Ship
 	const sf::Vector2i tileTransform = map.getTileScreenPos(m_currentPosition);
 	float scale = map.getDrawScale();
-	m_sprite.setPosition(sf::Vector2i(
+	m_shipSprite.setPosition(sf::Vector2i(
 		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * scale),
 		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * scale) ));
-	m_sprite.setScale({ scale / 2, scale / 2 });
-	m_sprite.render(window);
+	m_shipSprite.setScale({ scale / 2, scale / 2 });
+	m_shipSprite.render(window);
 
 	m_actionSprite.setPosition(m_currentPosition);
 	m_actionSprite.render(window, map);
+
+	m_healthBarSprite.setPosition(m_currentPosition);
+	m_healthBarSprite.render(window, map);
 }
 
 void Ship::renderMovementArea(sf::RenderWindow & window, const Map & map)
@@ -488,12 +492,12 @@ void Ship::renderMovementArea(sf::RenderWindow & window, const Map & map)
 void Ship::setDeploymentPosition(sf::Vector2i position, eDirection direction)
 {
 	m_currentPosition = position;
-	m_sprite.setRotation(direction * ROTATION_ANGLE % 360);
+	m_shipSprite.setRotation(direction * ROTATION_ANGLE % 360);
 }
 
 void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)
 {
 	m_currentPosition = position;
 	m_deployed = true;
-	m_sprite.setRotation(startingDirection * ROTATION_ANGLE % 360);
+	m_shipSprite.setRotation(startingDirection * ROTATION_ANGLE % 360);
 }

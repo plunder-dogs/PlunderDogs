@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="verticalHealthBar_surface.png">
+	<SubTexture name="verticalHealthBar.png_0" x="0" y="0" width="12" height="27">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="12" top="0" bottom="27" />
+			<Circle name="BoundingCircle" type="0" radius="14.773287" y="13.000000" x="6.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>
