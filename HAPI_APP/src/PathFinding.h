@@ -58,12 +58,12 @@ class PathFinding
 	{
 		TileData(bool traversable) 
 			: m_traversable(traversable),
-			m_parent{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } 
+			m_neighbours{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } 
 		{}
 
 		void resetParent()
 		{
-			for (auto& i : m_parent)
+			for (auto& i : m_neighbours)
 			{
 				i = NO_TILE;
 			}
@@ -72,7 +72,7 @@ class PathFinding
 		bool m_traversable;
 		//The node that was first used to access the corresponding direction during the BFS
 		//One for each direction in ord
-		std::array<Ray2D, static_cast<size_t>(eDirection::Max + 1)> m_parent;
+		std::array<Ray2D, static_cast<size_t>(eDirection::Max + 1)> m_neighbours;
 	};
 
 public:

@@ -42,7 +42,7 @@ void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos,
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessTileData(startPos, map.getDimensions().x).m_parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	accessTileData(startPos, map.getDimensions().x).m_neighbours[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
 	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
@@ -61,7 +61,7 @@ void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos,
 	while (trace != startPos)
 	{
 		tileArea.m_tileArea.push_back(trace);
-		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
+		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[trace.dir];
 	}
 	std::reverse(tileArea.m_tileArea.begin(), tileArea.m_tileArea.end());
 }
@@ -77,7 +77,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessTileData(startPos, map.getDimensions().x).m_parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	accessTileData(startPos, map.getDimensions().x).m_neighbours[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
 	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
@@ -94,7 +94,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	while (trace != startPos)
 	{
 		pathToTile.emplace_back(trace);
-		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
+		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[trace.dir];
 	}
 
 	std::reverse(pathToTile.begin(), pathToTile.end());
@@ -202,25 +202,25 @@ bool PathFinding::pathExplorer(Ray2D & trace, std::queue<std::pair<Ray2D, float>
 		
 		//Left
 		Ray2D queueTile = turnLeft(tile);
-		if (accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Right
 		queueTile = turnRight(tile);
-		if (accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Forward
 		queueTile = nextTile(tile, mapWidth, m_tileData.size());
 		if (queueTile != NO_TILE &&
-			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE &&
+			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE &&
 			accessTileData(queueTile, mapWidth).m_traversable)
 		{
-			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
 			if (queueTile.dir == windDirection)
 				queue.emplace(queueTile, tether - (1.0f - windStrength));
 			else
