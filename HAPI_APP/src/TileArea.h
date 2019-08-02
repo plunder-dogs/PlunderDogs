@@ -8,9 +8,9 @@
 
 class Map;
 struct Texture;
-struct PosiArea
+struct Ray2DArea
 {
-	PosiArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph = false);
+	Ray2DArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph = false);
 
 	void disableNode(sf::Vector2i position);
 	

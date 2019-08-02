@@ -102,7 +102,7 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 
 	Ray2D start = { m_currentPosition, m_currentDirection };
 	Ray2D end = { destination.x, destination.y };
-	PathFinding::getInstance().findPath(m_movementArea.m_tileArea, map, start, end, m_movementPoints);
+	PathFinding::getInstance().findPath(m_movementArea, map, start, end, m_movementPoints);
 	if (m_movementArea.m_tileArea.empty())
 	{
 		return;

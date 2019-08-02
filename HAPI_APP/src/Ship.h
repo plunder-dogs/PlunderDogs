@@ -78,7 +78,7 @@ private:
 	int m_movementPoints;
 	Sprite m_sprite;
 	bool m_deployed;
-	PosiArea m_movementArea;
+	Ray2DArea m_movementArea;
 
 	void onNewBattlePhase(GameEvent gameEvent);
 };

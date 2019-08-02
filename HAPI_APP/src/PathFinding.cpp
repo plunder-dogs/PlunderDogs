@@ -1,6 +1,7 @@
 #include "PathFinding.h"
 #include "Map.h"
 #include <assert.h>
+#include "TileArea.h"
 
 void PathFinding::loadTileData(const Map & map)
 {
@@ -28,7 +29,7 @@ void PathFinding::loadTileData(const Map & map)
 	}
 }
 
-void PathFinding::findPath(std::deque<Ray2D>& tileArea, const Map & map, Ray2D startPos, Ray2D endPos, float maxMovement)
+void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos, Ray2D endPos, float maxMovement)
 {
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
@@ -55,14 +56,14 @@ void PathFinding::findPath(std::deque<Ray2D>& tileArea, const Map & map, Ray2D s
 		return;
 	}
 
-	tileArea.clear();
+	tileArea.clearTileArea();
 	//Trace path back from destination via parents
 	while (trace != startPos)
 	{
-		tileArea.push_back(trace);
+		tileArea.m_tileArea.push_back(trace);
 		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
 	}
-	std::reverse(tileArea.begin(), tileArea.end());
+	std::reverse(tileArea.m_tileArea.begin(), tileArea.m_tileArea.end());
 }
 
 std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement)

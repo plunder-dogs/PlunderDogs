@@ -3,7 +3,7 @@
 #include "Texture.h"
 #include <assert.h>
 
-PosiArea::PosiArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph)
+Ray2DArea::Ray2DArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph)
 {
 	m_tileAreaGraph.reserve(maxTileAreaSize);
 
@@ -13,7 +13,7 @@ PosiArea::PosiArea(const Texture& texture, size_t maxTileAreaSize, bool activeGr
 	}
 }
 
-void PosiArea::disableNode(sf::Vector2i position)
+void Ray2DArea::disableNode(sf::Vector2i position)
 {
 	for (auto iter = m_tileAreaGraph.begin(); iter != m_tileAreaGraph.end(); ++iter)
 	{
@@ -24,7 +24,7 @@ void PosiArea::disableNode(sf::Vector2i position)
 	}
 }
 
-void PosiArea::render(sf::RenderWindow & window, const Map & map)
+void Ray2DArea::render(sf::RenderWindow & window, const Map & map)
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
@@ -34,7 +34,7 @@ void PosiArea::render(sf::RenderWindow & window, const Map & map)
 	}
 }
 
-void PosiArea::clearTileArea()
+void Ray2DArea::clearTileArea()
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
@@ -46,7 +46,7 @@ void PosiArea::clearTileArea()
 	m_tileArea.clear();
 }
 
-void PosiArea::clearDisplayGraph()
+void Ray2DArea::clearDisplayGraph()
 {
 	for (int i = 0; i < m_tileArea.size(); ++i)
 	{
@@ -54,7 +54,7 @@ void PosiArea::clearDisplayGraph()
 	}
 }
 
-void PosiArea::activateGraph()
+void Ray2DArea::activateGraph()
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
 
