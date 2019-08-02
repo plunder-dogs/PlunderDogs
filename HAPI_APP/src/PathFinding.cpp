@@ -28,6 +28,43 @@ void PathFinding::loadTileData(const Map & map)
 	}
 }
 
+void PathFinding::findPath(std::deque<Ray2D>& tileArea, const Map & map, Ray2D startPos, Ray2D endPos, float maxMovement)
+{
+	if (!map.getTile(startPos) || !map.getTile(endPos) ||
+		map.getTile(endPos)->m_shipOnTile.isValid() ||
+		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
+	{
+		return;
+	}
+
+	resetTileData(map);
+	std::queue<std::pair<Ray2D, float>> exploreQueue;
+	//Add first element and set it to explored
+	exploreQueue.emplace(startPos, maxMovement);
+	accessTileData(startPos, map.getDimensions().x).m_parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	//Start recursion
+	Ray2D trace{ NO_TILE };
+	while (!exploreQueue.empty())
+	{
+		if (pathExplorer(trace, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength(), map.getDimensions().x))
+			break;
+	}
+
+	if (trace == NO_TILE)
+	{
+		return;
+	}
+
+	tileArea.clear();
+	//Trace path back from destination via parents
+	while (trace != startPos)
+	{
+		tileArea.push_back(trace);
+		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
+	}
+	std::reverse(tileArea.begin(), tileArea.end());
+}
+
 std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement)
 {
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
@@ -49,6 +86,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	}
 	if (trace == NO_TILE)
 		return std::queue<Ray2D>();
+	
 	//Trace path back from destination via parents
 	std::vector<Ray2D> pathToTile;
 	pathToTile.reserve(25);
@@ -57,6 +95,9 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 		pathToTile.emplace_back(trace);
 		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
 	}
+
+	std::reverse(pathToTile.begin(), pathToTile.end());
+
 	//Invert for convenience and fetch tile* for each address
 	std::queue<Ray2D> finalPath;
 	for (int i = pathToTile.size() - 1; i >= 0; i--)
@@ -80,11 +121,9 @@ std::vector<Ray2D> PathFinding::findArea(const Map & map, Ray2D startPos, float 
 	accessByteData(startPos, map.getDimensions().x).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
 	//Start recursion
 	int areaSize{ 1 };
-	const eDirection windDir = { map.getWindDirection() };
-	const float windStr = { map.getWindStrength() };
 	while (!exploreQueue.empty())
 	{
-		if (areaExplorer(exploreQueue, windDir, windStr, map.getDimensions().x))
+		if (areaExplorer(exploreQueue, map.getWindDirection(), map.getWindStrength(), map.getDimensions().x))
 			areaSize++;
 	}
 	//Iterate through exploreArea and pushback to the return vector
@@ -113,11 +152,9 @@ void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, 
 	accessByteData(startPos, map.getDimensions().x).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
 	//Start recursion
 	int areaSize{ 1 };
-	const eDirection windDir = { map.getWindDirection() };
-	const float windStr = { map.getWindStrength() };
 	while (!exploreQueue.empty())
 	{
-		if (areaExplorer(exploreQueue, windDir, windStr, map.getDimensions().x))
+		if (areaExplorer(exploreQueue, map.getWindDirection(), map.getWindStrength(), map.getDimensions().x))
 			areaSize++;
 	}
 
@@ -137,13 +174,13 @@ PathFinding::TileData & PathFinding::accessTileData(Ray2D tile, int mapWidth)
 	return m_tileData[tile.x + tile.y * mapWidth];
 }
 
-byteStore & PathFinding::accessByteData(Ray2D tile, int mapWidth)
+ByteStore & PathFinding::accessByteData(Ray2D tile, int mapWidth)
 {
 	assert(tile.x + tile.y * mapWidth < m_byteData.size());
 	return m_byteData[tile.x + tile.y * mapWidth];
 }
 
-bool PathFinding::pathExplorer(Ray2D & finalPoint, std::queue<std::pair<Ray2D, float>>& queue, Ray2D destination, const eDirection windDirection, 
+bool PathFinding::pathExplorer(Ray2D & trace, std::queue<std::pair<Ray2D, float>>& queue, Ray2D destination, const eDirection windDirection, 
 	const float windStrength, int mapWidth)
 {
 	//Dequeue a tile
@@ -156,15 +193,14 @@ bool PathFinding::pathExplorer(Ray2D & finalPoint, std::queue<std::pair<Ray2D, f
 		//Check if this is the destination
 		if (tile.pair() == destination.pair())
 		{
-			finalPoint = tile;
+			trace = tile;
 			return true;
 		}
 		//Check if any movements are unexplored and movable, if so set those to true and set their parent to this tile
 		//Then enqueue left, right, and forward as appropriate:
+		
 		//Left
-
 		Ray2D queueTile = turnLeft(tile);
-
 		if (accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE)
 		{
 			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
