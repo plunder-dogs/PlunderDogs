@@ -46,14 +46,21 @@ class PathFinding
 
 	struct TileData
 	{
-		TileData(bool traversable, bool occupied) 
-			: m_isTraversable(traversable), 
-			m_isOccupied(occupied),
+		TileData(bool traversable) 
+			: m_traversable(traversable),
 			m_parent{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } 
 		{}
 
-		const bool m_isTraversable;
-		bool m_isOccupied;
+		void resetParent()
+		{
+			for (auto& i : m_parent)
+			{
+				i = NO_TILE;
+			}
+		}
+
+		bool m_traversable;
+
 		//The node that was first used to access the corresponding direction during the BFS
 		//One for each direction in order
 		std::array<Ray2D, static_cast<size_t>(eDirection::Max + 1)> m_parent;

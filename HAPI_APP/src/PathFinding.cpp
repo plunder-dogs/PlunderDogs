@@ -10,9 +10,13 @@ void PathFinding::loadTileData(const Map & map)
 	m_tileData.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& tile : map.getData())
 	{
-		bool tileTraversable = (tile.m_type == eSea || tile.m_type == eOcean);
-		bool tileOccupied = tile.m_shipOnTile.isValid();
-		m_tileData.emplace_back(tileTraversable, tileOccupied);
+		bool tileTraversable = false;
+		if ((tile.m_type == eTileType::eSea || tile.m_type == eTileType::eOcean) && !tile.isShipOnTile())
+		{
+			tileTraversable = true;
+		}
+
+		m_tileData.emplace_back(tileTraversable);
 	}
 
 	assert(m_byteData.empty());
@@ -67,7 +71,7 @@ std::vector<Ray2D> PathFinding::findArea(const Map & map, Ray2D startPos, float 
 	if (!map.getTile(startPos))
 		return std::vector<Ray2D>();
 
-	resetTileData(map);
+	resetByteData(map);
 	//boolMap exploreArea(map);
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
@@ -177,8 +181,7 @@ bool PathFinding::pathExplorer(Ray2D & finalPoint, std::queue<std::pair<Ray2D, f
 		queueTile = nextTile(tile, mapWidth, m_tileData.size());
 		if (queueTile != NO_TILE &&
 			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE &&
-			accessTileData(queueTile, mapWidth).m_isTraversable &&
-			!accessTileData(queueTile, mapWidth).m_isOccupied)
+			accessTileData(queueTile, mapWidth).m_traversable)
 		{
 			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
 			if (queueTile.dir == windDirection)
@@ -381,11 +384,17 @@ void PathFinding::resetByteData(const Map & map)
 
 void PathFinding::resetTileData(const Map & map)
 {
-	m_tileData.clear();
-	for (const Tile& tile : map.getData())
+	assert(m_tileData.size() == map.getData().size());
+
+	for (int i = 0; i < map.getData().size(); ++i)
 	{
-		bool tileTraversable = (tile.m_type == eSea || tile.m_type == eOcean);
-		bool tileOccupied = tile.m_shipOnTile.isValid();
-		m_tileData.emplace_back(tileTraversable, tileOccupied);
+		bool tileTraversable = false;
+		if ((map.getData()[i].m_type == eSea || map.getData()[i].m_type == eOcean) && !map.getData()[i].isShipOnTile())
+		{
+			tileTraversable = true;
+		}
+
+		m_tileData[i].m_traversable = tileTraversable;
+		m_tileData[i].resetParent();
 	}
 }
