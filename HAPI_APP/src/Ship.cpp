@@ -1,6 +1,6 @@
  #include "Ship.h"
 #include "Map.h"
-#include "BFS.h"
+#include "PathFinding.h"
 #include "Textures.h"
 #include "GameEventMessenger.h"
 #include "Utilities/Utilities.h"
@@ -102,7 +102,7 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 
 	posi start = { m_currentPosition, m_currentDirection };
 	posi end = { destination.x, destination.y };
-	std::queue<posi> pathToTile = BFS::findPath(map, start, end, m_movementPoints);
+	std::queue<posi> pathToTile = PathFinding::getInstance().findPath(map, start, end, m_movementPoints);
 	if (pathToTile.empty())
 	{
 		return;

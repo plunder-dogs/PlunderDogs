@@ -1,6 +1,6 @@
 #include "BattleUI.h"
 #include "Battle.h"
-#include "BFS.h"
+#include "PathFinding.h"
 #include "Textures.h"
 #include "Utilities/Utilities.h"
 #include "GameEventMessenger.h"
@@ -157,7 +157,7 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	m_movementArea.clearTileArea();
 
 	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
-	BFS::findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
+	PathFinding::getInstance().findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
 	m_movementArea.activateGraph();
 }

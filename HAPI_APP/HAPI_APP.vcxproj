@@ -188,12 +188,12 @@
     <ClCompile Include="src\Battle.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
-    <ClCompile Include="src\BFS.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Textures.cpp" />
     <ClCompile Include="src\TileArea.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Utilities\Base64.cpp" />
+    <ClCompile Include="src\PathFinding.cpp" />
     <ClCompile Include="src\Utilities\XMLParser.cpp" />
     <ClCompile Include="src\Utilities\tinyxml.cpp" />
     <ClCompile Include="src\Utilities\tinyxmlerror.cpp" />
@@ -215,12 +215,12 @@
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\Map.h" />
-    <ClInclude Include="src\BFS.h" />
     <ClInclude Include="src\Textures.h" />
     <ClInclude Include="src\TileArea.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\Utilities\Base64.h" />
     <ClInclude Include="src\Utilities\NonCopyable.h" />
+    <ClInclude Include="src\PathFinding.h" />
     <ClInclude Include="src\Utilities\XMLParser.h" />
     <ClInclude Include="src\Utilities\tinyxml.h" />
     <ClInclude Include="src\Utilities\Utilities.h" />

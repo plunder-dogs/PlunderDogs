@@ -1,7 +1,7 @@
 #include <vector>
 #include "AI.h"
 #include "Utilities/Utilities.h"
-#include "BFS.h"
+#include "PathFinding.h"
 #include "Battle.h"
 #include "Map.h"
 #include "Global.h"
@@ -299,7 +299,7 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 	//Call generate path
 	const Tile* tile{ map.getTile(currentShip.getCurrentPosition()) };
 	//int pathLength = currentShip->m_battleProperties.generateMovementGraph(map, *tile, *targetTile.x);
-	auto availableTiles = BFS::findArea(
+	auto availableTiles = PathFinding::getInstance().findArea(
 		map,
 		posi(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
 		static_cast<float>(currentShip.getMovementPoints()));

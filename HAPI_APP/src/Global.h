@@ -26,6 +26,7 @@ enum FactionName
 
 enum eDirection
 {
+	eInvalid = -1,
 	eNorth,
 	eNorthEast,
 	eSouthEast,
