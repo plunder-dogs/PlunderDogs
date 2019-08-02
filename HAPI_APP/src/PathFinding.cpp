@@ -374,11 +374,18 @@ Ray2D PathFinding::turnRight(const Ray2D & currentTile) const
 
 void PathFinding::resetByteData(const Map & map)
 {
-	m_byteData.clear();
-	for (const Tile& tile : map.getData())
+	assert(m_byteData.size() == map.getData().size());
+
+	for (int i = 0; i < map.getData().size(); ++i)
 	{
-		bool tileTraversable = (tile.m_type == eSea || tile.m_type == eOcean) && !tile.m_shipOnTile.isValid();
-		m_byteData.emplace_back(tileTraversable);
+		bool tileTraversable = false;
+		if ((map.getData()[i].m_type == eTileType::eSea || map.getData()[i].m_type == eTileType::eOcean)
+			&& !map.getData()[i].isShipOnTile())
+		{
+			tileTraversable = true;
+		}
+
+		m_byteData[i].reset(tileTraversable);
 	}
 }
 

@@ -11,6 +11,15 @@ struct byteStore
 	byteStore(bool traversable = false) : byte(0) { if (traversable) byte = (1 << 7); }
 	//First bit
 	bool traversable() { return byte & 128; }
+
+	void reset(bool traversable)
+	{
+		byte = 0;
+		if (traversable)
+		{
+			byte = (1 << 7);
+		}
+	}
 	void setTraversable(bool istraversable)
 	{
 		if (istraversable)
