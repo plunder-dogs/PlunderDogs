@@ -76,12 +76,11 @@ public:
 	void loadTileData(const Map& map);
 
 	//For finding the optimal path for a ship, returns an empty queue if it can't be reached
-	std::queue<Ray2D> findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement = 10);
+	std::queue<Ray2D> findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement);
 
 	//For finding the possible movement area of a ship
-	std::vector<Ray2D> findArea(const Map& map, Ray2D startPos, float maxMovement = 10);
-	void findArea(std::vector<const Tile*>& tileArea, const Map& map, Ray2D startPos, float maxMovement = 10);
-
+	std::vector<Ray2D> findArea(const Map& map, Ray2D startPos, float maxMovement);
+	void findArea(std::vector<const Tile*>& tileArea, const Map& map, Ray2D startPos, float maxMovement);
 
 private:
 	std::vector<TileData> m_tileData;
