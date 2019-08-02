@@ -18,7 +18,7 @@ public:
 	Ship(FactionName playerName, eShipType shipType, int ID);
 	~Ship();
 
-	const std::deque<posi>& getMovementArea() const;
+	const std::deque<Ray2D>& getMovementArea() const;
 	sf::FloatRect getAABB(const Map& map) const;
 	FactionName getFactionName() const;
 	eDirection getCurrentDirection() const;

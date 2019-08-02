@@ -156,7 +156,7 @@ void BattleUI::generateMovementArea(const Ship & ship)
 {
 	m_movementArea.clearTileArea();
 
-	posi startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
+	Ray2D startPos = { ship.getCurrentPosition(), ship.getCurrentDirection() };
 	PathFinding::getInstance().findArea(m_movementArea.m_tileArea, m_battle.getMap(), startPos, ship.getMovementPoints());
 
 	m_movementArea.activateGraph();

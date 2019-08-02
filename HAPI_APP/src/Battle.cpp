@@ -6,7 +6,7 @@
 #include "NetworkHandler.h"
 #include <iostream>
 #include "Utilities/Utilities.h"
-#include "Utilities/PathFinding.h"
+#include "PathFinding.h"
 
 constexpr size_t MAX_PARTICLES = 6;
 

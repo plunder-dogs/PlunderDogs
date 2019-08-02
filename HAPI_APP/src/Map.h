@@ -59,8 +59,8 @@ public:
 	//Returns a pointer to a given tile, returns nullptr if there is no tile there
 	Tile* getTile(sf::Vector2i coordinate);
 	const Tile* getTile(sf::Vector2i coordinate) const;
-	Tile* getTile(posi coordinate);
-	const Tile* getTile(posi coordinate) const;
+	Tile* getTile(Ray2D coordinate);
+	const Tile* getTile(Ray2D coordinate) const;
 
 	//An n = 1 version of getTileRadius for use in pathfinding, 
 	//returns nullptr for each tile out of bounds

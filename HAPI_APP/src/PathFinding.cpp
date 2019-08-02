@@ -15,7 +15,6 @@ void PathFinding::loadTileData(const Map & map)
 		m_tileData.emplace_back(tileTraversable, tileOccupied);
 	}
 
-
 	assert(m_byteData.empty());
 	m_byteData.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& tile : map.getData())
@@ -25,29 +24,29 @@ void PathFinding::loadTileData(const Map & map)
 	}
 }
 
-std::queue<posi> PathFinding::findPath(const Map& map, posi startPos, posi endPos, float maxMovement)
+std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement)
 {
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
 		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
-		return std::queue<posi>();
+		return std::queue<Ray2D>();
 
 	resetTileData(map);
-	std::queue<std::pair<posi, float>> exploreQueue;
+	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
 	accessTileData(startPos, map.getDimensions().x).parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
-	posi trace{ NO_TILE };
+	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
 	{
 		if (pathExplorer(trace, exploreQueue, endPos, map.getWindDirection(), map.getWindStrength(), map.getDimensions().x))
 			break;
 	}
 	if (trace == NO_TILE)
-		return std::queue<posi>();
+		return std::queue<Ray2D>();
 	//Trace path back from destination via parents
-	std::vector<posi> pathToTile;
+	std::vector<Ray2D> pathToTile;
 	pathToTile.reserve(25);
 	while (trace != startPos)
 	{
@@ -55,7 +54,7 @@ std::queue<posi> PathFinding::findPath(const Map& map, posi startPos, posi endPo
 		trace = accessTileData(trace, map.getDimensions().x).parent[trace.dir];
 	}
 	//Invert for convenience and fetch tile* for each address
-	std::queue<posi> finalPath;
+	std::queue<Ray2D> finalPath;
 	for (int i = pathToTile.size() - 1; i >= 0; i--)
 	{
 		finalPath.emplace(pathToTile[i]);
@@ -63,14 +62,14 @@ std::queue<posi> PathFinding::findPath(const Map& map, posi startPos, posi endPo
 	return finalPath;
 }
 
-std::vector<posi> PathFinding::findArea(const Map & map, posi startPos, float maxMovement)
+std::vector<Ray2D> PathFinding::findArea(const Map & map, Ray2D startPos, float maxMovement)
 {
 	if (!map.getTile(startPos))
-		return std::vector<posi>();
+		return std::vector<Ray2D>();
 
 	resetTileData(map);
 	//boolMap exploreArea(map);
-	std::queue<std::pair<posi, float>> exploreQueue;
+	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
 	//accessByteData(
@@ -85,7 +84,7 @@ std::vector<posi> PathFinding::findArea(const Map & map, posi startPos, float ma
 			areaSize++;
 	}
 	//Iterate through exploreArea and pushback to the return vector
-	std::vector<posi> allowedArea;
+	std::vector<Ray2D> allowedArea;
 	allowedArea.reserve(areaSize);
 	for (int i = 0; i < m_byteData.size(); i++)
 	{
@@ -95,7 +94,7 @@ std::vector<posi> PathFinding::findArea(const Map & map, posi startPos, float ma
 	return allowedArea;
 }
 
-void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, posi startPos, float maxMovement)
+void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, Ray2D startPos, float maxMovement)
 {
 	if (!map.getTile(startPos))
 	{
@@ -104,7 +103,7 @@ void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, 
 
 	resetByteData(map);
 	//boolMap exploreArea(map);
-	std::queue<std::pair<posi, float>> exploreQueue;
+	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
 	accessByteData(startPos, map.getDimensions().x).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
@@ -123,28 +122,28 @@ void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, 
 	{
 		if (m_byteData[i].encountered())
 		{
-			tileArea.push_back(map.getTile(posi(i % map.getDimensions().x, i / map.getDimensions().x)));
+			tileArea.push_back(map.getTile(Ray2D(i % map.getDimensions().x, i / map.getDimensions().x)));
 		}
 	}
 }
 
-PathFinding::TileData & PathFinding::accessTileData(posi tile, int mapWidth)
+PathFinding::TileData & PathFinding::accessTileData(Ray2D tile, int mapWidth)
 {
 	assert(tile.x + tile.y * mapWidth < m_tileData.size());
 	return m_tileData[tile.x + tile.y * mapWidth];
 }
 
-byteStore & PathFinding::accessByteData(posi tile, int mapWidth)
+byteStore & PathFinding::accessByteData(Ray2D tile, int mapWidth)
 {
 	assert(tile.x + tile.y * mapWidth < m_byteData.size());
 	return m_byteData[tile.x + tile.y * mapWidth];
 }
 
-bool PathFinding::pathExplorer(posi & finalPoint, std::queue<std::pair<posi, float>>& queue, posi destination, const eDirection windDirection, 
+bool PathFinding::pathExplorer(Ray2D & finalPoint, std::queue<std::pair<Ray2D, float>>& queue, Ray2D destination, const eDirection windDirection, 
 	const float windStrength, int mapWidth)
 {
 	//Dequeue a tile
-	posi tile = queue.front().first;
+	Ray2D tile = queue.front().first;
 	float tether = queue.front().second;
 	queue.pop();
 	//Check if there's enough movement to do check other tiles
@@ -160,7 +159,7 @@ bool PathFinding::pathExplorer(posi & finalPoint, std::queue<std::pair<posi, flo
 		//Then enqueue left, right, and forward as appropriate:
 		//Left
 
-		posi queueTile = turnLeft(tile);
+		Ray2D queueTile = turnLeft(tile);
 
 		if (accessTileData(queueTile, mapWidth).parent[queueTile.dir] == NO_TILE)
 		{
@@ -192,10 +191,10 @@ bool PathFinding::pathExplorer(posi & finalPoint, std::queue<std::pair<posi, flo
 	return false;
 }
 
-bool PathFinding::areaExplorer(std::queue<std::pair<posi, float>>& queue, eDirection windDirection, float windStrength, int mapWidth)
+bool PathFinding::areaExplorer(std::queue<std::pair<Ray2D, float>>& queue, eDirection windDirection, float windStrength, int mapWidth)
 {
 	//Dequeue a tile
-	posi tile = queue.front().first;
+	Ray2D tile = queue.front().first;
 	float tether = queue.front().second;
 	queue.pop();
 	bool output = false;
@@ -207,7 +206,7 @@ bool PathFinding::areaExplorer(std::queue<std::pair<posi, float>>& queue, eDirec
 		//Check if any movements are unexplored and movable, if so set those to true and set their parent to this tile
 		//Then enqueue left, right, and forward as appropriate:
 		//Left
-		posi queueTile = turnLeft(tile);
+		Ray2D queueTile = turnLeft(tile);
 		if (!accessByteData(queueTile, mapWidth).getDir(queueTile.dir))
 		{
 			accessByteData(queueTile, mapWidth).setDir(queueTile.dir, true);
@@ -238,11 +237,11 @@ bool PathFinding::areaExplorer(std::queue<std::pair<posi, float>>& queue, eDirec
 	return output;
 }
 
-posi PathFinding::nextTile(const posi & currentTile, int mapWidth, int maxSize) const
+Ray2D PathFinding::nextTile(const Ray2D & currentTile, int mapWidth, int maxSize) const
 {
 	int x = currentTile.x;
 	int y = currentTile.y;
-	posi nextAddress = currentTile;
+	Ray2D nextAddress = currentTile;
 
 	if (x & 1)//odd
 	{
@@ -314,9 +313,9 @@ posi PathFinding::nextTile(const posi & currentTile, int mapWidth, int maxSize) 
 	return nextAddress;
 }
 
-posi PathFinding::turnLeft(const posi & currentTile) const
+Ray2D PathFinding::turnLeft(const Ray2D & currentTile) const
 {
-	posi nextTile = currentTile;
+	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)
 	{
 	case eNorth:
@@ -342,9 +341,9 @@ posi PathFinding::turnLeft(const posi & currentTile) const
 	return nextTile;
 }
 
-posi PathFinding::turnRight(const posi & currentTile) const
+Ray2D PathFinding::turnRight(const Ray2D & currentTile) const
 {
-	posi nextTile = currentTile;
+	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)
 	{
 	case eNorth:

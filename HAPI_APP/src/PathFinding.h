@@ -41,7 +41,7 @@ struct Tile;
 class Map;
 class PathFinding
 {
-	#define NO_TILE posi(-1, -1, eDirection::eInvalid)
+	#define NO_TILE Ray2D(static_cast<int>(TileID::Invalid), static_cast<int>(TileID::Invalid), eDirection::eInvalid)
 
 	struct TileData
 	{
@@ -53,7 +53,7 @@ class PathFinding
 		bool isOccupied;
 		//The node that was first used to access the corresponding direction during the BFS
 		//One for each direction in order
-		posi parent[6];
+		Ray2D parent[6];
 	};
 
 public:
@@ -66,28 +66,28 @@ public:
 	void loadTileData(const Map& map);
 
 	//For finding the optimal path for a ship, returns an empty queue if it can't be reached
-	std::queue<posi> findPath(const Map& map, posi startPos, posi endPos, float maxMovement = 10);
+	std::queue<Ray2D> findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement = 10);
 
 	//For finding the possible movement area of a ship
-	std::vector<posi> findArea(const Map& map, posi startPos, float maxMovement = 10);
-	void findArea(std::vector<const Tile*>& tileArea, const Map& map, posi startPos, float maxMovement = 10);
+	std::vector<Ray2D> findArea(const Map& map, Ray2D startPos, float maxMovement = 10);
+	void findArea(std::vector<const Tile*>& tileArea, const Map& map, Ray2D startPos, float maxMovement = 10);
 
 
 private:
 	std::vector<TileData> m_tileData;
 	std::vector<byteStore> m_byteData;
 
-	TileData& accessTileData(posi tile, int mapWidth);
-	byteStore& accessByteData(posi tile, int mapWidth);
+	TileData& accessTileData(Ray2D tile, int mapWidth);
+	byteStore& accessByteData(Ray2D tile, int mapWidth);
 
-	bool pathExplorer(posi& finalPoint, std::queue<std::pair<posi, float>>& queue, posi destination, eDirection windDirection, float windStrength,
+	bool pathExplorer(Ray2D& finalPoint, std::queue<std::pair<Ray2D, float>>& queue, Ray2D destination, eDirection windDirection, float windStrength,
 		int mapWidth);
 
-	bool areaExplorer(std::queue<std::pair<posi, float>>& queue, eDirection windDirection, float windStrength, int mapWidth);
+	bool areaExplorer(std::queue<std::pair<Ray2D, float>>& queue, eDirection windDirection, float windStrength, int mapWidth);
 
-	posi nextTile(const posi& currentTile, int mapWidth, int maxSize) const;
-	posi turnLeft(const posi& currentTile) const;
-	posi turnRight(const posi& currentTile) const;
+	Ray2D nextTile(const Ray2D& currentTile, int mapWidth, int maxSize) const;
+	Ray2D turnLeft(const Ray2D& currentTile) const;
+	Ray2D turnRight(const Ray2D& currentTile) const;
 
 	void resetByteData(const Map& map);
 	void resetTileData(const Map& map);

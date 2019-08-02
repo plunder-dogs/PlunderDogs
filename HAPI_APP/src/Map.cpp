@@ -372,7 +372,7 @@ const Tile * Map::getTile(sf::Vector2i coordinate) const
 	return nullptr;
 }
 
-Tile * Map::getTile(posi coordinate)
+Tile * Map::getTile(Ray2D coordinate)
 {
 	//Bounds check
 	if (coordinate.x < m_mapDimensions.x &&
@@ -385,7 +385,7 @@ Tile * Map::getTile(posi coordinate)
 	return nullptr;
 }
 
-const Tile * Map::getTile(posi coordinate) const
+const Tile * Map::getTile(Ray2D coordinate) const
 {
 //Bounds check
 if (coordinate.x < m_mapDimensions.x &&

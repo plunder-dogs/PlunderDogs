@@ -11,7 +11,7 @@
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
 
-const std::deque<posi>& Ship::getMovementArea() const
+const std::deque<Ray2D>& Ship::getMovementArea() const
 {
 	return m_movementArea.m_tileArea;
 }
@@ -100,9 +100,9 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 		return;
 	}
 
-	posi start = { m_currentPosition, m_currentDirection };
-	posi end = { destination.x, destination.y };
-	std::queue<posi> pathToTile = PathFinding::getInstance().findPath(map, start, end, m_movementPoints);
+	Ray2D start = { m_currentPosition, m_currentDirection };
+	Ray2D end = { destination.x, destination.y };
+	std::queue<Ray2D> pathToTile = PathFinding::getInstance().findPath(map, start, end, m_movementPoints);
 	if (pathToTile.empty())
 	{
 		return;

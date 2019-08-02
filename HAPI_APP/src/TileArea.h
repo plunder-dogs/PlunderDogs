@@ -19,7 +19,7 @@ struct PosiArea
 	void activateGraph();
 
 	std::vector<Sprite> m_tileAreaGraph;
-	std::deque<posi> m_tileArea;
+	std::deque<Ray2D> m_tileArea;
 };
 
 struct Tile;

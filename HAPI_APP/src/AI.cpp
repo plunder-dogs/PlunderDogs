@@ -301,14 +301,14 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 	//int pathLength = currentShip->m_battleProperties.generateMovementGraph(map, *tile, *targetTile.x);
 	auto availableTiles = PathFinding::getInstance().findArea(
 		map,
-		posi(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
+		Ray2D(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
 		static_cast<float>(currentShip.getMovementPoints()));
 	//Loop to find the closest tile to the target tile
 	sf::Vector2i targetPos = targetTile.first->m_tileCoordinate;
 	sf::Vector2i currentPos = currentShip.getCurrentPosition();
 	int closestDistance{ INT_MAX };
-	posi bestTile{ -1, -1, eNorth };
-	for (posi it : availableTiles)
+	Ray2D bestTile{ -1, -1, eNorth };
+	for (Ray2D it : availableTiles)
 	{
 		sf::Vector2i diff(
 			{ targetPos.x - it.x, targetPos.y - it.y });
@@ -321,7 +321,7 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 		}
 	}
 	//If a tile is found
-	if (bestTile != posi(-1, -1, eNorth))
+	if (bestTile != Ray2D(-1, -1, eNorth))
 	{
 		currentShip.generateMovementArea(faction, map, map.getTile(bestTile.pair())->m_tileCoordinate, true);
 		currentShip.startMovement(map, targetTile.second);		

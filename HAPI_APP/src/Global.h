@@ -15,6 +15,11 @@ const std::string SHIP_DATA_DIRECTORY = "Data/Ships/";
 const std::string LEVEL_DATA_DIRECTORY = "Data/Levels/";
 const sf::Vector2i MOUSE_POSITION_OFFSET{ 25, 45 };
 
+enum class TileID
+{
+	Invalid = -1
+};
+
 enum FactionName
 {
 	eYellow = 0,
@@ -248,17 +253,17 @@ struct ServerMessage
 	std::vector<ServerMessageExistingFaction> existingFactions;
 };
 
-struct posi
+struct Ray2D
 {
 	int x;
 	int y;
 	eDirection dir;
 
-	posi(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
-	posi(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
+	Ray2D(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
+	Ray2D(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
 
 	sf::Vector2i pair() const { return { x, y }; }
-	int dirDiff(const posi& compare)
+	int dirDiff(const Ray2D& compare)
 	{
 		int diff = std::abs(static_cast<int>(this->dir) - static_cast<int>(compare.dir));
 		if (diff != 0)
@@ -266,25 +271,25 @@ struct posi
 		return diff;
 	}
 	//Comparison operators
-	inline bool operator==(const posi& rhs) const
+	inline bool operator==(const Ray2D& rhs) const
 	{
 		bool ans{ false };
-		posi lhs = *this;
+		Ray2D lhs = *this;
 		if (lhs.x == rhs.x && lhs.y == rhs.y && lhs.dir == rhs.dir)
 			ans = true;
 		return ans;
 	}
-	inline bool operator!=(const posi& rhs) const { return !(*this == rhs); }
+	inline bool operator!=(const Ray2D& rhs) const { return !(*this == rhs); }
 	//Assignment operators
-	inline void operator+=(const posi& rhs) { this->x += rhs.x; this->y += rhs.y; }
-	inline void operator-=(const posi& rhs) { this->x -= rhs.x; this->y -= rhs.y; }
-	inline void operator*=(const posi& rhs) { this->x *= rhs.x; this->y *= rhs.y; }
-	inline void operator/=(const posi& rhs) { this->x /= rhs.x; this->y /= rhs.y; }
-	inline void operator%=(const posi& rhs) { this->x %= rhs.x; this->y %= rhs.y; }
+	inline void operator+=(const Ray2D& rhs) { this->x += rhs.x; this->y += rhs.y; }
+	inline void operator-=(const Ray2D& rhs) { this->x -= rhs.x; this->y -= rhs.y; }
+	inline void operator*=(const Ray2D& rhs) { this->x *= rhs.x; this->y *= rhs.y; }
+	inline void operator/=(const Ray2D& rhs) { this->x /= rhs.x; this->y /= rhs.y; }
+	inline void operator%=(const Ray2D& rhs) { this->x %= rhs.x; this->y %= rhs.y; }
 	//Maths operators
-	inline posi& operator+(const posi& rhs) const { return posi(this->x + rhs.x, this->y + rhs.y, this->dir); }
-	inline posi& operator-(const posi& rhs) const { return posi(this->x - rhs.x, this->y - rhs.y, this->dir); }
-	inline posi& operator*(const posi& rhs) const { return posi(this->x * rhs.x, this->y * rhs.y, this->dir); }
-	inline posi& operator/(const posi& rhs) const { return posi(this->x / rhs.x, this->y / rhs.y, this->dir); }
-	inline posi& operator%(const posi& rhs) const { return posi(this->x % rhs.x, this->y % rhs.y, this->dir); }
+	inline Ray2D& operator+(const Ray2D& rhs) const { return Ray2D(this->x + rhs.x, this->y + rhs.y, this->dir); }
+	inline Ray2D& operator-(const Ray2D& rhs) const { return Ray2D(this->x - rhs.x, this->y - rhs.y, this->dir); }
+	inline Ray2D& operator*(const Ray2D& rhs) const { return Ray2D(this->x * rhs.x, this->y * rhs.y, this->dir); }
+	inline Ray2D& operator/(const Ray2D& rhs) const { return Ray2D(this->x / rhs.x, this->y / rhs.y, this->dir); }
+	inline Ray2D& operator%(const Ray2D& rhs) const { return Ray2D(this->x % rhs.x, this->y % rhs.y, this->dir); }
 };
