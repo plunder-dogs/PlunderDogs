@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include "Global.h"
+#include <array>
 
 //A 1 byte store for all the data, very compact but annoying to use
 struct byteStore
@@ -45,15 +46,17 @@ class PathFinding
 
 	struct TileData
 	{
-		TileData(bool traversable, bool occupied) :
-			isTraversable(traversable), isOccupied(occupied),
-			parent{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } {}
+		TileData(bool traversable, bool occupied) 
+			: m_isTraversable(traversable), 
+			m_isOccupied(occupied),
+			m_parent{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } 
+		{}
 
-		const bool isTraversable;
-		bool isOccupied;
+		const bool m_isTraversable;
+		bool m_isOccupied;
 		//The node that was first used to access the corresponding direction during the BFS
 		//One for each direction in order
-		Ray2D parent[6];
+		std::array<Ray2D, static_cast<size_t>(eDirection::Max + 1)> m_parent;
 	};
 
 public:

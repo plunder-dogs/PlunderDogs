@@ -35,7 +35,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessTileData(startPos, map.getDimensions().x).parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	accessTileData(startPos, map.getDimensions().x).m_parent[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
 	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
@@ -51,7 +51,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	while (trace != startPos)
 	{
 		pathToTile.emplace_back(trace);
-		trace = accessTileData(trace, map.getDimensions().x).parent[trace.dir];
+		trace = accessTileData(trace, map.getDimensions().x).m_parent[trace.dir];
 	}
 	//Invert for convenience and fetch tile* for each address
 	std::queue<Ray2D> finalPath;
@@ -161,26 +161,26 @@ bool PathFinding::pathExplorer(Ray2D & finalPoint, std::queue<std::pair<Ray2D, f
 
 		Ray2D queueTile = turnLeft(tile);
 
-		if (accessTileData(queueTile, mapWidth).parent[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Right
 		queueTile = turnRight(tile);
-		if (accessTileData(queueTile, mapWidth).parent[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Forward
 		queueTile = nextTile(tile, mapWidth, m_tileData.size());
 		if (queueTile != NO_TILE &&
-			accessTileData(queueTile, mapWidth).parent[queueTile.dir] == NO_TILE &&
-			accessTileData(queueTile, mapWidth).isTraversable &&
-			!accessTileData(queueTile, mapWidth).isOccupied)
+			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] == NO_TILE &&
+			accessTileData(queueTile, mapWidth).m_isTraversable &&
+			!accessTileData(queueTile, mapWidth).m_isOccupied)
 		{
-			accessTileData(queueTile, mapWidth).parent[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_parent[queueTile.dir] = tile;
 			if (queueTile.dir == windDirection)
 				queue.emplace(queueTile, tether - (1.0f - windStrength));
 			else
