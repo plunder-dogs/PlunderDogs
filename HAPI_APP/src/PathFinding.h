@@ -5,10 +5,10 @@
 #include <array>
 
 //A 1 byte store for all the data, very compact but annoying to use
-struct byteStore
+struct ByteStore
 {
 	unsigned char byte;
-	byteStore(bool traversable = false) : byte(0) { if (traversable) byte = (1 << 7); }
+	ByteStore(bool traversable = false) : byte(0) { if (traversable) byte = (1 << 7); }
 	//First bit
 	bool traversable() { return byte & 128; }
 
@@ -69,9 +69,8 @@ class PathFinding
 		}
 
 		bool m_traversable;
-
 		//The node that was first used to access the corresponding direction during the BFS
-		//One for each direction in order
+		//One for each direction in ord
 		std::array<Ray2D, static_cast<size_t>(eDirection::Max + 1)> m_parent;
 	};
 
@@ -94,10 +93,10 @@ public:
 
 private:
 	std::vector<TileData> m_tileData;
-	std::vector<byteStore> m_byteData;
+	std::vector<ByteStore> m_byteData;
 
 	TileData& accessTileData(Ray2D tile, int mapWidth);
-	byteStore& accessByteData(Ray2D tile, int mapWidth);
+	ByteStore& accessByteData(Ray2D tile, int mapWidth);
 
 	bool pathExplorer(Ray2D& finalPoint, std::queue<std::pair<Ray2D, float>>& queue, Ray2D destination, eDirection windDirection, float windStrength,
 		int mapWidth);

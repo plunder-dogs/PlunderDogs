@@ -35,33 +35,3 @@ private:
 	void assignFaction(FactionName factionName, eControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
 	FactionName getLocalFactionName() const;
 };
-
-//
-////
-//Ray2D start = { m_currentPosition, m_currentDirection };
-//Ray2D end = { destination.x, destination.y };
-//std::queue<Ray2D> pathToTile = PathFinding::getInstance().findPath(map, start, end, m_movementPoints);
-//if (pathToTile.empty())
-//{
-//	return;
-//}
-//
-//m_movementArea.clearTileArea();
-//while (!pathToTile.empty())
-//{
-//	m_movementArea.m_tileArea.push_back(pathToTile.front());
-//	pathToTile.pop();
-//}
-//
-//m_displayOnlyLastPosition = displayOnlyLastPosition;
-//if (m_displayOnlyLastPosition)
-//{
-//	sf::Vector2i lastPosition = m_movementArea.m_tileArea.back().pair();
-//	m_movementArea.m_tileAreaGraph[0].setPosition(lastPosition);
-//	m_movementArea.m_tileAreaGraph[0].activate();
-//}
-//else
-//{
-//	m_movementArea.activateGraph();
-//}
-//}
