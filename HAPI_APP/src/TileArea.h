@@ -16,6 +16,7 @@ struct PosiArea
 	
 	void render(sf::RenderWindow& window, const Map& map);
 	void clearTileArea();
+	void clearDisplayGraph();
 	void activateGraph();
 
 	std::vector<Sprite> m_tileAreaGraph;

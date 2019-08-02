@@ -102,19 +102,13 @@ void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vec
 
 	Ray2D start = { m_currentPosition, m_currentDirection };
 	Ray2D end = { destination.x, destination.y };
-	std::queue<Ray2D> pathToTile = PathFinding::getInstance().findPath(map, start, end, m_movementPoints);
-	if (pathToTile.empty())
+	PathFinding::getInstance().findPath(m_movementArea.m_tileArea, map, start, end, m_movementPoints);
+	if (m_movementArea.m_tileArea.empty())
 	{
 		return;
 	}
-	
-	m_movementArea.clearTileArea();
-	while (!pathToTile.empty())
-	{
-		m_movementArea.m_tileArea.push_back(pathToTile.front());
-		pathToTile.pop();
-	}
 
+	m_movementArea.clearDisplayGraph();
 	m_displayOnlyLastPosition = displayOnlyLastPosition;
 	if (m_displayOnlyLastPosition)
 	{

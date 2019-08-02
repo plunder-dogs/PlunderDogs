@@ -85,6 +85,7 @@ public:
 	void loadTileData(const Map& map);
 
 	//For finding the optimal path for a ship, returns an empty queue if it can't be reached
+	void findPath(std::deque<Ray2D>& tileArea, const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement);
 	std::queue<Ray2D> findPath(const Map& map, Ray2D startPos, Ray2D endPos, float maxMovement);
 
 	//For finding the possible movement area of a ship

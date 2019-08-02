@@ -46,6 +46,14 @@ void PosiArea::clearTileArea()
 	m_tileArea.clear();
 }
 
+void PosiArea::clearDisplayGraph()
+{
+	for (int i = 0; i < m_tileArea.size(); ++i)
+	{
+		m_tileAreaGraph[i].deactivate();
+	}
+}
+
 void PosiArea::activateGraph()
 {
 	assert(m_tileArea.size() <= m_tileAreaGraph.size());
