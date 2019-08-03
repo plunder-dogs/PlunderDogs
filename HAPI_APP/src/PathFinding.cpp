@@ -439,6 +439,6 @@ void PathFinding::resetTileData(const Map & map)
 		}
 
 		m_tileData[i].m_traversable = tileTraversable;
-		m_tileData[i].resetParent();
+		m_tileData[i].resetNeighbours();
 	}
 }

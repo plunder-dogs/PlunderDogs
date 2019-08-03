@@ -61,7 +61,7 @@ class PathFinding
 			m_neighbours{ NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE, NO_TILE } 
 		{}
 
-		void resetParent()
+		void resetNeighbours()
 		{
 			for (auto& i : m_neighbours)
 			{
