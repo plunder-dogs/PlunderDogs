@@ -679,6 +679,11 @@ std::vector<const Tile*> Map::getTileRadius(sf::Vector2i coord, int range, bool 
 
 void Map::getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
+	if (getTile(coord)->m_type != eSea && getTile(coord)->m_type != eOcean)
+	{
+		return;
+	}
+
 	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && (getTile(coord)->m_type == eSea || getTile(coord)->m_type == eOcean)))
 	{
 		tileArea.push_back(getTile(coord));

@@ -13,6 +13,7 @@
 constexpr size_t MAX_MOVE_AREA{ 700 };
 constexpr size_t MAX_TARGET_AREA = 50;
 const sf::Vector2f CAMERA_MOVE_SPEED{ 1.0f, 1.0f };
+constexpr int MINIMUM_MULTIPLE_SHIP_SEARCH_AREA = 1;
 
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
@@ -509,22 +510,20 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	if (m_shipSelector.getSelectedShips().size() > size_t(1) && !m_leftClickHeld)
 	{
 		m_movementArea.clearTileArea();
-		m_battle.getMap().getNonCollidableAdjacentTiles(m_movementArea.m_tileArea, 
-			m_tileOnMouse->m_tileCoordinate);
+		m_battle.getMap().getTileRadius(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate, 
+			MINIMUM_MULTIPLE_SHIP_SEARCH_AREA, true, false);
 
 		if (m_movementArea.m_tileArea.empty())
 		{
 			return;
 		}
+
+		int range = MINIMUM_MULTIPLE_SHIP_SEARCH_AREA + 1;
 		while (m_movementArea.m_tileArea.size() < m_shipSelector.getSelectedShips().size())
 		{
-			const Tile* adjacentTile = m_battle.getMap().getNonCollidableAdjacentTile(
-				m_movementArea.m_tileArea, m_movementArea.m_tileArea.back()->m_tileCoordinate);
+			m_battle.getMap().getTileRadius(m_movementArea.m_tileArea, m_tileOnMouse->m_tileCoordinate, range, true, true);
 
-			if (adjacentTile)
-			{
-				m_movementArea.m_tileArea.push_back(adjacentTile);
-			}
+			++range;
 		}
 
 		//Generate ship movement paths to positions
