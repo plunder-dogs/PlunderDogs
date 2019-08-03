@@ -2,7 +2,7 @@
 
 #include "Textures.h"
 #include "Battle.h"
-#include "AI.h"
+#include "AIHandler.h"
 #include <array>
 #include "SFML/Graphics.hpp"
 #include "Utilities/XMLParser.h"

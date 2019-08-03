@@ -184,7 +184,7 @@
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\Faction.cpp" />
     <ClCompile Include="src\Ship.cpp" />
-    <ClCompile Include="src\AI.cpp" />
+    <ClCompile Include="src\AIHandler.cpp" />
     <ClCompile Include="src\Battle.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
@@ -210,7 +210,7 @@
     <ClInclude Include="src\Sprite.h" />
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
-    <ClInclude Include="src\AI.h" />
+    <ClInclude Include="src\AIHandler.h" />
     <ClInclude Include="src\BattleUI.h" />
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />

@@ -26,7 +26,7 @@ Game::Game(bool onlineGame)
 
 		m_factions[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
 		m_factions[static_cast<int>(FactionName::eRed)].m_controllerType = eControllerType::eAI;
-		AI::loadShips(m_factions[static_cast<int>(FactionName::eRed)]);
+		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(FactionName::eRed)]);
 		m_battle.startSinglePlayerGame("level2.tmx");
 	}
 }

@@ -1,5 +1,5 @@
 #include <vector>
-#include "AI.h"
+#include "AIHandler.h"
 #include "Utilities/Utilities.h"
 #include "PathFinding.h"
 #include "Battle.h"
@@ -11,12 +11,12 @@
 
 //Finds closest living enemy, returns nullptr if none found
 const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName faction);
-//Finds nearest firing position to ship, if none are found will return the tile the ship is on
+////Finds nearest firing position to ship, if none are found will return the tile the ship is on
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range);
-void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
-void attemptShot(Battle& battle, const Map& mapPtr, Ship& firingShip);
+void attemptMove(std::vector<Ray2D>& movementArea, const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
+void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map& mapPtr, Ship& firingShip);
 
-void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlayer, int currentUnit)
+void AIHandler::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlayer, int currentUnit)
 {
 	auto& ships = battlePlayer.m_ships;
 
@@ -37,17 +37,17 @@ void AI::handleMovementPhase(const Battle& battle, Map& map, Faction& battlePlay
 		ships[currentUnit].getRange())};
 
 	//move as far as possible on the path to the chosen position
-	attemptMove(battle.getCurrentFaction(), map, ships[currentUnit], firingPosition);
+	attemptMove(m_movementArea, battle.getCurrentFaction(), map, ships[currentUnit], firingPosition);
 }
 
-void AI::handleShootingPhase(Battle& battle, const Map& map, Faction& player, int currentUnit)
+void AIHandler::handleShootingPhase(Battle& battle, const Map& map, Faction& player, int currentUnit)
 {
 	//if (player.m_entities[i]->m_battleProperties.isDead()) continue;
 	//check if the ship is able to fire upon any enemies and fire if possible
-	attemptShot(battle, map, player.m_ships[currentUnit]);
+	attemptShot(m_targetArea, battle, map, player.m_ships[currentUnit]);
 }
 
-void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
+void AIHandler::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 {	
 	assert(currentPlayer.m_controllerType == eControllerType::eAI);
 
@@ -61,7 +61,7 @@ void AI::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 	}
 }
 
-void AI::loadShips(Faction& player)
+void AIHandler::loadShips(Faction& player)
 {
 	assert(player.m_controllerType == eControllerType::eAI);
 
@@ -294,12 +294,13 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 	return { closestTile, facingDirection };
 }
 
-void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile)
+void attemptMove(std::vector<Ray2D>& movementArea, const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile)
 {
 	//Call generate path
 	const Tile* tile{ map.getTile(currentShip.getCurrentPosition()) };
 	//int pathLength = currentShip->m_battleProperties.generateMovementGraph(map, *tile, *targetTile.x);
-	auto availableTiles = PathFinding::getInstance().findArea(
+	movementArea.clear();
+	movementArea = PathFinding::getInstance().findArea(
 		map,
 		Ray2D(currentShip.getCurrentPosition(), currentShip.getCurrentDirection()),
 		static_cast<float>(currentShip.getMovementPoints()));
@@ -308,7 +309,7 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 	sf::Vector2i currentPos = currentShip.getCurrentPosition();
 	int closestDistance{ INT_MAX };
 	Ray2D bestTile{ -1, -1, eNorth };
-	for (Ray2D it : availableTiles)
+	for (Ray2D it : movementArea)
 	{
 		sf::Vector2i diff(
 			{ targetPos.x - it.x, targetPos.y - it.y });
@@ -329,49 +330,49 @@ void attemptMove(const Faction& faction, Map& map, Ship& currentShip, std::pair<
 	currentShip.setDestination();
 }
 
-void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
+void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map& map, Ship& firingShip)
 {
-	std::vector<const Tile*> firingArea;
+	targetArea.clear();
 	switch (firingShip.getShipType())
 	{
 	case eShipType::eTurtle:
 	{
-		firingArea = map.getTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
-		for (int i = 0; i < firingArea.size(); i++)
+		targetArea = map.getTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
+		for (int i = 0; i < targetArea.size(); i++)
 		{
-			if (!firingArea[i]) continue;
-			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
-			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
+			if (!targetArea[i]) continue;
+			if (!targetArea[i]->m_shipOnTile.isValid()) continue;
+			if (targetArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(targetArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *targetArea[i], targetArea);
 			break;
 		}
 		break;
 	}
 	case eShipType::eSniper:
 	{
-		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
-		for (int i = 0; i < firingArea.size(); i++)
+		targetArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
+		for (int i = 0; i < targetArea.size(); i++)
 		{
-			if (!firingArea[i]) continue;
-			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
-			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
+			if (!targetArea[i]) continue;
+			if (!targetArea[i]->m_shipOnTile.isValid()) continue;
+			if (targetArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(targetArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *targetArea[i], targetArea);
 			break;
 		}
 		break;
 	}
 	case eShipType::eFrigate:
 	{
-		firingArea = map.getTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
-		for (int i = 0; i < firingArea.size(); i++)
+		targetArea = map.getTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
+		for (int i = 0; i < targetArea.size(); i++)
 		{
-			if (!firingArea[i]) continue;
-			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
-			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
+			if (!targetArea[i]) continue;
+			if (!targetArea[i]->m_shipOnTile.isValid()) continue;
+			if (targetArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(targetArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *targetArea[i], targetArea);
 			break;
 		}
 		break;
@@ -395,18 +396,19 @@ void attemptShot(Battle& battle, const Map& map, Ship& firingShip)
 			break;
 		}
 			
-		firingArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
-		for (int i = 0; i < firingArea.size(); i++)
+		targetArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
+		for (int i = 0; i < targetArea.size(); i++)
 		{
-			if (!firingArea[i]) continue;
-			if (!firingArea[i]->m_shipOnTile.isValid()) continue;
-			if (firingArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(firingArea[i]->m_shipOnTile).isDead()) continue;
+			if (!targetArea[i]) continue;
+			if (!targetArea[i]->m_shipOnTile.isValid()) continue;
+			if (targetArea[i]->m_shipOnTile.factionName == firingShip.getFactionName() || battle.getFactionShip(targetArea[i]->m_shipOnTile).isDead()) continue;
 			const Tile& tileOnFiringShip = *map.getTile(firingShip.getCurrentPosition());
-			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *firingArea[i], firingArea);
+			battle.fireFactionShipAtPosition(tileOnFiringShip.m_shipOnTile, *targetArea[i], targetArea);
 			break;
 		}
 		break;
 	}
 	}
+
 	firingShip.fireWeapon();
 }

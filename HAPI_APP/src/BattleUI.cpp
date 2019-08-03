@@ -5,7 +5,7 @@
 #include "Utilities/Utilities.h"
 #include "GameEventMessenger.h"
 #include <assert.h>
-#include "AI.h"
+#include "AIHandler.h"
 
 //Debug
 #include <iostream>

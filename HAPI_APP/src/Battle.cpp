@@ -1,7 +1,7 @@
 #include "Battle.h"
 #include "Utilities/XMLParser.h"
 #include "GameEventMessenger.h"
-#include "AI.h"
+#include "AIHandler.h"
 #include "Textures.h"
 #include "NetworkHandler.h"
 #include <iostream>
@@ -73,7 +73,7 @@ void Battle::handleAIMovementPhaseTimer(float deltaTime)
 			if (!ship.isDead() &&
 				!ship.isDestinationSet())
 			{
-				AI::handleMovementPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
+				AIHandler::getInstance().handleMovementPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
 				m_timeBetweenAIUnits.reset();
 				return;
 			}
@@ -102,7 +102,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 		{
 			if (!ship.isDead() && !ship.isWeaponFired())
 			{
-				AI::handleShootingPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
+				AIHandler::getInstance().handleShootingPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
 				m_timeBetweenAIUnits.reset();
 				return;
 			}
@@ -618,7 +618,7 @@ void Battle::advanceToNextBattlePhase()
 				if (!m_factions[i].m_ships[0].isDeployed())
 				{
 					m_currentFactionTurn = i;
-					AI::handleDeploymentPhase(*this, m_factions[m_currentFactionTurn]);
+					AIHandler::getInstance().handleDeploymentPhase(*this, m_factions[m_currentFactionTurn]);
 					allPlayersDeployed = false;
 					break;
 				}
