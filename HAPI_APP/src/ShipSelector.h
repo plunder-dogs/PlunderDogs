@@ -15,7 +15,7 @@ struct SelectedShip
 };
 
 class Map;
-class Ship;
+class Battle;
 class ShipSelector : private NonCopyable
 {
 public:
@@ -25,7 +25,7 @@ public:
 	//Get selected ship that has been removed
 	ShipOnTile removeSelectedShip();
 
-	void update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map);
+	void update(const Battle& battle, sf::Vector2i mousePosition, const Map& map);
 	void render(sf::RenderWindow& window, const Map& map, bool leftClickHeld);
 	
 	void reset();

@@ -1,6 +1,6 @@
 #include "ShipSelector.h"
 #include "Textures.h"
-#include "Ship.h"
+#include "Battle.h"
 #include <assert.h>
 #include <math.h>
 
@@ -48,7 +48,7 @@ void ShipSelector::setPosition(sf::Vector2i position)
 	m_AABB.top = position.y;
 }
 
-void ShipSelector::update(const std::vector<Ship>& currentFactionShips, sf::Vector2i mousePosition, const Map& map)
+void ShipSelector::update(const Battle& battle, sf::Vector2i mousePosition, const Map& map)
 {
 	//Change Size
 	mousePosition -= MOUSE_POSITION_OFFSET;
@@ -59,11 +59,18 @@ void ShipSelector::update(const std::vector<Ship>& currentFactionShips, sf::Vect
 	m_AABB.width = selectorSize.x;
 	m_AABB.height = selectorSize.y;
 
+	//Don't add AI or Remote Player ships
+	if (battle.getCurrentFaction().m_controllerType == eControllerType::eAI ||
+		battle.getCurrentFaction().m_controllerType == eControllerType::eRemotePlayer)
+	{
+		return;
+	}
+
 	//Add/Remove ships
 	if (std::abs(m_shape.getSize().x) >= MIN_SHAPE_WIDTH_SIZE &&
 		std::abs(m_shape.getSize().y) >= MIN_SHAPE_HEIGHT_SIZE)
 	{
-		for (const auto& shipToSelect : currentFactionShips)
+		for (const auto& shipToSelect : battle.getCurrentFactionShips())
 		{
 			//Do not add these ships to selector
 			if (shipToSelect.isDead() || shipToSelect.isDestinationSet() || shipToSelect.isWeaponFired())

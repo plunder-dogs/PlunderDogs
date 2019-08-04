@@ -10,7 +10,7 @@
 //Debug
 #include <iostream>
 
-constexpr size_t MAX_MOVE_AREA{ 700 };
+constexpr size_t MAX_MOVE_AREA{ 850 };
 constexpr size_t MAX_TARGET_AREA = 50;
 const sf::Vector2f CAMERA_MOVE_SPEED{ 1.0f, 1.0f };
 constexpr int MINIMUM_MULTIPLE_SHIP_SEARCH_AREA = 1;
@@ -233,7 +233,8 @@ void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	
-	if (!m_battle.isShipBelongToFactionInPlay(m_tileOnLeftClick->m_shipOnTile))
+	if (!m_battle.isShipBelongToFactionInPlay(m_tileOnLeftClick->m_shipOnTile) ||
+		m_battle.getCurrentFaction().m_controllerType != eControllerType::eLocalPlayer)
 	{
 		return;
 	}
@@ -400,7 +401,7 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
 	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
 	{
-		m_shipSelector.update(m_battle.getCurrentFactionShips(), mousePosition, m_battle.getMap());
+		m_shipSelector.update(m_battle, mousePosition, m_battle.getMap());
 	}
 
 	const Tile* tileOnMouse = m_battle.getMap().getTile(m_battle.getMap().getMouseClickCoord(mousePosition));
