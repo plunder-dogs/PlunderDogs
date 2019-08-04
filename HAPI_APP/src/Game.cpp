@@ -44,7 +44,6 @@ void Game::run()
 
 	if (NetworkHandler::getInstance().isConnected() && m_onlineGame)
 	{
-		NetworkHandler::getInstance().setBlocking();
 		ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 		NetworkHandler::getInstance().disconnect();
@@ -58,7 +57,6 @@ void Game::handleServerMessages()
 		return;
 	}
 
-	NetworkHandler::getInstance().listenToServer();
 	while (NetworkHandler::getInstance().hasMessages())
 	{
 		ServerMessage receivedServerMessage = NetworkHandler::getInstance().getServerMessage();
@@ -123,7 +121,6 @@ void Game::handleInput()
 		{
 			if (m_onlineGame)
 			{
-				NetworkHandler::getInstance().setBlocking();
 				ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
 				NetworkHandler::getInstance().sendServerMessage(messageToSend);
 				NetworkHandler::getInstance().disconnect();
