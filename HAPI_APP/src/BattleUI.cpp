@@ -12,7 +12,7 @@
 
 constexpr size_t MAX_MOVE_AREA{ 850 };
 constexpr size_t MAX_TARGET_AREA = 50;
-const sf::Vector2f CAMERA_MOVE_SPEED{ 1.0f, 1.0f };
+const sf::Vector2f CAMERA_MOVE_SPEED{ 2.0f, 2.0f };
 constexpr int MINIMUM_MULTIPLE_SHIP_SEARCH_AREA = 1;
 
 BattleUI::BattleUI(Battle & battle)
@@ -26,8 +26,8 @@ BattleUI::BattleUI(Battle & battle)
 	m_leftClickHeld(false),
 	m_leftClickPosition(),
 	m_maxCameraOffset(),
-	m_pendingCameraMovement(),
-	m_cameraPositionOffset()
+	m_cameraVelocity(),
+	m_cameraPosition()
 {
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
@@ -42,9 +42,9 @@ TileArea & BattleUI::getTargetArea()
 	return m_targetArea;
 }
 
-sf::Vector2i BattleUI::getCameraPositionOffset() const
+sf::Vector2i BattleUI::getCameraPosition() const
 {
-	return m_cameraPositionOffset;
+	return m_cameraPosition;
 }
 
 void BattleUI::render(sf::RenderWindow& window)
@@ -114,8 +114,33 @@ void BattleUI::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePos
 }
 
 void BattleUI::update(float deltaTime)
-{
-	updateCamera();
+{	
+	//Move Camera
+	if (m_cameraPosition.x < -120)
+	{
+		m_cameraPosition.x = -120;
+	}
+	else if (m_cameraPosition.x > m_maxCameraOffset.x)
+	{
+		m_cameraPosition.x = m_maxCameraOffset.x;
+	}
+	else
+	{
+		m_cameraPosition.x += m_cameraVelocity.x;
+	}
+
+	if (m_cameraPosition.y < -100)
+	{
+		m_cameraPosition.y = -100;
+	}
+	else if (m_cameraPosition.y > m_maxCameraOffset.y)
+	{
+		m_cameraPosition.y = m_maxCameraOffset.y;
+	}
+	else
+	{
+		m_cameraPosition.y += m_cameraVelocity.y;
+	}
 }
 
 void BattleUI::generateTargetArea(const Tile & source)
@@ -189,42 +214,6 @@ void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEv
 		if (m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
 		{
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
-		}
-	}
-}
-
-void BattleUI::updateCamera()
-{
-	//camera pan
-	if (m_pendingCameraMovement != sf::Vector2f(0, 0))
-	{
-		m_cameraPositionOffset.x += m_pendingCameraMovement.x;
-		m_cameraPositionOffset.y += m_pendingCameraMovement.y;
-
-		if (m_cameraPositionOffset.x < -120)
-		{
-			m_cameraPositionOffset.x = -120;
-		}
-		else if (m_cameraPositionOffset.x > m_maxCameraOffset.x)
-		{
-			m_cameraPositionOffset.x = m_maxCameraOffset.x;
-		}
-		else
-		{
-			m_cameraPositionOffset.x += m_pendingCameraMovement.x;
-		}
-
-		if (m_cameraPositionOffset.y < -100)
-		{
-			m_cameraPositionOffset.y = -100;
-		}
-		else if (m_cameraPositionOffset.y > m_maxCameraOffset.y)
-		{
-			m_cameraPositionOffset.y = m_maxCameraOffset.y;
-		}
-		else
-		{
-			m_cameraPositionOffset.y += m_pendingCameraMovement.y;
 		}
 	}
 }
@@ -443,24 +432,30 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 
 void BattleUI::moveCamera(sf::Vector2i mousePosition)
 {
-	m_pendingCameraMovement = sf::Vector2f(0, 0);
-
 	if (mousePosition.x < 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ -CAMERA_MOVE_SPEED.x , 0.0f };
+		m_cameraVelocity.x = -CAMERA_MOVE_SPEED.x;
 	}
 	else if (mousePosition.x > SCREEN_RESOLUTION.x - 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ CAMERA_MOVE_SPEED.x, 0.0f };
+		m_cameraVelocity.x = CAMERA_MOVE_SPEED.x;
+	}
+	else
+	{
+		m_cameraVelocity.x = 0.0f;
 	}
 
 	if (mousePosition.y < 50)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ 0, -CAMERA_MOVE_SPEED.y };
+		m_cameraVelocity.y = -CAMERA_MOVE_SPEED.y;
 	}
 	else if (mousePosition.y > SCREEN_RESOLUTION.y - 100)
 	{
-		m_pendingCameraMovement += sf::Vector2f{ 0, CAMERA_MOVE_SPEED.y };
+		m_cameraVelocity.y = CAMERA_MOVE_SPEED.y;
+	}
+	else
+	{
+		m_cameraVelocity.y = 0.0f;
 	}
 }
 

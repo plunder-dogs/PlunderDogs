@@ -15,7 +15,7 @@ public:
 	~BattleUI();
 
 	TileArea& getTargetArea();
-	sf::Vector2i getCameraPositionOffset() const;
+	sf::Vector2i getCameraPosition() const;
 
 	void moveCamera(sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
@@ -40,9 +40,8 @@ private:
 
 	//Camera
 	sf::Vector2i m_maxCameraOffset;
-	sf::Vector2f m_pendingCameraMovement;
-	sf::Vector2i m_cameraPositionOffset;
-	void updateCamera();
+	sf::Vector2f m_cameraVelocity;
+	sf::Vector2i m_cameraPosition;
 	
 	ShipSelector m_shipSelector;
 

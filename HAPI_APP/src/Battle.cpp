@@ -294,7 +294,7 @@ void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & curre
 void Battle::update(float deltaTime)
 {
 	m_battleUI.update(deltaTime);
-	m_map.setDrawOffset(m_battleUI.getCameraPositionOffset());
+	m_map.setDrawOffset(m_battleUI.getCameraPosition());
 	updateLightIntensity(deltaTime);
 	handleTimeUntilGameOver(deltaTime);
 
