@@ -18,7 +18,13 @@ public:
 	void run();
 
 private:
-	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> m_factions;
+	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> m_factions
+	{
+		static_cast<int>(FactionName::eYellow), 
+		static_cast<int>(FactionName::eBlue), 
+		static_cast<int>(FactionName::eGreen), 
+		static_cast<int>(FactionName::eRed)
+	};
 	sf::RenderWindow m_window;
 	bool m_onlineGame;
 	bool m_gameLobbyActive;

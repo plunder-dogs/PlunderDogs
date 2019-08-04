@@ -2,8 +2,7 @@
 #include "GameEventMessenger.h"
 
 Game::Game(bool onlineGame)
-	: m_factions(),
-	m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
+	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
 	m_onlineGame(onlineGame),
 	m_gameLobbyActive(false),
 	m_ready(false),

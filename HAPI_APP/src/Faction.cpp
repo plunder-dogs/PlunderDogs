@@ -7,11 +7,12 @@ constexpr size_t MAX_SPAWN_AREA = 75;
 constexpr size_t SPAWN_AREA_RANGE = 3;
 
 //BATTLE PLAYER
-Faction::Faction()
+Faction::Faction(int factionID)
 	: m_ships(),
 	m_factionName(),
 	m_controllerType(eControllerType::None),
-	m_spawnArea(MAX_SPAWN_AREA)
+	m_spawnArea(MAX_SPAWN_AREA),
+	m_factionID(factionID)
 {
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
 }
@@ -37,7 +38,7 @@ const Ship & Faction::getShip(int shipID) const
 	return m_ships[shipID];
 }
 
-void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase)
+void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase, int currentFactionTurn)
 {
 	for (auto& spawnArea : m_spawnArea.m_tileAreaGraph)
 	{
@@ -46,18 +47,27 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 
 	if (currentBattlePhase == BattlePhase::Deployment)
 	{
-		for (auto& ship : m_ships)
+		if (m_factionID <= currentFactionTurn)
 		{
-			if (ship.isDeployed())
+			//Only render deployed ships
+			for (auto& ship : m_ships)
 			{
-				ship.render(window, map);
+				if (!ship.isDeploymentStarted())
+				{
+					continue;
+				}
+
+				if (ship.isDeployed())
+				{
+					ship.render(window, map);
+				}
+				else
+				{
+					ship.render(window, map);
+					break;
+				}
 			}
-			else
-			{
-				ship.render(window, map);
-				break;
-			}
-		}		
+		}
 	}
 	else
 	{

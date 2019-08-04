@@ -250,7 +250,7 @@ void Battle::render(sf::RenderWindow& window)
 	{
 		if (faction.isActive())
 		{
-			faction.render(window, m_map, m_currentBattlePhase);
+			faction.render(window, m_map, m_currentBattlePhase, m_currentFactionTurn);
 		}
 	}
 	
