@@ -29,6 +29,7 @@ public:
 	bool isMovingToDestination() const;
 	bool isDestinationSet() const;
 	bool isDeployed() const;
+	bool isDeploymentStarted() const;
 	int getMovementPoints() const;
 	int getRange() const;
 	int getDamage() const;
@@ -71,6 +72,7 @@ private:
 	bool m_movingToDestination;
 	bool m_destinationSet;
 	bool m_displayOnlyLastPosition;
+	bool m_deploymentStarted;
 	int m_maxHealth;
 	int m_health;
 	int m_damage;

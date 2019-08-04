@@ -68,6 +68,11 @@ bool Ship::isDeployed() const
 	return m_deployed;
 }
 
+bool Ship::isDeploymentStarted() const
+{
+	return m_deploymentStarted;
+}
+
 int Ship::getMovementPoints() const
 {
 	return m_movementPoints;
@@ -286,6 +291,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 	m_movingToDestination(false),
 	m_destinationSet(false),
 	m_displayOnlyLastPosition(false),
+	m_deploymentStarted(false),
 	m_maxHealth(0),
 	m_health(0),
 	m_damage(0),
@@ -481,6 +487,7 @@ void Ship::renderMovementArea(sf::RenderWindow & window, const Map & map)
 
 void Ship::setDeploymentPosition(sf::Vector2i position, eDirection direction)
 {
+	m_deploymentStarted = true;
 	m_currentPosition = position;
 	m_sprite.setRotation(direction * ROTATION_ANGLE % 360);
 }
