@@ -160,8 +160,6 @@ void Battle::quitGame()
 
 void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
-	assert(!m_factions.empty());
-
 	m_onlineGame = true;
 	m_map.loadmap(newMapName);
 	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
@@ -180,7 +178,6 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 		}
 	}
 
-	//Set initial deployment state
 	bool playerFound = false;
 	for (const auto& faction : m_factions)
 	{
@@ -192,6 +189,7 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 		}
 	}
 
+	//Set initial deployment state
 	if (playerFound)
 	{
 		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
@@ -204,8 +202,6 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 
 void Battle::startSinglePlayerGame(const std::string & levelName)
 {
-	assert(!m_factions.empty());
-
 	m_onlineGame = false;
 	m_map.loadmap(levelName);
 	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
@@ -219,7 +215,6 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 		}
 	}
 
-	//Set initial deployment state
 	bool playerFound = false;
 	for (const auto& faction : m_factions)
 	{
@@ -230,6 +225,7 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 		}
 	}
 
+	//Set initial deployment state
 	if (playerFound)
 	{
 		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
@@ -569,38 +565,30 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 
 void Battle::advanceToNextBattlePhase()
 {
-	//Send server message
 	if (m_currentBattlePhase == BattlePhase::Deployment)
 	{
+		bool allFactionsDeployed = true;
 		bool allPlayersDeployed = true;
-		bool allHumansDeployed = true;
 		if (m_currentDeploymentState == eDeploymentState::DeployingPlayer)
 		{
 			for (int i = 0; i < m_factions.size(); ++i)
 			{
-				if (!m_factions[i].isActive())
+				if (!m_factions[i].isActive() || m_factions[i].m_controllerType == eControllerType::eAI)
 				{
 					continue;
 				}
 
-				if (m_factions[i].m_controllerType != eControllerType::eLocalPlayer &&
-					m_factions[i].m_controllerType != eControllerType::eRemotePlayer)
-				{
-					continue;
-				}
-
-				//If first ship hasn't been deployed - rest haven't
-				//Proceed to deploy this human player ships
+				//Faction hasn't been deployed - begin to deploy faction
 				if (!m_factions[i].m_ships[0].isDeployed())
 				{
 					m_currentFactionTurn = i;
+					allFactionsDeployed = false;
 					allPlayersDeployed = false;
-					allHumansDeployed = false;
 					break;
 				}
 			}
 
-			if (allHumansDeployed)
+			if (allPlayersDeployed)
 			{
 				m_currentDeploymentState = eDeploymentState::DeployingAI;
 			}
@@ -610,49 +598,27 @@ void Battle::advanceToNextBattlePhase()
 		{
 			for (int i = 0; i < m_factions.size(); ++i)
 			{
-				if(!m_factions[i].isActive())
-				{
-					continue;
-				}
-				for (int i = 0; i < m_factions.size(); ++i)
-				{
-					if (!m_factions[i].isActive())
-					{
-						continue;
-					}
-				}
-
-				if (m_factions[i].m_controllerType != eControllerType::eAI)
+				if(!m_factions[i].isActive() || m_factions[i].m_controllerType != eControllerType::eAI)
 				{
 					continue;
 				}
 
-				//If first ship hasn't been deployed - rest haven't
-				//Proceed to deploy this human player ships
+				//Faction hasn't been deployed - begin to deploy faction
 				if (!m_factions[i].m_ships[0].isDeployed())
 				{
 					m_currentFactionTurn = i;
 					AIHandler::getInstance().handleDeploymentPhase(*this, m_factions[m_currentFactionTurn]);
-					allPlayersDeployed = false;
+					allFactionsDeployed = false;
 					break;
 				}
 			}
 		}
 
-		if (allPlayersDeployed)
+		if (allFactionsDeployed)
 		{
 			switchToBattlePhase(BattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
 			m_currentFactionTurn = 0;
-
-			for (auto& faction : m_factions)
-			{
-				if (faction.isActive())
-				{
-					faction.clearSpawnArea();
-				}
-			}
-
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
 				ship.enableAction();
@@ -661,8 +627,15 @@ void Battle::advanceToNextBattlePhase()
 			if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
-				//TODO: Refactor
-				//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
+			}
+
+			//Clear all faction spawn areas
+			for (auto& faction : m_factions)
+			{
+				if (faction.isActive())
+				{
+					faction.clearSpawnArea();
+				}
 			}
 		}
 	}
@@ -678,8 +651,6 @@ void Battle::advanceToNextBattlePhase()
 		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
-			//TODO: Refactor
-			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
 		}
 	}
 	else if (m_currentBattlePhase == BattlePhase::Attack)
@@ -693,6 +664,7 @@ void Battle::advanceToNextBattlePhase()
 
 		updateWindDirection();
 		incrementFactionTurn();
+
 		for (auto& entity : m_factions[m_currentFactionTurn].m_ships)
 		{
 			entity.enableAction();
@@ -701,13 +673,6 @@ void Battle::advanceToNextBattlePhase()
 		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eAI)
 		{
 			m_timeUntilAITurn.setActive(true);
-			//TODO: Refactor		
-			//GameEventMessenger::getInstance().broadcast(GameEvent::eEnteredAITurn);
-		}
-		else if (m_factions[m_currentFactionTurn].m_controllerType == eControllerType::eLocalPlayer)
-		{
-			//TODO: Refactor
-			//GameEventMessenger::getInstance().broadcast(GameEvent::eLeftAITurn);
 		}
 	}
 }
