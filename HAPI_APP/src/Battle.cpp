@@ -328,11 +328,14 @@ void Battle::update(float deltaTime)
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
+	if (getFactionShip(shipOnTile).getMovementArea().empty())
+	{
+		return;
+	}
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
-		assert(getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().empty());
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
@@ -344,11 +347,14 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
+	if (getFactionShip(shipOnTile).getMovementArea().empty())
+	{
+		return;
+	}
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
-		assert(getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().empty());
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
