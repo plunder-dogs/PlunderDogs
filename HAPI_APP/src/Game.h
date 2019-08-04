@@ -10,7 +10,7 @@
 #include "NetworkHandler.h"
 #include <assert.h>
 
-class Game : private NonCopyable
+class Game : private NonCopyable 
 {
 public:
 	Game(bool onlineGame);

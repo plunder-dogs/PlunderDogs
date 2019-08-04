@@ -100,17 +100,15 @@ void BattleUI::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePos
 		break;
 
 	case sf::Event::MouseButtonReleased:
-		if (m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
+		if (m_leftClickHeld)
 		{
-			if (m_leftClickHeld)
-			{
-				onLeftClickReleased(mousePosition);
-			}
-			else if(m_rightClickHeld)
-			{
-				onRightClickReleased(mousePosition);
-			}
+			onLeftClickReleased(mousePosition);
 		}
+		else if(m_rightClickHeld)
+		{
+			onRightClickReleased(mousePosition);
+		}
+		
 		break;
 	}
 }
@@ -284,7 +282,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		m_leftClickHeld = false;
 		return;
 	}
-
+	m_tileOnMouse = tileOnMouse;
 	//First Click
 	if (!m_tileOnLeftClick)
 	{
@@ -620,6 +618,7 @@ void BattleUI::onRightClick(sf::Vector2i mousePosition)
 	if (tileOnMouse)
 	{
 		m_tileOnRightClick = tileOnMouse;
+		m_tileOnMouse = tileOnMouse;
 		if (m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
 		{
 			m_spriteOnMouse.activate();
