@@ -51,7 +51,7 @@ void BattleUI::render(sf::RenderWindow& window)
 {
 	m_spriteOnTileClick.render(window, m_battle.getMap());
 	m_movementArea.render(window, m_battle.getMap());
-	m_battle.renderFactionShipsMovementGraphs(window);
+	m_battle.renderFactionShipsMovementGraph(window);
 	m_targetArea.render(window, m_battle.getMap());
 
 	if (m_tileOnLeftClick && (m_tileOnLeftClick->m_type == eTileType::eSea || m_tileOnLeftClick->m_type == eTileType::eOcean))
@@ -93,10 +93,6 @@ void BattleUI::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePos
 
 	case sf::Event::MouseMoved:
 		onMouseMove(mousePosition);
-		break;
-
-	case sf::Event::KeyPressed:
-		onKeyPress(mousePosition, currentEvent);
 		break;
 
 	case sf::Event::MouseButtonReleased:
@@ -186,43 +182,11 @@ void BattleUI::generateMovementArea(const Ship & ship)
 	m_movementArea.activateGraph();
 }
 
-void BattleUI::onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent)
-{
-	if (currentEvent.key.code == sf::Keyboard::Escape)
-	{
-		m_leftClickHeld = false;
-		m_rightClickHeld = false;
-
-		switch (m_battle.getCurrentBattlePhase())
-		{
-		case BattlePhase::Movement:
-		{
-			onCancelMovementPhase();
-			break;
-		}
-		case BattlePhase::Attack:
-		{
-			onCancelAttackPhase();
-			break;
-		}
-		}
-
-		m_shipSelector.reset();
-	}
-	else if (currentEvent.key.code == sf::Keyboard::Enter && m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
-	{
-		if (m_battle.getCurrentPlayerType() == eControllerType::eLocalPlayer)
-		{
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEndBattlePhaseEarly);
-		}
-	}
-}
-
 void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	
-	if (!m_battle.isShipBelongToFactionInPlay(m_tileOnLeftClick->m_shipOnTile) ||
+	if (!m_battle.isShipBelongToCurrentFaction(m_tileOnLeftClick->m_shipOnTile) ||
 		m_battle.getCurrentFaction().m_controllerType != eControllerType::eLocalPlayer)
 	{
 		return;
@@ -368,7 +332,7 @@ void BattleUI::onRightClickReleasedAttackPhase()
 	}
 	else
 	{
-		if (m_tileOnRightClick->isShipOnTile() && !m_battle.isShipBelongToFactionInPlay(m_tileOnRightClick->m_shipOnTile))
+		if (m_tileOnRightClick->isShipOnTile() && !m_battle.isShipBelongToCurrentFaction(m_tileOnRightClick->m_shipOnTile))
 		{
 			m_battle.fireFactionShipAtPosition(m_tileOnLeftClick->m_shipOnTile, *m_tileOnRightClick, m_targetArea.m_tileArea);
 		}

@@ -50,7 +50,6 @@ private:
 	void generateMovementArea(const Ship& ship);
 
 	//KeyPress
-	void onKeyPress(sf::Vector2i mousePosition, const sf::Event& currentEvent);
 	void onCancelMovementPhase();
 	void onCancelAttackPhase();
 
