@@ -3,6 +3,10 @@
 #include <assert.h>
 #include "TileArea.h"
 
+Ray2D nextTile(const Ray2D& currentTile, int mapWidth, int maxSize);
+Ray2D turnLeft(const Ray2D& currentTile);
+Ray2D turnRight(const Ray2D& currentTile);
+
 void PathFinding::loadTileData(const Map & map)
 {
 	assert(!map.getData().empty());
@@ -277,7 +281,7 @@ bool PathFinding::areaExplorer(std::queue<std::pair<Ray2D, float>>& queue, eDire
 	return output;
 }
 
-Ray2D PathFinding::nextTile(const Ray2D & currentTile, int mapWidth, int maxSize) const
+Ray2D nextTile(const Ray2D & currentTile, int mapWidth, int maxSize)
 {
 	int x = currentTile.x;
 	int y = currentTile.y;
@@ -353,7 +357,7 @@ Ray2D PathFinding::nextTile(const Ray2D & currentTile, int mapWidth, int maxSize
 	return nextAddress;
 }
 
-Ray2D PathFinding::turnLeft(const Ray2D & currentTile) const
+Ray2D turnLeft(const Ray2D & currentTile) 
 {
 	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)
@@ -381,7 +385,7 @@ Ray2D PathFinding::turnLeft(const Ray2D & currentTile) const
 	return nextTile;
 }
 
-Ray2D PathFinding::turnRight(const Ray2D & currentTile) const
+Ray2D turnRight(const Ray2D & currentTile)
 {
 	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)

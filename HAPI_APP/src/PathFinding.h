@@ -104,10 +104,6 @@ private:
 
 	bool areaExplorer(std::queue<std::pair<Ray2D, float>>& queue, eDirection windDirection, float windStrength, int mapWidth);
 
-	Ray2D nextTile(const Ray2D& currentTile, int mapWidth, int maxSize) const;
-	Ray2D turnLeft(const Ray2D& currentTile) const;
-	Ray2D turnRight(const Ray2D& currentTile) const;
-
 	void resetByteData(const Map& map);
 	void resetTileData(const Map& map);
 };
