@@ -107,7 +107,10 @@ void Game::handleServerMessages()
 			receivedServerMessage.type == eMessageType::eAttackShipAtPosition ||
 			receivedServerMessage.type == eMessageType::eClientDisconnected))
 		{
-			m_battle.receiveServerMessage(receivedServerMessage, getLocalFactionName());
+			if (getLocalFactionName() != receivedServerMessage.faction)
+			{
+				m_battle.receiveServerMessage(receivedServerMessage);
+			}
 		}
 	}
 }
