@@ -18,6 +18,8 @@
 //debug by printing, if statements
 #endif // C++_NOTES
 
+//https://www.youtube.com/watch?v=dn1XRIaROM4
+
 int main()
 {
 	std::cout << "Select Game Mode: \n";
