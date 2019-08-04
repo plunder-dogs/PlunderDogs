@@ -124,18 +124,18 @@ void Battle::handleTimeUntilGameOver(float deltaTime)
 
 Battle::Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& players)
 	: m_factions(players),
-	m_currentFactionTurn(0),
 	m_map(),
 	m_currentBattlePhase(BattlePhase::Deployment),
+	m_currentDeploymentState(eDeploymentState::NotStarted),
 	m_battleUI(*this),
 	m_explosionParticles(),
 	m_fireParticles(),
 	m_timeUntilAITurn(1.5f, false),
 	m_timeBetweenAIUnits(0.3f, false),
-	m_lightIntensityTimer(30.0f),
-	m_currentLightIntensity(eLightIntensity::eMaximum),
+	m_timeUntilGameOver(2.f, false),
 	m_isRunning(true),
-	m_timeUntilGameOver(2.f, false)
+	m_onlineGame(false),
+	m_currentFactionTurn(0)
 {
 	m_explosionParticles.reserve(MAX_PARTICLES);
 	m_fireParticles.reserve(MAX_PARTICLES);
@@ -145,13 +145,11 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& pl
 		m_fireParticles.emplace_back(0.05, *Textures::getInstance().m_fireParticles, 2.0f);
 	}
 
-	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onEndBattlePhaseEarly, this, std::placeholders::_1), eGameEvent::eEndBattlePhaseEarly);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onFactionShipDestroyed, this, std::placeholders::_1), eGameEvent::eFactionShipDestroyed);
 }
 
 Battle::~Battle()
 {
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEndBattlePhaseEarly);
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
@@ -266,7 +264,7 @@ void Battle::render(sf::RenderWindow& window)
 	}
 }
 
-void Battle::renderFactionShipsMovementGraphs(sf::RenderWindow & window)
+void Battle::renderFactionShipsMovementGraph(sf::RenderWindow & window)
 {
 	if (m_currentBattlePhase == BattlePhase::Movement)
 	{
@@ -295,7 +293,6 @@ void Battle::update(float deltaTime)
 {
 	m_battleUI.update(deltaTime);
 	m_map.setDrawOffset(m_battleUI.getCameraPosition());
-	updateLightIntensity(deltaTime);
 	handleTimeUntilGameOver(deltaTime);
 
 	for (auto& explosionParticle : m_explosionParticles)
@@ -328,10 +325,13 @@ void Battle::update(float deltaTime)
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
+	assert(m_factions[m_currentFactionTurn].m_factionName == shipOnTile.factionName);
+
 	if (getFactionShip(shipOnTile).getMovementArea().empty())
 	{
 		return;
 	}
+
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
@@ -347,10 +347,13 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
+	assert(m_factions[m_currentFactionTurn].m_factionName == shipOnTile.factionName);
+
 	if (getFactionShip(shipOnTile).getMovementArea().empty())
 	{
 		return;
 	}
+
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
@@ -519,6 +522,7 @@ void Battle::setShipDeploymentAtPosition(sf::Vector2i position, eDirection direc
 void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea)
 {
 	assert(m_currentBattlePhase == BattlePhase::Attack);
+	assert(m_factions[m_currentFactionTurn].m_factionName == firingShip.factionName);
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
@@ -757,26 +761,6 @@ void Battle::playExplosionAnimation(sf::Vector2i position)
 	}
 }
 
-void Battle::updateLightIntensity(float deltaTime)
-{
-	m_lightIntensityTimer.update(deltaTime);
-	if (m_lightIntensityTimer.isExpired())
-	{
-		if (m_currentLightIntensity == eLightIntensity::eMaximum)
-		{
-			m_currentLightIntensity = eLightIntensity::eMinimum;
-			m_lightIntensityTimer.setNewExpirationTime(15.f);
-			m_lightIntensityTimer.reset();
-		}
-		else
-		{
-			m_currentLightIntensity = eLightIntensity::eMaximum;
-			m_lightIntensityTimer.setNewExpirationTime(30.f);
-			m_lightIntensityTimer.reset();
-		}
-	}
-}
-
 void Battle::updateMovementPhase(float deltaTime)
 {
 	for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
@@ -877,7 +861,7 @@ bool Battle::isRunning() const
 	return m_isRunning;
 }
 
-bool Battle::isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const
+bool Battle::isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].isActive());
 	return shipOnTile.factionName == getCurrentFaction().m_factionName;
@@ -899,22 +883,10 @@ const Faction& Battle::getCurrentFaction() const
 	return m_factions[m_currentFactionTurn];
 }
 
-eControllerType Battle::getCurrentPlayerType() const
-{
-	assert(m_factions[m_currentFactionTurn].isActive());
-	return m_factions[m_currentFactionTurn].m_controllerType;
-}
-
 const Ship & Battle::getFactionShip(ShipOnTile shipOnTile) const
 {
 	assert(shipOnTile.isValid());
 	return m_factions[static_cast<int>(shipOnTile.factionName)].getShip(shipOnTile.shipID);
-}
-
-const std::vector<Ship>& Battle::getCurrentFactionShips() const
-{
-	assert(m_factions[m_currentFactionTurn].isActive());
-	return m_factions[m_currentFactionTurn].getAllShips();
 }
 
 const Faction& Battle::getFaction(FactionName factionName) const

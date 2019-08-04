@@ -11,7 +11,8 @@ class Battle : private NonCopyable
 {
 	enum class eDeploymentState
 	{
-		DeployingPlayer = 0,
+		NotStarted = 0,
+		DeployingPlayer,
 		DeployingAI,
 		Finished
 	};
@@ -21,14 +22,12 @@ public:
 	~Battle();
 
 	bool isRunning() const;
-	bool isShipBelongToFactionInPlay(ShipOnTile shipOnTile) const;
+	bool isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	BattlePhase getCurrentBattlePhase() const;
 	const Faction& getCurrentFaction() const;
-	eControllerType getCurrentPlayerType() const;
 	std::vector<FactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
-	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
 	void receiveServerMessage(const ServerMessage& receivedServerMessage);
@@ -37,7 +36,7 @@ public:
 	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
 	void startSinglePlayerGame(const std::string& levelName);
 	void render(sf::RenderWindow& window);
-	void renderFactionShipsMovementGraphs(sf::RenderWindow& window);
+	void renderFactionShipsMovementGraph(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
 	void update(float deltaTime);
 
@@ -49,15 +48,13 @@ public:
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
 	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
 	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition = false);
-	//Disallow ending position of ships movement area to overlap with 
-	//ship belonging to same faction
+	//Stop ship destinations overlapping with other ship destinations
 	void rectifyFactionShipMovementArea(ShipOnTile shipOnTile);
 	//Attack Phase
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
 	std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& m_factions;
-	int m_currentFactionTurn;
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;
@@ -66,11 +63,10 @@ private:
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
 	Timer m_timeBetweenAIUnits;
-	Timer m_lightIntensityTimer;
 	Timer m_timeUntilGameOver;
-	eLightIntensity m_currentLightIntensity;
 	bool m_isRunning;
 	bool m_onlineGame = false;
+	int m_currentFactionTurn;
 
 	Faction& getCurrentPlayer();
 	Faction& getFaction(FactionName factionName);
@@ -79,7 +75,6 @@ private:
 	void playExplosionAnimation(sf::Vector2i position);
 	void advanceToNextBattlePhase();
 	void switchToBattlePhase(BattlePhase newBattlePhase);
-	void updateLightIntensity(float deltaTime);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
 	void incrementFactionTurn();

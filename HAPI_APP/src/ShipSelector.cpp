@@ -70,7 +70,7 @@ void ShipSelector::update(const Battle& battle, sf::Vector2i mousePosition, cons
 	if (std::abs(m_shape.getSize().x) >= MIN_SHAPE_WIDTH_SIZE &&
 		std::abs(m_shape.getSize().y) >= MIN_SHAPE_HEIGHT_SIZE)
 	{
-		for (const auto& shipToSelect : battle.getCurrentFactionShips())
+		for (const auto& shipToSelect : battle.getCurrentFaction().getAllShips())
 		{
 			//Do not add these ships to selector
 			if (shipToSelect.isDead() || shipToSelect.isDestinationSet() || shipToSelect.isWeaponFired())
