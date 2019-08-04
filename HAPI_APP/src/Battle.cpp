@@ -332,7 +332,9 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
+		assert(getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().empty());
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
+
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
@@ -346,7 +348,9 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
+		assert(getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().empty());
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
+
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
