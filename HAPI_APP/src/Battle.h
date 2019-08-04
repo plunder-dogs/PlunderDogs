@@ -31,7 +31,7 @@ public:
 	const std::vector<Ship>& getCurrentFactionShips() const;
 	const Faction& getFaction(FactionName factionName) const;
 
-	void receiveServerMessage(const ServerMessage& receivedServerMessage, FactionName localPlayerFaction);
+	void receiveServerMessage(const ServerMessage& receivedServerMessage);
 
 	void quitGame();
 	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);

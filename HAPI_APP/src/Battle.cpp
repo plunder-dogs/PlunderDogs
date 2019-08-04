@@ -923,30 +923,25 @@ const Faction& Battle::getFaction(FactionName factionName) const
 	return m_factions[static_cast<int>(factionName)];
 }
 
-void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage, FactionName localPlayerFaction)
+void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage)
 {
 	switch (receivedServerMessage.type)
 	{
 	case eMessageType::eDeployShipAtPosition :
-		if (receivedServerMessage.faction != localPlayerFaction)
-		{
-			deployFactionShipAtPosition(receivedServerMessage);
-		}
+		assert(receivedServerMessage.faction == m_factions[m_currentFactionTurn].m_factionName);
+		deployFactionShipAtPosition(receivedServerMessage);
 		break;
 
 	case eMessageType::eMoveShipToPosition :
-		if (receivedServerMessage.faction != localPlayerFaction)
-		{
-			moveFactionShipToPosition(receivedServerMessage);
-		}
+		assert(receivedServerMessage.faction == m_factions[m_currentFactionTurn].m_factionName);
+		moveFactionShipToPosition(receivedServerMessage);
 		break;
 
 	case eMessageType::eAttackShipAtPosition :
-		if (receivedServerMessage.faction != localPlayerFaction)
-		{
-			fireFactionShipAtPosition(receivedServerMessage);
-		}
+		assert(receivedServerMessage.faction == m_factions[m_currentFactionTurn].m_factionName);
+		fireFactionShipAtPosition(receivedServerMessage);
 		break;
+
 	case eMessageType::eClientDisconnected:
 		m_factions[static_cast<int>(receivedServerMessage.faction)].m_controllerType = eControllerType::eAI;
 		if (m_factions[m_currentFactionTurn].m_factionName == receivedServerMessage.faction)
