@@ -1,14 +1,17 @@
 #pragma once
 
 #include "Global.h"
+#include "Utilities/NonCopyable.h"
 #include <SFML/Network.hpp>
 #include <vector>
 #include <vector>
 #include <deque>
 #include <functional>
+#include <mutex>
+#include <atomic>
 
 enum FactionName;
-class NetworkHandler
+class NetworkHandler : private NonCopyable
 {
 public:
 	static NetworkHandler& getInstance()
@@ -18,18 +21,20 @@ public:
 	}
 
 	bool isConnected() const;
-	bool hasMessages() const;
+	bool hasMessages();
 	ServerMessage getServerMessage();
 	
-	void setBlocking();
 	void sendServerMessage(ServerMessage message);
-	void listenToServer();
 	bool connect();
 	void disconnect();
 
 private:
 	NetworkHandler();
+	std::mutex m_mutex;
+	std::thread m_listenThread;
 	sf::TcpSocket m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
-	bool m_connectedToServer = false;
+	std::atomic<bool> m_connectedToServer;
+
+	void listen();
 };
