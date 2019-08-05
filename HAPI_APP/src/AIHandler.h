@@ -1,11 +1,12 @@
 #pragma once
 
 #include "TileArea.h"
+#include "Utilities/NonCopyable.h"
 
 class Battle;
 class Map;
 struct Faction;
-class AIHandler
+class AIHandler : private NonCopyable
 {
 public:
 	static AIHandler& getInstance()
@@ -20,6 +21,7 @@ public:
 	void loadShips(Faction& player);
 
 private:
+	AIHandler() {}
 	std::vector<Ray2D> m_movementArea;
 	std::vector<const Tile*> m_targetArea;
 };
