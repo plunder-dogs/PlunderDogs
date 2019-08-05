@@ -11,7 +11,7 @@ struct GameEvent;
 class BattleUI : private NonCopyable
 {
 public:
-	BattleUI(Battle& battles);
+	BattleUI(Battle& battle);
 	~BattleUI();
 
 	TileArea& getTargetArea();
