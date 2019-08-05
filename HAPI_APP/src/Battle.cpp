@@ -436,19 +436,8 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 	//Inform remote clients on Deployment
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
-		ShipOnTile shipToDeploy;
-		for (const auto& ship : m_factions[m_currentFactionTurn].getAllShips())
-		{
-			if (!ship.isDeployed())
-			{
-				shipToDeploy.factionName = ship.getFactionName();
-				shipToDeploy.shipID = ship.getID();
-				break;
-			}
-		}
-		
-		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, shipToDeploy.factionName);
-		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, startingPosition.x, startingPosition.y, startingDirection);
+		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, m_factions[m_currentFactionTurn].m_factionName);
+		messageToSend.shipActions.emplace_back(startingPosition.x, startingPosition.y, startingDirection);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
 
@@ -479,7 +468,6 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
 		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
-		std::cout << static_cast<int>(shipAction.direction) << "\n";
 	}
 }
 

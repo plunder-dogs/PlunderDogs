@@ -189,6 +189,12 @@ struct ServerMessageShipAction
 		direction(direction)
 	{}
 
+	ServerMessageShipAction(int x, int y, eDirection direction)
+		: shipID(-1),
+		position(x, y),
+		direction(direction)
+	{}
+
 	int shipID;
 	sf::Vector2i position;
 	eDirection direction;
