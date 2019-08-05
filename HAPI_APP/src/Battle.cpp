@@ -363,6 +363,26 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 	}
 }
 
+void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
+{
+	for (int i = 0; i < selectedShips.getSelectedShips().size(); ++i)
+	{
+		ShipOnTile selectedShip = selectedShips.removeSelectedShip();
+		moveFactionShipToPosition(selectedShip);
+
+		if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
+		{
+
+			sf::Vector2i destination = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().pair();
+			eDirection endDirection = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().dir;
+
+			ServerMessage messageToSend(eMessageType::eMoveShipToPosition, selectedShip.factionName);
+			messageToSend.shipActions.emplace_back(selectedShip.shipID, destination.x, destination.y, endDirection);
+			NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		}
+	}
+}
+
 void Battle::generateFactionShipsMovementArea(std::vector<const Tile*>& movementArea, ShipSelector & shipSelector)
 {
 	//Generate ship movement paths to positions

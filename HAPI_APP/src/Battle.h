@@ -46,6 +46,7 @@ public:
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
+	void moveFactionShipsToPosition(ShipSelector& selectedShips);
 	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition = false);
 	void generateFactionShipsMovementArea(std::vector<const Tile*>& movementArea, ShipSelector& shipSelector);
 	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
