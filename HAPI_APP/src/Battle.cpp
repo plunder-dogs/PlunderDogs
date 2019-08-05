@@ -365,7 +365,8 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 
 void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 {
-	for (int i = 0; i < selectedShips.getSelectedShips().size(); ++i)
+  	int selectedShipsSize = selectedShips.getSelectedShips().size();
+	for (int i = 0; i < selectedShipsSize; ++i)
 	{
 		ShipOnTile selectedShip = selectedShips.removeSelectedShip();
 		moveFactionShipToPosition(selectedShip);
