@@ -509,7 +509,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 
 void BattleUI::onRightClickReleasedMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
-	if (m_shipSelector.getSelectedShips().size() > 0)
+	if (!m_shipSelector.getSelectedShips().empty())
 	{
 		m_battle.moveFactionShipsToPosition(m_shipSelector);
 	}

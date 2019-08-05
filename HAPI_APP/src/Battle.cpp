@@ -384,7 +384,7 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 	}
 }
 
-void Battle::generateFactionShipsMovementArea(std::vector<const Tile*>& movementArea, ShipSelector & shipSelector)
+void Battle::generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, ShipSelector & shipSelector)
 {
 	//Generate ship movement paths to positions
 	int shipIndex = 0;
@@ -410,20 +410,6 @@ void Battle::generateFactionShipsMovementArea(std::vector<const Tile*>& movement
 	{
 		getFaction(selectedShip.m_shipOnTile.factionName).rectifyShipMovementArea(selectedShip.m_shipOnTile.shipID);
 	}
-
-	//if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
-	//{
-	//	for (SelectedShip selectedShip : shipSelector.getSelectedShips())
-	//	{
-	//		const Ship& ship = getFactionShip(selectedShip.m_shipOnTile);
-	//	
-	//		sf::Vector2i destination = getFaction(ship.getFactionName()).getShip(ship.getID()).getMovementArea().back().pair();
-	//		eDirection endDirection = getFaction(ship.getFactionName()).getShip(ship.getID()).getMovementArea().back().dir;
-	//		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, ship.getFactionName());
-	//		messageToSend.shipActions.emplace_back(ship.getID(), destination.x, destination.y, endDirection);
-	//		NetworkHandler::getInstance().sendServerMessage(messageToSend);
-	//	}
-	//}
 }
 
 void Battle::clearFactionShipMovementArea(ShipOnTile shipOnTile)
