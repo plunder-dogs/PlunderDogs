@@ -2,6 +2,7 @@
 #include <vector>
 #include <queue>
 #include "Global.h"
+#include "Utilities/NonCopyable.h"
 #include <array>
 
 //A 1 byte store for all the data, very compact but annoying to use
@@ -50,7 +51,7 @@ struct ByteStore
 struct Ray2DArea;
 struct Tile;
 class Map;
-class PathFinding
+class PathFinding : private NonCopyable
 {
 	#define NO_TILE Ray2D(static_cast<int>(TileID::Invalid), static_cast<int>(TileID::Invalid), eDirection::eInvalid)
 
@@ -93,6 +94,7 @@ public:
 	void findArea(std::vector<const Tile*>& tileArea, const Map& map, Ray2D startPos, float maxMovement);
 
 private:
+	PathFinding() {}
 	std::vector<TileData> m_tileData;
 	std::vector<ByteStore> m_byteData;
 
