@@ -46,10 +46,9 @@ public:
 	//Movement Phase
 	void moveFactionShipToPosition(ShipOnTile shipOnTile);
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
-	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
 	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition = false);
-	//Stop ship destinations overlapping with other ship destinations
-	void rectifyFactionShipMovementArea(ShipOnTile shipOnTile);
+	void generateFactionShipsMovementArea(std::vector<const Tile*>& movementArea, ShipSelector& shipSelector);
+	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
 	//Attack Phase
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 

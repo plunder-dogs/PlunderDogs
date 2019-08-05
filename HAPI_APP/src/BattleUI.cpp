@@ -484,29 +484,7 @@ void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 			++range;
 		}
 
-		//Generate ship movement paths to positions
-		int shipIndex = 0;
-		for (const auto& tile : m_movementArea.m_tileArea)
-		{
-			if (tile && !tile->isShipOnTile())
-			{
-				for (int i = shipIndex; i < m_shipSelector.getSelectedShips().size();)
-				{
-					ShipOnTile selectedShip = m_shipSelector.getSelectedShips()[i].m_shipOnTile;
-					m_battle.generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
-					
-					++i;
-					shipIndex = i;
-					break;
-				}
-
-			}
-		}
-		//Fix ship movement graphs after generation
-		for (SelectedShip selectedShip : m_shipSelector.getSelectedShips())
-		{
-			m_battle.rectifyFactionShipMovementArea(selectedShip.m_shipOnTile);
-		}
+		m_battle.generateFactionShipsMovementArea(m_movementArea.m_tileArea, m_shipSelector);
 	}
 	//Singular ship selected with ship selector
 	else if (m_shipSelector.getSelectedShips().size() == 1 && !m_leftClickHeld)

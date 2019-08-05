@@ -333,9 +333,10 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
+		eDirection endDirection = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().dir;
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
-		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y);
+		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
 }
@@ -362,6 +363,48 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 	}
 }
 
+void Battle::generateFactionShipsMovementArea(std::vector<const Tile*>& movementArea, ShipSelector & shipSelector)
+{
+	//Generate ship movement paths to positions
+	int shipIndex = 0;
+	for (const auto& tile : movementArea)
+	{
+		if (tile && !tile->isShipOnTile())
+		{
+			for (int i = shipIndex; i < shipSelector.getSelectedShips().size();)
+			{
+				ShipOnTile selectedShip = shipSelector.getSelectedShips()[i].m_shipOnTile;
+				generateFactionShipMovementArea(selectedShip, tile->m_tileCoordinate, true);
+
+				++i;
+				shipIndex = i;
+				break;
+			}
+
+		}
+	}
+
+	//Fix ship movement graphs after generation
+	for (SelectedShip selectedShip : shipSelector.getSelectedShips())
+	{
+		getFaction(selectedShip.m_shipOnTile.factionName).rectifyShipMovementArea(selectedShip.m_shipOnTile.shipID);
+	}
+
+	//if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
+	//{
+	//	for (SelectedShip selectedShip : shipSelector.getSelectedShips())
+	//	{
+	//		const Ship& ship = getFactionShip(selectedShip.m_shipOnTile);
+	//	
+	//		sf::Vector2i destination = getFaction(ship.getFactionName()).getShip(ship.getID()).getMovementArea().back().pair();
+	//		eDirection endDirection = getFaction(ship.getFactionName()).getShip(ship.getID()).getMovementArea().back().dir;
+	//		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, ship.getFactionName());
+	//		messageToSend.shipActions.emplace_back(ship.getID(), destination.x, destination.y, endDirection);
+	//		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+	//	}
+	//}
+}
+
 void Battle::clearFactionShipMovementArea(ShipOnTile shipOnTile)
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
@@ -372,12 +415,6 @@ void Battle::generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i
 {
 	assert(m_currentBattlePhase == BattlePhase::Movement);
 	getFaction(shipOnTile.factionName).generateShipMovementArea(m_map, shipOnTile.shipID, destination, displayOnlyLastPosition);
-}
-
-void Battle::rectifyFactionShipMovementArea(ShipOnTile shipOnTile)
-{
-	assert(m_currentBattlePhase == BattlePhase::Movement);
-	getFaction(shipOnTile.factionName).rectifyShipMovementArea(shipOnTile.shipID);
 }
 
 void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirection startingDirection)
