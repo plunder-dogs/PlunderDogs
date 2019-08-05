@@ -387,7 +387,7 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 	}
 }
 
-void Battle::generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, ShipSelector & shipSelector)
+void Battle::generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, const ShipSelector & shipSelector)
 {
 	//Generate ship movement paths to positions
 	int shipIndex = 0;
@@ -404,7 +404,6 @@ void Battle::generateFactionShipsMovementArea(const std::vector<const Tile*>& mo
 				shipIndex = i;
 				break;
 			}
-
 		}
 	}
 

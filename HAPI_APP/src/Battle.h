@@ -48,7 +48,7 @@ public:
 	void moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDirection);
 	void moveFactionShipsToPosition(ShipSelector& selectedShips);
 	void generateFactionShipMovementArea(ShipOnTile shipOnTile, sf::Vector2i destination, bool displayOnlyLastPosition = false);
-	void generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, ShipSelector& shipSelector);
+	void generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, const ShipSelector& shipSelector);
 	void clearFactionShipMovementArea(ShipOnTile shipOnTile);
 	//Attack Phase
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
