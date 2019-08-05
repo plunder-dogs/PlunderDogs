@@ -65,7 +65,7 @@ private:
 	Timer m_timeBetweenAIUnits;
 	Timer m_timeUntilGameOver;
 	bool m_isRunning;
-	bool m_onlineGame = false;
+	bool m_onlineGame;
 	int m_currentFactionTurn;
 
 	Faction& getCurrentPlayer();

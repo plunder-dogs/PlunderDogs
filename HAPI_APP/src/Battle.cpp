@@ -371,9 +371,12 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 		ShipOnTile selectedShip = selectedShips.removeSelectedShip();
 		moveFactionShipToPosition(selectedShip);
 
+		if (getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().empty())
+		{
+			continue;
+		}
 		if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 		{
-
 			sf::Vector2i destination = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().pair();
 			eDirection endDirection = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().dir;
 
