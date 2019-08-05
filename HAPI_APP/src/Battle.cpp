@@ -431,6 +431,8 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 {
 	assert(m_currentBattlePhase == BattlePhase::Deployment);
 
+	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
+
 	//Inform remote clients on Deployment
 	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 	{
@@ -446,13 +448,9 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 		}
 		
 		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, shipToDeploy.factionName);
-		sf::Vector2i deployAtPosition = m_factions[m_currentFactionTurn].getShip(shipToDeploy.shipID).getCurrentPosition();
-		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, deployAtPosition.x, deployAtPosition.y, startingDirection);
-		
+		messageToSend.shipActions.emplace_back(shipToDeploy.shipID, startingPosition.x, startingPosition.y, startingDirection);
 		NetworkHandler::getInstance().sendServerMessage(messageToSend);
 	}
-
-	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
 	{

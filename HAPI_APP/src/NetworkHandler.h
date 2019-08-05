@@ -24,7 +24,7 @@ public:
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
-	void sendServerMessage(ServerMessage message);
+	void sendServerMessage(const ServerMessage& message);
 	bool connect();
 	void disconnect();
 	void handleBackLog();

@@ -13,7 +13,7 @@ NetworkHandler::NetworkHandler()
 	m_serverMessageBackLog()
 {}
 
-void NetworkHandler::sendServerMessage(ServerMessage message)
+void NetworkHandler::sendServerMessage(const ServerMessage& message)
 {
 	assert(m_connectedToServer);
 	if (m_serverMessageBackLog.empty())
