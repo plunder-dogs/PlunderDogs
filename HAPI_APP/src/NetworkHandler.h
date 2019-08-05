@@ -27,6 +27,7 @@ public:
 	void sendServerMessage(ServerMessage message);
 	bool connect();
 	void disconnect();
+	void handleBackLog();
 
 private:
 	NetworkHandler();
@@ -35,6 +36,7 @@ private:
 	sf::TcpSocket m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
 	std::atomic<bool> m_connectedToServer;
+	std::vector<ServerMessage> m_serverMessageBackLog;
 
 	void listen();
 };

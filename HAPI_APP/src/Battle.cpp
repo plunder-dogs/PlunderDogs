@@ -419,7 +419,6 @@ void Battle::deployFactionShipAtPosition(const ServerMessage & receivedServerMes
 
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, receivedServerMessage.shipActions.back().position, 
 		receivedServerMessage.shipActions.back().direction);
-	std::cout << static_cast<int>(receivedServerMessage.shipActions.back().direction);
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
 	{
@@ -435,7 +434,7 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
 		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
-		std::cout << static_cast<int>(shipAction.direction);
+		std::cout << static_cast<int>(shipAction.direction) << "\n";
 	}
 }
 

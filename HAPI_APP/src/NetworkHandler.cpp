@@ -9,18 +9,29 @@ NetworkHandler::NetworkHandler()
 	m_listenThread(),
 	m_tcpSocket(),
 	m_serverMessages(),
-	m_connectedToServer(false)
-{	
-}
+	m_connectedToServer(false),
+	m_serverMessageBackLog()
+{}
 
 void NetworkHandler::sendServerMessage(ServerMessage message)
 {
 	assert(m_connectedToServer);
-	sf::Packet packetToSend;
-	packetToSend << message;
-	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+	if (m_serverMessageBackLog.empty())
 	{
-		std::cout << "Unable to send message to server\n";
+		sf::Packet packetToSend;
+		packetToSend << message;
+		if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+		{
+			std::cout << "Unable to send message to server\n";
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_serverMessageBackLog.push_back(message);
+		}
+	}
+	else
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		std::cout << "Added to server client backlog\n";
+		m_serverMessageBackLog.push_back(message);
 	}
 }
 
@@ -64,6 +75,23 @@ void NetworkHandler::disconnect()
 	m_tcpSocket.disconnect();
 }
 
+void NetworkHandler::handleBackLog()
+{
+	for (auto iter = m_serverMessageBackLog.begin(); iter != m_serverMessageBackLog.end();)
+	{
+		sf::Packet packetToSend;
+		packetToSend << (*iter);
+		if (m_tcpSocket.send(packetToSend) == sf::Socket::Done)
+		{
+			iter = m_serverMessageBackLog.erase(iter);
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
 void NetworkHandler::listen()
 {
 	while (m_connectedToServer)
@@ -71,10 +99,9 @@ void NetworkHandler::listen()
 		sf::Packet receivedPacket;
 		if (m_tcpSocket.receive(receivedPacket) == sf::Socket::Done && receivedPacket)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
 			ServerMessage receivedServerMessage;
 			receivedPacket >> receivedServerMessage;
-
+			std::lock_guard<std::mutex> lock(m_mutex);
 			m_serverMessages.push_back(receivedServerMessage);
 		}
 		else
