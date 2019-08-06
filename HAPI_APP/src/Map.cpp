@@ -139,58 +139,6 @@ Tile* Map::getTile(sf::Vector2i coordinate)
 	return nullptr;
 }
 
-std::vector<const Tile*> Map::getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
-{
-	//TODO: Refactor
-	//assert(range > 1);
-
-	int reserveSize{ 0 };
-	for (int i = 2; i < range + 2; i++)
-	{
-		reserveSize += 2 * i;
-	}
-	std::vector<const Tile*> tileStore;
-	tileStore.reserve((size_t)reserveSize);
-
-	const sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range - 1);
-		y < std::min(m_mapDimensions.y, coord.y + range + 2);
-		y++)
-	{
-		for (int x = std::max(0, coord.x - range - 1);
-			x < std::min(m_mapDimensions.x, coord.x + range + 2);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				sf::Vector2i tempCube(offsetToCube(sf::Vector2i(x, y)));
-				if (cubeDistance(cubeCoord, tempCube) <= range)
-				{
-					if (inCone(cubeCoord, tempCube, direction))
-					{
-						const Tile* pushBackTile = getTile(sf::Vector2i(x, y));
-						if (!pushBackTile)
-							continue;
-						if (avoidInvalid)
-						{
-							if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
-							{
-								tileStore.push_back(getTile(sf::Vector2i(x, y)));
-							}
-						}
-						else
-						{
-							tileStore.push_back(getTile(sf::Vector2i(x, y)));
-						}
-					}
-				}
-			}
-		}
-	}
-	return tileStore;
-}
-
 void Map::getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
 	assert(range > 1);
@@ -626,57 +574,6 @@ const Tile * Map::getNonCollidableAdjacentTile(const std::vector<const Tile*>& t
 	return nullptr;
 }
 
-std::vector<const Tile*> Map::getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
-{
-	int reserveSize{ 0 };
-	if (includeSource)
-		reserveSize++;
-	for (int i = 1; i <= range; i++)
-	{
-		reserveSize += 6 * i;
-	}
-	std::vector<const Tile*> tileStore;
-	tileStore.reserve((size_t)reserveSize);
-	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && (getTile(coord)->m_type == eSea || getTile(coord)->m_type == eOcean)))
-	{
-		tileStore.push_back(getTile(coord));
-	}
-
-	sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range);
-		y < std::min(m_mapDimensions.y, coord.y + range + 1);
-		y++)
-	{
-		for (int x = std::max(0, coord.x - range);
-			x < std::min(m_mapDimensions.x, coord.x + range + 1);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) <= range)
-				{
-					const Tile* pushBackTile = getTile(sf::Vector2i(x, y));
-					if (!pushBackTile)
-						continue;
-					if (avoidInvalid)
-					{
-						if (!(pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
-						{
-							tileStore.push_back(getTile(sf::Vector2i(x, y)));
-						}
-					}
-					else
-					{
-						tileStore.push_back(getTile(sf::Vector2i(x, y)));
-					}
-				}
-			}
-		}
-	}
-	return tileStore;
-}
-
 void Map::getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
 	if (getTile(coord)->m_type != eSea && getTile(coord)->m_type != eOcean)
@@ -721,29 +618,6 @@ void Map::getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, 
 			}
 		}
 	}
-}
-
-
-std::vector<const Tile*> Map::getTileLine(
-	sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
-{
-	std::vector<const Tile*> tileStore;
-	tileStore.reserve(range);
-	const Tile* pushBackTile{ getTile(coord) };
-	for (int i = 0; i < range; i++)
-	{
-		if (!pushBackTile)
-			continue;
-		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[direction]; 
-		//If avoidInvalid stop the line if a mountain or Mesa is encountered
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eMountain || pushBackTile->m_type == eMesa))
-			break;
-		//If avoidInvalid skip if the tile is not water
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type != eSea && pushBackTile->m_type != eOcean))
-			continue;
-		tileStore.emplace_back(pushBackTile);
-	}
-	return tileStore;
 }
 
 void Map::getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const

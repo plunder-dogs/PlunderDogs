@@ -207,7 +207,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 	//Iterate through all 6 possible lines
 	for (int i = 0; i < 6; i++)
 	{
-		availableTiles = map.getTileLine(targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
+		map.getTileLine(availableTiles, targetShip->m_tileCoordinate, range, static_cast<eDirection>(i), true);
 		for (const Tile* it : availableTiles)
 		{
 			//Ensure it's a valid tile, if not skip this one
@@ -337,7 +337,7 @@ void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map
 	{
 	case eShipType::eTurtle:
 	{
-		targetArea = map.getTileCone(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
+		map.getTileCone(targetArea, firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection());
 		for (int i = 0; i < targetArea.size(); i++)
 		{
 			if (!targetArea[i]) continue;
@@ -351,7 +351,7 @@ void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map
 	}
 	case eShipType::eSniper:
 	{
-		targetArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
+		map.getTileLine(targetArea, firingShip.getCurrentPosition(), firingShip.getRange(), firingShip.getCurrentDirection(), true);
 		for (int i = 0; i < targetArea.size(); i++)
 		{
 			if (!targetArea[i]) continue;
@@ -365,7 +365,7 @@ void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map
 	}
 	case eShipType::eFrigate:
 	{
-		targetArea = map.getTileRadius(firingShip.getCurrentPosition(), firingShip.getRange());
+		map.getTileRadius(targetArea, firingShip.getCurrentPosition(), firingShip.getRange());
 		for (int i = 0; i < targetArea.size(); i++)
 		{
 			if (!targetArea[i]) continue;
@@ -396,7 +396,7 @@ void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map
 			break;
 		}
 			
-		targetArea = map.getTileLine(firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
+		map.getTileLine(targetArea, firingShip.getCurrentPosition(), firingShip.getRange(), backwardsDirection, true);
 		for (int i = 0; i < targetArea.size(); i++)
 		{
 			if (!targetArea[i]) continue;

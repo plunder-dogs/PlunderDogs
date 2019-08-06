@@ -72,16 +72,13 @@ public:
 	const Tile* getNonCollidableAdjacentTile(const std::vector<const Tile*>& tileArea, sf::Vector2i coord) const;
 
 	//Returns tiles in a radius around a given tile, skipping the tile itself
-	std::vector<const Tile*> getTileRadius(sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
 	void getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid = false, bool includeSource = false) const;
 	
 	//Returns tiles in two cones emanating from a given tile, skipping the tile itself
-	std::vector<const Tile*> getTileCone(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
 	void getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
 
 	//Returns tiles in a line from a given direction,
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<const Tile*> getTileLine(sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false)const;
 	void getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid = false) const;
 
 	//Returns a ring of tiles at a certain radius from a specified tile
