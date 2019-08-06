@@ -83,7 +83,6 @@ public:
 
 	//Returns a ring of tiles at a certain radius from a specified tile
 	//An element in the vector will be nullptr if it accesses an invalid tile
-	std::vector<const Tile*> getTileRing(sf::Vector2i coord, int range)const;
 	void getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const;
 
 	sf::Vector2i getRandomSpawnPosition();

@@ -638,33 +638,6 @@ void Map::getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, in
 	}
 }
 
-std::vector<const Tile*> Map::getTileRing(sf::Vector2i coord, int range) const
-{
-	std::vector<const Tile*> tileStore;
-	tileStore.reserve(6 * range);
-
-	sf::Vector2i cubeCoord(offsetToCube(coord));
-
-	for (int y = std::max(0, coord.y - range);
-		y < std::min(m_mapDimensions.y, coord.y + range + 1);
-		y++)
-	{
-		for (int x = std::max(0, coord.x - range);
-			x < std::min(m_mapDimensions.x, coord.x + range + 1);
-			x++)
-		{
-			if (!(coord.x == x && coord.y == y))//If not the tile at the centre
-			{
-				if (cubeDistance(cubeCoord, offsetToCube(sf::Vector2i(x, y))) == range)
-				{
-					tileStore.push_back(getTile(sf::Vector2i(x, y)));
-				}
-			}
-		}
-	}
-	return tileStore;
-}
-
 void Map::getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const
 {
 	sf::Vector2i cubeCoord(offsetToCube(coord));
