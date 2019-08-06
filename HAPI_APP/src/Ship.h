@@ -5,8 +5,6 @@
 #include "Sprite.h"
 #include "TileArea.h"
 
-constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
-
 struct Faction;
 struct GameEvent;
 struct Tile;

@@ -149,26 +149,24 @@ void Game::handleInput()
 
 void Game::handleGameLoop()
 {
-	if (!m_battle.isRunning())
+	if (m_battle.isRunning())
 	{
-		return;
-	}
+		if (m_onlineGame && !m_gameLobbyActive)
+		{
+			m_battle.update(m_deltaTime);
 
-	if (m_onlineGame && !m_gameLobbyActive)
-	{
-		m_battle.update(m_deltaTime);
+			m_window.clear();
+			m_battle.render(m_window);
+			m_window.display();
+		}
+		else if (!m_onlineGame)
+		{
+			m_battle.update(m_deltaTime);
 
-		m_window.clear();
-		m_battle.render(m_window);
-		m_window.display();
-	}
-	else if (!m_onlineGame)
-	{
-		m_battle.update(m_deltaTime);
-
-		m_window.clear();
-		m_battle.render(m_window);
-		m_window.display();
+			m_window.clear();
+			m_battle.render(m_window);
+			m_window.display();
+		}
 	}
 }
 

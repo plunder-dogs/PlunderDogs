@@ -10,6 +10,7 @@
 
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
+constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
 
 const std::deque<Ray2D>& Ship::getMovementArea() const
 {

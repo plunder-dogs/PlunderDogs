@@ -365,26 +365,31 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 
 void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 {
-  	int selectedShipsSize = selectedShips.getSelectedShips().size();
+	ServerMessage messageToSend;
+	int selectedShipsSize = selectedShips.getSelectedShips().size();
 	for (int i = 0; i < selectedShipsSize; ++i)
 	{
 		ShipOnTile selectedShip = selectedShips.removeSelectedShip();
-		moveFactionShipToPosition(selectedShip);
-
 		if (getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().empty())
 		{
 			continue;
 		}
+
+		getFaction(selectedShip.factionName).moveShipToPosition(m_map, selectedShip.shipID);
+
 		if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eAI)
 		{
 			sf::Vector2i destination = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().pair();
 			eDirection endDirection = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().dir;
 
-			ServerMessage messageToSend(eMessageType::eMoveShipToPosition, selectedShip.factionName);
+			messageToSend.type = eMessageType::eMoveShipToPosition;
+			messageToSend.faction = selectedShip.factionName;
 			messageToSend.shipActions.emplace_back(selectedShip.shipID, destination.x, destination.y, endDirection);
 			NetworkHandler::getInstance().sendServerMessage(messageToSend);
 		}
 	}
+
+	assert(messageToSend.shipActions.size() == selectedShipsSize);
 }
 
 void Battle::generateFactionShipsMovementArea(const std::vector<const Tile*>& movementArea, const ShipSelector & shipSelector)
@@ -466,6 +471,13 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 	{
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
+		m_factions[m_currentFactionTurn].rectifyShipMovementArea(shipToMove.shipID);
+		
+	}
+
+	for (const auto& shipAction : receivedServerMessage.shipActions)
+	{
+		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
 	}
 }
