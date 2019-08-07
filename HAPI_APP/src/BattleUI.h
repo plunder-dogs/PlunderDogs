@@ -17,7 +17,7 @@ public:
 	TileArea& getTargetArea();
 	sf::Vector2i getCameraPosition() const;
 
-	void moveCamera(sf::Vector2i mousePosition);
+	void moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
 	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
 	void handleInput(const sf::Event& currentEvent, sf::Vector2i mousePosition);

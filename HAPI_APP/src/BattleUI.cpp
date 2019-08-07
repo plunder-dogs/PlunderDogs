@@ -14,6 +14,7 @@ constexpr size_t MAX_MOVE_AREA{ 850 };
 constexpr size_t MAX_TARGET_AREA = 50;
 const sf::Vector2f CAMERA_MOVE_SPEED{ 2.0f, 2.0f };
 constexpr int MINIMUM_MULTIPLE_SHIP_SEARCH_AREA = 1;
+constexpr int CAMERA_MOVEMENT_BOUNDARY = 10;
 
 BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
@@ -394,13 +395,15 @@ void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 	}
 }
 
-void BattleUI::moveCamera(sf::Vector2i mousePosition)
+void BattleUI::moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition)
 {
-	if (mousePosition.x < 100)
+ 	sf::Vector2i cameraBoundary(windowSize.x / CAMERA_MOVEMENT_BOUNDARY, windowSize.y / CAMERA_MOVEMENT_BOUNDARY);
+
+	if (mousePosition.x < cameraBoundary.x)
 	{
 		m_cameraVelocity.x = -CAMERA_MOVE_SPEED.x;
 	}
-	else if (mousePosition.x > SCREEN_RESOLUTION.x - 100)
+	else if (mousePosition.x > windowSize.x - cameraBoundary.x)
 	{
 		m_cameraVelocity.x = CAMERA_MOVE_SPEED.x;
 	}
@@ -409,11 +412,11 @@ void BattleUI::moveCamera(sf::Vector2i mousePosition)
 		m_cameraVelocity.x = 0.0f;
 	}
 
-	if (mousePosition.y < 50)
+	if (mousePosition.y < cameraBoundary.y)
 	{
 		m_cameraVelocity.y = -CAMERA_MOVE_SPEED.y;
 	}
-	else if (mousePosition.y > SCREEN_RESOLUTION.y - 100)
+	else if (mousePosition.y > windowSize.y - cameraBoundary.y)
 	{
 		m_cameraVelocity.y = CAMERA_MOVE_SPEED.y;
 	}

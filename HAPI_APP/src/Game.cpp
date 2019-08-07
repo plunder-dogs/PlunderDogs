@@ -34,7 +34,6 @@ void Game::run()
 {
 	while (m_battle.isRunning())
 	{
-		NetworkHandler::getInstance().handleBackLog();
 		handleServerMessages();
 		handleInput();
 		handleGameLoop();
@@ -56,6 +55,8 @@ void Game::handleServerMessages()
 	{
 		return;
 	}
+
+	NetworkHandler::getInstance().handleBackLog();
 
 	while (NetworkHandler::getInstance().hasMessages())
 	{

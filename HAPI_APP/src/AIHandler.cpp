@@ -172,7 +172,8 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 	const Tile* closestTile{ alliedShip };
 	int closestDistance{ INT_MAX };
 	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShip->m_tileCoordinate) };
-	std::vector<const Tile*> availableTiles{ map.getTileRing(targetShip->m_tileCoordinate, range) };
+	std::vector<const Tile*> availableTiles;
+	map.getTileRing(availableTiles, targetShip->m_tileCoordinate, range);
 	for (const Tile* it : availableTiles)
 	{
 		//Ensure it's a valid tile, if not skip this one

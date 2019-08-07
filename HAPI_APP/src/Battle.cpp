@@ -276,7 +276,7 @@ void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & curre
 
 	if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		m_battleUI.moveCamera(mousePosition);
+		m_battleUI.moveCamera(window.getSize(), mousePosition);
 	}
 
 	if (m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eRemotePlayer)
