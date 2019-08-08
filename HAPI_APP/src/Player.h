@@ -8,11 +8,11 @@ struct Tile;
 class Ship;
 class Battle;
 struct GameEvent;
-class BattleUI : private NonCopyable
+class Player : private NonCopyable
 {
 public:
-	BattleUI(Battle& battle);
-	~BattleUI();
+	Player(Battle& battle);
+	~Player();
 
 	TileArea& getTargetArea();
 	sf::Vector2i getCameraPosition() const;

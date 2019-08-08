@@ -127,7 +127,7 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& pl
 	m_map(),
 	m_currentBattlePhase(BattlePhase::Deployment),
 	m_currentDeploymentState(eDeploymentState::NotStarted),
-	m_battleUI(*this),
+	m_player(*this),
 	m_explosionParticles(),
 	m_fireParticles(),
 	m_timeUntilAITurn(1.5f, false),
@@ -162,7 +162,7 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 {
 	m_onlineGame = true;
 	m_map.loadmap(newMapName);
-	m_battleUI.setCameraBounds(m_map.getDimensions());
+	m_player.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 	
 	for (auto& faction : m_factions)
@@ -204,7 +204,7 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 {
 	m_onlineGame = false;
 	m_map.loadmap(levelName);
-	m_battleUI.setCameraBounds(m_map.getDimensions());
+	m_player.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 
 	for (auto& faction : m_factions)
@@ -248,7 +248,7 @@ void Battle::render(sf::RenderWindow& window)
 		}
 	}
 	
-	m_battleUI.render(window);
+	m_player.render(window);
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{
@@ -276,19 +276,19 @@ void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & curre
 
 	if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		m_battleUI.moveCamera(window.getSize(), mousePosition);
+		m_player.moveCamera(window.getSize(), mousePosition);
 	}
 
 	if (m_factions[m_currentFactionTurn].m_controllerType != eControllerType::eRemotePlayer)
 	{
-		m_battleUI.handleInput(currentEvent, mousePosition);
+		m_player.handleInput(currentEvent, mousePosition);
 	}
 }
 
 void Battle::update(float deltaTime)
 {
-	m_battleUI.update(deltaTime);
-	m_map.setDrawOffset(m_battleUI.getCameraPosition());
+	m_player.update(deltaTime);
+	m_map.setDrawOffset(m_player.getCameraPosition());
 	handleTimeUntilGameOver(deltaTime);
 
 	for (auto& explosionParticle : m_explosionParticles)
@@ -488,7 +488,7 @@ void Battle::fireFactionShipAtPosition(const ServerMessage & receivedServerMessa
 
 	for (const auto& shipAction : receivedServerMessage.shipActions)
 	{
-		TileArea& targetArea = m_battleUI.getTargetArea();
+		TileArea& targetArea = m_player.getTargetArea();
 		targetArea.clearTileArea();
 
 		const Ship& firingShip = getCurrentFaction().getShip(shipAction.shipID);

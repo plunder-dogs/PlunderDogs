@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Map.h"
-#include "BattleUI.h"
+#include "Player.h"
 #include "Faction.h"
 #include "Particle.h"
 #include <array>
@@ -58,7 +58,7 @@ private:
 	Map m_map;
 	BattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;
-	BattleUI m_battleUI;
+	Player m_player;
 	std::vector<Particle> m_explosionParticles;
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
