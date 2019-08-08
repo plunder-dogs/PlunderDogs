@@ -162,7 +162,7 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 {
 	m_onlineGame = true;
 	m_map.loadmap(newMapName);
-	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
+	m_battleUI.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 	
 	for (auto& faction : m_factions)
@@ -204,7 +204,7 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 {
 	m_onlineGame = false;
 	m_map.loadmap(levelName);
-	m_battleUI.setMaxCameraOffset(m_map.getDimensions());
+	m_battleUI.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 
 	for (auto& faction : m_factions)

@@ -19,7 +19,7 @@ public:
 
 	void moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
-	void setMaxCameraOffset(sf::Vector2i maxCameraOffset);
+	void setCameraBounds(sf::Vector2i mapDimensions);
 	void handleInput(const sf::Event& currentEvent, sf::Vector2i mousePosition);
 	void update(float deltaTime);
 
@@ -39,7 +39,7 @@ private:
 	sf::Vector2i m_rightClickPosition;
 
 	//Camera
-	sf::Vector2i m_maxCameraOffset;
+	sf::IntRect m_cameraBounds;
 	sf::Vector2f m_cameraVelocity;
 	sf::Vector2i m_cameraPosition;
 	
