@@ -37,23 +37,23 @@ eDirection Utilities::getOppositeDirection(eDirection direction)
 	eDirection oppositeDirection;
 	switch (direction)
 	{
-	case eNorth:
-		oppositeDirection = eSouth;
+	case eDirection::eNorth:
+		oppositeDirection = eDirection::eSouth;
 		break;
-	case eNorthEast:
-		oppositeDirection = eSouthWest;
+	case eDirection::eNorthEast:
+		oppositeDirection = eDirection::eSouthWest;
 		break;
-	case eSouthEast:
-		oppositeDirection = eNorthWest;
+	case eDirection::eSouthEast:
+		oppositeDirection = eDirection::eNorthWest;
 		break;
-	case eSouth:
-		oppositeDirection = eNorth;
+	case eDirection::eSouth:
+		oppositeDirection = eDirection::eNorth;
 		break;
-	case eSouthWest:
-		oppositeDirection = eNorthEast;
+	case eDirection::eSouthWest:
+		oppositeDirection = eDirection::eNorthEast;
 		break;
-	case eNorthWest:
-		oppositeDirection = eSouthEast;
+	case eDirection::eNorthWest:
+		oppositeDirection = eDirection::eSouthEast;
 		break;
 	}
 
@@ -86,7 +86,7 @@ std::pair<double, eDirection> Math::calculateDirection(sf::Vector2i startLocatio
 	{
 		magnitude = sqrt(distance.first * distance.first + distance.second * distance.second);
 	}
-	std::pair<double, eDirection> returnVariable{ magnitude, eNorth };
+	std::pair<double, eDirection> returnVariable{ magnitude, eDirection::eNorth };
 
 	if (magnitude)
 	{
@@ -94,10 +94,10 @@ std::pair<double, eDirection> Math::calculateDirection(sf::Vector2i startLocatio
 		{
 			if (distance.second > 0)
 			{
-				returnVariable.second = eSouth;
+				returnVariable.second = eDirection::eSouth;
 				return returnVariable;
 			}
-			else returnVariable.second = eNorth;
+			else returnVariable.second = eDirection::eNorth;
 			return returnVariable;
 		}
 		double angle;
@@ -113,17 +113,17 @@ std::pair<double, eDirection> Math::calculateDirection(sf::Vector2i startLocatio
 
 		switch (tmp)
 		{
-		case 0: returnVariable.second = eNorth;
+		case 0: returnVariable.second = eDirection::eNorth;
 			break;
-		case 1: returnVariable.second = eNorthEast;
+		case 1: returnVariable.second = eDirection::eNorthEast;
 			break;
-		case 2: returnVariable.second = eSouthEast;
+		case 2: returnVariable.second = eDirection::eSouthEast;
 			break;
-		case 3: returnVariable.second = eSouth;
+		case 3: returnVariable.second = eDirection::eSouth;
 			break;
-		case 4: returnVariable.second = eSouthWest;
+		case 4: returnVariable.second = eDirection::eSouthWest;
 			break;
-		case 5: returnVariable.second = eNorthWest;
+		case 5: returnVariable.second = eDirection::eNorthWest;
 			break;
 		}
 	}
@@ -133,14 +133,14 @@ std::pair<double, eDirection> Math::calculateDirection(sf::Vector2i startLocatio
 std::pair<double, eDirection> Math::calculateDirection(const Tile* startLocation, const Tile* endLocation)
 {
 	if (!startLocation || !endLocation)
-		return { 0.0 , eNorth };
+		return { 0.0 , eDirection::eNorth };
 	// Calculating the distance vector of the line between the start and end point
 	sf::Vector2i startPos{ Math::coordToHexPos(startLocation->m_tileCoordinate) };
 	sf::Vector2i endPos{ Math::coordToHexPos(endLocation->m_tileCoordinate) };
 	sf::Vector2i distance{ endPos.x - startPos.x, endPos.y - startPos.y };
 	// Calculating the magnitude of the line between the start and end point.
 	double magnitude{ sqrt(distance.x * distance.x + distance.y * distance.y) };
-	std::pair<double, eDirection> returnVariable{ magnitude, eNorth };
+	std::pair<double, eDirection> returnVariable{ magnitude, eDirection::eNorth };
 
 	if (magnitude)
 	{
@@ -149,11 +149,11 @@ std::pair<double, eDirection> Math::calculateDirection(const Tile* startLocation
 			if (distance.y > 0)
 			{
 				//Changed from SouthEast
-				returnVariable.second = eSouth;
+				returnVariable.second = eDirection::eSouth;
 				return returnVariable;
 			}
 			//Changed from NorthWest
-			else returnVariable.second = eNorth;
+			else returnVariable.second = eDirection::eNorth;
 			return returnVariable;
 		}
 		double angle;
@@ -169,17 +169,17 @@ std::pair<double, eDirection> Math::calculateDirection(const Tile* startLocation
 
 		switch (tmp)
 		{
-		case 0: returnVariable.second = eNorth;
+		case 0: returnVariable.second = eDirection::eNorth;
 			break;
-		case 1: returnVariable.second = eNorthEast;
+		case 1: returnVariable.second = eDirection::eNorthEast;
 			break;
-		case 2: returnVariable.second = eSouthEast;
+		case 2: returnVariable.second = eDirection::eSouthEast;
 			break;
-		case 3: returnVariable.second = eSouth;
+		case 3: returnVariable.second = eDirection::eSouth;
 			break;
-		case 4: returnVariable.second = eSouthWest;
+		case 4: returnVariable.second = eDirection::eSouthWest;
 			break;
-		case 5: returnVariable.second = eNorthWest;
+		case 5: returnVariable.second = eDirection::eNorthWest;
 			break;
 		}
 	}

@@ -10,7 +10,7 @@
 #include <assert.h>
 
 //Finds closest living enemy, returns nullptr if none found
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName faction);
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, eFactionName faction);
 ////Finds nearest firing position to ship, if none are found will return the tile the ship is on
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& mapPtr, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range);
 void attemptMove(std::vector<Ray2D>& movementArea, const Faction& faction, Map& map, Ship& currentShip, std::pair<const Tile*, eDirection> targetTile);
@@ -49,7 +49,7 @@ void AIHandler::handleShootingPhase(Battle& battle, const Map& map, Faction& pla
 
 void AIHandler::handleDeploymentPhase(Battle& battle, const Faction& currentPlayer)
 {	
-	assert(currentPlayer.m_controllerType == eControllerType::eAI);
+	assert(currentPlayer.m_controllerType == eFactionControllerType::eAI);
 
 	for (const auto& i : currentPlayer.m_spawnArea.m_tileArea)
 	{
@@ -63,7 +63,7 @@ void AIHandler::handleDeploymentPhase(Battle& battle, const Faction& currentPlay
 
 void AIHandler::loadShips(Faction& player)
 {
-	assert(player.m_controllerType == eControllerType::eAI);
+	assert(player.m_controllerType == eFactionControllerType::eAI);
 
 	int randomNumber{ std::rand() % 8 };
 	int numSideCannons{ 0 };
@@ -130,18 +130,18 @@ void AIHandler::loadShips(Faction& player)
 	}
 }
 
-const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, FactionName ourFaction)
+const Tile* findClosestEnemy(const Battle& battle, const Map& map, sf::Vector2i alliedShipPosition, eFactionName ourFaction)
 {
 	const Tile* closestEnemy{ nullptr };
 	int closestDistance{ INT_MAX };
 	sf::Vector2i alliedPos{ Math::coordToHexPos(alliedShipPosition) };
 	auto activeFactions = battle.getAllFactionsInPlay();
-	for (FactionName i : activeFactions)
+	for (eFactionName i : activeFactions)
 	{
-		if (i == static_cast<int>(ourFaction))
+		if (i == ourFaction)
 			continue;
 
-		const auto& factionShips = battle.getFaction(static_cast<FactionName>(i)).m_ships;
+		const auto& factionShips = battle.getFaction(static_cast<eFactionName>(i)).m_ships;
 
 		for (int j = 0; j < factionShips.size(); j++)
 		{
@@ -178,7 +178,7 @@ const Tile* firePosRadial(const Map& map, const Tile* targetShip, const Tile* al
 	{
 		//Ensure it's a valid tile, if not skip this one
 		if (!it) continue;
-		if (it->m_type != eSea && it->m_type != eOcean) continue;
+		if (it->m_type != eTileType::eSea && it->m_type != eTileType::eOcean) continue;
 		if (it->m_shipOnTile.isValid()) continue;
 		//Determine distance
 		sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
@@ -213,7 +213,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 		{
 			//Ensure it's a valid tile, if not skip this one
 			if (!it) continue;
-			if (it->m_type != eSea && it->m_type != eOcean) continue;
+			if (it->m_type != eTileType::eSea && it->m_type != eTileType::eOcean) continue;
 			if (it->m_shipOnTile.isValid()) continue;
 			//Determine distance
 			sf::Vector2i tempPos = Math::coordToHexPos(it->m_tileCoordinate);
@@ -234,7 +234,7 @@ const Tile* firePosLine(const Map& map, const Tile* targetShip, const Tile* alli
 std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile* targetShip, const Tile* alliedShip, eShipType shipType, int range)
 {
 	const Tile* closestTile{ alliedShip };
-	eDirection facingDirection{ eNorth };
+	eDirection facingDirection{ eDirection::eNorth };
 	switch (shipType)
 	{
 	case eShipType::eFrigate:
@@ -243,17 +243,17 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch (facingDirection)
 		{
-		case eNorth: facingDirection = eNorthEast;
+		case eDirection::eNorth: facingDirection = eDirection::eNorthEast;
 			break;
-		case eNorthEast: facingDirection = eSouthEast;
+		case eDirection::eNorthEast: facingDirection = eDirection::eSouthEast;
 			break;
-		case eSouthEast: facingDirection = eSouth;
+		case eDirection::eSouthEast: facingDirection = eDirection::eSouth;
 			break;
-		case eSouth: facingDirection = eSouthWest;
+		case eDirection::eSouth: facingDirection = eDirection::eSouthWest;
 			break;
-		case eSouthWest: facingDirection = eNorthWest;
+		case eDirection::eSouthWest: facingDirection = eDirection::eNorthWest;
 			break;
-		case eNorthWest: facingDirection = eNorth;
+		case eDirection::eNorthWest: facingDirection = eDirection::eNorth;
 			break;
 		}
 		break;
@@ -276,17 +276,17 @@ std::pair<const Tile*, eDirection> findFiringPosition(const Map& map, const Tile
 		facingDirection = Math::calculateDirection(closestTile, targetShip).second;
 		switch(facingDirection)
 		{
-		case eNorth: facingDirection = eSouth;
+		case eDirection::eNorth: facingDirection = eDirection::eSouth;
 			break;
-		case eNorthEast: facingDirection = eSouthWest;
+		case eDirection::eNorthEast: facingDirection = eDirection::eSouthWest;
 			break;
-		case eSouthEast: facingDirection = eNorthWest;
+		case eDirection::eSouthEast: facingDirection = eDirection::eNorthWest;
 			break;
-		case eSouth: facingDirection = eNorth;
+		case eDirection::eSouth: facingDirection = eDirection::eNorth;
 			break;
-		case eSouthWest: facingDirection = eNorthEast;
+		case eDirection::eSouthWest: facingDirection = eDirection::eNorthEast;
 			break;
-		case eNorthWest: facingDirection = eSouthEast;
+		case eDirection::eNorthWest: facingDirection = eDirection::eSouthEast;
 			break;
 		}
 		break;
@@ -309,7 +309,7 @@ void attemptMove(std::vector<Ray2D>& movementArea, const Faction& faction, Map& 
 	sf::Vector2i targetPos = targetTile.first->m_tileCoordinate;
 	sf::Vector2i currentPos = currentShip.getCurrentPosition();
 	int closestDistance{ INT_MAX };
-	Ray2D bestTile{ -1, -1, eNorth };
+	Ray2D bestTile{ -1, -1, eDirection::eNorth };
 	for (Ray2D it : movementArea)
 	{
 		sf::Vector2i diff(
@@ -323,7 +323,7 @@ void attemptMove(std::vector<Ray2D>& movementArea, const Faction& faction, Map& 
 		}
 	}
 	//If a tile is found
-	if (bestTile != Ray2D(-1, -1, eNorth))
+	if (bestTile != Ray2D(-1, -1, eDirection::eNorth))
 	{
 		currentShip.generateMovementArea(faction, map, map.getTile(bestTile.pair())->m_tileCoordinate, true);
 		currentShip.startMovement(map, targetTile.second);		
@@ -380,20 +380,20 @@ void attemptShot(std::vector<const Tile*>& targetArea, Battle& battle, const Map
 	}
 	case eShipType::eFire:
 	{
-		eDirection backwardsDirection{ eNorth };
+		eDirection backwardsDirection{ eDirection::eNorth };
 		switch(firingShip.getCurrentDirection())
 		{
-		case eNorth: backwardsDirection = eSouth;
+		case eDirection::eNorth: backwardsDirection = eDirection::eSouth;
 			break;
-		case eNorthEast: backwardsDirection = eSouthWest;
+		case eDirection::eNorthEast: backwardsDirection = eDirection::eSouthWest;
 			break;
-		case eSouthEast: backwardsDirection = eNorthWest;
+		case eDirection::eSouthEast: backwardsDirection = eDirection::eNorthWest;
 			break;
-		case eSouth: backwardsDirection = eNorth;
+		case eDirection::eSouth: backwardsDirection = eDirection::eNorth;
 			break;
-		case eSouthWest: backwardsDirection = eNorthEast;
+		case eDirection::eSouthWest: backwardsDirection = eDirection::eNorthEast;
 			break;
-		case eNorthWest: backwardsDirection = eSouthEast;
+		case eDirection::eNorthWest: backwardsDirection = eDirection::eSouthEast;
 			break;
 		}
 			

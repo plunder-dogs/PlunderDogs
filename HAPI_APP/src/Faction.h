@@ -5,20 +5,20 @@
 
 struct Faction : private NonCopyable
 {
-	Faction(FactionName factionName);
+	Faction(eFactionName factionName);
 
 	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;
 	const std::vector<Ship>& getAllShips() const;
 	const Ship& getShip(int shipID) const;
-	void render(sf::RenderWindow& window, const Map& map, BattlePhase currentBattlePhase, int currentFactionTurn);
+	void render(sf::RenderWindow& window, const Map& map, eBattlePhase currentBattlePhase, int currentFactionTurn);
 	void renderShipsMovementGraphs(sf::RenderWindow& window, const Map& map);
 	bool isEliminated() const;
 	void clearSpawnArea();
 
 	//Deployment Phase
 	bool isPositionInDeploymentArea(sf::Vector2i position) const;
-	void addShip(FactionName factionName, eShipType shipType);
+	void addShip(eFactionName factionName, eShipType shipType);
 	bool isAllShipsDeployed() const;
 	void createSpawnArea(const Map& map, sf::Vector2i spawnPosition );
 	void deployShipAtPosition(Map& map, sf::Vector2i startingPosition, eDirection startingDirection);
@@ -33,7 +33,7 @@ struct Faction : private NonCopyable
 	void shipTakeDamage(int shipID, int damage);
 	
 	std::vector<Ship> m_ships;
-	const FactionName m_factionName;
-	eControllerType m_controllerType;
+	const eFactionName m_factionName;
+	eFactionControllerType m_controllerType;
 	TileArea m_spawnArea;
 };

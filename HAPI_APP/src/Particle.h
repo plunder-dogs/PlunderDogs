@@ -4,7 +4,7 @@
 #include "Timer.h"
 
 class Map;
-enum eDirection;
+enum class eDirection;
 struct Particle
 {
 	Particle(float lifespan, const Texture& texture, float scale);

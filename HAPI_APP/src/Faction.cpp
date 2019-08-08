@@ -7,10 +7,10 @@ constexpr size_t MAX_SPAWN_AREA = 75;
 constexpr size_t SPAWN_AREA_RANGE = 3;
 
 //BATTLE PLAYER
-Faction::Faction(FactionName factionName)
+Faction::Faction(eFactionName factionName)
 	: m_ships(),
 	m_factionName(factionName),
-	m_controllerType(eControllerType::None),
+	m_controllerType(eFactionControllerType::None),
 	m_spawnArea(MAX_SPAWN_AREA)
 {
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
@@ -37,14 +37,14 @@ const Ship & Faction::getShip(int shipID) const
 	return m_ships[shipID];
 }
 
-void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase currentBattlePhase, int currentFactionTurn)
+void Faction::render(sf::RenderWindow& window, const Map & map, eBattlePhase currentBattlePhase, int currentFactionTurn)
 {
 	for (auto& spawnArea : m_spawnArea.m_tileAreaGraph)
 	{
 		spawnArea.render(window, map);
 	}
 
-	if (currentBattlePhase == BattlePhase::Deployment)
+	if (currentBattlePhase == eBattlePhase::Deployment)
 	{
 		if (static_cast<int>(m_factionName) <= currentFactionTurn)
 		{
@@ -92,7 +92,7 @@ bool Faction::isPositionInDeploymentArea(sf::Vector2i position) const
 	return cIter != m_spawnArea.m_tileArea.cend();
 }
 
-void Faction::addShip(FactionName factionName, eShipType shipType)
+void Faction::addShip(eFactionName factionName, eShipType shipType)
 {
 	assert(m_ships.size() < size_t(MAX_SHIPS_PER_FACTION));
 	int shipID = static_cast<int>(m_ships.size());
@@ -118,16 +118,16 @@ void Faction::createSpawnArea(const Map & map, sf::Vector2i spawnPosition)
 	const Texture* texture = nullptr;
 	switch (m_factionName)
 	{
-	case eYellow:
+	case eFactionName::eYellow:
 		texture = Textures::getInstance().m_yellowSpawnHex.get();
 		break;
-	case eBlue:
+	case eFactionName::eBlue:
 		texture = Textures::getInstance().m_blueSpawnHex.get();
 		break;
-	case eGreen:
+	case eFactionName::eGreen:
 		texture = Textures::getInstance().m_greenSpawnHex.get();
 		break;
-	case eRed:
+	case eFactionName::eRed:
 		texture = Textures::getInstance().m_redSpawnHex.get();
 		break;
 	};

@@ -60,8 +60,8 @@ void ShipSelector::update(const Battle& battle, sf::Vector2i mousePosition, cons
 	m_AABB.height = selectorSize.y;
 
 	//Don't add AI or Remote Player ships
-	if (battle.getCurrentFaction().m_controllerType == eControllerType::eAI ||
-		battle.getCurrentFaction().m_controllerType == eControllerType::eRemotePlayer)
+	if (battle.getCurrentFaction().m_controllerType == eFactionControllerType::eAI ||
+		battle.getCurrentFaction().m_controllerType == eFactionControllerType::eRemotePlayer)
 	{
 		return;
 	}

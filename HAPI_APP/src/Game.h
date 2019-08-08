@@ -18,12 +18,12 @@ public:
 	void run();
 
 private:
-	std::array<Faction, static_cast<size_t>(FactionName::eTotal)> m_factions
+	std::array<Faction, static_cast<size_t>(eFactionName::eTotal)> m_factions
 	{
-		FactionName::eYellow, 
-		FactionName::eBlue, 
-		FactionName::eGreen, 
-		FactionName::eRed
+		eFactionName::eYellow, 
+		eFactionName::eBlue, 
+		eFactionName::eGreen, 
+		eFactionName::eRed
 	};
 	sf::RenderWindow m_window;
 	bool m_onlineGame;
@@ -38,6 +38,6 @@ private:
 	void handleInput();
 	void handleGameLoop();
 
-	void assignFaction(FactionName factionName, eControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
-	FactionName getLocalFactionName() const;
+	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
+	eFactionName getLocalFactionName() const;
 };

@@ -27,12 +27,12 @@ struct GameEvent
 
 struct FactionShipDestroyedEvent
 {
-	FactionShipDestroyedEvent(FactionName factionName, int shipID)
+	FactionShipDestroyedEvent(eFactionName factionName, int shipID)
 		: factionName(factionName),
 		shipID(shipID)
 	{}
 
-	const FactionName factionName;
+	const eFactionName factionName;
 	const int shipID;
 };
 

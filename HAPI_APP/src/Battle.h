@@ -18,17 +18,17 @@ class Battle : private NonCopyable
 	};
 
 public:
-	Battle(std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& players);
+	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& players);
 	~Battle();
 
 	bool isRunning() const;
 	bool isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
-	BattlePhase getCurrentBattlePhase() const;
+	eBattlePhase getCurrentBattlePhase() const;
 	const Faction& getCurrentFaction() const;
-	std::vector<FactionName> getAllFactionsInPlay() const;
+	std::vector<eFactionName> getAllFactionsInPlay() const;
 	const Ship& getFactionShip(ShipOnTile shipOnTile) const;
-	const Faction& getFaction(FactionName factionName) const;
+	const Faction& getFaction(eFactionName factionName) const;
 
 	void receiveServerMessage(const ServerMessage& receivedServerMessage);
 
@@ -54,9 +54,9 @@ public:
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
-	std::array<Faction, static_cast<size_t>(FactionName::eTotal)>& m_factions;
+	std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& m_factions;
 	Map m_map;
-	BattlePhase m_currentBattlePhase;
+	eBattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;
 	Player m_player;
 	std::vector<Particle> m_explosionParticles;
@@ -69,12 +69,12 @@ private:
 	int m_currentFactionTurn;
 
 	Faction& getCurrentPlayer();
-	Faction& getFaction(FactionName factionName);
+	Faction& getFaction(eFactionName factionName);
 	
 	void playFireAnimation(eDirection orientation, sf::Vector2i position);
 	void playExplosionAnimation(sf::Vector2i position);
 	void advanceToNextBattlePhase();
-	void switchToBattlePhase(BattlePhase newBattlePhase);
+	void switchToBattlePhase(eBattlePhase newBattlePhase);
 	void updateMovementPhase(float deltaTime);
 	void updateAttackPhase();
 	void incrementFactionTurn();

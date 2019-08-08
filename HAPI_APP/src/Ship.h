@@ -13,12 +13,12 @@ class Map;
 class Ship
 {
 public:
-	Ship(FactionName playerName, eShipType shipType, int ID);
+	Ship(eFactionName playerName, eShipType shipType, int ID);
 	~Ship();
 
 	const std::deque<Ray2D>& getMovementArea() const;
 	sf::FloatRect getAABB(const Map& map) const;
-	FactionName getFactionName() const;
+	eFactionName getFactionName() const;
 	eDirection getCurrentDirection() const;
 	eShipType getShipType() const;
 	sf::Vector2i getCurrentPosition() const;
@@ -57,7 +57,7 @@ public:
 	void fireWeapon();
 
 private:
-	const FactionName m_factionName;
+	const eFactionName m_factionName;
 	const eShipType m_shipType;
 	const int m_ID;
 	sf::Vector2i m_currentPosition;

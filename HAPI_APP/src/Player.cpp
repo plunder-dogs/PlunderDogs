@@ -178,16 +178,16 @@ void Player::onLeftClickReleased(sf::Vector2i mousePosition)
 	m_leftClickHeld = false;
 	
 	if (!m_battle.isShipBelongToCurrentFaction(m_tileOnLeftClick->m_shipOnTile) ||
-		m_battle.getCurrentFaction().m_controllerType != eControllerType::eLocalPlayer)
+		m_battle.getCurrentFaction().m_controllerType != eFactionControllerType::eLocalPlayer)
 	{
 		return;
 	}
 
-	if (m_battle.getCurrentBattlePhase() == BattlePhase::Movement)
+	if (m_battle.getCurrentBattlePhase() == eBattlePhase::Movement)
 	{
 		onLeftClickMovementPhase();
 	}
-	else if (m_battle.getCurrentBattlePhase() == BattlePhase::Attack)
+	else if (m_battle.getCurrentBattlePhase() == eBattlePhase::Attack)
 	{
 		onLeftClickAttackPhase();
 	}
@@ -201,15 +201,15 @@ void Player::onRightClickReleased(sf::Vector2i mousePosition)
 	auto mouseDirection = Math::calculateDirection(m_rightClickPosition, mousePosition);
 	switch (m_battle.getCurrentBattlePhase())
 	{
-	case BattlePhase::Deployment:
+	case eBattlePhase::Deployment:
 		onRightClickReleasedDeploymentPhase(mouseDirection.second);
 		break;
 
-	case BattlePhase::Movement:
+	case eBattlePhase::Movement:
 		onRightClickReleasedMovementPhase(mouseDirection, mousePosition);
 		break;
 
-	case BattlePhase::Attack:
+	case eBattlePhase::Attack:
 		onRightClickReleasedAttackPhase();
 		break;
 	}
@@ -235,12 +235,12 @@ void Player::onLeftClick(sf::Vector2i mousePosition)
 		m_tileOnMouse = tileOnMouse;
 	}
 
-	BattlePhase currentBattlePhase = m_battle.getCurrentBattlePhase();
+	eBattlePhase currentBattlePhase = m_battle.getCurrentBattlePhase();
 
 	//Clicked on new tile
 	if (m_tileOnLeftClick->m_tileCoordinate != tileOnMouse->m_tileCoordinate)
 	{
-		if (currentBattlePhase == BattlePhase::Movement)
+		if (currentBattlePhase == eBattlePhase::Movement)
 		{
 			m_movementArea.clearTileArea();
 			if (m_tileOnLeftClick->isShipOnTile())
@@ -248,7 +248,7 @@ void Player::onLeftClick(sf::Vector2i mousePosition)
 				m_battle.clearFactionShipMovementArea(m_tileOnLeftClick->m_shipOnTile);
 			}
 		}
-		else if (currentBattlePhase == BattlePhase::Attack)
+		else if (currentBattlePhase == eBattlePhase::Attack)
 		{
 			m_targetArea.clearTileArea();
 		}
@@ -264,7 +264,7 @@ void Player::onLeftClick(sf::Vector2i mousePosition)
 		for (int i = 0; i < selectedShipCount; ++i)
 		{
 			ShipOnTile selectedShip = m_shipSelector.removeSelectedShip();
-			if (currentBattlePhase == BattlePhase::Movement)
+			if (currentBattlePhase == eBattlePhase::Movement)
 			{
 				m_battle.clearFactionShipMovementArea(selectedShip);
 			}
@@ -343,7 +343,7 @@ void Player::onRightClickReleasedAttackPhase()
 
 void Player::onMouseMove(sf::Vector2i mousePosition)
 {
-	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
+	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != eBattlePhase::Deployment)
 	{
 		m_shipSelector.update(m_battle, mousePosition, m_battle.getMap());
 	}
@@ -366,17 +366,17 @@ void Player::onMouseMove(sf::Vector2i mousePosition)
 		
 		switch (m_battle.getCurrentBattlePhase())
 		{
-		case BattlePhase::Deployment:
+		case eBattlePhase::Deployment:
 		{
 			onMouseMoveDeploymentPhase(mousePosition);
 			break;
 		}
-		case BattlePhase::Movement:
+		case eBattlePhase::Movement:
 		{
 			onMouseMoveMovementPhase(mousePosition);
 			break;
 		}
-		case BattlePhase::Attack:
+		case eBattlePhase::Attack:
 		{
 			onMouseMoveAttackPhase();
 			break;
@@ -545,7 +545,7 @@ void Player::onRightClick(sf::Vector2i mousePosition)
 	{
 		m_tileOnRightClick = tileOnMouse;
 		m_tileOnMouse = tileOnMouse;
-		if (m_battle.getCurrentBattlePhase() != BattlePhase::Deployment)
+		if (m_battle.getCurrentBattlePhase() != eBattlePhase::Deployment)
 		{
 			m_spriteOnMouse.activate();
 			m_spriteOnMouse.setPosition(m_tileOnMouse->m_tileCoordinate);

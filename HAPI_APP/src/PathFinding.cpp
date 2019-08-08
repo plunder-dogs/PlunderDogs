@@ -28,7 +28,7 @@ void PathFinding::loadTileData(const Map & map)
 	m_byteData.reserve(map.getDimensions().x * map.getDimensions().y);
 	for (const Tile& tile : map.getData())
 	{
-		bool tileTraversable = (tile.m_type == eSea || tile.m_type == eOcean) && !tile.m_shipOnTile.isValid();
+		bool tileTraversable = (tile.m_type == eTileType::eSea || tile.m_type == eTileType::eOcean) && !tile.m_shipOnTile.isValid();
 		m_byteData.emplace_back(tileTraversable);
 	}
 }
@@ -37,7 +37,7 @@ void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos,
 {
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
-		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
+		(map.getTile(endPos)->m_type != eTileType::eSea && map.getTile(endPos)->m_type != eTileType::eOcean))
 	{
 		return;
 	}
@@ -46,7 +46,7 @@ void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos,
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessTileData(startPos, map.getDimensions().x).m_neighbours[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	accessTileData(startPos, map.getDimensions().x).m_neighbours[static_cast<int>(startPos.dir)] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
 	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
@@ -65,7 +65,7 @@ void PathFinding::findPath(Ray2DArea& tileArea, const Map & map, Ray2D startPos,
 	while (trace != startPos)
 	{
 		tileArea.m_tileArea.push_back(trace);
-		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[trace.dir];
+		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[static_cast<int>(trace.dir)];
 	}
 	std::reverse(tileArea.m_tileArea.begin(), tileArea.m_tileArea.end());
 }
@@ -74,14 +74,14 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 {
 	if (!map.getTile(startPos) || !map.getTile(endPos) ||
 		map.getTile(endPos)->m_shipOnTile.isValid() ||
-		(map.getTile(endPos)->m_type != eSea && map.getTile(endPos)->m_type != eOcean))
+		(map.getTile(endPos)->m_type != eTileType::eSea && map.getTile(endPos)->m_type != eTileType::eOcean))
 		return std::queue<Ray2D>();
 
 	resetTileData(map);
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessTileData(startPos, map.getDimensions().x).m_neighbours[startPos.dir] = startPos;//Yes, it's set = itself as it's the root note
+	accessTileData(startPos, map.getDimensions().x).m_neighbours[static_cast<int>(startPos.dir)] = startPos;//Yes, it's set = itself as it's the root note
 	//Start recursion
 	Ray2D trace{ NO_TILE };
 	while (!exploreQueue.empty())
@@ -98,7 +98,7 @@ std::queue<Ray2D> PathFinding::findPath(const Map& map, Ray2D startPos, Ray2D en
 	while (trace != startPos)
 	{
 		pathToTile.emplace_back(trace);
-		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[trace.dir];
+		trace = accessTileData(trace, map.getDimensions().x).m_neighbours[static_cast<int>(trace.dir)];
 	}
 
 	std::reverse(pathToTile.begin(), pathToTile.end());
@@ -123,7 +123,7 @@ std::vector<Ray2D> PathFinding::findArea(const Map & map, Ray2D startPos, float 
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
 	//accessByteData(
-	accessByteData(startPos, map.getDimensions().x).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
+	accessByteData(startPos, map.getDimensions().x).setDir(static_cast<int>(startPos.dir), true);//Yes, it's set = itself as it's the root note
 	//Start recursion
 	int areaSize{ 1 };
 	while (!exploreQueue.empty())
@@ -154,7 +154,7 @@ void PathFinding::findArea(std::vector<const Tile*>& tileArea, const Map & map, 
 	std::queue<std::pair<Ray2D, float>> exploreQueue;
 	//Add first element and set it to explored
 	exploreQueue.emplace(startPos, maxMovement);
-	accessByteData(startPos, map.getDimensions().x).setDir(startPos.dir, true);//Yes, it's set = itself as it's the root note
+	accessByteData(startPos, map.getDimensions().x).setDir(static_cast<int>(startPos.dir), true);//Yes, it's set = itself as it's the root note
 	//Start recursion
 	int areaSize{ 1 };
 	while (!exploreQueue.empty())
@@ -206,25 +206,25 @@ bool PathFinding::pathExplorer(Ray2D & trace, std::queue<std::pair<Ray2D, float>
 		
 		//Left
 		Ray2D queueTile = turnLeft(tile);
-		if (accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Right
 		queueTile = turnRight(tile);
-		if (accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE)
+		if (accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] == NO_TILE)
 		{
-			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] = tile;
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Forward
 		queueTile = nextTile(tile, mapWidth, m_tileData.size());
 		if (queueTile != NO_TILE &&
-			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] == NO_TILE &&
+			accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] == NO_TILE &&
 			accessTileData(queueTile, mapWidth).m_traversable)
 		{
-			accessTileData(queueTile, mapWidth).m_neighbours[queueTile.dir] = tile;
+			accessTileData(queueTile, mapWidth).m_neighbours[static_cast<int>(queueTile.dir)] = tile;
 			if (queueTile.dir == windDirection)
 				queue.emplace(queueTile, tether - (1.0f - windStrength));
 			else
@@ -251,26 +251,26 @@ bool PathFinding::areaExplorer(std::queue<std::pair<Ray2D, float>>& queue, eDire
 		//Then enqueue left, right, and forward as appropriate:
 		//Left
 		Ray2D queueTile = turnLeft(tile);
-		if (!accessByteData(queueTile, mapWidth).getDir(queueTile.dir))
+		if (!accessByteData(queueTile, mapWidth).getDir(static_cast<int>(queueTile.dir)))
 		{
-			accessByteData(queueTile, mapWidth).setDir(queueTile.dir, true);
+			accessByteData(queueTile, mapWidth).setDir(static_cast<int>(queueTile.dir), true);
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Right
 		queueTile = turnRight(tile);
-		if (!accessByteData(queueTile, mapWidth).getDir(queueTile.dir))
+		if (!accessByteData(queueTile, mapWidth).getDir(static_cast<int>(queueTile.dir)))
 		{
-			accessByteData(queueTile, mapWidth).setDir(queueTile.dir, true);
+			accessByteData(queueTile, mapWidth).setDir(static_cast<int>(queueTile.dir), true);
 			queue.emplace(queueTile, tether - 1);
 		}
 		//Forward
 		queueTile = nextTile(tile, mapWidth, m_byteData.size());
 		if (queueTile != NO_TILE &&
-			!accessByteData(queueTile, mapWidth).getDir(queueTile.dir) &&
+			!accessByteData(queueTile, mapWidth).getDir(static_cast<int>(queueTile.dir)) &&
 			accessByteData(queueTile, mapWidth).traversable())
 		{
 			output = true;
-			accessByteData(queueTile, mapWidth).setDir(queueTile.dir, true);
+			accessByteData(queueTile, mapWidth).setDir(static_cast<int>(queueTile.dir), true);
 			if (queueTile.dir == windDirection)
 				queue.emplace(queueTile, tether - (1.0f - windStrength));
 			else
@@ -291,27 +291,27 @@ Ray2D nextTile(const Ray2D & currentTile, int mapWidth, int maxSize)
 	{
 		switch (currentTile.dir)
 		{
-		case eNorth:
+		case eDirection::eNorth:
 			nextAddress.x = x;
 			nextAddress.y = y - 1;
 			break;
-		case eNorthEast:
+		case eDirection::eNorthEast:
 			nextAddress.x = x + 1;
 			nextAddress.y = y - 1;
 			break;
-		case eSouthEast:
+		case eDirection::eSouthEast:
 			nextAddress.x = x + 1;
 			nextAddress.y = y;
 			break;
-		case eSouth:
+		case eDirection::eSouth:
 			nextAddress.x = x;
 			nextAddress.y = y + 1;
 			break;
-		case eSouthWest:
+		case eDirection::eSouthWest:
 			nextAddress.x = x - 1;
 			nextAddress.y = y;
 			break;
-		case eNorthWest:
+		case eDirection::eNorthWest:
 			nextAddress.x = x - 1;
 			nextAddress.y = y - 1;
 			break;
@@ -321,27 +321,27 @@ Ray2D nextTile(const Ray2D & currentTile, int mapWidth, int maxSize)
 	{
 		switch (currentTile.dir)
 		{
-		case eNorth:
+		case eDirection::eNorth:
 			nextAddress.x = x;
 			nextAddress.y = y - 1;
 			break;
-		case eNorthEast:
+		case eDirection::eNorthEast:
 			nextAddress.x = x + 1;
 			nextAddress.y = y;
 			break;
-		case eSouthEast:
+		case eDirection::eSouthEast:
 			nextAddress.x = x + 1;
 			nextAddress.y = y + 1;
 			break;
-		case eSouth:
+		case eDirection::eSouth:
 			nextAddress.x = x;
 			nextAddress.y = y + 1;
 			break;
-		case eSouthWest:
+		case eDirection::eSouthWest:
 			nextAddress.x = x - 1;
 			nextAddress.y = y + 1;
 			break;
-		case eNorthWest:
+		case eDirection::eNorthWest:
 			nextAddress.x = x - 1;
 			nextAddress.y = y;
 			break;
@@ -362,23 +362,23 @@ Ray2D turnLeft(const Ray2D & currentTile)
 	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)
 	{
-	case eNorth:
-		nextTile.dir = eNorthWest;
+	case eDirection::eNorth:
+		nextTile.dir = eDirection::eNorthWest;
 		break;
-	case eNorthEast:
-		nextTile.dir = eNorth;
+	case eDirection::eNorthEast:
+		nextTile.dir = eDirection::eNorth;
 		break;
-	case eSouthEast:
-		nextTile.dir = eNorthEast;
+	case eDirection::eSouthEast:
+		nextTile.dir = eDirection::eNorthEast;
 		break;
-	case eSouth:
-		nextTile.dir = eSouthEast;
+	case eDirection::eSouth:
+		nextTile.dir = eDirection::eSouthEast;
 		break;
-	case eSouthWest:
-		nextTile.dir = eSouth;
+	case eDirection::eSouthWest:
+		nextTile.dir = eDirection::eSouth;
 		break;
-	case eNorthWest:
-		nextTile.dir = eSouthWest;
+	case eDirection::eNorthWest:
+		nextTile.dir = eDirection::eSouthWest;
 		break;
 	}
 
@@ -390,23 +390,23 @@ Ray2D turnRight(const Ray2D & currentTile)
 	Ray2D nextTile = currentTile;
 	switch (currentTile.dir)
 	{
-	case eNorth:
-		nextTile.dir = eNorthEast;
+	case eDirection::eNorth:
+		nextTile.dir = eDirection::eNorthEast;
 		break;
-	case eNorthEast:
-		nextTile.dir = eSouthEast;
+	case eDirection::eNorthEast:
+		nextTile.dir = eDirection::eSouthEast;
 		break;
-	case eSouthEast:
-		nextTile.dir = eSouth;
+	case eDirection::eSouthEast:
+		nextTile.dir = eDirection::eSouth;
 		break;
-	case eSouth:
-		nextTile.dir = eSouthWest;
+	case eDirection::eSouth:
+		nextTile.dir = eDirection::eSouthWest;
 		break;
-	case eSouthWest:
-		nextTile.dir = eNorthWest;
+	case eDirection::eSouthWest:
+		nextTile.dir = eDirection::eNorthWest;
 		break;
-	case eNorthWest:
-		nextTile.dir = eNorth;
+	case eDirection::eNorthWest:
+		nextTile.dir = eDirection::eNorth;
 		break;
 	}
 
@@ -437,7 +437,7 @@ void PathFinding::resetTileData(const Map & map)
 	for (int i = 0; i < map.getData().size(); ++i)
 	{
 		bool tileTraversable = false;
-		if ((map.getData()[i].m_type == eSea || map.getData()[i].m_type == eOcean) && !map.getData()[i].isShipOnTile())
+		if ((map.getData()[i].m_type == eTileType::eSea || map.getData()[i].m_type == eTileType::eOcean) && !map.getData()[i].isShipOnTile())
 		{
 			tileTraversable = true;
 		}

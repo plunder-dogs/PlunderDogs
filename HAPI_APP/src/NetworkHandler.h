@@ -10,7 +10,7 @@
 #include <mutex>
 #include <atomic>
 
-enum FactionName;
+enum class eFactionName;
 class NetworkHandler : private NonCopyable
 {
 public:

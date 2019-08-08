@@ -15,12 +15,12 @@ const std::string SHIP_DATA_DIRECTORY = "Data/Ships/";
 const std::string LEVEL_DATA_DIRECTORY = "Data/Levels/";
 const sf::Vector2i MOUSE_POSITION_OFFSET{ 25, 45 };
 
-enum class TileID
+enum class eTileID
 {
 	Invalid = -1
 };
 
-enum FactionName
+enum class eFactionName
 {
 	eYellow = 0,
 	eBlue = 1,
@@ -29,7 +29,7 @@ enum FactionName
 	eTotal = eRed + 1
 };
 
-enum eDirection
+enum class eDirection
 {
 	eInvalid = -1,
 	eNorth,
@@ -41,24 +41,14 @@ enum eDirection
 	Max = eNorthWest
 };
 
-enum OverWorldWindow
-{
-	eBattle = 0,
-	eMainMenu,
-	eShipSelection,
-	eLevelSelection,
-	ePlayerSelection,
-	eUpgrade
-};
-
-enum BattlePhase
+enum class eBattlePhase
 {
 	Deployment = 0,
 	Movement,
 	Attack
 };
 
-enum eControllerType
+enum class eFactionControllerType
 {
 	eLocalPlayer = 0,
 	eAI,
@@ -66,7 +56,7 @@ enum eControllerType
 	None
 };
 
-enum eTileType
+enum class eTileType
 {
 	eGrass = 0,
 	eSparseForest,
@@ -107,14 +97,6 @@ enum eTileType
 	eSwampRuins
 };
 
-enum eShipSpriteFrame
-{
-	eMaxHealth = 0,
-	eLowDamage,
-	eHighDamage,
-	eDead
-};
-
 enum class eShipType
 {
 	eFrigate,
@@ -123,21 +105,13 @@ enum class eShipType
 	eSniper
 };
 
-enum eLightIntensity
-{
-	eMaximum = 0,
-	//eHigh,
-	//eLow,
-	eMinimum
-};
-
 struct ShipOnTile
 {
 	ShipOnTile()
 		: factionName(),
 		shipID(INVALID_SHIP_ID)
 	{}
-	ShipOnTile(FactionName factionName, int shipID)
+	ShipOnTile(eFactionName factionName, int shipID)
 		: factionName(factionName),
 		shipID(shipID)
 	{}
@@ -157,7 +131,7 @@ struct ShipOnTile
 		shipID = INVALID_SHIP_ID;
 	}
 
-	FactionName factionName;
+	eFactionName factionName;
 	int shipID;
 };
 
@@ -202,30 +176,30 @@ struct ServerMessageShipAction
 
 struct ServerMessageSpawnPosition
 {
-	ServerMessageSpawnPosition(FactionName factionName, int x, int y)
+	ServerMessageSpawnPosition(eFactionName factionName, int x, int y)
 		:factionName(factionName),
 		position(x, y)
 	{}
 
-	FactionName factionName;
+	eFactionName factionName;
 	sf::Vector2i position;
 };
 
 struct ServerMessageExistingFaction
 {
-	ServerMessageExistingFaction(FactionName factionName, std::vector<eShipType>&& existingShips, bool AIControlled)
+	ServerMessageExistingFaction(eFactionName factionName, std::vector<eShipType>&& existingShips, bool AIControlled)
 		: factionName(factionName),
 		AIControlled(AIControlled),
 		existingShips(std::move(existingShips))
 	{}
 
-	ServerMessageExistingFaction(FactionName factionName, const std::vector<eShipType>& existingShips, bool AIControlled)
+	ServerMessageExistingFaction(eFactionName factionName, const std::vector<eShipType>& existingShips, bool AIControlled)
 		: factionName(factionName),
 		AIControlled(AIControlled),
 		existingShips(existingShips)
 	{}
 
-	FactionName factionName;
+	eFactionName factionName;
 	bool AIControlled;
 	std::vector<eShipType> existingShips;
 };
@@ -239,19 +213,19 @@ struct ServerMessage
 		: type(type)
 	{}
 
-	ServerMessage(eMessageType type, FactionName factionName)
+	ServerMessage(eMessageType type, eFactionName factionName)
 		: type(type),
 		faction(factionName)
 	{}
 
-	ServerMessage(eMessageType type, FactionName factionName, std::vector<eShipType>&& shipsToAdd)
+	ServerMessage(eMessageType type, eFactionName factionName, std::vector<eShipType>&& shipsToAdd)
 		: type(type),
 		faction(factionName),
 		shipsToAdd(std::move(shipsToAdd))
 	{}
 
 	eMessageType type;
-	FactionName faction;
+	eFactionName faction;
 	std::string levelName;
 	std::vector<eShipType> shipsToAdd;
 	std::vector<ServerMessageShipAction> shipActions;
@@ -265,8 +239,8 @@ struct Ray2D
 	int y;
 	eDirection dir;
 
-	Ray2D(int numX = 0, int numY = 0, eDirection direction = eNorth) : x(numX), y(numY), dir(direction) {}
-	Ray2D(sf::Vector2i pair, eDirection direction = eNorth) : x(pair.x), y(pair.y), dir(direction) {}
+	Ray2D(int numX = 0, int numY = 0, eDirection direction = eDirection::eNorth) : x(numX), y(numY), dir(direction) {}
+	Ray2D(sf::Vector2i pair, eDirection direction = eDirection::eNorth) : x(pair.x), y(pair.y), dir(direction) {}
 
 	sf::Vector2i pair() const { return { x, y }; }
 	int dirDiff(const Ray2D& compare)

@@ -8,6 +8,15 @@
 //Debug
 #include <iostream>
 
+
+enum class eShipSpriteFrame
+{
+	eMaxHealth = 0,
+	eLowDamage,
+	eHighDamage,
+	eDead
+};
+
 constexpr float MOVEMENT_ANIMATION_TIME(0.35f);
 constexpr int ROTATION_ANGLE = 60;
 constexpr size_t MOVEMENT_GRAPH_SIZE{ 32 };
@@ -24,7 +33,7 @@ sf::FloatRect Ship::getAABB(const Map& map) const
 	return AABB;
 }
 
-FactionName Ship::getFactionName() const
+eFactionName Ship::getFactionName() const
 {
 	return m_factionName;
 }
@@ -278,7 +287,7 @@ void Ship::onNewBattlePhase(GameEvent gameEvent)
 	m_movingToDestination = false;
 }
 
-Ship::Ship(FactionName factionName, eShipType shipType, int ID)
+Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 	: m_factionName(factionName),
 	m_shipType(shipType),
 	m_ID(ID),
@@ -308,16 +317,16 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 
 	switch (factionName)
 	{
-	case FactionName::eYellow:
+	case eFactionName::eYellow:
 		m_actionSprite.setTexture(*Textures::getInstance().m_yellowSpawnHex);
 		break;
-	case FactionName::eBlue:
+	case eFactionName::eBlue:
 		m_actionSprite.setTexture(*Textures::getInstance().m_blueSpawnHex);
 		break;
-	case FactionName::eGreen:
+	case eFactionName::eGreen:
 		m_actionSprite.setTexture(*Textures::getInstance().m_greenSpawnHex);
 		break;
-	case FactionName::eRed:
+	case eFactionName::eRed:
 		m_actionSprite.setTexture(*Textures::getInstance().m_redSpawnHex);
 		break;
 	}
@@ -357,7 +366,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 
 	switch (factionName)
 	{
-	case FactionName::eYellow:
+	case eFactionName::eYellow:
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
@@ -375,7 +384,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 		}
 		break;
 
-	case FactionName::eBlue:
+	case eFactionName::eBlue:
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
@@ -392,7 +401,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 			break;
 		}
 		break;
-	case FactionName::eRed:
+	case eFactionName::eRed:
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
@@ -411,7 +420,7 @@ Ship::Ship(FactionName factionName, eShipType shipType, int ID)
 			break;
 		}
 		break;
-	case FactionName::eGreen:
+	case eFactionName::eGreen:
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
@@ -490,12 +499,12 @@ void Ship::setDeploymentPosition(sf::Vector2i position, eDirection direction)
 {
 	m_deploymentStarted = true;
 	m_currentPosition = position;
-	m_sprite.setRotation(direction * ROTATION_ANGLE % 360);
+	m_sprite.setRotation(static_cast<int>(direction) * ROTATION_ANGLE % 360);
 }
 
 void Ship::deployAtPosition(sf::Vector2i position, eDirection startingDirection)
 {
 	m_currentPosition = position;
 	m_deployed = true;
-	m_sprite.setRotation(startingDirection * ROTATION_ANGLE % 360);
+	m_sprite.setRotation(static_cast<int>(startingDirection) * ROTATION_ANGLE % 360);
 }

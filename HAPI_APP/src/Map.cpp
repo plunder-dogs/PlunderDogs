@@ -86,19 +86,19 @@ bool Map::inCone(sf::Vector2i orgHex, sf::Vector2i testHex, eDirection dir) cons
 {
 	const sf::Vector2i diff(testHex.x - orgHex.x, testHex.y - orgHex.y);
 	const int zDiff = -diff.x - diff.y;
-	if (dir == eNorth || dir == eSouth)//Axis x = 0
+	if (dir == eDirection::eNorth || dir == eDirection::eSouth)//Axis x = 0
 	{
 		//Deadzones y pos and z neg or y neg and z pos
 		if ((diff.y > 0 && zDiff < 0) || (diff.y < 0 && zDiff > 0))
 			return false;
 	}
-	else if (dir == eNorthEast || dir == eSouthWest)//Axis y = 0
+	else if (dir == eDirection::eNorthEast || dir == eDirection::eSouthWest)//Axis y = 0
 	{
 		//Deadzones x pos and z neg or x neg and z pos
 		if ((diff.x > 0 && zDiff < 0) || (diff.x < 0 && zDiff > 0))
 			return false;
 	}
-	else if (dir == eNorthWest || dir == eSouthEast)//Axis z = 0
+	else if (dir == eDirection::eNorthWest || dir == eDirection::eSouthEast)//Axis z = 0
 	{
 		//Deadzones x pos and y neg or x neg and y pos
 		if ((diff.x > 0 && diff.y < 0) || (diff.x < 0 && diff.y > 0))
@@ -295,7 +295,7 @@ Map::Map() :
 	m_mapDimensions(0, 0),
 	m_data(),
 	m_drawOffset(sf::Vector2i(10, 60)),
-	m_windDirection(eNorth),
+	m_windDirection(eDirection::eNorth),
 	m_windStrength(WIND_STRENGTH),
 	m_drawScale(2)
 {}
@@ -576,12 +576,13 @@ const Tile * Map::getNonCollidableAdjacentTile(const std::vector<const Tile*>& t
 
 void Map::getTileRadius(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, bool avoidInvalid, bool includeSource) const
 {
-	if (getTile(coord)->m_type != eSea && getTile(coord)->m_type != eOcean)
+	if (getTile(coord)->m_type != eTileType::eSea && getTile(coord)->m_type != eTileType::eOcean)
 	{
 		return;
 	}
 
-	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && (getTile(coord)->m_type == eSea || getTile(coord)->m_type == eOcean)))
+	if ((includeSource && !avoidInvalid) || (includeSource && avoidInvalid && 
+		(getTile(coord)->m_type == eTileType::eSea || getTile(coord)->m_type == eTileType::eOcean)))
 	{
 		tileArea.push_back(getTile(coord));
 	}
@@ -627,12 +628,12 @@ void Map::getTileLine(std::vector<const Tile*>& tileArea, sf::Vector2i coord, in
 	{
 		if (!pushBackTile)
 			continue;
-		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[direction];
+		pushBackTile = getAdjacentTiles(pushBackTile->m_tileCoordinate)[static_cast<int>(direction)];
 		//If avoidInvalid stop the line if a mountain or Mesa is encountered
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eMountain || pushBackTile->m_type == eMesa))
+		if (avoidInvalid && pushBackTile && (pushBackTile->m_type == eTileType::eMountain || pushBackTile->m_type == eTileType::eMesa))
 			break;
 		//If avoidInvalid skip if the tile is not water
-		if (avoidInvalid && pushBackTile && (pushBackTile->m_type != eSea && pushBackTile->m_type != eOcean))
+		if (avoidInvalid && pushBackTile && (pushBackTile->m_type != eTileType::eSea && pushBackTile->m_type != eTileType::eOcean))
 			continue;
 		tileArea.push_back(pushBackTile);
 	}

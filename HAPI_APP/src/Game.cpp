@@ -19,12 +19,12 @@ Game::Game(bool onlineGame)
 	}
 	else
 	{
-		assignFaction(FactionName::eYellow, eControllerType::eLocalPlayer,
+		assignFaction(eFactionName::eYellow, eFactionControllerType::eLocalPlayer,
 			{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
 			eShipType::eFrigate, eShipType::eFrigate });
 
-		m_factions[static_cast<int>(FactionName::eRed)].m_controllerType = eControllerType::eAI;
-		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(FactionName::eRed)]);
+		m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
+		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
 		m_battle.startSinglePlayerGame("level3.tmx");
 	}
 }
@@ -70,16 +70,16 @@ void Game::handleServerMessages()
 			shipsToAdd.push_back(eShipType::eFrigate);
 			shipsToAdd.push_back(eShipType::eFrigate);
 
-			assignFaction(receivedServerMessage.faction, eControllerType::eLocalPlayer, shipsToAdd);
+			assignFaction(receivedServerMessage.faction, eFactionControllerType::eLocalPlayer, shipsToAdd);
 			for (auto& existingFaction : receivedServerMessage.existingFactions)
 			{
 				if (!existingFaction.existingShips.empty() && existingFaction.AIControlled)
 				{
-					assignFaction(existingFaction.factionName, eControllerType::eAI, existingFaction.existingShips);
+					assignFaction(existingFaction.factionName, eFactionControllerType::eAI, existingFaction.existingShips);
 				}
 				else if (!existingFaction.existingShips.empty())
 				{
-					assignFaction(existingFaction.factionName, eControllerType::eRemotePlayer, existingFaction.existingShips);
+					assignFaction(existingFaction.factionName, eFactionControllerType::eRemotePlayer, existingFaction.existingShips);
 				}
 			}
 
@@ -90,7 +90,7 @@ void Game::handleServerMessages()
 		{
 			if (receivedServerMessage.faction != getLocalFactionName())
 			{
-				assignFaction(receivedServerMessage.faction, eControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
+				assignFaction(receivedServerMessage.faction, eFactionControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
 			}
 		}
 		else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
@@ -170,7 +170,7 @@ void Game::handleGameLoop()
 	}
 }
 
-void Game::assignFaction(FactionName factionName, eControllerType controllerType, const std::vector<eShipType>& shipsToAdd)
+void Game::assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd)
 {
 	m_factions[static_cast<int>(factionName)].m_controllerType = controllerType;
 
@@ -180,10 +180,10 @@ void Game::assignFaction(FactionName factionName, eControllerType controllerType
 	}
 }
 
-FactionName Game::getLocalFactionName() const
+eFactionName Game::getLocalFactionName() const
 {
 	auto cIter = std::find_if(m_factions.cbegin(), m_factions.cend(), [](const auto& faction)
-	{ return faction.m_controllerType == eControllerType::eLocalPlayer; });
+	{ return faction.m_controllerType == eFactionControllerType::eLocalPlayer; });
 
 	assert(cIter != m_factions.cend());
 	return cIter->m_factionName;

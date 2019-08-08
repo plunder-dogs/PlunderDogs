@@ -43,26 +43,26 @@ void Particle::render(sf::RenderWindow& window, const Map& map)
 
 void Particle::orient(eDirection entityDir)
 {
-	eDirection direction = eNorth;
+	eDirection direction = eDirection::eNorth;
 	switch (entityDir)
 	{
-	case eNorth:
-		direction = eSouth;
+	case eDirection::eNorth:
+		direction = eDirection::eSouth;
 		break;
-	case eNorthEast:
-		direction = eSouthWest;
+	case eDirection::eNorthEast:
+		direction = eDirection::eSouthWest;
 		break;
-	case eSouthEast:
-		direction = eNorthWest;
+	case eDirection::eSouthEast:
+		direction = eDirection::eNorthWest;
 		break;
-	case eSouth:
-		direction = eNorth;
+	case eDirection::eSouth:
+		direction = eDirection::eNorth;
 		break;
-	case eSouthWest:
-		direction = eNorthEast;
+	case eDirection::eSouthWest:
+		direction = eDirection::eNorthEast;
 		break;
-	case eNorthWest:
-		direction = eSouthEast;
+	case eDirection::eNorthWest:
+		direction = eDirection::eSouthEast;
 		break;
 	}
 
