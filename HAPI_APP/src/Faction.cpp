@@ -7,12 +7,11 @@ constexpr size_t MAX_SPAWN_AREA = 75;
 constexpr size_t SPAWN_AREA_RANGE = 3;
 
 //BATTLE PLAYER
-Faction::Faction(int factionID)
+Faction::Faction(FactionName factionName)
 	: m_ships(),
-	m_factionName(),
+	m_factionName(factionName),
 	m_controllerType(eControllerType::None),
-	m_spawnArea(MAX_SPAWN_AREA),
-	m_factionID(factionID)
+	m_spawnArea(MAX_SPAWN_AREA)
 {
 	m_ships.reserve(MAX_SHIPS_PER_FACTION);
 }
@@ -47,7 +46,7 @@ void Faction::render(sf::RenderWindow& window, const Map & map, BattlePhase curr
 
 	if (currentBattlePhase == BattlePhase::Deployment)
 	{
-		if (m_factionID <= currentFactionTurn)
+		if (static_cast<int>(m_factionName) <= currentFactionTurn)
 		{
 			//Only render deployed ships
 			for (auto& ship : m_ships)

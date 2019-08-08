@@ -5,7 +5,7 @@
 
 struct Faction : private NonCopyable
 {
-	Faction(int factionID);
+	Faction(FactionName factionName);
 
 	bool isActive() const;
 	bool isPositionInSpawnArea(sf::Vector2i position) const;
@@ -33,8 +33,7 @@ struct Faction : private NonCopyable
 	void shipTakeDamage(int shipID, int damage);
 	
 	std::vector<Ship> m_ships;
-	FactionName m_factionName;
+	const FactionName m_factionName;
 	eControllerType m_controllerType;
 	TileArea m_spawnArea;
-	const int m_factionID;
 };

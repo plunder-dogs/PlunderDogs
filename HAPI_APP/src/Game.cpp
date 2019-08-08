@@ -23,7 +23,6 @@ Game::Game(bool onlineGame)
 			{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
 			eShipType::eFrigate, eShipType::eFrigate });
 
-		m_factions[static_cast<int>(FactionName::eRed)].m_factionName = FactionName::eRed;
 		m_factions[static_cast<int>(FactionName::eRed)].m_controllerType = eControllerType::eAI;
 		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(FactionName::eRed)]);
 		m_battle.startSinglePlayerGame("level3.tmx");
@@ -173,7 +172,6 @@ void Game::handleGameLoop()
 
 void Game::assignFaction(FactionName factionName, eControllerType controllerType, const std::vector<eShipType>& shipsToAdd)
 {
-	m_factions[static_cast<int>(factionName)].m_factionName = factionName;
 	m_factions[static_cast<int>(factionName)].m_controllerType = controllerType;
 
 	for (eShipType shipToAdd : shipsToAdd)
