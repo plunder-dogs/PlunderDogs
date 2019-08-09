@@ -312,7 +312,7 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 	m_movementArea(*Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE)
 {
 	//Action Sprite
-	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
+	m_actionSprite.setScale(sf::Vector2f(1.0f, 1.0f));
 	m_actionSprite.deactivate();
 
 	switch (factionName)

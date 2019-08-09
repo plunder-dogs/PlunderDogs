@@ -227,7 +227,7 @@ sf::Vector2i Map::getMouseClickCoord(sf::Vector2i mouseCoord) const
 	
 	const float translatedX = (static_cast<float>(mouseCoord.x - FRAME_CENTRE_X) / m_drawScale) + static_cast<float>(m_drawOffset.x);
 	const float translatedY = (static_cast<float>(mouseCoord.y - FRAME_CENTRE_Y) / m_drawScale) + static_cast<float>(m_drawOffset.y);
-	const int predictedTileX = static_cast<const int>(translatedX * 4 / (3 * textureDimensions.x));
+	const int predictedTileX = static_cast<const int>(translatedX * 4/ (3 * textureDimensions.x));
 	const int predictedTileY = static_cast<const int>(translatedY / textureDimensions.y);
 	
 	float distance{ 10000000 };//An arbitrary big number
@@ -310,13 +310,6 @@ const Tile * Map::getTile(sf::Vector2i coordinate) const
 	{
 		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 	}
-	/*
-	HAPI_Sprites.UserMessage(
-		std::string("getTile request out of bounds: " + std::to_string(coordinate.x) +
-			", " + std::to_string(coordinate.y) + " map dimensions are: " +
-			std::to_string(m_mapDimensions.x) +", "+ std::to_string(m_mapDimensions.y)),
-		"Map error");
-	*/
 	return nullptr;
 }
 

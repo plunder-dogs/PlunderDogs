@@ -26,9 +26,8 @@ Player::Player(Battle & battle)
 	m_targetArea(*Textures::getInstance().m_mouseCrossHair, MAX_TARGET_AREA),
 	m_leftClickHeld(false),
 	m_leftClickPosition(),
-	m_cameraBounds(),
-	m_cameraVelocity(),
-	m_cameraPosition()
+	m_cameraMovementBounds(),
+	m_cameraVelocity()
 {
 	GameEventMessenger::getInstance().subscribe(std::bind(&Player::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
@@ -45,7 +44,7 @@ TileArea & Player::getTargetArea()
 
 sf::Vector2i Player::getCameraPosition() const
 {
-	return m_cameraPosition;
+	return sf::Vector2i(m_cameraRect.left, m_cameraRect.top);
 }
 
 void Player::render(sf::RenderWindow& window)
@@ -62,14 +61,51 @@ void Player::render(sf::RenderWindow& window)
 
 	m_spriteOnMouse.render(window, m_battle.getMap());
 	m_shipSelector.render(window, m_battle.getMap(), m_leftClickHeld);
+	window.draw(m_rect);
 }
 
-void Player::setCameraBounds(sf::Vector2i mapDimensions)
+void Player::setCameraBounds(sf::Vector2i mapDimensions, sf::Vector2u windowSize)
 {
-	m_cameraBounds.left = -120;
-	m_cameraBounds.top = -100;
-	m_cameraBounds.width = mapDimensions.x * 24 - 820;
-	m_cameraBounds.height = mapDimensions.y * 28 - 400;
+	m_cameraMovementBounds.left = -120;
+	m_cameraMovementBounds.top = -100;
+	//Set camera movement bounds width
+	if (windowSize.x >= (mapDimensions.x * 32 * 0.75 * m_battle.getMap().getDrawScale()))
+	{
+		m_cameraMovementBounds.width = mapDimensions.x * 24 - 820;
+		m_cameraRect.width = 0;
+	}
+	else
+	{
+		m_cameraMovementBounds.width = (mapDimensions.x * 32 * 0.75 * m_battle.getMap().getDrawScale()) - 120;
+		m_cameraRect.width = windowSize.x;
+	}
+
+	//Set camera movement bounds height
+	if (windowSize.y >= mapDimensions.y * 28 * m_battle.getMap().getDrawScale() + 120)
+	{
+		m_cameraMovementBounds.height = mapDimensions.y * 28 - 400;
+		m_cameraRect.height = 0;
+	}
+	else
+	{
+		m_cameraMovementBounds.height = mapDimensions.y * 28 * m_battle.getMap().getDrawScale() + 120;
+		m_cameraRect.height = windowSize.y - 100;
+	}
+
+	m_cameraRect.left = -120;
+	m_cameraRect.top = -100;
+	
+	//m_cameraMovementBounds.height = mapDimensions.y * 28 - 400;
+	//m_cameraBounds.width = (mapDimensions.x * 32 * 0.75 * 2) + 120;
+	//m_cameraBounds.height = (mapDimensions.y * 28 * 2) + 100;
+	//m_cameraPosition.x = -120;
+	//m_cameraPosition.y = -100;
+
+	m_rect.setPosition(100, 150);
+	m_rect.setSize({ 1550, 50 });
+	m_rect.setOutlineColor(sf::Color::Red);
+	m_rect.setOutlineThickness(2.5f);
+	m_rect.setFillColor(sf::Color::Transparent);
 }
 
 void Player::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosition)
@@ -107,27 +143,77 @@ void Player::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosit
 
 void Player::update(float deltaTime)
 {	
-	//Move Camera 'x' axis
-	m_cameraPosition.x += m_cameraVelocity.x;
-	if (m_cameraPosition.x < m_cameraBounds.left)
+	//Move Camera 'x' Axis
+	m_cameraRect.left += m_cameraVelocity.x;
+	if (m_cameraRect.left < m_cameraMovementBounds.left)
 	{
-		m_cameraPosition.x = m_cameraBounds.left;
+		m_cameraRect.left = m_cameraMovementBounds.left;
 	}
-	else if (m_cameraPosition.x > m_cameraBounds.width)
+	else if (m_cameraRect.width > 0)
 	{
-		m_cameraPosition.x = m_cameraBounds.width;
+		m_cameraRect.width += m_cameraVelocity.x;
+		//std::cout << m_cameraRect.left<< "\n";
+		if (m_cameraRect.width > m_cameraMovementBounds.width)
+		{
+			m_cameraRect.width = m_cameraMovementBounds.width;
+			m_cameraRect.left -= m_cameraVelocity.x;
+		}
+	}
+	else
+	{
+		if (m_cameraRect.left > m_cameraMovementBounds.width)
+		{
+			m_cameraRect.left = m_cameraMovementBounds.width;
+		}
 	}
 
-	//Move camera 'y' axis
-	m_cameraPosition.y += m_cameraVelocity.y;
-	if (m_cameraPosition.y < m_cameraBounds.top)
+	//Move Camera 'y' Axis
+	m_cameraRect.top += m_cameraVelocity.y;
+	if (m_cameraRect.top < m_cameraMovementBounds.top)
 	{
-		m_cameraPosition.y = m_cameraBounds.top;
+		m_cameraRect.top = m_cameraMovementBounds.top;
 	}
-	else if (m_cameraPosition.y > m_cameraBounds.height)
+	else if (m_cameraRect.height > 0)
 	{
-		m_cameraPosition.y = m_cameraBounds.height;
+		m_cameraRect.height += m_cameraVelocity.y;
+		if (m_cameraRect.height > m_cameraMovementBounds.height)
+		{
+			m_cameraRect.height = m_cameraMovementBounds.height;
+			m_cameraRect.top -= m_cameraVelocity.y;
+		}
 	}
+	else
+	{
+		if (m_cameraRect.top > m_cameraMovementBounds.height)
+		{
+			m_cameraRect.top = m_cameraMovementBounds.height;
+		}
+	}
+
+	////if (m_cameraRect.width > 0 && m_cameraRect.width > m_cameraMovementBounds.width)
+	////{
+	////	m_cameraRect.width
+	////}
+
+	//m_cameraPosition.x += m_cameraVelocity.x;
+	//if (m_cameraPosition.x < m_cameraMovementBounds.left)
+	//{
+	//	m_cameraPosition.x = m_cameraMovementBounds.left;
+	//}
+	//else if (m_cameraPosition.x > m_cameraMovementBounds.width)
+	//{
+	//	m_cameraPosition.x = m_cameraMovementBounds.width;
+	//}
+
+	//m_cameraPosition.y += m_cameraVelocity.y;
+	//if (m_cameraPosition.y < m_cameraMovementBounds.top)
+	//{
+	//	m_cameraPosition.y = m_cameraMovementBounds.top;
+	//}
+	//else if (m_cameraPosition.y > m_cameraMovementBounds.height)
+	//{
+	//	m_cameraPosition.y = m_cameraMovementBounds.height;
+	//}
 }
 
 void Player::generateTargetArea(const Tile & source)

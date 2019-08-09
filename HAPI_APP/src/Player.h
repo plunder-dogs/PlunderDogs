@@ -19,7 +19,7 @@ public:
 
 	void moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
-	void setCameraBounds(sf::Vector2i mapDimensions);
+	void setCameraBounds(sf::Vector2i mapDimensions, sf::Vector2u windowSize);
 	void handleInput(const sf::Event& currentEvent, sf::Vector2i mousePosition);
 	void update(float deltaTime);
 
@@ -39,10 +39,11 @@ private:
 	sf::Vector2i m_rightClickPosition;
 
 	//Camera
-	sf::IntRect m_cameraBounds;
+	sf::IntRect m_cameraMovementBounds;
+	sf::IntRect m_cameraRect;
 	sf::Vector2f m_cameraVelocity;
-	sf::Vector2i m_cameraPosition;
-	
+	//sf::Vector2i m_cameraPosition;
+	sf::RectangleShape m_rect;
 	ShipSelector m_shipSelector;
 
 	void onNewBattlePhase(GameEvent gameEvent);

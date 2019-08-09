@@ -2,7 +2,7 @@
 #include "GameEventMessenger.h"
 
 Game::Game(bool onlineGame)
-	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
+	: m_window(sf::VideoMode(768, 1080), "SFML_WINDOW", sf::Style::Default),
 	m_onlineGame(onlineGame),
 	m_gameLobbyActive(false),
 	m_ready(false),
@@ -25,7 +25,7 @@ Game::Game(bool onlineGame)
 
 		m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
 		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
-		m_battle.startSinglePlayerGame("level3.tmx");
+		m_battle.startSinglePlayerGame("level3.tmx", m_window.getSize());
 	}
 }
 
@@ -96,7 +96,7 @@ void Game::handleServerMessages()
 		else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
 		{
 			m_gameLobbyActive = false;
-			m_battle.startOnlineGame(receivedServerMessage.levelName, receivedServerMessage.spawnPositions);
+			m_battle.startOnlineGame(receivedServerMessage.levelName, receivedServerMessage.spawnPositions, m_window.getSize());
 		}
 		else if (receivedServerMessage.type == eMessageType::eRefuseConnection)
 		{

@@ -158,11 +158,11 @@ void Battle::quitGame()
 	m_isRunning = false;
 }
 
-void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
+void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions, sf::Vector2u windowSize)
 {
 	m_onlineGame = true;
 	m_map.loadmap(newMapName);
-	m_player.setCameraBounds(m_map.getDimensions());
+	m_player.setCameraBounds(m_map.getDimensions(), windowSize);
 	PathFinding::getInstance().loadTileData(m_map);
 	
 	for (auto& faction : m_factions)
@@ -200,11 +200,11 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 	}
 }
 
-void Battle::startSinglePlayerGame(const std::string & levelName)
+void Battle::startSinglePlayerGame(const std::string & levelName, sf::Vector2u windowSize)
 {
 	m_onlineGame = false;
 	m_map.loadmap(levelName);
-	m_player.setCameraBounds(m_map.getDimensions());
+	m_player.setCameraBounds(m_map.getDimensions(), windowSize);
 	PathFinding::getInstance().loadTileData(m_map);
 
 	for (auto& faction : m_factions)
@@ -272,8 +272,8 @@ void Battle::renderFactionShipsMovementGraph(sf::RenderWindow & window)
 void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-	mousePosition += MOUSE_POSITION_OFFSET;
-
+	//mousePosition += MOUSE_POSITION_OFFSET;
+	std::cout << mousePosition.x << "\n";
 	if (currentEvent.type == sf::Event::MouseMoved)
 	{
 		m_player.moveCamera(window.getSize(), mousePosition);

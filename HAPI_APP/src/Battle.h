@@ -33,8 +33,8 @@ public:
 	void receiveServerMessage(const ServerMessage& receivedServerMessage);
 
 	void quitGame();
-	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
-	void startSinglePlayerGame(const std::string& levelName);
+	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions, sf::Vector2u windowSize);
+	void startSinglePlayerGame(const std::string& levelName, sf::Vector2u windowSize);
 	void render(sf::RenderWindow& window);
 	void renderFactionShipsMovementGraph(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);

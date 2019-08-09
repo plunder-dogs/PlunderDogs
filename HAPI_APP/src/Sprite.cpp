@@ -137,6 +137,8 @@ void Sprite::render(sf::RenderWindow & window, const Map & map)
 		m_sprite.setPosition({
 		static_cast<float>(tileTransform.x + DRAW_OFFSET_X * map.getDrawScale()),
 		static_cast<float>(tileTransform.y + DRAW_OFFSET_Y * map.getDrawScale()) });
+		
+		m_sprite.setScale({ m_sprite.getScale().x * map.getDrawScale(), m_sprite.getScale().y * map.getDrawScale() });
 		window.draw(m_sprite);
 	}
 }
