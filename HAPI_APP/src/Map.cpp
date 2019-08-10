@@ -7,6 +7,7 @@
 #include "GameEventMessenger.h"
 #include "Utilities/XMLParser.h"
 #include <algorithm>
+#include <iostream>
 
 constexpr int FRAME_HEIGHT{ 28 };
 constexpr int FRAME_WIDTH{ 32 };
@@ -249,19 +250,23 @@ sf::Vector2i Map::getMouseClickCoord(sf::Vector2i mouseCoord) const
 	return closestTile;
 }
 
-void Map::loadmap(const std::string & mapName)
+bool Map::loadmap(const std::string & mapName)
 {
 	assert(!mapName.empty());
 	assert(m_data.empty());
 
-	//Load in Map Details
-	MapDetails mapDetails = XMLParser::parseMapDetails(mapName);
-	m_mapDimensions = mapDetails.mapDimensions;
+	std::vector<std::vector<int>> tileData;
+	std::vector<sf::Vector2i> m_spawnPositions;
+	if (!XMLParser::loadMap(mapName, m_mapDimensions, tileData, m_spawnPositions))
+	{
+		std::cerr << "Cannot load Map: " << mapName << "\n";
+		return false;
+	}
 	m_data.reserve(m_mapDimensions.x * m_mapDimensions.y);
 
 	//Load in Spawn Positions
-	m_spawnPositions.reserve(mapDetails.m_spawnPositions.size());
-	for (auto spawnPosition : mapDetails.m_spawnPositions)
+	m_spawnPositions.reserve(m_spawnPositions.size());
+	for (auto spawnPosition : m_spawnPositions)
 	{
 		m_spawnPositions.push_back(spawnPosition);
 	}
@@ -271,12 +276,14 @@ void Map::loadmap(const std::string & mapName)
 	{
 		for (int x = 0; x < m_mapDimensions.x; x++)
 		{
-			const int tileID = mapDetails.tileData[y][x];
+			const int tileID = tileData[y][x];
 			assert(tileID != -1);
 
 			m_data.emplace_back(*Textures::getInstance().m_hexTiles, sf::Vector2i(x, y), tileID);
 		}
 	}
+
+	return true;
 }
 
 bool Map::isTileCollidable(const Tile & tile) const

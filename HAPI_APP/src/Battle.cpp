@@ -161,7 +161,11 @@ void Battle::quitGame()
 void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
 	m_onlineGame = true;
-	m_map.loadmap(newMapName);
+	if (!m_map.loadmap(newMapName))
+	{
+		m_isRunning = false;
+		return;
+	}
 	m_player.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 	
@@ -203,7 +207,11 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 void Battle::startSinglePlayerGame(const std::string & levelName)
 {
 	m_onlineGame = false;
-	m_map.loadmap(levelName);
+	if (!m_map.loadmap(levelName))
+	{
+		m_isRunning = false;
+		return;
+	}
 	m_player.setCameraBounds(m_map.getDimensions());
 	PathFinding::getInstance().loadTileData(m_map);
 

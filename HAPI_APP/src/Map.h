@@ -115,7 +115,7 @@ public:
 	eDirection getWindDirection() const { return eDirection::eNorth; }
 	void setWindDirection(eDirection direction) { m_windDirection = direction; }
 
-	void loadmap(const std::string& mapName);
+	bool loadmap(const std::string& mapName);
 
 	const std::vector<Tile>& getData()const { return m_data; }
 
