@@ -6,13 +6,6 @@
 #include "Utilities.h"
 #include "../Texture.h"
 
-MapDetails::MapDetails(sf::Vector2i mapSize, std::vector<std::vector<int>>&& tileData,
-	std::vector<sf::Vector2i>&& spawnPositions)
-	: mapDimensions(mapSize),
-	tileData(std::move(tileData)),
-	m_spawnPositions(std::move(spawnPositions))
-{}
-
 std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
@@ -55,19 +48,21 @@ std::unique_ptr<Texture> XMLParser::parseTexture(const std::string& directory, c
 	return texture;
 }
 
-MapDetails XMLParser::parseMapDetails(const std::string& name)
+bool XMLParser::loadMap(const std::string& mapName, sf::Vector2i& mapDimensions,
+	std::vector<std::vector<int>>& tileData, std::vector<sf::Vector2i>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
-	bool mapLoaded = xmlFile.LoadFile(LEVEL_DATA_DIRECTORY + name);
-	assert(mapLoaded);
-
+	if (!xmlFile.LoadFile(LEVEL_DATA_DIRECTORY + mapName))
+	{
+		return false;
+	}
+	
 	const auto& rootElement = xmlFile.RootElement();
-	sf::Vector2i mapSize = parseMapSize(*rootElement);
-	sf::Vector2i tileSize = parseTileSize(*rootElement);
-	std::vector<std::vector<int>> tileData = parseTileData(*rootElement, mapSize);
-	std::vector<sf::Vector2i> spawnPositions = parseFactionSpawnPositions(*rootElement, tileSize);
-
-	return MapDetails(mapSize, std::move(tileData), std::move(spawnPositions));
+	mapDimensions = parseMapSize(*rootElement);
+	tileData = parseTileData(*rootElement, mapDimensions);
+	spawnPositions = parseFactionSpawnPositions(*rootElement, parseTileSize(*rootElement));
+	
+	return true;
 }
 
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize)
