@@ -19,14 +19,13 @@ sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parseFactionSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
-void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string& directory, const std::string& fileName)
+std::unique_ptr<Texture> XMLParser::parseTexture(const std::string& directory, const std::string& fileName)
 {
-	assert(!texture);
-	TiXmlDocument file;
-	bool fileLoaded = file.LoadFile(directory + fileName);
+	TiXmlDocument xmlFile;
+	bool fileLoaded = xmlFile.LoadFile(directory + fileName);
 	assert(fileLoaded);
 
-	const auto& rootElement = file.RootElement();
+	const auto& rootElement = xmlFile.RootElement();
 	std::vector<FrameDetails> frameDetails;
 	int i = 0; //Acts as the frame ID for each iteration
 	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
@@ -45,17 +44,24 @@ void XMLParser::loadTexture(std::unique_ptr<Texture>& texture, const std::string
 		frameDetails.emplace_back(height, width, y, x, frameID);	
 	}
 
-	std::string imagePath = rootElement->Attribute("imagePath");
-	texture = std::make_unique<Texture>(directory + imagePath, std::move(frameDetails));
+	std::string textureFileName = rootElement->Attribute("fileName");
+	sf::Texture textureData;
+	std::unique_ptr<Texture> texture;
+	if (textureData.loadFromFile(directory + textureFileName))
+	{
+		texture = std::make_unique<Texture>(std::move(frameDetails), std::move(textureData));
+	}
+
+	return texture;
 }
 
 MapDetails XMLParser::parseMapDetails(const std::string& name)
 {
-	TiXmlDocument mapFile;
-	bool mapLoaded = mapFile.LoadFile(LEVEL_DATA_DIRECTORY + name);
+	TiXmlDocument xmlFile;
+	bool mapLoaded = xmlFile.LoadFile(LEVEL_DATA_DIRECTORY + name);
 	assert(mapLoaded);
 
-	const auto& rootElement = mapFile.RootElement();
+	const auto& rootElement = xmlFile.RootElement();
 	sf::Vector2i mapSize = parseMapSize(*rootElement);
 	sf::Vector2i tileSize = parseTileSize(*rootElement);
 	std::vector<std::vector<int>> tileData = parseTileData(*rootElement, mapSize);

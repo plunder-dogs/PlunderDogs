@@ -18,6 +18,6 @@ struct MapDetails
 struct Texture;
 namespace XMLParser
 {
-	void loadTexture(std::unique_ptr<Texture>& texture, const std::string& directory, const std::string& fileName);
+	std::unique_ptr<Texture> parseTexture(const std::string& directory, const std::string& fileName);
 	MapDetails parseMapDetails(const std::string& mapName);
 }
