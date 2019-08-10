@@ -16,13 +16,17 @@ struct FrameDetails
 	int ID;
 };
 
-struct Texture : NonCopyable
+class Texture : NonCopyable
 {
-	Texture(const std::string& name, std::vector<FrameDetails>&& frames);
+public:
+	Texture(std::vector<FrameDetails>&& frames, sf::Texture&& texture);
 	
-	static std::unique_ptr<Texture> load(const std::string& fileName);
 	const FrameDetails& getFrame(int frameID) const;
 
+	const sf::Texture& getTexture() const;
+	const std::vector<FrameDetails>& getFrames() const;
+
+private:
 	sf::Texture m_texture;
 	std::vector<FrameDetails> m_frames;
 };
