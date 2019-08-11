@@ -141,8 +141,8 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 	m_fireParticles.reserve(MAX_PARTICLES);
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		m_explosionParticles.emplace_back(0.10, *Textures::getInstance().m_explosionParticles, 2.5f);
-		m_fireParticles.emplace_back(0.05, *Textures::getInstance().m_fireParticles, 2.0f);
+		m_explosionParticles.emplace_back(0.10, Textures::getInstance().getTexture(EXPLOSION_PARTICLES), 2.5f);
+		m_fireParticles.emplace_back(0.05, Textures::getInstance().getTexture(FIRE_PARTICLES), 2.0f);
 	}
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&Battle::onFactionShipDestroyed, this, std::placeholders::_1), eGameEvent::eFactionShipDestroyed);
@@ -219,7 +219,7 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 	{
 		if (faction.isActive())
 		{
-			faction.createSpawnArea(m_map, m_map.getRandomSpawnPosition());
+			faction.createSpawnArea(m_map, m_map.getSpawnPosition());
 		}
 	}
 

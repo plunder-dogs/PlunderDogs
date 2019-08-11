@@ -21,7 +21,19 @@ Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool acti
 	m_currentFrameID(0),
 	m_isActive(active) 
 {
-	m_sprite.setTexture(m_texture->m_texture);
+	m_sprite.setTexture(m_texture->getTexture());
+	setFrameID(m_currentFrameID);
+	setOriginAtCenter();
+}
+
+Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, sf::Vector2f size, bool active)
+	: m_texture(&texture),
+	m_sprite(),
+	m_position(startingPosition),
+	m_currentFrameID(0),
+	m_isActive(active)
+{
+	m_sprite.setTexture(m_texture->getTexture());
 	setFrameID(m_currentFrameID);
 	setOriginAtCenter();
 }
@@ -33,7 +45,7 @@ Sprite::Sprite(const Texture& texture, bool active)
 	m_currentFrameID(0),
 	m_isActive(active)
 {
-	m_sprite.setTexture(m_texture->m_texture);
+	m_sprite.setTexture(m_texture->getTexture());
 	setFrameID(m_currentFrameID);
 	setOriginAtCenter();
 }
@@ -61,7 +73,7 @@ bool Sprite::isActive() const
 
 bool Sprite::isAnimationCompleted() const
 {
-	return m_currentFrameID >= static_cast<int>(m_texture->m_frames.size()) - 1;
+	return m_currentFrameID >= static_cast<int>(m_texture->getFrames().size()) - 1;
 }
 
 int Sprite::getCurrentFrameID() const
@@ -82,8 +94,8 @@ void Sprite::setFrameID(int frameID)
 void Sprite::incrementFrameID()
 {
 	assert(m_texture);
-	assert(m_currentFrameID < static_cast<int>(m_texture->m_frames.size()) - 1);
-	if (m_currentFrameID + 1 < static_cast<int>(m_texture->m_frames.size()))
+	assert(m_currentFrameID < static_cast<int>(m_texture->getFrames().size()) - 1);
+	if (m_currentFrameID + 1 < static_cast<int>(m_texture->getFrames().size()))
 	{
 		++m_currentFrameID;
 	}
@@ -144,7 +156,7 @@ void Sprite::render(sf::RenderWindow & window, const Map & map)
 void Sprite::setTexture(const Texture& texture, int frameID)
 {
 	m_texture = &texture;
-	m_sprite.setTexture(m_texture->m_texture);
+	m_sprite.setTexture(m_texture->getTexture());
 	setFrameID(frameID);
 	setOriginAtCenter();
 }

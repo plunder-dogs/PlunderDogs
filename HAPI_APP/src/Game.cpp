@@ -48,6 +48,11 @@ void Game::run()
 	}
 }
 
+void Game::fillLobby()
+{
+	assert(m_onlineGame);
+}
+
 void Game::handleServerMessages()
 {
 	if (!m_onlineGame)
@@ -166,6 +171,36 @@ void Game::handleGameLoop()
 			m_window.clear();
 			m_battle.render(m_window);
 			m_window.display();
+		}
+	}
+}
+
+void Game::renderLobby()
+{
+	if (!m_onlineGame)
+	{
+		return;
+	}
+
+	sf::Vector2f factionTextPosition(100, 100);
+	sf::Text factionNameText;
+	std::string factionText;
+	for (const auto& faction : m_factions)
+	{
+		switch (faction.m_factionName)
+		{
+		case eFactionName::eYellow :
+			
+			break;
+
+		case eFactionName::eBlue :
+			break;
+
+		case eFactionName::eGreen :
+			break;
+
+		case eFactionName::eRed :
+			break;
 		}
 	}
 }

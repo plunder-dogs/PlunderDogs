@@ -10,6 +10,8 @@
 #include "NetworkHandler.h"
 #include <assert.h>
 
+constexpr size_t MAX_SHIP_SPRITES = 24;
+
 class Game : private NonCopyable 
 {
 public:
@@ -34,9 +36,14 @@ private:
 	sf::Clock m_gameClock;
 	float m_deltaTime;
 
+	//Online Lobby
+
+	void fillLobby();
+
 	void handleServerMessages();
 	void handleInput();
 	void handleGameLoop();
+	void renderLobby();
 
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
 	eFactionName getLocalFactionName() const;

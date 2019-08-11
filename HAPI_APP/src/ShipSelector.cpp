@@ -9,7 +9,7 @@ constexpr int MIN_SHAPE_HEIGHT_SIZE = 25;
 
 SelectedShip::SelectedShip(ShipOnTile shipOnTile, sf::Vector2i shipPosition)
 	: m_shipOnTile(shipOnTile),
-	m_sprite(*Textures::getInstance().m_selectedHex)
+	m_sprite(Textures::getInstance().getTexture(SELECTED_HEX))
 {
 	m_sprite.setPosition(shipPosition);
 }

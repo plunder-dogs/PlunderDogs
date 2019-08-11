@@ -119,16 +119,16 @@ void Faction::createSpawnArea(const Map & map, sf::Vector2i spawnPosition)
 	switch (m_factionName)
 	{
 	case eFactionName::eYellow:
-		texture = Textures::getInstance().m_yellowSpawnHex.get();
+		texture = &Textures::getInstance().getTexture(YELLOW_SPAWN_HEX); 
 		break;
 	case eFactionName::eBlue:
-		texture = Textures::getInstance().m_blueSpawnHex.get();
+		texture = &Textures::getInstance().getTexture(BLUE_SPAWN_HEX);
 		break;
 	case eFactionName::eGreen:
-		texture = Textures::getInstance().m_greenSpawnHex.get();
+		texture = &Textures::getInstance().getTexture(GREEN_SPAWN_HEX);
 		break;
 	case eFactionName::eRed:
-		texture = Textures::getInstance().m_redSpawnHex.get();
+		texture = &Textures::getInstance().getTexture(RED_SPAWN_HEX);
 		break;
 	};
 

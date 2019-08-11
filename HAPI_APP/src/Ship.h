@@ -7,8 +7,6 @@
 
 struct Faction;
 struct GameEvent;
-struct Tile;
-struct Weapons;
 class Map;
 class Ship
 {

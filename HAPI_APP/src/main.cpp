@@ -19,6 +19,14 @@
 #endif // C++_NOTES
 
 //https://www.youtube.com/watch?v=dn1XRIaROM4
+//https://youtu.be/h47zZrqjgLc
+//https://github.com/MFatihMAR/Awesome-Game-Networking
+
+//Solution 1:
+//Local host server
+
+//Solution 2:
+//current solution - "m_onlineGame" to tell if multiplayer or singleplayer
 
 int main()
 {

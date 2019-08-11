@@ -309,7 +309,7 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 	m_movementPoints(0),
 	m_sprite(),
 	m_deployed(false),
-	m_movementArea(*Textures::getInstance().m_spawnHex, MOVEMENT_GRAPH_SIZE)
+	m_movementArea(Textures::getInstance().getTexture(SPAWN_HEX), MOVEMENT_GRAPH_SIZE)
 {
 	//Action Sprite
 	m_actionSprite.setScale(sf::Vector2f(2.0f, 2.0f));
@@ -318,16 +318,16 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 	switch (factionName)
 	{
 	case eFactionName::eYellow:
-		m_actionSprite.setTexture(*Textures::getInstance().m_yellowSpawnHex);
+		m_actionSprite.setTexture(Textures::getInstance().getTexture(YELLOW_SPAWN_HEX));
 		break;
 	case eFactionName::eBlue:
-		m_actionSprite.setTexture(*Textures::getInstance().m_blueSpawnHex);
+		m_actionSprite.setTexture(Textures::getInstance().getTexture(BLUE_SPAWN_HEX));
 		break;
 	case eFactionName::eGreen:
-		m_actionSprite.setTexture(*Textures::getInstance().m_greenSpawnHex);
+		m_actionSprite.setTexture(Textures::getInstance().getTexture(GREEN_SPAWN_HEX));
 		break;
 	case eFactionName::eRed:
-		m_actionSprite.setTexture(*Textures::getInstance().m_redSpawnHex);
+		m_actionSprite.setTexture(Textures::getInstance().getTexture(RED_SPAWN_HEX));
 		break;
 	}
 
@@ -370,16 +370,16 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipSideCannons); 
+			m_sprite.setTexture(Textures::getInstance().getTexture(YELLOW_SHIP_SIDE_CANNONS));
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipBomb);
+			m_sprite.setTexture(Textures::getInstance().getTexture(YELLOW_SHIP_BOMB)); 
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipMelee); 
+			m_sprite.setTexture(Textures::getInstance().getTexture(YELLOW_SHIP_MELEE));
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_yellowShipSnipe);
+			m_sprite.setTexture(Textures::getInstance().getTexture(YELLOW_SHIP_SNIPE));
 			break;
 		}
 		break;
@@ -388,16 +388,16 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipSideCannons);
+			m_sprite.setTexture(Textures::getInstance().getTexture(BLUE_SHIP_SIDE_CANNONS));
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipBomb);
+			m_sprite.setTexture(Textures::getInstance().getTexture(BLUE_SHIP_BOMB));
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipMelee);
+			m_sprite.setTexture(Textures::getInstance().getTexture(BLUE_SHIP_MELEE)); 
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_blueShipSnipe);
+			m_sprite.setTexture(Textures::getInstance().getTexture(BLUE_SHIP_SNIPE));
 			break;
 		}
 		break;
@@ -405,16 +405,16 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipSideCannons);
+			m_sprite.setTexture(Textures::getInstance().getTexture(RED_SHIP_SIDE_CANNONS));
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipBomb);
+			m_sprite.setTexture(Textures::getInstance().getTexture(RED_SHIP_BOMB));
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipMelee);
+			m_sprite.setTexture(Textures::getInstance().getTexture(RED_SHIP_MELEE)); 
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_redShipSnipe);
+			m_sprite.setTexture(Textures::getInstance().getTexture(RED_SHIP_SNIPE));
 			break;
 		default:
 			break;
@@ -424,16 +424,16 @@ Ship::Ship(eFactionName factionName, eShipType shipType, int ID)
 		switch (shipType)
 		{
 		case eShipType::eFrigate:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipSideCannons);
+			m_sprite.setTexture(Textures::getInstance().getTexture(GREEN_SHIP_SIDE_CANNONS));
 			break;
 		case eShipType::eTurtle:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipBomb);
+			m_sprite.setTexture(Textures::getInstance().getTexture(GREEN_SHIP_BOMB)); 
 			break;
 		case eShipType::eFire:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipMelee);
+			m_sprite.setTexture(Textures::getInstance().getTexture(GREEN_SHIP_MELEE));
 			break;
 		case eShipType::eSniper:
-			m_sprite.setTexture(*Textures::getInstance().m_greenShipSnipe);
+			m_sprite.setTexture(Textures::getInstance().getTexture(GREEN_SHIP_SNIPE));
 			break;
 		}
 		break;
