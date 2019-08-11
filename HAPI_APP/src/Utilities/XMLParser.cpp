@@ -6,20 +6,25 @@
 #include "Utilities.h"
 #include "../Texture.h"
 
+const std::string LEVEL_DATA_DIRECTORY = "Data/Levels/";
+
 std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parseFactionSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
-std::unique_ptr<Texture> XMLParser::parseTexture(const std::string& directory, const std::string& fileName)
+bool XMLParser::loadTextureDetails(const std::string& filePath, std::string& imagePath, std::vector<FrameDetails>& frames)
 {
 	TiXmlDocument xmlFile;
-	bool fileLoaded = xmlFile.LoadFile(directory + fileName);
-	assert(fileLoaded);
+	if (!xmlFile.LoadFile(filePath))
+	{
+		return false;
+	}
 
 	const auto& rootElement = xmlFile.RootElement();
-	std::vector<FrameDetails> frameDetails;
+	imagePath = rootElement->Attribute("imagePath");
+
 	int i = 0; //Acts as the frame ID for each iteration
 	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
 	{
@@ -34,18 +39,10 @@ std::unique_ptr<Texture> XMLParser::parseTexture(const std::string& directory, c
 		int frameID = i;
 		++i;
 		
-		frameDetails.emplace_back(height, width, y, x, frameID);	
+		frames.emplace_back(height, width, y, x, frameID);	
 	}
 
-	std::string textureFileName = rootElement->Attribute("fileName");
-	sf::Texture textureData;
-	std::unique_ptr<Texture> texture;
-	if (textureData.loadFromFile(directory + textureFileName))
-	{
-		texture = std::make_unique<Texture>(std::move(frameDetails), std::move(textureData));
-	}
-
-	return texture;
+	return true;
 }
 
 bool XMLParser::loadMap(const std::string& mapName, sf::Vector2i& mapDimensions,
@@ -157,9 +154,10 @@ std::vector<sf::Vector2i> parseFactionSpawnPositions(const TiXmlElement & rootEl
 			//startingPosition.y -= tileSize; //Tiled Hack
 			spawnPosition.x /= 24;
 			spawnPosition.y /= 28;
-			factionSpawnPositions.push_back(spawnPosition);
+			factionSpawnPositions.emplace_back(spawnPosition);
 		}
 	}
+
 	assert(!factionSpawnPositions.empty());
 	return factionSpawnPositions;
 }
