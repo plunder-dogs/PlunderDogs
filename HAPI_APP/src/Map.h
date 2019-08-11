@@ -29,14 +29,6 @@ struct Tile
 
 class Map : private NonCopyable
 {
-	struct SpawnPosition
-	{
-		SpawnPosition(sf::Vector2i spawnPosition);
-
-		sf::Vector2i position;
-		bool inUse;
-	};
-
 private:
 	sf::Vector2i m_mapDimensions;
 	float m_windStrength;
@@ -45,7 +37,7 @@ private:
 	float m_drawScale;
 	sf::Vector2i m_drawOffset;
 	std::vector<Tile> m_data;
-	std::vector<SpawnPosition> m_spawnPositions;
+	std::vector<sf::Vector2i> m_spawnPositions;
 
 	sf::Vector2i offsetToCube(sf::Vector2i offset) const;
 	sf::Vector2i cubeToOffset(sf::Vector2i cube) const;
@@ -85,7 +77,7 @@ public:
 	//An element in the vector will be nullptr if it accesses an invalid tile
 	void getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range) const;
 
-	sf::Vector2i getRandomSpawnPosition();
+	sf::Vector2i getSpawnPosition();
 
 	//For finding the location on the screen a given tile is being drawn
 	sf::Vector2i getTileScreenPos(sf::Vector2i coord) const;

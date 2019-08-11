@@ -8,6 +8,7 @@
 #include "Utilities/XMLParser.h"
 #include <algorithm>
 #include <iostream>
+#include <random>
 
 constexpr int FRAME_HEIGHT{ 28 };
 constexpr int FRAME_WIDTH{ 32 };
@@ -15,12 +16,6 @@ constexpr float FRAME_CENTRE_X{ 15.5 };
 constexpr float FRAME_CENTRE_Y{ 32.5 };
 constexpr float WIND_STRENGTH{ 0.3 };
 constexpr int MAX_ADJACENT_TILE_RANGE{ 10 };
-
-//SpawnPosition
-Map::SpawnPosition::SpawnPosition(sf::Vector2i spawnPosition)
-	: position(spawnPosition),
-	inUse(false)
-{}
 
 void Map::renderMap(sf::RenderWindow& window)
 {
@@ -130,13 +125,7 @@ Tile* Map::getTile(sf::Vector2i coordinate)
 	{	 
 		return &m_data[coordinate.x + coordinate.y * m_mapDimensions.x];
 	}
-	/*
-	HAPI_Sprites.UserMessage(
-		std::string("getTile request out of bounds: " + std::to_string(coordinate.x) +
-			", " + std::to_string(coordinate.y) + " map dimensions are: " +
-			std::to_string(m_mapDimensions.x) +", "+ std::to_string(m_mapDimensions.y)),
-		"Map error");
-	*/
+
 	return nullptr;
 }
 
@@ -254,24 +243,21 @@ bool Map::loadmap(const std::string & mapName)
 {
 	assert(!mapName.empty());
 	assert(m_data.empty());
-
+	
+	//Load in map
 	std::vector<std::vector<int>> tileData;
-	std::vector<sf::Vector2i> m_spawnPositions;
 	if (!XMLParser::loadMap(mapName, m_mapDimensions, tileData, m_spawnPositions))
 	{
 		std::cerr << "Cannot load Map: " << mapName << "\n";
 		return false;
 	}
-	m_data.reserve(m_mapDimensions.x * m_mapDimensions.y);
 
-	//Load in Spawn Positions
-	m_spawnPositions.reserve(m_spawnPositions.size());
-	for (auto spawnPosition : m_spawnPositions)
-	{
-		m_spawnPositions.push_back(spawnPosition);
-	}
+	//Shuffle random spawn positions
+	auto rng = std::default_random_engine{};
+	std::shuffle(m_spawnPositions.begin(), m_spawnPositions.end(), rng);
 
 	//Load in Map
+	m_data.reserve(m_mapDimensions.x * m_mapDimensions.y);
 	for (int y = 0; y < m_mapDimensions.y; y++)
 	{
 		for (int x = 0; x < m_mapDimensions.x; x++)
@@ -279,7 +265,7 @@ bool Map::loadmap(const std::string & mapName)
 			const int tileID = tileData[y][x];
 			assert(tileID != -1);
 
-			m_data.emplace_back(*Textures::getInstance().m_hexTiles, sf::Vector2i(x, y), tileID);
+			m_data.emplace_back(Textures::getInstance().getTexture(HEX_TILES), sf::Vector2i(x, y), tileID);
 		}
 	}
 
@@ -669,23 +655,10 @@ void Map::getTileRing(std::vector<const Tile*>& tileArea, sf::Vector2i coord, in
 	}
 }
 
-sf::Vector2i Map::getRandomSpawnPosition()
+sf::Vector2i Map::getSpawnPosition()
 {
-	//Make sure all spawn positions aren't in use
-	assert(std::find_if(m_spawnPositions.cbegin(), m_spawnPositions.cend(),
-		[](const auto& spawnPosition) { return spawnPosition.inUse == false; }) != m_spawnPositions.cend());
-
-	sf::Vector2i spawnPosition;
-	bool validSpawnPositionFound = false;
-	while (!validSpawnPositionFound)
-	{
-		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(m_spawnPositions.size()) - 1);
-		if (!m_spawnPositions[randNumb].inUse)
-		{
-			m_spawnPositions[randNumb].inUse = true;
-			spawnPosition = m_spawnPositions[randNumb].position;
-			validSpawnPositionFound = true;
-		}
-	}
+	assert(!m_spawnPositions.empty());
+	sf::Vector2i spawnPosition = m_spawnPositions.back();
+	m_spawnPositions.pop_back();
 	return spawnPosition;
 }
