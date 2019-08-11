@@ -3,6 +3,7 @@
 #include <utility>
 #include <assert.h>
 
+//Frame Details
 FrameDetails::FrameDetails(int height, int width, int y, int x, int ID)
 	: height(height),
 	width(width),
@@ -11,10 +12,18 @@ FrameDetails::FrameDetails(int height, int width, int y, int x, int ID)
 	ID(ID)
 {}
 
-Texture::Texture(std::vector<FrameDetails>&& frames, sf::Texture&& texture)
-	: m_texture(std::move(texture)),
-	m_frames(std::move(frames))
-{}
+std::unique_ptr<Texture> Texture::load(const std::string & fileName, std::vector<FrameDetails>&& frames)
+{
+	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
+	if (texture->init(fileName, std::move(frames)))
+	{
+		return texture;
+	}
+	else
+	{
+		return std::unique_ptr<Texture>();
+	}
+}
 
 const FrameDetails & Texture::getFrame(int frameID) const
 {
@@ -30,4 +39,10 @@ const sf::Texture & Texture::getTexture() const
 const std::vector<FrameDetails>& Texture::getFrames() const
 {
 	return m_frames;
+}
+
+bool Texture::init(const std::string & fileName, std::vector<FrameDetails>&& frames)
+{
+	m_frames = std::move(frames);
+	return m_texture.loadFromFile(fileName);
 }

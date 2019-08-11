@@ -1,8 +1,42 @@
 #pragma once
 
-#include <memory>
 #include "Texture.h"
-class Textures
+#include "Utilities/NonCopyable.h"
+#include <memory>
+#include <unordered_map>
+#include <string>
+
+//Texture names
+const std::string HEX_TILES = "hexTiles.xml";
+const std::string CROSSHAIR = "crossHair.xml";
+const std::string CROSS = "cross.xml";
+const std::string SPAWN_HEX = "spawnHex.xml";
+const std::string SELECTED_HEX = "whiteHex75.xml";
+const std::string BLUE_SHIP_SIDE_CANNONS = "shipBlueSide.xml";
+const std::string BLUE_SHIP_BOMB = "shipBlueBomb.xml";
+const std::string BLUE_SHIP_MELEE = "shipBlueMelee.xml";
+const std::string BLUE_SHIP_SNIPE = "shipBlueSnipe.xml";
+const std::string RED_SHIP_SIDE_CANNONS = "shipRedSide.xml";
+const std::string RED_SHIP_BOMB = "shipRedBomb.xml";
+const std::string RED_SHIP_MELEE = "shipRedMelee.xml";
+const std::string RED_SHIP_SNIPE = "shipRedSnipe.xml";
+const std::string GREEN_SHIP_SIDE_CANNONS = "shipGreenSide.xml";
+const std::string GREEN_SHIP_BOMB = "shipGreenBomb.xml";
+const std::string GREEN_SHIP_MELEE = "ShipGreenMelee.xml";
+const std::string GREEN_SHIP_SNIPE = "shipGreenSnipe.xml";
+const std::string YELLOW_SHIP_MELEE = "shipYellowMelee.xml";
+const std::string YELLOW_SHIP_SIDE_CANNONS = "shipYellowSide.xml";
+const std::string YELLOW_SHIP_BOMB = "shipYellowBomb.xml";
+const std::string YELLOW_SHIP_SNIPE = "shipYellowSnipe.xml";
+const std::string EXPLOSION_PARTICLES = "explosion.xml";
+const std::string RED_SPAWN_HEX = "spawnHexRed.xml";
+const std::string BLUE_SPAWN_HEX = "spawnHexBlue.xml";
+const std::string YELLOW_SPAWN_HEX = "spawnHexYellow.xml";
+const std::string GREEN_SPAWN_HEX = "spawnHexGreen.xml";
+const std::string FIRE_PARTICLES = "fire.xml";
+const std::string BACKGROUND = "background.xml";
+
+class Textures : private NonCopyable
 {
 public:
 	static Textures& getInstance()
@@ -11,71 +45,13 @@ public:
 		return textures;
 	}
 
-	void loadAllTextures();	
-
-	std::unique_ptr<Texture> m_mouseCrossHair;
-	std::unique_ptr<Texture> m_enemyTerritoryHexSheet;
-	std::unique_ptr<Texture> m_levelSelectBackground;
-	std::unique_ptr<Texture> m_levelSelect1;
-	std::unique_ptr<Texture> m_levelSelect2;
-	std::unique_ptr<Texture> m_levelSelect3;
-	std::unique_ptr<Texture> m_levelSelect4;
-	std::unique_ptr<Texture> m_levelSelect5;
-	std::unique_ptr<Texture> m_playerSelectIconYellow;
-	std::unique_ptr<Texture> m_playerSelectIconGreen;
-	std::unique_ptr<Texture> m_playerSelectIconRed;
-	std::unique_ptr<Texture> m_playerSelectIconBlue;
-	std::unique_ptr<Texture> m_playerSelectBackground;
-	std::unique_ptr<Texture> m_prebattleUIBackground;
-	std::unique_ptr<Texture> m_preBattleUIPlayButton;
-	std::unique_ptr<Texture> m_preBattleUIBackButton;
-	std::unique_ptr<Texture> m_cross;
-	std::unique_ptr<Texture> m_hexTiles;
-	std::unique_ptr<Texture> m_afternoonHexTiles;
-	std::unique_ptr<Texture> m_eveningHexTiles;
-	std::unique_ptr<Texture> m_nightHexTiles;
-	std::unique_ptr<Texture> m_spawnHex;
-	std::unique_ptr<Texture> m_selectedHex;
-	std::unique_ptr<Texture> m_battleIcons;
-	std::unique_ptr<Texture> m_endPhaseButtons;
-	std::unique_ptr<Texture> m_pauseButton;
-	std::unique_ptr<Texture> m_chickenButton;
-	std::unique_ptr<Texture> m_pauseMenuBackground;
-	std::unique_ptr<Texture> m_resumeButton;
-	std::unique_ptr<Texture> m_quitButton;
-	std::unique_ptr<Texture> m_CompassBackGround;
-	std::unique_ptr<Texture> m_CompassPointer;
-	std::unique_ptr<Texture> m_WindArrow;
-	std::unique_ptr<Texture> m_activeFactionToken;
-	std::unique_ptr<Texture> m_postBattleBackground;
-	std::unique_ptr<Texture> m_doneButton;
-	std::unique_ptr<Texture> m_blueShipSideCannons;
-	std::unique_ptr<Texture> m_blueShipBomb;
-	std::unique_ptr<Texture> m_blueShipMelee;
-	std::unique_ptr<Texture> m_blueShipSnipe;
-	std::unique_ptr<Texture> m_redShipSideCannons;
-	std::unique_ptr<Texture> m_redShipBomb;
-	std::unique_ptr<Texture> m_redShipMelee;
-	std::unique_ptr<Texture> m_redShipSnipe;
-	std::unique_ptr<Texture> m_greenShipSideCannons;
-	std::unique_ptr<Texture> m_greenShipBomb;
-	std::unique_ptr<Texture> m_greenShipMelee;
-	std::unique_ptr<Texture> m_greenShipSnipe;
-	std::unique_ptr<Texture> m_yellowShipSideCannons;
-	std::unique_ptr<Texture> m_yellowShipBomb;
-	std::unique_ptr<Texture> m_yellowShipMelee;
-	std::unique_ptr<Texture> m_yellowShipSnipe;
-
-
-	std::unique_ptr<Texture> m_background;
-	std::unique_ptr<Texture> m_explosionParticles;
-	std::unique_ptr<Texture> m_fireParticles;
-
-	std::unique_ptr<Texture> m_redSpawnHex;
-	std::unique_ptr<Texture> m_blueSpawnHex;
-	std::unique_ptr<Texture> m_yellowSpawnHex;
-	std::unique_ptr<Texture> m_greenSpawnHex;
+	bool loadAllTextures();	
+	const Texture& getTexture(const std::string& textureName) const;
 
 private:
+	Textures() {}
+	std::unordered_map<std::string, std::unique_ptr<Texture>> m_textures;
 	bool m_allTexturesLoaded = false;
+
+	bool loadTexture(const std::string& fileName, const std::string& directory);
 };
