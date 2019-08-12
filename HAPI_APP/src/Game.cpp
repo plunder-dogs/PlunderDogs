@@ -1,44 +1,54 @@
 #include "Game.h"
 #include "GameEventMessenger.h"
+#include "Sprite.h"
+#include "Textures.h"
+#include "Texture.h"
 
-Game::Game(bool onlineGame)
+Game::Game()
 	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
-	m_onlineGame(onlineGame),
+	m_onlineGame(false)
 	m_gameLobbyActive(false),
 	m_ready(false),
 	m_battle(m_factions),
 	m_currentSFMLEvent(),
 	m_gameClock(),
-	m_deltaTime(m_gameClock.restart().asSeconds())
+	m_deltaTime(m_gameClock.restart().asSeconds()),
+	m_backgroundSprite(Textures::getInstance().getTexture(BACKGROUND))
 {
 	m_window.setFramerateLimit(120);
 
-	if (onlineGame)
-	{
-		m_gameLobbyActive = true;
-	}
-	else
-	{
-		assignFaction(eFactionName::eYellow, eFactionControllerType::eLocalPlayer,
-			{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
-			eShipType::eFrigate, eShipType::eFrigate });
+	//if (onlineGame)
+	//{
+	//	m_gameLobbyActive = true;
+	//}
+	//else
+	//{
+	//	assignFaction(eFactionName::eYellow, eFactionControllerType::eLocalPlayer,
+	//		{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
+	//		eShipType::eFrigate, eShipType::eFrigate });
 
-		m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
-		AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
-		m_battle.startSinglePlayerGame("level3.tmx");
-	}
+	//	m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
+	//	AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
+	//	m_battle.startSinglePlayerGame("level3.tmx");
+	//}
 }
 
 void Game::run()
 {
-	while (m_battle.isRunning())
+	while (m_window.isOpen())
 	{
-		handleServerMessages();
-		handleInput();
-		handleGameLoop();
+		if(m_battle.isRunning())
+		{
+			handleServerMessages();
+			handleInput();
+			handleGameLoop();
 
-		m_deltaTime = m_gameClock.restart().asSeconds();
+			m_deltaTime = m_gameClock.restart().asSeconds();
+		}
 	}
+
+
+
 
 	if (NetworkHandler::getInstance().isConnected() && m_onlineGame)
 	{
@@ -59,6 +69,7 @@ void Game::handleServerMessages()
 	{
 		return;
 	}
+	
 
 	NetworkHandler::getInstance().handleBackLog();
 
@@ -154,23 +165,19 @@ void Game::handleInput()
 
 void Game::handleGameLoop()
 {
+
 	if (m_battle.isRunning())
 	{
+		//m_backgroundSprite.render(m_window);
 		if (m_onlineGame && !m_gameLobbyActive)
 		{
 			m_battle.update(m_deltaTime);
 
 			m_window.clear();
-			m_battle.render(m_window);
-			m_window.display();
 		}
 		else if (!m_onlineGame)
 		{
 			m_battle.update(m_deltaTime);
-
-			m_window.clear();
-			m_battle.render(m_window);
-			m_window.display();
 		}
 	}
 }
@@ -190,7 +197,6 @@ void Game::renderLobby()
 		switch (faction.m_factionName)
 		{
 		case eFactionName::eYellow :
-			
 			break;
 
 		case eFactionName::eBlue :

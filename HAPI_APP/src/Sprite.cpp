@@ -19,18 +19,6 @@ Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, bool acti
 	m_sprite(),
 	m_position(startingPosition),
 	m_currentFrameID(0),
-	m_isActive(active) 
-{
-	m_sprite.setTexture(m_texture->getTexture());
-	setFrameID(m_currentFrameID);
-	setOriginAtCenter();
-}
-
-Sprite::Sprite(const Texture & texture, sf::Vector2i startingPosition, sf::Vector2f size, bool active)
-	: m_texture(&texture),
-	m_sprite(),
-	m_position(startingPosition),
-	m_currentFrameID(0),
 	m_isActive(active)
 {
 	m_sprite.setTexture(m_texture->getTexture());

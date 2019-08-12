@@ -7,7 +7,7 @@
 #include <deque>
 
 class Map;
-struct Texture;
+class Texture;
 struct Ray2DArea
 {
 	Ray2DArea(const Texture& texture, size_t maxTileAreaSize, bool activeGraph = false);

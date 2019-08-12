@@ -4,15 +4,14 @@
 #include <SFML/Graphics.hpp>
 
 struct FrameDetails;
-struct Texture;
+class Texture;
 class Map;
 class Sprite
 {
 public:
 	Sprite(bool active = true);
-	Sprite(const Texture& texture, sf::Vector2i startingPosition, bool active = true);
-	Sprite(const Texture& texture, sf::Vector2i startingPosition, sf::Vector2f size, bool active = false);
 	Sprite(const Texture& texture, bool active = true);
+	Sprite(const Texture& texture, sf::Vector2i startingPosition, bool active = true);
 
 	sf::Vector2f getSize() const;
 	sf::Vector2i getPosition() const;

@@ -15,7 +15,7 @@ constexpr size_t MAX_SHIP_SPRITES = 24;
 class Game : private NonCopyable 
 {
 public:
-	Game(bool onlineGame);
+	Game();
 
 	void run();
 
@@ -35,6 +35,7 @@ private:
 	sf::Event m_currentSFMLEvent;
 	sf::Clock m_gameClock;
 	float m_deltaTime;
+	Sprite m_backgroundSprite;
 
 	//Online Lobby
 

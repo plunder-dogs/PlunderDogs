@@ -30,26 +30,12 @@
 
 int main()
 {
-	std::cout << "Select Game Mode: \n";
-	std::cout << "Single Player: '1'\n";
-	std::cout << "Multiplayer: '2'\n";
-	int gameModeInput = 0;
-	bool onlineGame = false;
-	while (gameModeInput != 1 && gameModeInput != 2)
+	if (!Textures::getInstance().loadAllTextures())
 	{
-		std::cin >> gameModeInput;
-		if (gameModeInput == 2)
-		{
-			if (!NetworkHandler::getInstance().connect())
-			{
-				return -1;
-			}
-
-			onlineGame = true;
-		}
+		std::cerr << "Failed to load all textures.\n";
+		return -1;
 	}
-	Textures::getInstance().loadAllTextures();
-	Game game(onlineGame);
+	Game game;
 	game.run();
 
 	return 0;
