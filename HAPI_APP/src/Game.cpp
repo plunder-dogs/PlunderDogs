@@ -6,8 +6,7 @@
 
 Game::Game()
 	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
-	m_onlineGame(false)
-	m_gameLobbyActive(false),
+	m_currentGameState(eGameState::eMainMenu),
 	m_ready(false),
 	m_battle(m_factions),
 	m_currentSFMLEvent(),
@@ -37,42 +36,38 @@ void Game::run()
 {
 	while (m_window.isOpen())
 	{
-		if(m_battle.isRunning())
-		{
-			handleServerMessages();
-			handleInput();
-			handleGameLoop();
+		handleServerMessages();
+		handleInput();
+		//if (m_onlineGame && !m_gameLobbyActive)
+		//{
+		//	m_battle.update(m_deltaTime);
 
-			m_deltaTime = m_gameClock.restart().asSeconds();
-		}
+		//	m_window.clear();
+		//}
+		//else if (!m_onlineGame)
+		//{
+		//	m_battle.update(m_deltaTime);
+		//}
+
+		m_deltaTime = m_gameClock.restart().asSeconds();
 	}
-
-
-
-
-	if (NetworkHandler::getInstance().isConnected() && m_onlineGame)
+	
+	if (NetworkHandler::getInstance().isConnectedToServer())
 	{
 		ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 		NetworkHandler::getInstance().disconnect();
 	}
 }
 
-void Game::fillLobby()
-{
-	assert(m_onlineGame);
-}
-
 void Game::handleServerMessages()
 {
-	if (!m_onlineGame)
+	if (NetworkHandler::getInstance().isConnectedToServer())
 	{
 		return;
 	}
-	
 
 	NetworkHandler::getInstance().handleBackLog();
-
 	while (NetworkHandler::getInstance().hasMessages())
 	{
 		ServerMessage receivedServerMessage = NetworkHandler::getInstance().getServerMessage();
@@ -100,7 +95,7 @@ void Game::handleServerMessages()
 			}
 
 			ServerMessage messageToSend(eMessageType::eNewPlayer, getLocalFactionName(), std::move(shipsToAdd));
-			NetworkHandler::getInstance().sendServerMessage(messageToSend);
+			NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 		}
 		else if (receivedServerMessage.type == eMessageType::eNewPlayer)
 		{
@@ -111,7 +106,7 @@ void Game::handleServerMessages()
 		}
 		else if (receivedServerMessage.type == eMessageType::eStartOnlineGame)
 		{
-			m_gameLobbyActive = false;
+			m_currentGameState = eGameState::eBattle;
 			m_battle.startOnlineGame(receivedServerMessage.levelName, receivedServerMessage.spawnPositions);
 		}
 		else if (receivedServerMessage.type == eMessageType::eRefuseConnection)
@@ -119,7 +114,7 @@ void Game::handleServerMessages()
 			std::cout << "Connection Refused\n";
 			m_window.close();
 		}
-		else if (!m_gameLobbyActive && (receivedServerMessage.type == eMessageType::eDeployShipAtPosition ||
+		else if (m_currentGameState == eGameState::eBattle && (receivedServerMessage.type == eMessageType::eDeployShipAtPosition ||
 			receivedServerMessage.type == eMessageType::eMoveShipToPosition ||
 			receivedServerMessage.type == eMessageType::eAttackShipAtPosition ||
 			receivedServerMessage.type == eMessageType::eClientDisconnected))
@@ -138,76 +133,28 @@ void Game::handleInput()
 	{
 		if (m_currentSFMLEvent.type == sf::Event::Closed)
 		{
-			if (m_onlineGame)
+			if (NetworkHandler::getInstance().isConnectedToServer())
 			{
 				ServerMessage messageToSend(eMessageType::eDisconnect, getLocalFactionName());
-				NetworkHandler::getInstance().sendServerMessage(messageToSend);
+				NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 				NetworkHandler::getInstance().disconnect();
 				m_battle.quitGame();
 			}
 			m_window.close();
 		}
-		else if (m_currentSFMLEvent.type == sf::Event::KeyPressed)
-		{
-			if (m_currentSFMLEvent.key.code == sf::Keyboard::R && m_onlineGame && m_gameLobbyActive && !m_ready)
-			{
-				ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName());
-				NetworkHandler::getInstance().sendServerMessage(messageToSend);
-				m_ready = true;
-			}
-		}
-		if (m_battle.isRunning() && (!m_onlineGame || (m_onlineGame && !m_gameLobbyActive)))
-		{
-			m_battle.handleInput(m_window, m_currentSFMLEvent);
-		}
-	}
-}
-
-void Game::handleGameLoop()
-{
-
-	if (m_battle.isRunning())
-	{
-		//m_backgroundSprite.render(m_window);
-		if (m_onlineGame && !m_gameLobbyActive)
-		{
-			m_battle.update(m_deltaTime);
-
-			m_window.clear();
-		}
-		else if (!m_onlineGame)
-		{
-			m_battle.update(m_deltaTime);
-		}
-	}
-}
-
-void Game::renderLobby()
-{
-	if (!m_onlineGame)
-	{
-		return;
-	}
-
-	sf::Vector2f factionTextPosition(100, 100);
-	sf::Text factionNameText;
-	std::string factionText;
-	for (const auto& faction : m_factions)
-	{
-		switch (faction.m_factionName)
-		{
-		case eFactionName::eYellow :
-			break;
-
-		case eFactionName::eBlue :
-			break;
-
-		case eFactionName::eGreen :
-			break;
-
-		case eFactionName::eRed :
-			break;
-		}
+		//else if (m_currentSFMLEvent.type == sf::Event::KeyPressed)
+		//{
+		//	if (m_currentSFMLEvent.key.code == sf::Keyboard::R && m_onlineGame && !m_ready)
+		//	{
+		//		ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName());
+		//		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
+		//		m_ready = true;
+		//	}
+		//}
+		//if (m_battle.isRunning() && (!m_onlineGame || (m_onlineGame && !m_gameLobbyActive)))
+		//{
+		//	m_battle.handleInput(m_window, m_currentSFMLEvent);
+		//}
 	}
 }
 

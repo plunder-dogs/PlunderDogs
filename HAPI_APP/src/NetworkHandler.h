@@ -20,11 +20,11 @@ public:
 		return instance;
 	}
 
-	bool isConnected() const;
+	bool isConnectedToServer() const;
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
-	void sendServerMessage(const ServerMessage& message);
+	void sendMessageToServer(const ServerMessage& message);
 	bool connect();
 	void disconnect();
 	void handleBackLog();

@@ -134,7 +134,6 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 	m_timeBetweenAIUnits(0.3f, false),
 	m_timeUntilGameOver(2.f, false),
 	m_isRunning(true),
-	m_onlineGame(false),
 	m_currentFactionTurn(0)
 {
 	m_explosionParticles.reserve(MAX_PARTICLES);
@@ -160,7 +159,6 @@ void Battle::quitGame()
 
 void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
-	m_onlineGame = true;
 	if (!m_map.loadmap(newMapName))
 	{
 		m_isRunning = false;
@@ -206,7 +204,6 @@ void Battle::startOnlineGame(const std::string & newMapName, const std::vector<S
 
 void Battle::startSinglePlayerGame(const std::string & levelName)
 {
-	m_onlineGame = false;
 	if (!m_map.loadmap(levelName))
 	{
 		m_isRunning = false;
@@ -338,14 +335,15 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 		eDirection endDirection = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().dir;
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 }
 
@@ -361,13 +359,14 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 }
 
@@ -385,7 +384,8 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 
 		getFaction(selectedShip.factionName).moveShipToPosition(m_map, selectedShip.shipID);
 
-		if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+		if (NetworkHandler::getInstance().isConnectedToServer() && 
+			m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 		{
 			sf::Vector2i destination = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().pair();
 			eDirection endDirection = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().dir;
@@ -393,7 +393,7 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 			messageToSend.type = eMessageType::eMoveShipToPosition;
 			messageToSend.faction = selectedShip.factionName;
 			messageToSend.shipActions.emplace_back(selectedShip.shipID, destination.x, destination.y, endDirection);
-			NetworkHandler::getInstance().sendServerMessage(messageToSend);
+			NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 		}
 	}
 }
@@ -444,11 +444,12 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
 
 	//Inform remote clients on Deployment
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, m_factions[m_currentFactionTurn].m_factionName);
 		messageToSend.shipActions.emplace_back(startingPosition.x, startingPosition.y, startingDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
@@ -570,13 +571,14 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 	assert(m_factions[m_currentFactionTurn].m_factionName == firingShip.factionName);
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
 		messageToSend.shipActions.emplace_back(firingShip.shipID,
 			firingPosition.m_tileCoordinate.x, firingPosition.m_tileCoordinate.y);
 
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 
 	m_factions[static_cast<int>(firingShip.factionName)].m_ships[firingShip.shipID].fireWeapon();

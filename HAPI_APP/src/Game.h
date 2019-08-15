@@ -12,6 +12,15 @@
 
 constexpr size_t MAX_SHIP_SPRITES = 24;
 
+enum class eGameState
+{
+	eMainMenu = 0,
+	eMultiplayerLobby,
+	eLevelSelection,
+	eShipSelection,
+	eBattle
+};
+
 class Game : private NonCopyable 
 {
 public:
@@ -28,23 +37,19 @@ private:
 		eFactionName::eRed
 	};
 	sf::RenderWindow m_window;
-	bool m_onlineGame;
-	bool m_gameLobbyActive;
+	eGameState m_currentGameState;
 	bool m_ready;
 	Battle m_battle;
 	sf::Event m_currentSFMLEvent;
 	sf::Clock m_gameClock;
 	float m_deltaTime;
+
 	Sprite m_backgroundSprite;
 
 	//Online Lobby
 
-	void fillLobby();
-
 	void handleServerMessages();
 	void handleInput();
-	void handleGameLoop();
-	void renderLobby();
 
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
 	eFactionName getLocalFactionName() const;

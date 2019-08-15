@@ -13,7 +13,7 @@ NetworkHandler::NetworkHandler()
 	m_serverMessageBackLog()
 {}
 
-void NetworkHandler::sendServerMessage(const ServerMessage& message)
+void NetworkHandler::sendMessageToServer(const ServerMessage& message)
 {
 	assert(m_connectedToServer);
 	if (m_serverMessageBackLog.empty())
@@ -35,7 +35,7 @@ void NetworkHandler::sendServerMessage(const ServerMessage& message)
 	}
 }
 
-bool NetworkHandler::isConnected() const
+bool NetworkHandler::isConnectedToServer() const
 {
 	return m_connectedToServer;
 }
