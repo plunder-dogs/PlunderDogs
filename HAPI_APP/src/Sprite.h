@@ -10,8 +10,8 @@ class Sprite
 {
 public:
 	Sprite(bool active = true);
-	Sprite(const Texture& texture, bool active = true);
-	Sprite(const Texture& texture, sf::Vector2i startingPosition, bool active = true);
+	Sprite(const Texture& texture, bool active = true, bool setOriginAtCentre = true);
+	Sprite(const Texture& texture, sf::Vector2i startingPosition, bool active = true, bool originAtCentre = true);
 
 	sf::Vector2f getSize() const;
 	sf::Vector2i getPosition() const;

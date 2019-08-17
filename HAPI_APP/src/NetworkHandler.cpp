@@ -54,7 +54,7 @@ ServerMessage NetworkHandler::getServerMessage()
 	return serverMessage;
 }
 
-bool NetworkHandler::connect()
+bool NetworkHandler::connectToServer()
 {
 	assert(!m_connectedToServer);
 	if (m_tcpSocket.connect("81.97.212.79", 55001) != sf::Socket::Done)
@@ -67,8 +67,9 @@ bool NetworkHandler::connect()
 	return true;
 }
 
-void NetworkHandler::disconnect()
+void NetworkHandler::disconnectFromServer()
 {
+
 	assert(m_connectedToServer);
 	m_connectedToServer = false;
 	m_listenThread.join();

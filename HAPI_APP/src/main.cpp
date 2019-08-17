@@ -28,6 +28,8 @@
 //Solution 2:
 //current solution - "m_onlineGame" to tell if multiplayer or singleplayer
 
+//https://stackoverflow.com/questions/51705967/advantages-of-pass-by-value-and-stdmove-over-pass-by-reference/51706522
+
 int main()
 {
 	if (!Textures::getInstance().loadAllTextures())
@@ -35,7 +37,15 @@ int main()
 		std::cerr << "Failed to load all textures.\n";
 		return -1;
 	}
-	Game game;
+
+	sf::Font font;
+	if (!font.loadFromFile("unicode.arialr.ttf"))
+	{
+		std::cerr << "Failed to load font\n";
+		return -1;
+	}
+
+	Game game(font);
 	game.run();
 
 	return 0;

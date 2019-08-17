@@ -25,8 +25,8 @@ public:
 	ServerMessage getServerMessage();
 	
 	void sendMessageToServer(const ServerMessage& message);
-	bool connect();
-	void disconnect();
+	bool connectToServer();
+	void disconnectFromServer();
 	void handleBackLog();
 
 private:
