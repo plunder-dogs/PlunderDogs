@@ -10,6 +10,8 @@ class UILayer : private NonCopyable
 public:
 	UILayer();
 
+	const UIComponentButton& getButton(eUIComponentName name) const;
+
 	void onComponentIntersect(sf::IntRect mouseRect);
 	void onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails& intersectionDetails);
 	
@@ -17,7 +19,7 @@ public:
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);
 	void setImages(std::vector<Sprite>&& images);
 
-	void resetButtonsFrameID();
+	void resetButtons();
 
 	void render(sf::RenderWindow& window) const;
 

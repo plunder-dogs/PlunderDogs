@@ -32,14 +32,18 @@ private:
 	
 	//UI
 	std::array<UILayer, static_cast<size_t>(eGameState::Total)> m_UILayers;
-	sf::RectangleShape mouseShape;
+	sf::RectangleShape m_mouseShape;
 
 	void handleServerMessages();
 	void handleInput();
 	void handleMainMenuInput(sf::IntRect mouseRect);
 	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
+	void handleLevelSelectionInput(sf::IntRect mouseRect);
+	
 	void render();
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
+	void assignFactionControllerType(eFactionName factionName, int frameID);
+	void fillFactions();
 	eFactionName getLocalControlledFaction() const;
 
 	void quit();

@@ -15,9 +15,15 @@ enum class eUIComponentName
 	eBlueFactionSelect,
 	eGreenFactionSelect,
 	eRedFactionSelect,
+	eLevelOneSelect,
+	eLevelTwoSelect,
+	eLevelThreeSelect,
+	eLevelFourSelect,
+	eLevelFiveSelect,
 	ePlaySinglePlayer,
 	ePlayerMultiplayer,
 	eBack,
+	eDone,
 	eQuit
 };
 

@@ -1,11 +1,20 @@
 #include "UILayer.h"
 #include <assert.h>
+#include <algorithm>
 
 UILayer::UILayer()
 	: m_buttons(),
 	m_textBoxes(),
 	m_images()
 {}
+
+const UIComponentButton & UILayer::getButton(eUIComponentName name) const
+{
+	auto cIter = std::find_if(m_buttons.cbegin(), m_buttons.cend(), [name](const auto& button) { return button.name == name; });
+	assert(cIter != m_buttons.cend());
+	
+	return (*cIter);
+}
 
 void UILayer::onComponentIntersect(sf::IntRect mouseRect)
 {
@@ -77,10 +86,11 @@ void UILayer::setImages(std::vector<Sprite>&& images)
 	m_images = std::move(images);
 }
 
-void UILayer::resetButtonsFrameID()
+void UILayer::resetButtons()
 {
 	for (auto& button : m_buttons)
 	{
+		button.currentlyIntersected = false;
 		button.sprite.setFrameID(0);
 	}
 }

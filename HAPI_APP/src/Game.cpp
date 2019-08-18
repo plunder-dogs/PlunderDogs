@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "GameEventMessenger.h"
+#include "AIHandler.h"
 #include "Sprite.h"
 #include "Texture.h"
 #include <iostream>
@@ -24,28 +25,42 @@ Game::Game(const sf::Font& font)
 	mainMenuSprites.emplace_back(Textures::getInstance().getTexture(BACKGROUND), true, false);
 	m_UILayers[static_cast<int>(eGameState::eMainMenu)].setImages(std::move(mainMenuSprites));
 	
-
 	//Single Player Faction Select
 	std::vector<UIComponentButton> singlePlayerFactionSelectButtons;
-	singlePlayerFactionSelectButtons.reserve(size_t(4));
+	singlePlayerFactionSelectButtons.reserve(size_t(6));
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("blueSelectBtn.xml"), sf::Vector2i(400, 250), eUIComponentName::eBlueFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("greenSelectBtn.xml"), sf::Vector2i(600, 250), eUIComponentName::eGreenFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("redSelectBtn.xml"), sf::Vector2i(800, 250), eUIComponentName::eRedFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("yellowSelectBtn.xml"), sf::Vector2i(1000, 250), eUIComponentName::eYellowFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(250, 700), eUIComponentName::eBack, true);
+	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(800, 800), eUIComponentName::eDone, true);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setButtons(std::move(singlePlayerFactionSelectButtons));
 	std::vector<Sprite> singlePlayerFactionSelectImages;
-	singlePlayerFactionSelectImages.emplace_back(Textures::getInstance().getTexture(BACKGROUND), true, false);
+	singlePlayerFactionSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), true, false);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setImages(std::move(singlePlayerFactionSelectImages));
 
+	//Level Selection
+	std::vector<UIComponentButton> levelSelectButtons;
+	levelSelectButtons.reserve(size_t(6));
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level1Button.xml"), sf::Vector2i(200, 200), eUIComponentName::eLevelOneSelect, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level2Button.xml"), sf::Vector2i(600, 200), eUIComponentName::eLevelTwoSelect, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level3Button.xml"), sf::Vector2i(500, 400), eUIComponentName::eLevelThreeSelect, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level4Button.xml"), sf::Vector2i(200, 600), eUIComponentName::eLevelFourSelect, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level5Button.xml"), sf::Vector2i(700, 700), eUIComponentName::eLevelFiveSelect, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, true);
+	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setButtons(std::move(levelSelectButtons));
+	std::vector<Sprite> levelSelectImages;
+	levelSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), true, false);
+	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setImages(std::move(levelSelectImages));
+
 	//Level Select
-	std::vector<UIComponentButton> singlePlayerFactionSelectButtons;
+	//std::vector<UIComponentButton> singlePlayerFactionSelectButtons;
 
 
 	m_window.setFramerateLimit(120);
 
-	mouseShape.setFillColor(sf::Color::Red);
-	mouseShape.setSize(sf::Vector2f(25, 25));
+	m_mouseShape.setFillColor(sf::Color::Red);
+	m_mouseShape.setSize(sf::Vector2f(25, 25));
 
 	//if (onlineGame)
 	//{
@@ -163,7 +178,7 @@ void Game::handleInput()
 	{
 		sf::Vector2i mousePosition = sf::Mouse::getPosition(m_window);
 		sf::IntRect mouseRect(mousePosition, sf::Vector2i(5, 5));
-		mouseShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
+		m_mouseShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
 
 		switch (m_currentSFMLEvent.type)
 		{
@@ -172,7 +187,7 @@ void Game::handleInput()
 			break;
 
 		case sf::Event::MouseMoved :
-			m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].onComponentIntersect(mouseRect);
+			m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect);
 			break;
 		
 		case sf::Event::MouseButtonPressed :
@@ -185,6 +200,9 @@ void Game::handleInput()
 					break;
 				case eGameState::eSinglePlayerFactionSelect :
 					handleSinglePlayerFactionSelectionInput(mouseRect);
+					break;
+				case eGameState::eLevelSelection :
+					handleLevelSelectionInput(mouseRect);
 					break;
 				}
 			}
@@ -238,9 +256,69 @@ void Game::handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect)
 	{
 		switch (intersectionDetails.getComponentName())
 		{
+		case eUIComponentName::eDone :
+		{
+			const UILayer& currentUILayer = m_UILayers[static_cast<int>(m_currentGameState)];
+			assignFactionControllerType(eFactionName::eRed, currentUILayer.getButton(eUIComponentName::eRedFactionSelect).sprite.getCurrentFrameID());
+			assignFactionControllerType(eFactionName::eYellow, currentUILayer.getButton(eUIComponentName::eYellowFactionSelect).sprite.getCurrentFrameID());
+			assignFactionControllerType(eFactionName::eGreen, currentUILayer.getButton(eUIComponentName::eGreenFactionSelect).sprite.getCurrentFrameID());
+			assignFactionControllerType(eFactionName::eBlue, currentUILayer.getButton(eUIComponentName::eBlueFactionSelect).sprite.getCurrentFrameID());
+
+			m_currentGameState = eGameState::eLevelSelection;
+			break;
+		}
 		case eUIComponentName::eBack :
-			m_UILayers[static_cast<int>(m_currentGameState)].resetButtonsFrameID();
+		{
+			m_UILayers[static_cast<int>(m_currentGameState)].resetButtons();
+
 			m_currentGameState = eGameState::eMainMenu;
+			break;
+		}
+		}
+	}
+}
+
+void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
+{
+	UIComponentIntersectionDetails intersectionDetails;
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	if (intersectionDetails.isIntersected())
+	{
+		switch (intersectionDetails.getComponentName())
+		{
+		case eUIComponentName::eLevelOneSelect :
+			m_currentGameState = eGameState::eBattle;
+			fillFactions();
+			m_battle.startSinglePlayerGame("levelOne.tmx");
+			break;
+
+		case eUIComponentName::eLevelTwoSelect :
+			m_currentGameState = eGameState::eBattle;
+			fillFactions();
+			m_battle.startSinglePlayerGame("levelTwo.tmx");
+			break;
+		
+		case eUIComponentName::eLevelThreeSelect :
+			m_currentGameState = eGameState::eBattle;
+			fillFactions();
+			m_battle.startSinglePlayerGame("levelThree.tmx");
+			break;
+		
+		case eUIComponentName::eLevelFourSelect :
+			m_currentGameState = eGameState::eBattle;
+			fillFactions();
+			m_battle.startSinglePlayerGame("levelFour.tmx");
+			break;
+		
+		case eUIComponentName::eLevelFiveSelect :
+			m_currentGameState = eGameState::eBattle;
+			fillFactions();
+			m_battle.startSinglePlayerGame("levelFive.tmx");
+			break;
+
+		case eUIComponentName::eBack :
+			m_currentGameState = eGameState::eMainMenu;
+			
 			break;
 		}
 	}
@@ -252,7 +330,7 @@ void Game::render()
 
 	m_UILayers[static_cast<int>(m_currentGameState)].render(m_window);
 
-	m_window.draw(mouseShape);
+	m_window.draw(m_mouseShape);
 
 	m_window.display();
 }
@@ -264,6 +342,50 @@ void Game::assignFaction(eFactionName factionName, eFactionControllerType contro
 	for (eShipType shipToAdd : shipsToAdd)
 	{
 		m_factions[static_cast<int>(factionName)].addShip(factionName, shipToAdd);
+	}
+}
+
+void Game::assignFactionControllerType(eFactionName factionName, int frameID)
+{
+	eFactionControllerType& factionControllerType = m_factions[static_cast<int>(factionName)].m_controllerType;
+	switch (frameID)
+	{
+	case 0:
+		factionControllerType = eFactionControllerType::None;
+		break;
+	case 1:
+		factionControllerType = eFactionControllerType::eLocalPlayer;
+		break;
+	case 2:
+		factionControllerType = eFactionControllerType::eAI;
+		break;
+	}
+}
+
+void Game::fillFactions()
+{
+	std::vector<eShipType> shipsToAdd;
+	shipsToAdd.reserve(size_t(6));
+	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.push_back(eShipType::eFrigate);
+	
+	for (auto& faction : m_factions)
+	{
+		if (faction.m_controllerType == eFactionControllerType::eLocalPlayer)
+		{
+			for (eShipType shipToAdd : shipsToAdd)
+			{
+				faction.addShip(faction.m_factionName, shipToAdd);
+			}
+		}
+		else if (faction.m_controllerType == eFactionControllerType::eAI)
+		{
+			AIHandler::getInstance().loadShips(faction);
+		}
 	}
 }
 
