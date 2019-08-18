@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+constexpr float CONNECTION_TIMEOUT = 2.5f;
+
 NetworkHandler::NetworkHandler()
 	: m_mutex(),
 	m_listenThread(),
@@ -57,7 +59,7 @@ ServerMessage NetworkHandler::getServerMessage()
 bool NetworkHandler::connectToServer()
 {
 	assert(!m_connectedToServer);
-	if (m_tcpSocket.connect("81.97.212.79", 55001) != sf::Socket::Done)
+	if (m_tcpSocket.connect("81.97.212.79", 55001, sf::seconds(CONNECTION_TIMEOUT)) != sf::Socket::Done)
 	{
 		return false;
 	}

@@ -39,7 +39,7 @@ private:
 	void handleMainMenuInput(sf::IntRect mouseRect);
 	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
 	void handleLevelSelectionInput(sf::IntRect mouseRect);
-	
+
 	void render();
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
 	void fillFaction(eFactionName factionName, int frameID);

@@ -205,7 +205,10 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 			break;
 
 		case eUIComponentName::ePlayerMultiplayer :
-			m_currentGameState = eGameState::eMultiPlayerFactionSelect;
+			if (NetworkHandler::getInstance().connectToServer())
+			{
+				m_currentGameState = eGameState::eMultiPlayerFactionSelect;
+			}
 			break;
 
 		case eUIComponentName::eQuit :
