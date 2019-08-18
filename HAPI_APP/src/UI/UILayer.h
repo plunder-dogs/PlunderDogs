@@ -14,6 +14,8 @@ public:
 
 	void onComponentIntersect(sf::IntRect mouseRect);
 	void onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails& intersectionDetails);
+
+	void setComponentVisiblity(eUIComponentName componentName, eUIComponentType componentType, bool visible);
 	
 	void setButtons(std::vector<UIComponentButton>&& buttons);
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);
