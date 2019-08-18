@@ -42,8 +42,7 @@ private:
 	
 	void render();
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
-	void assignFactionControllerType(eFactionName factionName, int frameID);
-	void fillFactions();
+	void fillFaction(eFactionName factionName, int frameID);
 	eFactionName getLocalControlledFaction() const;
 
 	void quit();
