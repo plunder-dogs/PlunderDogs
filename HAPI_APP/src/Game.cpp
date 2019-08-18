@@ -20,6 +20,7 @@ Game::Game(const sf::Font& font)
 	mainMenuTextBoxes.emplace_back("Play Singleplayer", font, sf::Vector2i(600, 600), eUIComponentName::ePlaySinglePlayer);
 	mainMenuTextBoxes.emplace_back("Play Multiplayer", font, sf::Vector2i(600, 680), eUIComponentName::ePlayerMultiplayer);
 	mainMenuTextBoxes.emplace_back("Quit", font, sf::Vector2i(600, 760), eUIComponentName::eQuit);
+	mainMenuTextBoxes.emplace_back("Cannot connect to MultiPlayer", font, sf::Vector2i(960, 540), eUIComponentName::eAlert, false);
 	m_UILayers[static_cast<int>(eGameState::eMainMenu)].setTextBoxes(std::move(mainMenuTextBoxes));
 	std::vector<Sprite> mainMenuSprites;
 	mainMenuSprites.emplace_back(Textures::getInstance().getTexture(BACKGROUND), true, false);
@@ -65,6 +66,7 @@ void Game::run()
 	{
 		handleServerMessages();
 		handleInput();
+		m_UILayers[static_cast<int>(m_currentGameState)].update(m_deltaTime);
 		if (m_currentGameState == eGameState::eBattle)
 		{
 			m_battle.update(m_deltaTime);
@@ -208,6 +210,10 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 			if (NetworkHandler::getInstance().connectToServer())
 			{
 				m_currentGameState = eGameState::eMultiPlayerFactionSelect;
+			}
+			else
+			{
+				m_UILayers[static_cast<int>(m_currentGameState)].activateTimedVisibilityComponent(eUIComponentName::eAlert, eUIComponentType::eTextBox);
 			}
 			break;
 

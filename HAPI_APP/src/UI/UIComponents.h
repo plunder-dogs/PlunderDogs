@@ -43,7 +43,8 @@ struct UIComponentBase
 protected:
 	UIComponentBase(eUIComponentName name, bool visible = true)
 		: name(name),
-		AABB()
+		AABB(),
+		visible(visible)
 	{}
 };
 

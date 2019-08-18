@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 
-constexpr float CONNECTION_TIMEOUT = 2.5f;
+constexpr float CONNECTION_TIMEOUT = 1.0f;
 
 NetworkHandler::NetworkHandler()
 	: m_mutex(),
