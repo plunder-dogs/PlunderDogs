@@ -24,15 +24,6 @@ Game::Game(const sf::Font& font)
 	std::vector<Sprite> mainMenuSprites;
 	mainMenuSprites.emplace_back(Textures::getInstance().getTexture(BACKGROUND), true, false);
 	m_UILayers[static_cast<int>(eGameState::eMainMenu)].setImages(std::move(mainMenuSprites));
-	
-	//enum class eFactionName
-	//{
-	//	eYellow = 0,
-	//	eBlue = 1,
-	//	eGreen = 2,
-	//	eRed = 3,
-	//	eTotal = eRed + 1
-	//};
 
 	//Single Player Faction Select
 	std::vector<UIComponentButton> singlePlayerFactionSelectButtons;
@@ -62,25 +53,10 @@ Game::Game(const sf::Font& font)
 	levelSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), true, false);
 	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setImages(std::move(levelSelectImages));
 
-
 	m_window.setFramerateLimit(120);
 
 	m_mouseShape.setFillColor(sf::Color::Red);
 	m_mouseShape.setSize(sf::Vector2f(25, 25));
-
-	//if (onlineGame)
-	//{
-	//	m_gameLobbyActive = true;
-	//}
-	//else
-	//{
-	//	assignFaction(eFactionName::eYellow, eFactionControllerType::eLocalPlayer,
-	//		{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
-	//		eShipType::eFrigate, eShipType::eFrigate });
-	//	m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
-	//	AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
-	//	m_battle.startSinglePlayerGame("level3.tmx");
-	//}
 }
 
 void Game::run()
@@ -89,18 +65,12 @@ void Game::run()
 	{
 		handleServerMessages();
 		handleInput();
+		if (m_currentGameState == eGameState::eBattle)
+		{
+			m_battle.update(m_deltaTime);
+		}
 
 		render();
-		//if (m_onlineGame && !m_gameLobbyActive)
-		//{
-		//	m_battle.update(m_deltaTime);
-		//	m_window.clear();
-		//}
-		//else if (!m_onlineGame)
-		//{
-		//	m_battle.update(m_deltaTime);
-		//}
-
 		m_deltaTime = m_gameClock.restart().asSeconds();
 	}
 	
@@ -215,16 +185,7 @@ void Game::handleInput()
 			break;
 		}
 
-		//else if (m_currentSFMLEvent.type == sf::Event::KeyPressed)
-		//{
-		//	if (m_currentSFMLEvent.key.code == sf::Keyboard::R && m_onlineGame && !m_ready)
-		//	{
-		//		ServerMessage messageToSend(eMessageType::ePlayerReady, getLocalFactionName());
-		//		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
-		//		m_ready = true;
-		//	}
-		//}
-		if (m_battle.isRunning())
+		if (m_currentGameState == eGameState::eBattle)
 		{
 			m_battle.handleInput(m_window, m_currentSFMLEvent);
 		}
