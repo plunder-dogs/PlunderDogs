@@ -2,10 +2,15 @@
 #include <assert.h>
 #include <algorithm>
 
+constexpr float COMPONENT_VISIBILITY_DURATION = 2.0f;
+
 UILayer::UILayer()
 	: m_buttons(),
 	m_textBoxes(),
-	m_images()
+	m_images(),
+	m_timedVisibleButton(nullptr),
+	m_timedVisibleTextBox(nullptr),
+	m_componentVisiblityTimer(COMPONENT_VISIBILITY_DURATION, false)
 {}
 
 const UIComponentButton & UILayer::getButton(eUIComponentName name) const
@@ -68,7 +73,7 @@ void UILayer::onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectio
 	}
 }
 
-void UILayer::setComponentVisiblity(eUIComponentName componentName, eUIComponentType componentType, bool visible)
+void UILayer::activateTimedVisibilityComponent(eUIComponentName componentName, eUIComponentType componentType)
 {
 	switch (componentType)
 	{
@@ -76,7 +81,9 @@ void UILayer::setComponentVisiblity(eUIComponentName componentName, eUIComponent
 	{
 		auto iter = std::find_if(m_buttons.begin(), m_buttons.end(), [componentName](const auto& button) { return button.name == componentName; });
 		assert(iter != m_buttons.end());
-		iter->visible = visible;
+		iter->visible = true;
+		m_timedVisibleButton = &(*iter);
+		m_componentVisiblityTimer.setActive(true);
 		break;
 	}
 
@@ -84,7 +91,9 @@ void UILayer::setComponentVisiblity(eUIComponentName componentName, eUIComponent
 	{
 		auto iter = std::find_if(m_textBoxes.begin(), m_textBoxes.end(), [componentName](const auto& textBox) { return textBox.name == componentName; });
 		assert(iter != m_textBoxes.end());
-		iter->visible = visible;
+		iter->visible = true;
+		m_timedVisibleTextBox = &(*iter);
+		m_componentVisiblityTimer.setActive(true);
 		break;
 	}
 	}
@@ -117,6 +126,28 @@ void UILayer::resetButtons()
 	}
 }
 
+void UILayer::update(float deltaTime)
+{
+	m_componentVisiblityTimer.update(deltaTime);
+	if (m_componentVisiblityTimer.isExpired())
+	{
+		m_componentVisiblityTimer.reset();
+		m_componentVisiblityTimer.setActive(false);
+
+		if (m_timedVisibleButton)
+		{
+			m_timedVisibleButton->visible = false;
+			m_timedVisibleButton = nullptr;
+		}
+		
+		if (m_timedVisibleTextBox)
+		{
+			m_timedVisibleTextBox->visible = false;
+			m_timedVisibleTextBox = nullptr;
+		}
+	}
+}
+
 void UILayer::render(sf::RenderWindow & window) const
 {
 	for (const auto& image : m_images)
@@ -126,11 +157,17 @@ void UILayer::render(sf::RenderWindow & window) const
 
 	for (const auto& button : m_buttons)
 	{
-		button.sprite.render(window);
+		if (button.visible)
+		{
+			button.sprite.render(window);
+		}
 	}
 
 	for (const auto& textBox : m_textBoxes)
 	{
-		window.draw(textBox.text);
+		if (textBox.visible)
+		{
+			window.draw(textBox.text);
+		}
 	}
 }
