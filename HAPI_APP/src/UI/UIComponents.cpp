@@ -33,9 +33,7 @@ UIComponentIntersectionDetails::UIComponentIntersectionDetails()
 	m_type(),
 	m_name(),
 	m_frameID(0)
-{
-
-}
+{}
 
 UIComponentIntersectionDetails::UIComponentIntersectionDetails(bool intersected, int frameID)
 	: m_intersected(intersected),

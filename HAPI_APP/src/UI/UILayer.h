@@ -17,10 +17,9 @@ public:
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);
 	void setImages(std::vector<Sprite>&& images);
 
-
 	void resetButtonsFrameID();
 
-	void render(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window) const;
 
 private:
 	std::vector<UIComponentButton> m_buttons;

@@ -127,7 +127,7 @@ void Sprite::setScale(sf::Vector2f scale)
 	m_sprite.setScale(scale);
 }
 
-void Sprite::render(sf::RenderWindow & window)
+void Sprite::render(sf::RenderWindow & window) const
 {
 	if (m_isActive)
 	{

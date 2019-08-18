@@ -31,7 +31,7 @@ void UILayer::onComponentIntersect(sf::IntRect mouseRect)
 
 void UILayer::onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails & intersectionDetails)
 {
-	for (auto& textBox : m_textBoxes)
+	for (const auto& textBox : m_textBoxes)
 	{
 		if (mouseRect.intersects(textBox.AABB))
 		{
@@ -85,19 +85,19 @@ void UILayer::resetButtonsFrameID()
 	}
 }
 
-void UILayer::render(sf::RenderWindow & window)
+void UILayer::render(sf::RenderWindow & window) const
 {
-	for (auto& image : m_images)
+	for (const auto& image : m_images)
 	{
 		image.render(window);
 	}
 
-	for (auto& button : m_buttons)
+	for (const auto& button : m_buttons)
 	{
 		button.sprite.render(window);
 	}
 
-	for (auto& textBox : m_textBoxes)
+	for (const auto& textBox : m_textBoxes)
 	{
 		window.draw(textBox.text);
 	}

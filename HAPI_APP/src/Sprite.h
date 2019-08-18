@@ -27,7 +27,7 @@ public:
 	void rotate(float angle);
 	void setOriginAtCenter();
 	void setScale(sf::Vector2f scale);
-	void render(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window) const;
 	void render(sf::RenderWindow& window, const Map& map);
 	void setTexture(const Texture& texture, int frameID = 0);
 	void activate();

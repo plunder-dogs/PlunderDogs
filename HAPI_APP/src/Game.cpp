@@ -39,6 +39,7 @@ Game::Game(const sf::Font& font)
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setImages(std::move(singlePlayerFactionSelectImages));
 
 	//Level Select
+	std::vector<UIComponentButton> singlePlayerFactionSelectButtons;
 
 
 	m_window.setFramerateLimit(120);
@@ -186,49 +187,6 @@ void Game::handleInput()
 					handleSinglePlayerFactionSelectionInput(mouseRect);
 					break;
 				}
-
-
-				//m_UILayers[static_cast<int>(m_currentGameState)]->update(mouseRect);
-				////Main Menu Input
-				//if (m_currentGameState == eGameState::eMainMenu)
-				//{
-				//	for (const auto& textBox : m_mainMenuTextBoxes)
-				//	{
-				//		if (mouseRect.intersects(textBox.AABB))
-				//		{
-				//			switch (textBox.name)
-				//			{
-				//			case eUITextBoxName::ePlaySinglePlayer:
-				//				m_currentGameState = eGameState::eSinglePlayerFactionSelect;
-
-				//				break;
-
-				//			case eUITextBoxName::ePlayerMultiplayer:
-				//				break;
-
-				//			case eUITextBoxName::eQuit:
-				//				quit();
-				//				break;
-				//			}
-				//		}
-				//	}
-				//}
-				////Single Player Faction Select
-				//else if (m_currentGameState == eGameState::eSinglePlayerFactionSelect)
-				//{
-				//	for (auto& button : m_singlePlayerButtons)
-				//	{
-				//		if (mouseRect.intersects(button.AABB))
-				//		{
-				//			button.sprite.incrementFrameID();
-				//		}
-				//	}
-
-				//	if (mouseRect.intersects(m_singlePlayerDoneButton.AABB))
-				//	{
-
-				//	}
-				//}
 			}
 			break;
 		}
@@ -294,29 +252,6 @@ void Game::render()
 
 	m_UILayers[static_cast<int>(m_currentGameState)].render(m_window);
 
-	//switch (m_currentGameState)
-	//{
-	//case eGameState::eMainMenu :
-	//	m_backgroundSprite.render(m_window);
-	//	for (const auto& textBox : m_mainMenuTextBoxes)
-	//	{
-	//		m_window.draw(textBox.text);
-	//	}
-
-	//	break;
-	//case eGameState::eBattle :
-	//	m_battle.render(m_window);
-	//	
-	//	break;
-
-	//case eGameState::eSinglePlayerFactionSelect :
-	//	m_backgroundSprite.render(m_window);
-	//	for (auto& button : m_singlePlayerButtons)
-	//	{
-	//		button.sprite.render(m_window);
-	//	}
-	//	break;
-	//}
 	m_window.draw(mouseShape);
 
 	m_window.display();
