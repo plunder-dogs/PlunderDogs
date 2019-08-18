@@ -10,7 +10,8 @@ class UILayer : private NonCopyable
 public:
 	UILayer();
 
-	UIComponentIntersectionDetails getIntersectionDetails(sf::IntRect mouseRect);
+	void onComponentIntersect(sf::IntRect mouseRect);
+	void onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails& intersectionDetails);
 	
 	void setButtons(std::vector<UIComponentButton>&& buttons);
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);

@@ -1,54 +1,36 @@
 #include "UILayer.h"
 #include <assert.h>
 
-UIComponentIntersectionDetails::UIComponentIntersectionDetails(bool intersected)
-	: m_intersected(intersected),
-	m_type(),
-	m_name(),
-	m_frameID(0)
-{}
-
-UIComponentIntersectionDetails::UIComponentIntersectionDetails(bool intersected, int frameID)
-	: m_intersected(intersected),
-	m_type(),
-	m_name(),
-	m_frameID(frameID)
-{}
-
-bool UIComponentIntersectionDetails::isIntersected() const
-{
-	return m_intersected;
-}
-
-int UIComponentIntersectionDetails::getFrameID() const
-{
-	assert(m_intersected);
-	return m_frameID;
-}
-
-eUIComponentType UIComponentIntersectionDetails::getComponentType()
-{
-	assert(m_intersected);
-	assert(m_type == eUIComponentType::eButton);
-	return m_type;
-}
-
-eUIComponentName UIComponentIntersectionDetails::getComponentName()
-{
-	assert(m_intersected);
-	return m_name;
-}
-
-//UI Layer
 UILayer::UILayer()
 	: m_buttons(),
 	m_textBoxes(),
 	m_images()
 {}
 
-UIComponentIntersectionDetails UILayer::getIntersectionDetails(sf::IntRect mouseRect)
+void UILayer::onComponentIntersect(sf::IntRect mouseRect)
 {
-	UIComponentIntersectionDetails intersectionDetails(false);
+	for (auto& button : m_buttons)
+	{
+		if (button.changeOnIntersect)
+		{
+			if (!button.currentlyIntersected && mouseRect.intersects(button.AABB))
+			{
+				button.sprite.incrementFrameID();
+				button.currentlyIntersected = true;
+				break;
+			}
+			else if (button.currentlyIntersected && !mouseRect.intersects(button.AABB))
+			{
+				button.sprite.incrementFrameID();
+				button.currentlyIntersected = false;
+				break;
+			}
+		}
+	}
+}
+
+void UILayer::onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails & intersectionDetails)
+{
 	for (auto& textBox : m_textBoxes)
 	{
 		if (mouseRect.intersects(textBox.AABB))
@@ -75,8 +57,6 @@ UIComponentIntersectionDetails UILayer::getIntersectionDetails(sf::IntRect mouse
 			}
 		}
 	}
-
-	return intersectionDetails;
 }
 
 void UILayer::setButtons(std::vector<UIComponentButton>&& buttons)

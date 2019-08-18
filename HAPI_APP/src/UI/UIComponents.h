@@ -41,41 +41,25 @@ protected:
 
 struct UIComponentTextBox : public UIComponentBase
 {
-	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name)
-		: UIComponentBase(name),
-		text(message, font)
-	{
-		text.setPosition(sf::Vector2f(position.x, position.y));
-
-		AABB.left = position.x - 5;
-		AABB.top = position.y - 5;
-		AABB.width = static_cast<int>(text.getLocalBounds().width) + 5;
-		AABB.height = static_cast<int>(text.getLocalBounds().height) + 5;
-	}
+	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name);
 
 	sf::Text text;
 };
 
 struct UIComponentButton : public UIComponentBase
 {
-	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name)
-		: UIComponentBase(name),
-		sprite(texture, position, true, false)
-	{
-		AABB.left = position.x;
-		AABB.top = position.y;
-		AABB.width = static_cast<int>(sprite.getSize().x);
-		AABB.height = static_cast<int>(sprite.getSize().y);
-	}
+	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect = false);
 
 	Sprite sprite;
+	bool currentlyIntersected;
+	bool changeOnIntersect;
 };
 
 class UIComponentIntersectionDetails
 {
 	friend class UILayer;
 public:
-	UIComponentIntersectionDetails(bool intersected);
+	UIComponentIntersectionDetails();
 	UIComponentIntersectionDetails(bool intersected, int frameID);
 
 	bool isIntersected() const;

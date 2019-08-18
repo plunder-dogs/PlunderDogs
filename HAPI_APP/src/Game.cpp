@@ -32,11 +32,13 @@ Game::Game(const sf::Font& font)
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("greenSelectBtn.xml"), sf::Vector2i(600, 250), eUIComponentName::eGreenFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("redSelectBtn.xml"), sf::Vector2i(800, 250), eUIComponentName::eRedFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("yellowSelectBtn.xml"), sf::Vector2i(1000, 250), eUIComponentName::eYellowFactionSelect);
-	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(250, 700), eUIComponentName::eBack);
+	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(250, 700), eUIComponentName::eBack, true);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setButtons(std::move(singlePlayerFactionSelectButtons));
 	std::vector<Sprite> singlePlayerFactionSelectImages;
 	singlePlayerFactionSelectImages.emplace_back(Textures::getInstance().getTexture(BACKGROUND), true, false);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setImages(std::move(singlePlayerFactionSelectImages));
+
+	//Level Select
 
 
 	m_window.setFramerateLimit(120);
@@ -53,7 +55,6 @@ Game::Game(const sf::Font& font)
 	//	assignFaction(eFactionName::eYellow, eFactionControllerType::eLocalPlayer,
 	//		{ eShipType::eFrigate, eShipType::eFrigate , eShipType::eFrigate , eShipType::eFrigate ,
 	//		eShipType::eFrigate, eShipType::eFrigate });
-
 	//	m_factions[static_cast<int>(eFactionName::eRed)].m_controllerType = eFactionControllerType::eAI;
 	//	AIHandler::getInstance().loadShips(m_factions[static_cast<int>(eFactionName::eRed)]);
 	//	m_battle.startSinglePlayerGame("level3.tmx");
@@ -160,7 +161,6 @@ void Game::handleInput()
 	while (m_window.pollEvent(m_currentSFMLEvent))
 	{
 		sf::Vector2i mousePosition = sf::Mouse::getPosition(m_window);
-		//mousePosition += MOUSE_POSITION_OFFSET;
 		sf::IntRect mouseRect(mousePosition, sf::Vector2i(5, 5));
 		mouseShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
 
@@ -170,6 +170,10 @@ void Game::handleInput()
 			quit();
 			break;
 
+		case sf::Event::MouseMoved :
+			m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].onComponentIntersect(mouseRect);
+			break;
+		
 		case sf::Event::MouseButtonPressed :
 			if (m_currentSFMLEvent.mouseButton.button == sf::Mouse::Left)
 			{
@@ -247,7 +251,8 @@ void Game::handleInput()
 
 void Game::handleMainMenuInput(sf::IntRect mouseRect)
 {
-	auto intersectionDetails = m_UILayers[static_cast<int>(m_currentGameState)].getIntersectionDetails(mouseRect);
+	UIComponentIntersectionDetails intersectionDetails;
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())
@@ -269,7 +274,8 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 
 void Game::handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect)
 {
-	auto intersectionDetails = m_UILayers[static_cast<int>(m_currentGameState)].getIntersectionDetails(mouseRect);
+	UIComponentIntersectionDetails intersectionDetails;
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())

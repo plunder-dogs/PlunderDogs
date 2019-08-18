@@ -193,6 +193,7 @@
     <ClCompile Include="src\Textures.cpp" />
     <ClCompile Include="src\TileArea.cpp" />
     <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="src\UI\UIComponents.cpp" />
     <ClCompile Include="src\UI\UILayer.cpp" />
     <ClCompile Include="src\Utilities\Base64.cpp" />
     <ClCompile Include="src\PathFinding.cpp" />
