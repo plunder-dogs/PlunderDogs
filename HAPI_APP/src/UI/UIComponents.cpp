@@ -2,8 +2,8 @@
 #include <assert.h>
 
 //UI Component Text Box
-UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name)
-	: UIComponentBase(name),
+UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name, bool visible)
+	: UIComponentBase(name, visible),
 	text(message, font)
 {
 	text.setPosition(sf::Vector2f(position.x, position.y));
@@ -15,8 +15,8 @@ UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Fo
 }
 
 //UI Component Button
-UIComponentButton::UIComponentButton(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect)
-	: UIComponentBase(name),
+UIComponentButton::UIComponentButton(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect, bool visible)
+	: UIComponentBase(name, visible),
 	sprite(texture, position, true, false),
 	currentlyIntersected(false),
 	changeOnIntersect(changeOnIntersect)

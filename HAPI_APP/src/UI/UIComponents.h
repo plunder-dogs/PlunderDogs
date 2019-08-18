@@ -24,6 +24,7 @@ enum class eUIComponentName
 	ePlayerMultiplayer,
 	eBack,
 	eDone,
+	eAlert,
 	eQuit
 };
 
@@ -37,9 +38,10 @@ struct UIComponentBase
 {
 	const eUIComponentName name;
 	sf::IntRect AABB;
+	bool visible;
 
 protected:
-	UIComponentBase(eUIComponentName name)
+	UIComponentBase(eUIComponentName name, bool visible = true)
 		: name(name),
 		AABB()
 	{}
@@ -47,14 +49,14 @@ protected:
 
 struct UIComponentTextBox : public UIComponentBase
 {
-	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name);
+	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, bool visible = true);
 
 	sf::Text text;
 };
 
 struct UIComponentButton : public UIComponentBase
 {
-	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect = false);
+	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect = false, bool visible = true);
 
 	Sprite sprite;
 	bool currentlyIntersected;
