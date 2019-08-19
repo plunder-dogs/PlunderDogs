@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="endPhaseButtons_surface.png">
+	<SubTexture name="AutoFrame" x="0" y="0" width="350" height="111">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="350" top="0" bottom="111" />
+			<Circle name="BoundingCircle" type="0" radius="183.589890" y="55.000000" x="175.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame0" x="350" y="0" width="352" height="110">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="352" top="0" bottom="110" />
+			<Circle name="BoundingCircle" type="0" radius="184.393600" y="55.000000" x="176.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame1" x="702" y="0" width="351" height="108">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="351" top="0" bottom="108" />
+			<Circle name="BoundingCircle" type="0" radius="183.619858" y="54.000000" x="175.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame2" x="1054" y="0" width="351" height="108">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="351" top="0" bottom="108" />
+			<Circle name="BoundingCircle" type="0" radius="183.619858" y="54.000000" x="175.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>
