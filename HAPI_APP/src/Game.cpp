@@ -56,27 +56,26 @@ Game::Game(const sf::Font& font)
 
 	//Battle - UI
 	std::vector<UIComponentButton> battleButtons;
-	//battleButtons.reserve(size_t(2));
 	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
 	m_UILayers[static_cast<int>(eGameState::eBattle)].setButtons(std::move(battleButtons));
-
-	class Projectile
-	{
-		sf::Sprite m_sprite;
-		sf::Vector2f m_position;
-	};
+	std::vector<UIComponentImage> battleImages;
+	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
+	m_UILayers[static_cast<int>(eGameState::eBattle)].setImages(std::move(battleImages));
 
 	m_window.setFramerateLimit(120);
 
 	m_mouseShape.setFillColor(sf::Color::Red);
 	m_mouseShape.setSize(sf::Vector2f(25, 25));
 
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onDeploymentFinished, this, std::placeholders::_1), eGameEvent::eFinishedDeployment);
+	//Subscribe to events
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onAllFactionsFinishedDeployment, this, std::placeholders::_1), eGameEvent::eAllFactionsFinishedDeployment);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onNewFactionTurn, this, std::placeholders::_1), eGameEvent::eEnteredNewFactionTurn);
 }
 
 Game::~Game()
 {
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFinishedDeployment);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eAllFactionsFinishedDeployment);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewFactionTurn);
 }
 
 void Game::run()
@@ -392,8 +391,27 @@ void Game::quit()
 	m_battle.quitGame();
 }
 
-void Game::onDeploymentFinished(GameEvent gameEvent)
+void Game::onAllFactionsFinishedDeployment(GameEvent gameEvent)
 {
 	assert(m_battle.getCurrentBattlePhase() != eBattlePhase::Deployment);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
+}
+
+void Game::onNewFactionTurn(GameEvent gameEvent)
+{
+	switch (m_battle.getCurrentFaction().m_factionName)
+	{
+	case eFactionName::eYellow :
+		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 0);
+		break;
+	case eFactionName::eBlue :
+		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 1);
+		break;
+	case eFactionName::eGreen :
+		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 2);
+		break;
+	case eFactionName::eRed :
+		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 3);
+		break;
+	}
 }

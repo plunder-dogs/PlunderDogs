@@ -40,3 +40,4 @@ backButton.xml Data/
 GameBackGround.xml Data/
 EndPhaseButtons.xml Data/
 pauseButton.xml Data/
+playerFlags.xml Data/

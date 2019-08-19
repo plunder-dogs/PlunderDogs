@@ -14,7 +14,8 @@ enum eGameEvent
 	eEnteredAITurn,
 	eLeftAITurn,
 	//New Events
-	eFinishedDeployment
+	eAllFactionsFinishedDeployment,
+	eEnteredNewFactionTurn
 };
 
 struct GameEvent

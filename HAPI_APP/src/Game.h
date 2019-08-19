@@ -49,5 +49,6 @@ private:
 	void quit();
 
 	//UI Events
-	void onDeploymentFinished(GameEvent gameEvent);
+	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
+	void onNewFactionTurn(GameEvent gameEvent);
 };

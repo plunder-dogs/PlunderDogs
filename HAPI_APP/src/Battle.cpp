@@ -229,6 +229,7 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 			m_currentFactionTurn = static_cast<int>(faction.m_factionName);
 			playerFound = true;
 			m_currentDeploymentState = eDeploymentState::DeployingPlayer;
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 			break;
 		}
 	}
@@ -238,6 +239,8 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 		//Advance to next AI to deploy
 		advanceToNextBattlePhase(); 
 	}
+
+	
 }
 
 void Battle::render(sf::RenderWindow& window)
@@ -631,6 +634,7 @@ void Battle::advanceToNextBattlePhase()
 				//Faction hasn't been deployed - begin to deploy faction
 				if (!m_factions[i].m_ships[0].isDeployed())
 				{
+					GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 					m_currentFactionTurn = i;
 					allFactionsDeployed = false;
 					allPlayersDeployed = false;
@@ -670,6 +674,7 @@ void Battle::advanceToNextBattlePhase()
 			m_currentDeploymentState = eDeploymentState::Finished;
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eAllFactionsFinishedDeployment);
 			m_currentFactionTurn = 0;
+			incrementFactionTurn();
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
 				ship.enableAction();
@@ -688,6 +693,8 @@ void Battle::advanceToNextBattlePhase()
 					faction.clearSpawnArea();
 				}
 			}
+
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 		}
 	}
 	else if (m_currentBattlePhase == eBattlePhase::Movement)
@@ -725,6 +732,8 @@ void Battle::advanceToNextBattlePhase()
 		{
 			m_timeUntilAITurn.setActive(true);
 		}
+
+		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 	}
 }
 
