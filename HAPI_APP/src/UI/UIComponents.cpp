@@ -16,16 +16,10 @@ UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Fo
 
 //UI Component Button
 UIComponentButton::UIComponentButton(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect, bool visible)
-	: UIComponentBase(name, visible),
-	sprite(texture, position, true, false),
+	: UIComponentImage(texture, position, name, visible),
 	currentlyIntersected(false),
 	changeOnIntersect(changeOnIntersect)
-{
-	AABB.left = position.x;
-	AABB.top = position.y;
-	AABB.width = static_cast<int>(sprite.getSize().x);
-	AABB.height = static_cast<int>(sprite.getSize().y);
-}
+{}
 
 //UI Component Intersection Details
 UIComponentIntersectionDetails::UIComponentIntersectionDetails()
@@ -64,4 +58,14 @@ eUIComponentName UIComponentIntersectionDetails::getComponentName()
 {
 	assert(m_intersected);
 	return m_name;
+}
+
+UIComponentImage::UIComponentImage(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool visible)
+	: UIComponentBase(name, visible),
+	sprite(texture, position, visible, false)
+{
+	AABB.left = position.x;
+	AABB.top = position.y;
+	AABB.width = static_cast<int>(sprite.getSize().x);
+	AABB.height = static_cast<int>(sprite.getSize().y);
 }

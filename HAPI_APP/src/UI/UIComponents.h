@@ -22,16 +22,20 @@ enum class eUIComponentName
 	eLevelFiveSelect,
 	ePlaySinglePlayer,
 	ePlayerMultiplayer,
+	eEndPhase,
 	eBack,
 	eDone,
 	eAlert,
-	eQuit
+	eQuit,
+	MainMenuBackground,
+	GameBackground
 };
 
 enum class eUIComponentType
 {
 	eTextBox = 0,
-	eButton
+	eButton,
+	eImage
 };
 
 struct UIComponentBase
@@ -48,6 +52,13 @@ protected:
 	{}
 };
 
+struct UIComponentImage : public UIComponentBase
+{
+	UIComponentImage(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool visible = true);
+
+	Sprite sprite;
+};
+
 struct UIComponentTextBox : public UIComponentBase
 {
 	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, bool visible = true);
@@ -55,11 +66,10 @@ struct UIComponentTextBox : public UIComponentBase
 	sf::Text text;
 };
 
-struct UIComponentButton : public UIComponentBase
+struct UIComponentButton : public UIComponentImage
 {
 	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect = false, bool visible = true);
 
-	Sprite sprite;
 	bool currentlyIntersected;
 	bool changeOnIntersect;
 };
