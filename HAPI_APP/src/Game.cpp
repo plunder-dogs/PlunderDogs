@@ -70,12 +70,16 @@ Game::Game(const sf::Font& font)
 	//Subscribe to events
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onAllFactionsFinishedDeployment, this, std::placeholders::_1), eGameEvent::eAllFactionsFinishedDeployment);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onNewFactionTurn, this, std::placeholders::_1), eGameEvent::eEnteredNewFactionTurn);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onEnteredAITurn, this, std::placeholders::_1), eGameEvent::eEnteredAITurn);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onLeftAITurn, this, std::placeholders::_1), eGameEvent::eLeftAITurn);
 }
 
 Game::~Game()
 {
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eAllFactionsFinishedDeployment);
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewFactionTurn);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredAITurn);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eLeftAITurn);
 }
 
 void Game::run()
@@ -414,4 +418,16 @@ void Game::onNewFactionTurn(GameEvent gameEvent)
 		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 3);
 		break;
 	}
+}
+
+void Game::onEnteredAITurn(GameEvent gameEvent)
+{
+	assert(m_battle.getCurrentFaction().m_controllerType == eFactionControllerType::eAI);
+	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, false);
+}
+
+void Game::onLeftAITurn(GameEvent gameEvent)
+{
+	assert(m_battle.getCurrentFaction().m_controllerType != eFactionControllerType::eAI);
+	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
 }

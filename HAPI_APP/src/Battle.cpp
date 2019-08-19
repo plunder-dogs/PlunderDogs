@@ -680,9 +680,16 @@ void Battle::advanceToNextBattlePhase()
 				ship.enableAction();
 			}
 
+			//Clear faction spawn area
+			for (auto& faction : m_factions)
+			{
+				faction.clearSpawnArea();
+			}
+
 			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
+				GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredAITurn);
 			}
 
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
@@ -721,7 +728,12 @@ void Battle::advanceToNextBattlePhase()
 
 		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
 		{
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredAITurn);
 			m_timeUntilAITurn.setActive(true);
+		}
+		else if(!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+		{
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eLeftAITurn);
 		}
 
 		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);

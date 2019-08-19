@@ -25,7 +25,7 @@ void UILayer::onComponentIntersect(sf::IntRect mouseRect)
 {
 	for (auto& button : m_buttons)
 	{
-		if (button.changeOnIntersect)
+		if (button.visible && button.changeOnIntersect)
 		{
 			if (!button.currentlyIntersected && mouseRect.intersects(button.AABB))
 			{
@@ -60,7 +60,7 @@ void UILayer::onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectio
 	{
 		for (auto& button : m_buttons)
 		{
-			if (mouseRect.intersects(button.AABB))
+			if (button.visible && mouseRect.intersects(button.AABB))
 			{
 				button.sprite.incrementFrameID();
 

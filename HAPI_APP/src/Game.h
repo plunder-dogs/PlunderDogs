@@ -51,4 +51,6 @@ private:
 	//UI Events
 	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
 	void onNewFactionTurn(GameEvent gameEvent);
+	void onEnteredAITurn(GameEvent gameEvent);
+	void onLeftAITurn(GameEvent gameEvent);
 };
