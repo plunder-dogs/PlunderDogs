@@ -11,6 +11,7 @@ class Game : private NonCopyable
 {
 public:
 	Game(const sf::Font& font);
+	~Game();
 
 	void run();
 
@@ -46,4 +47,7 @@ private:
 	eFactionName getLocalControlledFaction() const;
 
 	void quit();
+
+	//UI Events
+	void onDeploymentFinished(GameEvent gameEvent);
 };

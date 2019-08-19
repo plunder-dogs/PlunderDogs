@@ -669,6 +669,7 @@ void Battle::advanceToNextBattlePhase()
 		{
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eFinishedDeployment);
 			m_currentFactionTurn = 0;
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{

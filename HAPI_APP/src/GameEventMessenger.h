@@ -12,7 +12,9 @@ enum eGameEvent
 	eEndBattlePhaseEarly,
 	eUnableToSkipPhase,
 	eEnteredAITurn,
-	eLeftAITurn
+	eLeftAITurn,
+	//New Events
+	eFinishedDeployment
 };
 
 struct GameEvent
