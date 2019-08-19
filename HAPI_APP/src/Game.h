@@ -39,6 +39,7 @@ private:
 	void fillFaction(eFactionName factionName, int frameID);
 	eFactionName getLocalControlledFaction() const;
 	void quit();
+	void resetAllFactions();
 
 	//UI
 	void handleInput();

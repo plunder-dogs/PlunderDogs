@@ -56,6 +56,7 @@ Game::Game(const sf::Font& font)
 	//Battle - UI
 	std::vector<UIComponentButton> battleButtons;
 	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
+	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
 	m_UILayers[static_cast<int>(eGameState::eBattle)].setButtons(std::move(battleButtons));
 	std::vector<UIComponentImage> battleImages;
 	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
@@ -292,32 +293,31 @@ void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
 	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
-		assert(m_battle);
 		switch (intersectionDetails.getComponentName())
 		{
 		case eUIComponentName::eLevelOneSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle = Battle::startSinglePlayerGame(m_factions, "level1tmx.");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level1.tmx");
 			break;
 
 		case eUIComponentName::eLevelTwoSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle = Battle::startSinglePlayerGame(m_factions, "level2tmx.");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level2.tmx");
 			break;
 		
 		case eUIComponentName::eLevelThreeSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle = Battle::startSinglePlayerGame(m_factions, "level3tmx.");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level3.tmx");
 			break;
 		
 		case eUIComponentName::eLevelFourSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle = Battle::startSinglePlayerGame(m_factions, "level4tmx.");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level4.tmx");
 			break;
 		
 		case eUIComponentName::eLevelFiveSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle = Battle::startSinglePlayerGame(m_factions, "level5tmx.");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level5.tmx");
 			break;
 
 		case eUIComponentName::eBack :
@@ -345,6 +345,11 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 		case eUIComponentName::eEndPhase :
 			m_battle->endCurrentBattlePhase();
 			break;
+		case eUIComponentName::ePause :
+			m_battle.reset();
+			resetAllFactions();
+			m_currentGameState = eGameState::eMainMenu;
+			break;
 		}
 	}
 }
@@ -352,7 +357,6 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 void Game::render()
 {
 	m_window.clear(sf::Color::Black);
-
 	if(m_currentGameState == eGameState::eBattle)
 	{
 		assert(m_battle);
@@ -428,6 +432,16 @@ void Game::quit()
 	m_window.close();
 }
 
+void Game::resetAllFactions()
+{
+	for (auto& faction : m_factions)
+	{
+		faction.m_controllerType = eFactionControllerType::None;
+		faction.m_ships.clear();
+		faction.m_spawnArea.clearTileArea();
+	}
+}
+
 void Game::onAllFactionsFinishedDeployment(GameEvent gameEvent)
 {
 	assert(m_battle && m_battle->getCurrentBattlePhase() != eBattlePhase::Deployment);
@@ -436,7 +450,7 @@ void Game::onAllFactionsFinishedDeployment(GameEvent gameEvent)
 
 void Game::onNewFactionTurn(GameEvent gameEvent)
 {
-	assert(m_battle);
+	assert(m_currentGameState == eGameState::eBattle);
 	switch (m_battle->getCurrentFaction().m_factionName)
 	{
 	case eFactionName::eYellow :

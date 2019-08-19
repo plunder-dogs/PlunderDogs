@@ -68,6 +68,24 @@ public:
 		}
 	}
 
+	void addGameEventToQueue(eGameEvent gameEvent)
+	{
+		gameEventQueue.push_back(gameEvent);
+	}
+
+	void update()
+	{
+		if (!gameEventQueue.empty())
+		{
+			for (eGameEvent gameEvent : gameEventQueue)
+			{
+
+			}
+
+			gameEventQueue.clear();
+		}
+	}
+
 	void broadcast(GameEvent message, eGameEvent gameEvent)
 	{
 		auto iter = m_listeners.find(gameEvent);
@@ -94,4 +112,5 @@ public:
 
 private:
 	std::unordered_map<eGameEvent, std::vector<Listener>> m_listeners;
+	std::vector<eGameEvent> gameEventQueue;
 };

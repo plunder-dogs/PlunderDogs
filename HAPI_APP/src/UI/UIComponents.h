@@ -29,7 +29,8 @@ enum class eUIComponentName
 	eQuit,
 	MainMenuBackground,
 	eGameBackground,
-	eFactionFlags
+	eFactionFlags,
+	ePause
 };
 
 enum class eUIComponentType

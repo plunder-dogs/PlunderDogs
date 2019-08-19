@@ -18,6 +18,9 @@ class Battle : private NonCopyable
 	};
 
 public:
+	//
+	//TODO: Make constructor private somehow
+	//
 	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions);
 	~Battle();
 
@@ -55,7 +58,6 @@ public:
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
-
 	std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& m_factions;
 	Map m_map;
 	eBattlePhase m_currentBattlePhase;
