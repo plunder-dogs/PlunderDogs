@@ -18,10 +18,11 @@ public:
 
 	void activateTimedVisibilityComponent(eUIComponentName componentName, eUIComponentType componentType);
 	void setComponentVisibility(eUIComponentName componentName, eUIComponentType componentType, bool visible);
+	void setComponentFrameID(eUIComponentName componentName, eUIComponentType componentType, int frameID);
 	
 	void setButtons(std::vector<UIComponentButton>&& buttons);
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);
-	void setImages(std::vector<Sprite>&& images);
+	void setImages(std::vector<UIComponentImage>&& images);
 
 	void resetButtons();
 
@@ -31,7 +32,7 @@ public:
 private:
 	std::vector<UIComponentButton> m_buttons;
 	std::vector<UIComponentTextBox> m_textBoxes;
-	std::vector<Sprite> m_images;
+	std::vector<UIComponentImage> m_images;
 
 	UIComponentButton* m_timedVisibleButton;
 	UIComponentTextBox* m_timedVisibleTextBox;

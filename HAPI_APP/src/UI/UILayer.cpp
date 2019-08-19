@@ -121,6 +121,27 @@ void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponen
 	}
 }
 
+void UILayer::setComponentFrameID(eUIComponentName componentName, eUIComponentType componentType, int frameID)
+{
+	switch (componentType)
+	{
+	case eUIComponentType::eButton :
+	{
+		auto iter = std::find_if(m_buttons.begin(), m_buttons.end(), [componentName](const auto& button) { return button.name == componentName; });
+		assert(iter != m_buttons.end());
+		iter->sprite.setFrameID(frameID);
+		break;
+	}
+		
+	case eUIComponentType::eImage :
+	{
+		auto iter = std::find_if(m_images.begin(), m_images.end(), [componentName](const auto& image) { return image.name == componentName; });
+		assert(iter != m_images.end());
+		iter->sprite.setFrameID(frameID);
+	}
+	}
+}
+
 void UILayer::setButtons(std::vector<UIComponentButton>&& buttons)
 {
 	assert(m_buttons.empty());
@@ -133,7 +154,7 @@ void UILayer::setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes)
 	m_textBoxes = std::move(textBoxes);
 }
 
-void UILayer::setImages(std::vector<Sprite>&& images)
+void UILayer::setImages(std::vector<UIComponentImage>&& images)
 {
 	assert(m_images.empty());
 	m_images = std::move(images);
@@ -174,7 +195,7 @@ void UILayer::render(sf::RenderWindow & window) const
 {
 	for (const auto& image : m_images)
 	{
-		image.render(window);
+		image.sprite.render(window);
 	}
 
 	for (const auto& button : m_buttons)
