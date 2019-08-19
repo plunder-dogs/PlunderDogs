@@ -99,6 +99,28 @@ void UILayer::activateTimedVisibilityComponent(eUIComponentName componentName, e
 	}
 }
 
+void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponentType componentType, bool visible)
+{
+	switch (componentType)
+	{
+	case eUIComponentType::eButton:
+	{
+		auto iter = std::find_if(m_buttons.begin(), m_buttons.end(), [componentName](const auto& button) { return button.name == componentName; });
+		assert(iter != m_buttons.end());
+		iter->visible = visible;
+		break;
+	}
+
+	case eUIComponentType::eTextBox:
+	{
+		auto iter = std::find_if(m_textBoxes.begin(), m_textBoxes.end(), [componentName](const auto& textBox) { return textBox.name == componentName; });
+		assert(iter != m_textBoxes.end());
+		iter->visible = visible;
+		break;
+	}
+	}
+}
+
 void UILayer::setButtons(std::vector<UIComponentButton>&& buttons)
 {
 	assert(m_buttons.empty());
