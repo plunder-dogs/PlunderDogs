@@ -26,28 +26,26 @@ private:
 	sf::RenderWindow m_window;
 	eGameState m_currentGameState;
 	bool m_ready;
-	Battle m_battle;
+	std::unique_ptr<Battle> m_battle;
 	sf::Event m_currentSFMLEvent;
 	sf::Clock m_gameClock;
 	float m_deltaTime;
-	
-	//UI
 	std::array<UILayer, static_cast<size_t>(eGameState::Total)> m_UILayers;
 	sf::RectangleShape m_mouseShape;
 
 	void handleServerMessages();
-	void handleInput();
-	void handleMainMenuInput(sf::IntRect mouseRect);
-	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
-	void handleLevelSelectionInput(sf::IntRect mouseRect);
-
 	void render();
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
 	void fillFaction(eFactionName factionName, int frameID);
 	eFactionName getLocalControlledFaction() const;
-
 	void quit();
 
+	//UI
+	void handleInput();
+	void handleMainMenuInput(sf::IntRect mouseRect);
+	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
+	void handleLevelSelectionInput(sf::IntRect mouseRect);
+	void handleBattleInput(sf::IntRect mouseRect);
 	//UI Events
 	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
 	void onNewFactionTurn(GameEvent gameEvent);

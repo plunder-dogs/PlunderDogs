@@ -9,7 +9,6 @@ Game::Game(const sf::Font& font)
 	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
 	m_currentGameState(eGameState::eMainMenu),
 	m_ready(false),
-	m_battle(m_factions),
 	m_currentSFMLEvent(),
 	m_gameClock(),
 	m_deltaTime(m_gameClock.restart().asSeconds())
@@ -91,7 +90,8 @@ void Game::run()
 		m_UILayers[static_cast<int>(m_currentGameState)].update(m_deltaTime);
 		if (m_currentGameState == eGameState::eBattle)
 		{
-			m_battle.update(m_deltaTime);
+			assert(m_battle);
+			m_battle->update(m_deltaTime);
 		}
 
 		render();
@@ -153,7 +153,12 @@ void Game::handleServerMessages()
 			break;
 		case eMessageType::eStartOnlineGame :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startOnlineGame(receivedServerMessage.levelName, receivedServerMessage.spawnPositions);
+			m_battle = Battle::startOnlineGame(m_factions, receivedServerMessage.levelName, receivedServerMessage.spawnPositions);
+			if (!m_battle)
+			{
+				//Battle failed to load
+				m_currentGameState = eGameState::eMainMenu;
+			}
 			break;
 		case eMessageType::eRefuseConnection :
 			std::cout << "Connection Refused\n";
@@ -165,7 +170,8 @@ void Game::handleServerMessages()
 		case eMessageType::eClientDisconnected :
 			if (getLocalControlledFaction() != receivedServerMessage.faction)
 			{
-				m_battle.receiveServerMessage(receivedServerMessage);
+				assert(m_battle);
+				m_battle->receiveServerMessage(receivedServerMessage);
 			}
 			break;
 		}
@@ -204,6 +210,9 @@ void Game::handleInput()
 				case eGameState::eLevelSelection :
 					handleLevelSelectionInput(mouseRect);
 					break;
+				case eGameState::eBattle :
+					handleBattleInput(mouseRect);
+					break;
 				}
 			}
 			break;
@@ -211,7 +220,8 @@ void Game::handleInput()
 
 		if (m_currentGameState == eGameState::eBattle)
 		{
-			m_battle.handleInput(m_window, m_currentSFMLEvent);
+			assert(m_battle);
+			m_battle->handleInput(m_window, m_currentSFMLEvent);
 		}
 	}
 }
@@ -282,35 +292,58 @@ void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
 	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
+		assert(m_battle);
 		switch (intersectionDetails.getComponentName())
 		{
 		case eUIComponentName::eLevelOneSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startSinglePlayerGame("level1.tmx");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level1tmx.");
 			break;
 
 		case eUIComponentName::eLevelTwoSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startSinglePlayerGame("level2.tmx");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level2tmx.");
 			break;
 		
 		case eUIComponentName::eLevelThreeSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startSinglePlayerGame("level3.tmx");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level3tmx.");
 			break;
 		
 		case eUIComponentName::eLevelFourSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startSinglePlayerGame("level4.tmx");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level4tmx.");
 			break;
 		
 		case eUIComponentName::eLevelFiveSelect :
 			m_currentGameState = eGameState::eBattle;
-			m_battle.startSinglePlayerGame("level5.tmx");
+			m_battle = Battle::startSinglePlayerGame(m_factions, "level5tmx.");
 			break;
 
 		case eUIComponentName::eBack :
 			m_currentGameState = eGameState::eMainMenu;
+			break;
+		}
+
+		//Battle failed to load
+		if (m_currentGameState == eGameState::eBattle && !m_battle)
+		{
+			m_currentGameState = eGameState::eMainMenu;
+		}
+	}
+}
+
+void Game::handleBattleInput(sf::IntRect mouseRect)
+{
+	UIComponentIntersectionDetails intersectionDetails;
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	if (intersectionDetails.isIntersected())
+	{
+		assert(m_battle);
+		switch (intersectionDetails.getComponentName())
+		{
+		case eUIComponentName::eEndPhase :
+			m_battle->endCurrentBattlePhase();
 			break;
 		}
 	}
@@ -322,7 +355,8 @@ void Game::render()
 
 	if(m_currentGameState == eGameState::eBattle)
 	{
-		m_battle.render(m_window);
+		assert(m_battle);
+		m_battle->render(m_window);
 	}
 	m_UILayers[static_cast<int>(m_currentGameState)].render(m_window);
 	m_window.draw(m_mouseShape);
@@ -392,18 +426,18 @@ void Game::quit()
 	}
 
 	m_window.close();
-	m_battle.quitGame();
 }
 
 void Game::onAllFactionsFinishedDeployment(GameEvent gameEvent)
 {
-	assert(m_battle.getCurrentBattlePhase() != eBattlePhase::Deployment);
+	assert(m_battle && m_battle->getCurrentBattlePhase() != eBattlePhase::Deployment);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
 }
 
 void Game::onNewFactionTurn(GameEvent gameEvent)
 {
-	switch (m_battle.getCurrentFaction().m_factionName)
+	assert(m_battle);
+	switch (m_battle->getCurrentFaction().m_factionName)
 	{
 	case eFactionName::eYellow :
 		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 0);
@@ -422,12 +456,12 @@ void Game::onNewFactionTurn(GameEvent gameEvent)
 
 void Game::onEnteredAITurn(GameEvent gameEvent)
 {
-	assert(m_battle.getCurrentFaction().m_controllerType == eFactionControllerType::eAI);
+	assert(m_battle && m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eAI);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, false);
 }
 
 void Game::onLeftAITurn(GameEvent gameEvent)
 {
-	assert(m_battle.getCurrentFaction().m_controllerType != eFactionControllerType::eAI);
+	assert(m_battle && m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eAI);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
 }

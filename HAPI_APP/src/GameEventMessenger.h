@@ -9,8 +9,7 @@ enum eGameEvent
 {
 	eEnteredNewBattlePhase,
 	eFactionShipDestroyed,
-	eEndBattlePhaseEarly,
-	eUnableToSkipPhase,
+	eUnableToEndMovementPhase,
 	eEnteredAITurn,
 	eLeftAITurn,
 	//New Events
