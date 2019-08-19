@@ -84,7 +84,7 @@ void UILayer::activateTimedVisibilityComponent(eUIComponentName componentName, e
 		iter->visible = true;
 		m_timedVisibleButton = &(*iter);
 		m_componentVisiblityTimer.setActive(true);
-		break;
+		return;
 	}
 
 	case eUIComponentType::eTextBox:
@@ -94,9 +94,11 @@ void UILayer::activateTimedVisibilityComponent(eUIComponentName componentName, e
 		iter->visible = true;
 		m_timedVisibleTextBox = &(*iter);
 		m_componentVisiblityTimer.setActive(true);
-		break;
+		return;
 	}
 	}
+
+	assert(false);
 }
 
 void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponentType componentType, bool visible)
@@ -108,7 +110,7 @@ void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponen
 		auto iter = std::find_if(m_buttons.begin(), m_buttons.end(), [componentName](const auto& button) { return button.name == componentName; });
 		assert(iter != m_buttons.end());
 		iter->visible = visible;
-		break;
+		return;
 	}
 
 	case eUIComponentType::eTextBox:
@@ -116,9 +118,11 @@ void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponen
 		auto iter = std::find_if(m_textBoxes.begin(), m_textBoxes.end(), [componentName](const auto& textBox) { return textBox.name == componentName; });
 		assert(iter != m_textBoxes.end());
 		iter->visible = visible;
-		break;
+		return;
 	}
 	}
+
+	assert(false);
 }
 
 void UILayer::setComponentFrameID(eUIComponentName componentName, eUIComponentType componentType, int frameID)
@@ -130,7 +134,7 @@ void UILayer::setComponentFrameID(eUIComponentName componentName, eUIComponentTy
 		auto iter = std::find_if(m_buttons.begin(), m_buttons.end(), [componentName](const auto& button) { return button.name == componentName; });
 		assert(iter != m_buttons.end());
 		iter->sprite.setFrameID(frameID);
-		break;
+		return;
 	}
 		
 	case eUIComponentType::eImage :
@@ -138,8 +142,11 @@ void UILayer::setComponentFrameID(eUIComponentName componentName, eUIComponentTy
 		auto iter = std::find_if(m_images.begin(), m_images.end(), [componentName](const auto& image) { return image.name == componentName; });
 		assert(iter != m_images.end());
 		iter->sprite.setFrameID(frameID);
+		return;
 	}
 	}
+
+	assert(false);
 }
 
 void UILayer::setButtons(std::vector<UIComponentButton>&& buttons)

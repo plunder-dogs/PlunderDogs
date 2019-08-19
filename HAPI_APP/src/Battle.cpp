@@ -101,6 +101,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 		for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 		{
 			if (!ship.isDead() && !ship.isWeaponFired())
+			if (!ship.isDead() && !ship.isWeaponFired())
 			{
 				AIHandler::getInstance().handleShootingPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
 				m_timeBetweenAIUnits.reset();
@@ -634,10 +635,10 @@ void Battle::advanceToNextBattlePhase()
 				//Faction hasn't been deployed - begin to deploy faction
 				if (!m_factions[i].m_ships[0].isDeployed())
 				{
-					GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 					m_currentFactionTurn = i;
 					allFactionsDeployed = false;
 					allPlayersDeployed = false;
+					GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 					break;
 				}
 			}
@@ -673,7 +674,6 @@ void Battle::advanceToNextBattlePhase()
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eAllFactionsFinishedDeployment);
-			m_currentFactionTurn = 0;
 			incrementFactionTurn();
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
@@ -683,15 +683,6 @@ void Battle::advanceToNextBattlePhase()
 			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
 			{
 				m_timeUntilAITurn.setActive(true);
-			}
-
-			//Clear all faction spawn areas
-			for (auto& faction : m_factions)
-			{
-				if (faction.isActive())
-				{
-					faction.clearSpawnArea();
-				}
 			}
 
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);

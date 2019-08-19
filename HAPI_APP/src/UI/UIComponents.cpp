@@ -62,7 +62,7 @@ eUIComponentName UIComponentIntersectionDetails::getComponentName()
 
 UIComponentImage::UIComponentImage(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool visible)
 	: UIComponentBase(name, visible),
-	sprite(texture, position, visible, false)
+	sprite(texture, position, true, false)
 {
 	AABB.left = position.x;
 	AABB.top = position.y;
