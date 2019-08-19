@@ -38,3 +38,5 @@ level4Button.xml Data/
 level5Button.xml Data/
 backButton.xml Data/
 GameBackGround.xml Data/
+EndPhaseButtons.xml Data/
+pauseButton.xml Data/
