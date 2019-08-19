@@ -220,24 +220,23 @@ void Battle::startSinglePlayerGame(const std::string & levelName)
 		}
 	}
 
+	//Find player to deploy first
 	bool playerFound = false;
 	for (const auto& faction : m_factions)
 	{
 		if (faction.isActive() && faction.m_controllerType == eFactionControllerType::eLocalPlayer)
 		{
+			m_currentFactionTurn = static_cast<int>(faction.m_factionName);
 			playerFound = true;
+			m_currentDeploymentState = eDeploymentState::DeployingPlayer;
 			break;
 		}
 	}
-
-	//Set initial deployment state
-	if (playerFound)
-	{
-		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
-	}
-	else
+	if (m_currentDeploymentState == eDeploymentState::NotStarted)
 	{
 		m_currentDeploymentState = eDeploymentState::DeployingAI;
+		//Advance to next AI to deploy
+		advanceToNextBattlePhase(); 
 	}
 }
 
@@ -669,7 +668,7 @@ void Battle::advanceToNextBattlePhase()
 		{
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eFinishedDeployment);
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eAllFactionsFinishedDeployment);
 			m_currentFactionTurn = 0;
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
