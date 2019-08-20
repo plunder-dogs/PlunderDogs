@@ -179,7 +179,7 @@ std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static
 				battle->m_currentFactionTurn = static_cast<int>(faction.m_factionName);
 				playerFound = true;
 				battle->m_currentDeploymentState = eDeploymentState::DeployingPlayer;
-				GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
+				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
 				break;
 			}
 		}

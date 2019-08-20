@@ -331,6 +331,8 @@ void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
 		{
 			m_currentGameState = eGameState::eMainMenu;
 		}
+
+		m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].resetButtons();
 	}
 }
 
@@ -352,6 +354,8 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 			m_currentGameState = eGameState::eMainMenu;
 			break;
 		}
+
+		m_UILayers[static_cast<int>(m_currentGameState)].resetButtons();
 	}
 }
 

@@ -173,6 +173,7 @@ void UILayer::resetButtons()
 	{
 		button.currentlyIntersected = false;
 		button.sprite.setFrameID(0);
+		button.currentlyIntersected = false;
 	}
 }
 
