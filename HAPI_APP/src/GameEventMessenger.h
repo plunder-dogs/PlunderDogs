@@ -79,7 +79,7 @@ public:
 		{
 			for (eGameEvent gameEvent : gameEventQueue)
 			{
-
+				broadcast(GameEvent(), gameEvent);
 			}
 
 			gameEventQueue.clear();

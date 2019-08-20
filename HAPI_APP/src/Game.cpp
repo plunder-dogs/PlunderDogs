@@ -95,6 +95,7 @@ void Game::run()
 			m_battle->update(m_deltaTime);
 		}
 
+		GameEventMessenger::getInstance().update();
 		render();
 		m_deltaTime = m_gameClock.restart().asSeconds();
 	}
