@@ -64,15 +64,20 @@ bool NetworkHandler::connectToServer()
 		return false;
 	}
 
+	std::cout << "Connected to server\n";
 	m_connectedToServer = true;
 	m_listenThread = std::thread(&NetworkHandler::listen, this);
+
 	return true;
 }
 
 void NetworkHandler::disconnectFromServer()
 {
 	assert(m_connectedToServer);
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_tcpSocket.setBlocking(false);
 	m_connectedToServer = false;
+	lock.unlock();
 	m_listenThread.join();
 	m_tcpSocket.disconnect();
 }
@@ -112,5 +117,5 @@ void NetworkHandler::listen()
 		}
 	}
 
-	int i = 0;
+	std::cout << "Exit\n";
 }

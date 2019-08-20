@@ -36,10 +36,9 @@ private:
 	
 	sf::TcpSocket m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
-	std::atomic<bool> m_connectedToServer;
+	bool m_connectedToServer;
 	std::vector<ServerMessage> m_serverMessageBackLog;
 	std::thread m_listenThread;
 
 	void listen();
-
 };

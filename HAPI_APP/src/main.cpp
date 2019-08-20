@@ -31,6 +31,8 @@
 
 //https://stackoverflow.com/questions/51705967/advantages-of-pass-by-value-and-stdmove-over-pass-by-reference/51706522
 
+//https://thispointer.com//c-11-multithreading-part-1-three-different-ways-to-create-threads/
+
 int main()
 {
 	if (!Textures::getInstance().loadAllTextures())

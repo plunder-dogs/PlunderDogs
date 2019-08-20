@@ -72,13 +72,13 @@ Game::Game(const sf::Font& font)
 	std::vector<UIComponentTextBox> multiplayerTextBoxes;
 	multiplayerTextBoxes.reserve(size_t(8));
 	multiplayerTextBoxes.emplace_back("Yellow Faction: ", font, sf::Vector2i(200, 200), eUIComponentName::eYellowFactionText, false); //200
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 200), eUIComponentName::eYellowFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 200), eUIComponentName::eYellowFactionReadyText, false);
 	multiplayerTextBoxes.emplace_back("Blue Faction: ", font, sf::Vector2i(200, 400), eUIComponentName::eBlueFactionText, false); //400
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 400), eUIComponentName::eBlueFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 400), eUIComponentName::eBlueFactionReadyText, false);
 	multiplayerTextBoxes.emplace_back("Green Faction: ", font, sf::Vector2i(200, 600), eUIComponentName::eGreenFactionText, false); //600
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 600), eUIComponentName::eGreenFactionText, false);
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 600), eUIComponentName::eGreenFactionText, false);
 	multiplayerTextBoxes.emplace_back("Red Faction: ", font, sf::Vector2i(200, 800), eUIComponentName::eRedFactionText, false); //800
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 800), eUIComponentName::eRedFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 800), eUIComponentName::eRedFactionReadyText, false);
 	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setTextBoxes(std::move(multiplayerTextBoxes));
 	std::vector<UIComponentImage> multiplayerLobbyImages;
 	multiplayerLobbyImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
@@ -256,12 +256,16 @@ void Game::handleServerMessages()
 		case eMessageType::eClientDisconnected :
 			if (getLocalControlledFaction() != receivedServerMessage.faction)
 			{
-				assert(m_battle);
-				m_battle->receiveServerMessage(receivedServerMessage);
+				m_factions[static_cast<int>(receivedServerMessage.faction)].m_controllerType = eFactionControllerType::None;
+
+				if (m_battle)
+				{
+					m_battle->receiveServerMessage(receivedServerMessage);
+				}
 			}
 			break;
 		case eMessageType::ePlayerReady :
-			if (receivedServerMessage.faction != getLocalControlledFaction())
+			if (m_currentGameState == eGameState::eMultiplayerLobby && receivedServerMessage.faction != getLocalControlledFaction())
 			{
 				switch (receivedServerMessage.faction)
 				{
@@ -276,6 +280,26 @@ void Game::handleServerMessages()
 					break;
 				case eFactionName::eRed:
 					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				}
+			}
+			break;
+		case eMessageType::ePlayerUnReady :
+			if (receivedServerMessage.faction != getLocalControlledFaction())
+			{
+				switch (receivedServerMessage.faction)
+				{
+				case eFactionName::eYellow:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eBlue:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eGreen:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eRed:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, false);
 					break;
 				}
 			}
@@ -479,6 +503,41 @@ void Game::handleMultiplayerLobbyInput(sf::IntRect mouseRect)
 			{
 				m_ready = true;
 				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerReady, getLocalControlledFaction() });
+				switch (getLocalControlledFaction())
+				{
+				case eFactionName::eYellow:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eBlue:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eGreen:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eRed:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				}
+			}
+			else
+			{
+				m_ready = false;
+				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerUnReady, getLocalControlledFaction() });
+				switch (getLocalControlledFaction())
+				{
+				case eFactionName::eYellow:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eBlue:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eGreen:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				case eFactionName::eRed:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, false);
+					break;
+				}
 			}
 			break;
 		case eUIComponentName::eBack :
