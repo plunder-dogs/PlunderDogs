@@ -130,7 +130,7 @@ sf::Packet & sf::operator>>(sf::Packet & packetReceived, ServerMessage & serverM
 			packetReceived >> existingShip;
 			existingShips.emplace_back(static_cast<eShipType>(existingShip));
 		}
-		serverMessage.existingFactions.emplace_back(static_cast<eFactionName>(existingFactionName), std::move(existingShips), AIControlled);
+		serverMessage.existingFactions.emplace_back(static_cast<eFactionName>(existingFactionName), std::move(existingShips), AIControlled, ready);
 	}
 
 	return packetReceived;
