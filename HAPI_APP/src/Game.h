@@ -7,6 +7,17 @@
 #include "NetworkHandler.h"
 #include <assert.h>
 
+enum class eGameState
+{
+	eMainMenu = 0,
+	eSinglePlayerFactionSelect,
+	eMultiplayerLobby,
+	eLevelSelection,
+	eShipSelection,
+	eBattle,
+	Total = eBattle + 1
+};
+
 class Game : private NonCopyable 
 {
 public:
@@ -47,6 +58,7 @@ private:
 	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
 	void handleLevelSelectionInput(sf::IntRect mouseRect);
 	void handleBattleInput(sf::IntRect mouseRect);
+	void handleMultiplayerLobbyInput(sf::IntRect mouseRect);
 	//UI Events
 	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
 	void onNewFactionTurn(GameEvent gameEvent);

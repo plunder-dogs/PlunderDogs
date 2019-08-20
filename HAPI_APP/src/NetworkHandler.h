@@ -24,6 +24,7 @@ public:
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
+	
 	void sendMessageToServer(const ServerMessage& message);
 	bool connectToServer();
 	void disconnectFromServer();
@@ -32,11 +33,13 @@ public:
 private:
 	NetworkHandler();
 	std::mutex m_mutex;
-	std::thread m_listenThread;
+	
 	sf::TcpSocket m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
 	std::atomic<bool> m_connectedToServer;
 	std::vector<ServerMessage> m_serverMessageBackLog;
+	std::thread m_listenThread;
 
 	void listen();
+
 };

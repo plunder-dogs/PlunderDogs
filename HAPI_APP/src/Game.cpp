@@ -55,6 +55,7 @@ Game::Game(const sf::Font& font)
 
 	//Battle - UI
 	std::vector<UIComponentButton> battleButtons;
+	battleButtons.reserve(size_t(2));
 	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
 	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
 	m_UILayers[static_cast<int>(eGameState::eBattle)].setButtons(std::move(battleButtons));
@@ -62,12 +63,32 @@ Game::Game(const sf::Font& font)
 	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
 	m_UILayers[static_cast<int>(eGameState::eBattle)].setImages(std::move(battleImages));
 
-	m_window.setFramerateLimit(120);
 
+	//Multiplayer Lobby - UI
+	std::vector<UIComponentButton> multiplayerLobbyButtons;
+	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, true);
+	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(1200, 900), eUIComponentName::eDone, true);
+	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setButtons(std::move(multiplayerLobbyButtons));
+	std::vector<UIComponentTextBox> multiplayerTextBoxes;
+	multiplayerTextBoxes.reserve(size_t(8));
+	multiplayerTextBoxes.emplace_back("Yellow Faction: ", font, sf::Vector2i(200, 200), eUIComponentName::eYellowFactionText, false); //200
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 200), eUIComponentName::eYellowFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Blue Faction: ", font, sf::Vector2i(200, 400), eUIComponentName::eBlueFactionText, false); //400
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 400), eUIComponentName::eBlueFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Green Faction: ", font, sf::Vector2i(200, 600), eUIComponentName::eGreenFactionText, false); //600
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 600), eUIComponentName::eGreenFactionText, false);
+	multiplayerTextBoxes.emplace_back("Red Faction: ", font, sf::Vector2i(200, 800), eUIComponentName::eRedFactionText, false); //800
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(300, 800), eUIComponentName::eRedFactionReadyText, false);
+	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setTextBoxes(std::move(multiplayerTextBoxes));
+	std::vector<UIComponentImage> multiplayerLobbyImages;
+	multiplayerLobbyImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
+	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setImages(std::move(multiplayerLobbyImages));
+
+	m_window.setFramerateLimit(120);
 	m_mouseShape.setFillColor(sf::Color::Red);
 	m_mouseShape.setSize(sf::Vector2f(25, 25));
 
-	//Subscribe to events
+	//Subscribe to Game Events
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onAllFactionsFinishedDeployment, this, std::placeholders::_1), eGameEvent::eAllFactionsFinishedDeployment);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onNewFactionTurn, this, std::placeholders::_1), eGameEvent::eEnteredNewFactionTurn);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onEnteredAITurn, this, std::placeholders::_1), eGameEvent::eEnteredAITurn);
@@ -122,7 +143,24 @@ void Game::handleServerMessages()
 		{
 		case eMessageType::eEstablishConnection :
 		{
+			switch (receivedServerMessage.faction)
+			{
+			case eFactionName::eYellow :
+				m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionText, eUIComponentType::eTextBox, true);
+				break;
+			case eFactionName::eBlue :
+				m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionText, eUIComponentType::eTextBox, true);
+				break;
+			case eFactionName::eGreen :
+				m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionText, eUIComponentType::eTextBox, true);
+				break;
+			case eFactionName::eRed :
+				m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionText, eUIComponentType::eTextBox, true);
+				break;
+			}
+
 			std::vector<eShipType> shipsToAdd;
+			shipsToAdd.reserve(size_t(6));
 			shipsToAdd.push_back(eShipType::eFrigate);
 			shipsToAdd.push_back(eShipType::eFrigate);
 			shipsToAdd.push_back(eShipType::eFrigate);
@@ -140,6 +178,37 @@ void Game::handleServerMessages()
 				else if (!existingFaction.existingShips.empty())
 				{
 					assignFaction(existingFaction.factionName, eFactionControllerType::eRemotePlayer, existingFaction.existingShips);
+					switch (existingFaction.factionName)
+					{
+					case eFactionName::eYellow:
+						m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionText, eUIComponentType::eTextBox, true);
+						if (existingFaction.ready)
+						{
+							m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionReadyText, eUIComponentType::eTextBox, true);
+						}
+						break;
+					case eFactionName::eBlue:
+						m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionText, eUIComponentType::eTextBox, true);
+						if (existingFaction.ready)
+						{
+							m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionReadyText, eUIComponentType::eTextBox, true);
+						}
+						break;
+					case eFactionName::eGreen:
+						m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionText, eUIComponentType::eTextBox, true);
+						if (existingFaction.ready)
+						{
+							m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionReadyText, eUIComponentType::eTextBox, true);
+						}
+						break;
+					case eFactionName::eRed:
+						m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionText, eUIComponentType::eTextBox, true);
+						if (existingFaction.ready)
+						{
+							m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, true);
+						}
+						break;
+					}
 				}
 			}
 
@@ -151,6 +220,21 @@ void Game::handleServerMessages()
 			if (receivedServerMessage.faction != getLocalControlledFaction())
 			{
 				assignFaction(receivedServerMessage.faction, eFactionControllerType::eRemotePlayer, receivedServerMessage.shipsToAdd);
+				switch (receivedServerMessage.faction)
+				{
+				case eFactionName::eYellow:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eBlue:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eGreen:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eRed:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionText, eUIComponentType::eTextBox, true);
+					break;
+				}
 			}
 			break;
 		case eMessageType::eStartOnlineGame :
@@ -174,6 +258,26 @@ void Game::handleServerMessages()
 			{
 				assert(m_battle);
 				m_battle->receiveServerMessage(receivedServerMessage);
+			}
+			break;
+		case eMessageType::ePlayerReady :
+			if (receivedServerMessage.faction != getLocalControlledFaction())
+			{
+				switch (receivedServerMessage.faction)
+				{
+				case eFactionName::eYellow:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eYellowFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eBlue:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eBlueFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eGreen:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eGreenFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				case eFactionName::eRed:
+					m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eRedFactionReadyText, eUIComponentType::eTextBox, true);
+					break;
+				}
 			}
 			break;
 		}
@@ -215,6 +319,9 @@ void Game::handleInput()
 				case eGameState::eBattle :
 					handleBattleInput(mouseRect);
 					break;
+				case eGameState::eMultiplayerLobby :
+					handleMultiplayerLobbyInput(mouseRect);
+					break;
 				}
 			}
 			break;
@@ -243,7 +350,7 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 		case eUIComponentName::ePlayerMultiplayer :
 			if (NetworkHandler::getInstance().connectToServer())
 			{
-				m_currentGameState = eGameState::eMultiPlayerFactionSelect;
+				m_currentGameState = eGameState::eMultiplayerLobby;
 			}
 			else
 			{
@@ -356,6 +463,31 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 		}
 
 		m_UILayers[static_cast<int>(m_currentGameState)].resetButtons();
+	}
+}
+
+void Game::handleMultiplayerLobbyInput(sf::IntRect mouseRect)
+{
+	UIComponentIntersectionDetails intersectionDetails;
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	if (intersectionDetails.isIntersected())
+	{
+		switch (intersectionDetails.getComponentName())
+		{
+		case eUIComponentName::eDone :
+			if (!m_ready)
+			{
+				m_ready = true;
+				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerReady, getLocalControlledFaction() });
+			}
+			break;
+		case eUIComponentName::eBack :
+			m_currentGameState = eGameState::eMainMenu;
+			m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].resetButtons();
+			NetworkHandler::getInstance().sendMessageToServer(ServerMessage(eMessageType::eDisconnect, getLocalControlledFaction()));
+			NetworkHandler::getInstance().disconnectFromServer();
+			break;
+		}
 	}
 }
 

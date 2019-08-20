@@ -59,7 +59,7 @@ ServerMessage NetworkHandler::getServerMessage()
 bool NetworkHandler::connectToServer()
 {
 	assert(!m_connectedToServer);
-	if (m_tcpSocket.connect("81.97.212.79", 55001, sf::seconds(CONNECTION_TIMEOUT)) != sf::Socket::Done)
+	if (m_tcpSocket.connect("152.105.241.168", 55001, sf::seconds(CONNECTION_TIMEOUT)) != sf::Socket::Done)
 	{
 		return false;
 	}
@@ -71,7 +71,6 @@ bool NetworkHandler::connectToServer()
 
 void NetworkHandler::disconnectFromServer()
 {
-
 	assert(m_connectedToServer);
 	m_connectedToServer = false;
 	m_listenThread.join();
@@ -96,7 +95,7 @@ void NetworkHandler::handleBackLog()
 }
 
 void NetworkHandler::listen()
-{
+{	
 	while (m_connectedToServer)
 	{
 		sf::Packet receivedPacket;
@@ -112,4 +111,6 @@ void NetworkHandler::listen()
 			std::cout << "received incorrect packet\n";
 		}
 	}
+
+	int i = 0;
 }

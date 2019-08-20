@@ -30,7 +30,16 @@ enum class eUIComponentName
 	MainMenuBackground,
 	eGameBackground,
 	eFactionFlags,
-	ePause
+	eYellowFactionText,
+	eYellowFactionReadyText,
+	eBlueFactionText,
+	eBlueFactionReadyText,
+	eGreenFactionText,
+	eGreenFactionReadyText,
+	eRedFactionText,
+	eRedFactionReadyText,
+	ePause,
+	eReady
 };
 
 enum class eUIComponentType
