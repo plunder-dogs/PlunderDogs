@@ -3,9 +3,10 @@
 #include "AIHandler.h"
 #include "Sprite.h"
 #include "Texture.h"
+#include "Resources.h"
 #include <iostream>
 
-Game::Game(const sf::Font& font)
+Game::Game()
 	: m_window(sf::VideoMode(1920, 1080), "SFML_WINDOW", sf::Style::Default),
 	m_currentGameState(eGameState::eMainMenu),
 	m_ready(false),
@@ -13,7 +14,7 @@ Game::Game(const sf::Font& font)
 	m_gameClock(),
 	m_deltaTime(m_gameClock.restart().asSeconds())
 {
-
+	const auto& font = Fonts::getInstance().getFont("arial");
 	//Main Menu - UI
 	std::vector<UIComponentTextBox> mainMenuTextBoxes;
 	mainMenuTextBoxes.reserve(size_t(4));

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Textures.h"
+
 #include "Battle.h"
 #include "Utilities/XMLParser.h"
 #include "UI/UILayer.h"
@@ -12,7 +12,7 @@ constexpr size_t MAX_UI_LAYERS = 4;
 class Game : private NonCopyable 
 {
 public:
-	Game(const sf::Font& font);
+	Game();
 	~Game();
 
 	void run();

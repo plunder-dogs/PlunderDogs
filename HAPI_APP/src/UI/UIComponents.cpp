@@ -2,11 +2,12 @@
 #include <assert.h>
 
 //UI Component Text Box
-UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name, bool visible)
+UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name, bool visible, sf::Color textColor)
 	: UIComponentBase(name, visible),
 	text(message, font)
 {
 	text.setPosition(sf::Vector2f(position.x, position.y));
+	text.setColor(textColor);
 
 	AABB.left = position.x - 5;
 	AABB.top = position.y - 5;

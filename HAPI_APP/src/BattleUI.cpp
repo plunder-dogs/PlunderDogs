@@ -1,7 +1,7 @@
 #include "BattleUI.h"
 #include "Battle.h"
 #include "PathFinding.h"
-#include "Textures.h"
+#include "Resources.h"
 #include "Utilities/Utilities.h"
 #include "GameEventMessenger.h"
 #include "NetworkHandler.h"
@@ -34,13 +34,22 @@ BattleUI::BattleUI(Battle & battle)
 {
 	//Battle - UI
 	std::vector<UIComponentButton> battleButtons;
-	battleButtons.reserve(size_t(2));
 	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
 	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
 	m_battleUILayer.setButtons(std::move(battleButtons));
 	std::vector<UIComponentImage> battleImages;
 	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
+	battleImages.emplace_back(Textures::getInstance().getTexture("shipStats.xml"), sf::Vector2i(400, 850), eUIComponentName::eShipStats, false);
 	m_battleUILayer.setImages(std::move(battleImages));
+	
+	const auto& font = Fonts::getInstance().getFont("arial");
+	std::vector<UIComponentTextBox> textBoxes;
+	textBoxes.reserve(size_t(4));
+	textBoxes.emplace_back("", font, sf::Vector2i(550, 875), eUIComponentName::eShipStatHealth, false, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(750, 875), eUIComponentName::eShipStatAttackRange, false, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(950, 875), eUIComponentName::eShipStatMovementRange, false, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(1150, 875), eUIComponentName::eShipStatDamage, false, sf::Color::Black);
+	m_battleUILayer.setTextBoxes(std::move(textBoxes));
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
@@ -225,6 +234,50 @@ void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	
+	if (m_shipSelector.getSelectedShips().empty() && m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
+	{
+		//Health
+		//Attack Range
+		//Movement Range
+		//Attack Damage
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStats, eUIComponentType::eImage, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatHealth, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatAttackRange, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatMovementRange, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatDamage, eUIComponentType::eTextBox, true);
+
+		const Ship& shipOnTile = m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile);
+		m_battleUILayer.setText(eUIComponentName::eShipStatHealth, std::to_string(shipOnTile.getHealth()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatAttackRange, std::to_string(shipOnTile.getRange()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatMovementRange, std::to_string(shipOnTile.getMovementPoints()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatDamage, std::to_string(shipOnTile.getDamage()));
+		
+	}
+	else if (m_shipSelector.getSelectedShips().size() == 1)
+	{
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStats, eUIComponentType::eImage, true);
+
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStats, eUIComponentType::eImage, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatHealth, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatAttackRange, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatMovementRange, eUIComponentType::eTextBox, true);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatDamage, eUIComponentType::eTextBox, true);
+
+		const Ship& shipOnTile = m_battle.getFactionShip(m_shipSelector.getSelectedShips()[0].m_shipOnTile);
+		m_battleUILayer.setText(eUIComponentName::eShipStatHealth, std::to_string(shipOnTile.getHealth()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatAttackRange, std::to_string(shipOnTile.getRange()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatMovementRange, std::to_string(shipOnTile.getMovementPoints()));
+		m_battleUILayer.setText(eUIComponentName::eShipStatDamage, std::to_string(shipOnTile.getDamage()));
+	}
+	else
+	{
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStats, eUIComponentType::eImage, false);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatHealth, eUIComponentType::eTextBox, false);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatAttackRange, eUIComponentType::eTextBox, false);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatMovementRange, eUIComponentType::eTextBox, false);
+		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatDamage, eUIComponentType::eTextBox, false);
+	}
+
 	if (!m_battle.isShipBelongToCurrentFaction(m_tileOnLeftClick->m_shipOnTile) ||
 		m_battle.getCurrentFaction().m_controllerType != eFactionControllerType::eLocalPlayer)
 	{
@@ -305,7 +358,7 @@ void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 		m_tileOnMouse = tileOnMouse;
 	}
 
-	//Cancel movement for selected ships
+
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
 	{

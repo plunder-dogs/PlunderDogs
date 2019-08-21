@@ -228,7 +228,10 @@ void UILayer::render(sf::RenderWindow & window) const
 {
 	for (const auto& image : m_images)
 	{
-		image.sprite.render(window);
+		if (image.visible)
+		{
+			image.sprite.render(window);
+		}
 	}
 
 	for (const auto& button : m_buttons)

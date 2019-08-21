@@ -3,7 +3,7 @@
 #include <math.h>
 #include <algorithm>
 #include "Utilities/Utilities.h"
-#include "Textures.h"
+#include "Resources.h"
 #include "GameEventMessenger.h"
 #include "Utilities/XMLParser.h"
 #include <algorithm>

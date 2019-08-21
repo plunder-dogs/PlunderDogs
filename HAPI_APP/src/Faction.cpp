@@ -1,6 +1,6 @@
 #include "Faction.h"
 #include <assert.h>
-#include "Textures.h"
+#include "Resources.h"
 #include "Map.h"
 
 constexpr size_t MAX_SPAWN_AREA = 75;

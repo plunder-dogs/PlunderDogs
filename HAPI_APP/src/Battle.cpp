@@ -2,7 +2,7 @@
 #include "Utilities/XMLParser.h"
 #include "GameEventMessenger.h"
 #include "AIHandler.h"
-#include "Textures.h"
+#include "Resources.h"
 #include "NetworkHandler.h"
 #include <iostream>
 #include "Utilities/Utilities.h"

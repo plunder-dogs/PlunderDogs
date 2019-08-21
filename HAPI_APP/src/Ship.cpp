@@ -1,7 +1,7 @@
  #include "Ship.h"
 #include "Map.h"
 #include "PathFinding.h"
-#include "Textures.h"
+#include "Resources.h"
 #include "GameEventMessenger.h"
 #include "Utilities/Utilities.h"
 #include "Battle.h"

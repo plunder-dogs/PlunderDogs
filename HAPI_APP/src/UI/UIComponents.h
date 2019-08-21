@@ -39,7 +39,24 @@ enum class eUIComponentName
 	eRedFactionText,
 	eRedFactionReadyText,
 	ePause,
-	eReady
+	eReady,
+	eShipStats,
+	eShipStatHealth,
+	eShipStatAttackRange,
+	eShipStatMovementRange,
+	eShipStatDamage
+};
+
+enum class eIsComponentVisible
+{
+	eFalse = 0,
+	eTrue
+};
+
+enum class eIsComponentChangeOnIntersect
+{
+	eFalse = 0,
+	eTrue
 };
 
 enum class eUIComponentType
@@ -72,7 +89,7 @@ struct UIComponentImage : public UIComponentBase
 
 struct UIComponentTextBox : public UIComponentBase
 {
-	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, bool visible = true);
+	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, bool visible = true, sf::Color textColor = sf::Color::White);
 
 	sf::Text text;
 };

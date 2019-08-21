@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Resources.h"
 #include <iostream>
 
 #ifdef C++_NOTES
@@ -40,15 +41,14 @@ int main()
 		std::cerr << "Failed to load all textures.\n";
 		return -1;
 	}
-
-	sf::Font font;
-	if (!font.loadFromFile("unicode.arialr.ttf"))
+	
+	if (!Fonts::getInstance().loadAllFonts())
 	{
-		std::cerr << "Failed to load font\n";
+		std::cerr << "Failed to load all fonts\n";
 		return -1;
 	}
 
-	Game game(font);
+	Game game;
 	game.run();
 
 	return 0;
