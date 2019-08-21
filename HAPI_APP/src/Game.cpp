@@ -21,10 +21,10 @@ Game::Game()
 	mainMenuTextBoxes.emplace_back("Play Singleplayer", font, sf::Vector2i(600, 600), eUIComponentName::ePlaySinglePlayer);
 	mainMenuTextBoxes.emplace_back("Play Multiplayer", font, sf::Vector2i(600, 680), eUIComponentName::ePlayerMultiplayer);
 	mainMenuTextBoxes.emplace_back("Quit", font, sf::Vector2i(600, 760), eUIComponentName::eQuit);
-	mainMenuTextBoxes.emplace_back("Cannot connect to MultiPlayer", font, sf::Vector2i(960, 540), eUIComponentName::eAlert, false);
+	mainMenuTextBoxes.emplace_back("Cannot connect to MultiPlayer", font, sf::Vector2i(960, 540), eUIComponentName::eAlert, eIsComponentVisible::eFalse);
 	m_UILayers[static_cast<int>(eGameState::eMainMenu)].setTextBoxes(std::move(mainMenuTextBoxes));
 	std::vector<UIComponentImage> mainMenuSprites;
-	mainMenuSprites.emplace_back(Textures::getInstance().getTexture(BACKGROUND), sf::Vector2i(), eUIComponentName::MainMenuBackground, true);
+	mainMenuSprites.emplace_back(Textures::getInstance().getTexture(BACKGROUND), sf::Vector2i(), eUIComponentName::MainMenuBackground);
 	m_UILayers[static_cast<int>(eGameState::eMainMenu)].setImages(std::move(mainMenuSprites));
 
 	//Single Player Faction Select - UI
@@ -34,45 +34,48 @@ Game::Game()
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("blueSelectBtn.xml"), sf::Vector2i(600, 250), eUIComponentName::eBlueFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("greenSelectBtn.xml"), sf::Vector2i(800, 250), eUIComponentName::eGreenFactionSelect);
 	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("redSelectBtn.xml"), sf::Vector2i(1000, 250), eUIComponentName::eRedFactionSelect);
-	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(250, 700), eUIComponentName::eBack, true);
-	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(800, 800), eUIComponentName::eDone, true);
+	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(250, 700), 
+		eUIComponentName::eBack, eIsComponentChangeOnIntersect::eTrue);
+	singlePlayerFactionSelectButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(800, 800), 
+		eUIComponentName::eDone, eIsComponentChangeOnIntersect::eTrue);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setButtons(std::move(singlePlayerFactionSelectButtons));
 	std::vector<UIComponentImage> singlePlayerFactionSelectImages;
-	singlePlayerFactionSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
+	singlePlayerFactionSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground);
 	m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].setImages(std::move(singlePlayerFactionSelectImages));
 
 	//Level Selection - UI
 	std::vector<UIComponentButton> levelSelectButtons;
 	levelSelectButtons.reserve(size_t(6));
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level1Button.xml"), sf::Vector2i(200, 200), eUIComponentName::eLevelOneSelect, true);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level2Button.xml"), sf::Vector2i(1600, 200), eUIComponentName::eLevelTwoSelect, true);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level3Button.xml"), sf::Vector2i(200, 700), eUIComponentName::eLevelThreeSelect, true);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level4Button.xml"), sf::Vector2i(1600, 700), eUIComponentName::eLevelFourSelect, true);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level5Button.xml"), sf::Vector2i(700, 700), eUIComponentName::eLevelFiveSelect, true);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, true);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level1Button.xml"), sf::Vector2i(200, 200), 
+		eUIComponentName::eLevelOneSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level2Button.xml"), sf::Vector2i(1600, 200), eUIComponentName::eLevelTwoSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level3Button.xml"), sf::Vector2i(200, 700), eUIComponentName::eLevelThreeSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level4Button.xml"), sf::Vector2i(1600, 700), eUIComponentName::eLevelFourSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level5Button.xml"), sf::Vector2i(700, 700), eUIComponentName::eLevelFiveSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, eIsComponentChangeOnIntersect::eTrue);
 	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setButtons(std::move(levelSelectButtons));
 	std::vector<UIComponentImage> levelSelectImages;
-	levelSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
+	levelSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground);
 	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setImages(std::move(levelSelectImages));
 
 	//Multiplayer Lobby - UI
 	std::vector<UIComponentButton> multiplayerLobbyButtons;
-	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, true);
-	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(1200, 900), eUIComponentName::eDone, true);
+	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, eIsComponentChangeOnIntersect::eTrue);
+	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("doneButton.xml"), sf::Vector2i(1200, 900), eUIComponentName::eDone, eIsComponentChangeOnIntersect::eTrue);
 	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setButtons(std::move(multiplayerLobbyButtons));
 	std::vector<UIComponentTextBox> multiplayerTextBoxes;
 	multiplayerTextBoxes.reserve(size_t(8));
-	multiplayerTextBoxes.emplace_back("Yellow Faction: ", font, sf::Vector2i(200, 200), eUIComponentName::eYellowFactionText, false); //200
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 200), eUIComponentName::eYellowFactionReadyText, false);
-	multiplayerTextBoxes.emplace_back("Blue Faction: ", font, sf::Vector2i(200, 400), eUIComponentName::eBlueFactionText, false); //400
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 400), eUIComponentName::eBlueFactionReadyText, false);
-	multiplayerTextBoxes.emplace_back("Green Faction: ", font, sf::Vector2i(200, 600), eUIComponentName::eGreenFactionText, false); //600
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 600), eUIComponentName::eGreenFactionText, false);
-	multiplayerTextBoxes.emplace_back("Red Faction: ", font, sf::Vector2i(200, 800), eUIComponentName::eRedFactionText, false); //800
-	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 800), eUIComponentName::eRedFactionReadyText, false);
+	multiplayerTextBoxes.emplace_back("Yellow Faction: ", font, sf::Vector2i(200, 200), eUIComponentName::eYellowFactionText, eIsComponentVisible::eFalse); //200
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 200), eUIComponentName::eYellowFactionReadyText, eIsComponentVisible::eFalse);
+	multiplayerTextBoxes.emplace_back("Blue Faction: ", font, sf::Vector2i(200, 400), eUIComponentName::eBlueFactionText, eIsComponentVisible::eFalse); //400
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 400), eUIComponentName::eBlueFactionReadyText, eIsComponentVisible::eFalse);
+	multiplayerTextBoxes.emplace_back("Green Faction: ", font, sf::Vector2i(200, 600), eUIComponentName::eGreenFactionText, eIsComponentVisible::eFalse); //600
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 600), eUIComponentName::eGreenFactionText, eIsComponentVisible::eFalse);
+	multiplayerTextBoxes.emplace_back("Red Faction: ", font, sf::Vector2i(200, 800), eUIComponentName::eRedFactionText, eIsComponentVisible::eFalse); //800
+	multiplayerTextBoxes.emplace_back("Ready", font, sf::Vector2i(500, 800), eUIComponentName::eRedFactionReadyText, eIsComponentVisible::eFalse);
 	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setTextBoxes(std::move(multiplayerTextBoxes));
 	std::vector<UIComponentImage> multiplayerLobbyImages;
-	multiplayerLobbyImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
+	multiplayerLobbyImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground);
 	m_UILayers[static_cast<int>(eGameState::eMultiplayerLobby)].setImages(std::move(multiplayerLobbyImages));
 
 	m_window.setFramerateLimit(120);

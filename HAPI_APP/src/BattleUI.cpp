@@ -34,21 +34,22 @@ BattleUI::BattleUI(Battle & battle)
 {
 	//Battle - UI
 	std::vector<UIComponentButton> battleButtons;
-	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
-	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
+	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, 
+		eIsComponentChangeOnIntersect::eTrue, eIsComponentVisible::eFalse);
+	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, eIsComponentChangeOnIntersect::eTrue);
 	m_battleUILayer.setButtons(std::move(battleButtons));
 	std::vector<UIComponentImage> battleImages;
 	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
-	battleImages.emplace_back(Textures::getInstance().getTexture("shipStats.xml"), sf::Vector2i(400, 850), eUIComponentName::eShipStats, false);
+	battleImages.emplace_back(Textures::getInstance().getTexture("shipStats.xml"), sf::Vector2i(400, 850), eUIComponentName::eShipStats, eIsComponentVisible::eFalse);
 	m_battleUILayer.setImages(std::move(battleImages));
 	
 	const auto& font = Fonts::getInstance().getFont("arial");
 	std::vector<UIComponentTextBox> textBoxes;
 	textBoxes.reserve(size_t(4));
-	textBoxes.emplace_back("", font, sf::Vector2i(550, 875), eUIComponentName::eShipStatHealth, false, sf::Color::Black);
-	textBoxes.emplace_back("", font, sf::Vector2i(750, 875), eUIComponentName::eShipStatAttackRange, false, sf::Color::Black);
-	textBoxes.emplace_back("", font, sf::Vector2i(950, 875), eUIComponentName::eShipStatMovementRange, false, sf::Color::Black);
-	textBoxes.emplace_back("", font, sf::Vector2i(1150, 875), eUIComponentName::eShipStatDamage, false, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(550, 875), eUIComponentName::eShipStatHealth, eIsComponentVisible::eFalse, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(750, 875), eUIComponentName::eShipStatAttackRange, eIsComponentVisible::eFalse, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(950, 875), eUIComponentName::eShipStatMovementRange, eIsComponentVisible::eFalse, sf::Color::Black);
+	textBoxes.emplace_back("", font, sf::Vector2i(1150, 875), eUIComponentName::eShipStatDamage, eIsComponentVisible::eFalse, sf::Color::Black);
 	m_battleUILayer.setTextBoxes(std::move(textBoxes));
 
 	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);

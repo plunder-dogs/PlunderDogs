@@ -2,7 +2,7 @@
 #include <assert.h>
 
 //UI Component Text Box
-UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name, bool visible, sf::Color textColor)
+UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Font & font, sf::Vector2i position, eUIComponentName name, eIsComponentVisible visible, sf::Color textColor)
 	: UIComponentBase(name, visible),
 	text(message, font)
 {
@@ -16,10 +16,10 @@ UIComponentTextBox::UIComponentTextBox(const std::string & message, const sf::Fo
 }
 
 //UI Component Button
-UIComponentButton::UIComponentButton(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect, bool visible)
+UIComponentButton::UIComponentButton(const Texture & texture, sf::Vector2i position, eUIComponentName name, eIsComponentChangeOnIntersect changeOnIntersect, eIsComponentVisible visible)
 	: UIComponentImage(texture, position, name, visible),
 	currentlyIntersected(false),
-	changeOnIntersect(changeOnIntersect)
+	changeOnIntersect(static_cast<bool>(changeOnIntersect))
 {}
 
 //UI Component Intersection Details
@@ -61,7 +61,7 @@ eUIComponentName UIComponentIntersectionDetails::getComponentName()
 	return m_name;
 }
 
-UIComponentImage::UIComponentImage(const Texture & texture, sf::Vector2i position, eUIComponentName name, bool visible)
+UIComponentImage::UIComponentImage(const Texture & texture, sf::Vector2i position, eUIComponentName name, eIsComponentVisible visible)
 	: UIComponentBase(name, visible),
 	sprite(texture, position, true, false)
 {

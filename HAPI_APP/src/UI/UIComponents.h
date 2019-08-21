@@ -73,30 +73,32 @@ struct UIComponentBase
 	bool visible;
 
 protected:
-	UIComponentBase(eUIComponentName name, bool visible = true)
+	UIComponentBase(eUIComponentName name, eIsComponentVisible visible = eIsComponentVisible::eTrue)
 		: name(name),
 		AABB(),
-		visible(visible)
+		visible(static_cast<bool>(visible))
 	{}
 };
 
 struct UIComponentImage : public UIComponentBase
 {
-	UIComponentImage(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool visible = true);
+	UIComponentImage(const Texture& texture, sf::Vector2i position, eUIComponentName name, eIsComponentVisible visible = eIsComponentVisible::eTrue);
 
 	Sprite sprite;
 };
 
 struct UIComponentTextBox : public UIComponentBase
 {
-	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, bool visible = true, sf::Color textColor = sf::Color::White);
+	UIComponentTextBox(const std::string& message, const sf::Font& font, sf::Vector2i position, eUIComponentName name, 
+		eIsComponentVisible visible = eIsComponentVisible::eTrue, sf::Color textColor = sf::Color::White);
 
 	sf::Text text;
 };
 
 struct UIComponentButton : public UIComponentImage
 {
-	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, bool changeOnIntersect = false, bool visible = true);
+	UIComponentButton(const Texture& texture, sf::Vector2i position, eUIComponentName name, eIsComponentChangeOnIntersect changeOnIntersect = eIsComponentChangeOnIntersect::eFalse,
+		eIsComponentVisible visible = eIsComponentVisible::eTrue);
 
 	bool currentlyIntersected;
 	bool changeOnIntersect;
