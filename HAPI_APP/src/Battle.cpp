@@ -697,10 +697,11 @@ void Battle::advanceToNextBattlePhase()
 				faction.clearSpawnArea();
 			}
 
-			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
+			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI ||
+				m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 			{
 				m_timeUntilAITurn.setActive(true);
-				GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredAITurn);
+				GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eHideEndPhaseButton);
 			}
 
 			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
@@ -737,14 +738,16 @@ void Battle::advanceToNextBattlePhase()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
+		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI ||
+			m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 		{
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredAITurn);
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eHideEndPhaseButton);
 			m_timeUntilAITurn.setActive(true);
 		}
-		else if(!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+		else if(!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI || 
+			m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eRemotePlayer)
 		{
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eLeftAITurn);
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eShowEndPhaseButton);
 		}
 
 		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);

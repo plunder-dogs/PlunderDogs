@@ -91,16 +91,16 @@ Game::Game(const sf::Font& font)
 	//Subscribe to Game Events
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onAllFactionsFinishedDeployment, this, std::placeholders::_1), eGameEvent::eAllFactionsFinishedDeployment);
 	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onNewFactionTurn, this, std::placeholders::_1), eGameEvent::eEnteredNewFactionTurn);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onEnteredAITurn, this, std::placeholders::_1), eGameEvent::eEnteredAITurn);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onLeftAITurn, this, std::placeholders::_1), eGameEvent::eLeftAITurn);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onHideEndPhaseButton, this, std::placeholders::_1), eGameEvent::eHideEndPhaseButton);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onShowEndPhaseButton, this, std::placeholders::_1), eGameEvent::eShowEndPhaseButton);
 }
 
 Game::~Game()
 {
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eAllFactionsFinishedDeployment);
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewFactionTurn);
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredAITurn);
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eLeftAITurn);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eHideEndPhaseButton);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eShowEndPhaseButton);
 }
 
 void Game::run()
@@ -665,14 +665,16 @@ void Game::onNewFactionTurn(GameEvent gameEvent)
 	}
 }
 
-void Game::onEnteredAITurn(GameEvent gameEvent)
+void Game::onHideEndPhaseButton(GameEvent gameEvent)
 {
-	assert(m_battle && m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eAI);
+	assert(m_battle && m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eAI ||
+		m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eRemotePlayer);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, false);
 }
 
-void Game::onLeftAITurn(GameEvent gameEvent)
+void Game::onShowEndPhaseButton(GameEvent gameEvent)
 {
-	assert(m_battle && m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eAI);
+	assert(m_battle && m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eAI ||
+		m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eRemotePlayer);
 	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
 }

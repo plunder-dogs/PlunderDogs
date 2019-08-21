@@ -10,8 +10,8 @@ enum eGameEvent
 	eEnteredNewBattlePhase,
 	eFactionShipDestroyed,
 	eUnableToEndMovementPhase,
-	eEnteredAITurn,
-	eLeftAITurn,
+	eHideEndPhaseButton,
+	eShowEndPhaseButton,
 	//New Events
 	eAllFactionsFinishedDeployment,
 	eEnteredNewFactionTurn
