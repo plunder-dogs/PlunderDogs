@@ -128,6 +128,15 @@ void UILayer::setComponentVisibility(eUIComponentName componentName, eUIComponen
 		iter->visible = visible;
 		return;
 	}
+	
+	case eUIComponentType::eImage :
+	{
+		auto iter = std::find_if(m_images.begin(), m_images.end(), [componentName](const auto& image) { return image.name == componentName; });
+		assert(iter != m_images.cend());
+		iter->visible = visible;
+
+		return;
+	}
 	}
 
 	assert(false);
@@ -155,6 +164,14 @@ void UILayer::setComponentFrameID(eUIComponentName componentName, eUIComponentTy
 	}
 
 	assert(false);
+}
+
+void UILayer::setText(eUIComponentName componentName, const std::string& newText)
+{
+	auto iter = std::find_if(m_textBoxes.begin(), m_textBoxes.end(), [componentName](const auto& textBox) { return textBox.name == componentName; });
+	assert(iter != m_textBoxes.end());
+
+	iter->text.setString(newText);
 }
 
 void UILayer::setButtons(std::vector<UIComponentButton>&& buttons)

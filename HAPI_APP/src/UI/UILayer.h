@@ -20,7 +20,8 @@ public:
 	void activateTimedVisibilityComponent(eUIComponentName componentName, eUIComponentType componentType);
 	void setComponentVisibility(eUIComponentName componentName, eUIComponentType componentType, bool visible);
 	void setComponentFrameID(eUIComponentName componentName, eUIComponentType componentType, int frameID);
-	
+	void setText(eUIComponentName componentName, const std::string& newText);
+
 	void setButtons(std::vector<UIComponentButton>&& buttons);
 	void setTextBoxes(std::vector<UIComponentTextBox>&& textBoxes);
 	void setImages(std::vector<UIComponentImage>&& images);
