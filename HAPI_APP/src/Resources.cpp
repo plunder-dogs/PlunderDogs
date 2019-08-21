@@ -1,4 +1,4 @@
-#include "Textures.h"
+#include "Resources.h"
 #include "Global.h"
 #include "Utilities/XMLParser.h"
 #include <assert.h>
@@ -67,4 +67,26 @@ bool Textures::loadTexture(const std::string & fileName, const std::string & dir
 	}
 
 	return false;
+}
+
+bool Fonts::loadAllFonts()
+{
+	std::unique_ptr<sf::Font> font = std::make_unique<sf::Font>();
+	if (font->loadFromFile("unicode.arialr.ttf"))
+	{
+		m_fonts.emplace("arial", std::move(font));
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+const sf::Font & Fonts::getFont(const std::string & fontName) const
+{
+	auto cIter = std::find_if(m_fonts.cbegin(), m_fonts.cend(), [fontName](const auto& font) {return font.first == fontName; });
+	assert(cIter != m_fonts.cend());
+
+	return *cIter->second;
 }

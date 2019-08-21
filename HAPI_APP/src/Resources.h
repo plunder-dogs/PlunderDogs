@@ -55,3 +55,21 @@ private:
 
 	bool loadTexture(const std::string& fileName, const std::string& directory);
 };
+
+class Fonts : private NonCopyable
+{
+public:
+	static Fonts& getInstance()
+	{
+		static Fonts instance;
+		return instance;
+	}
+
+	bool loadAllFonts();
+	const sf::Font& getFont(const std::string& fontName) const;
+
+private:
+	Fonts() {}
+	std::unordered_map<std::string, std::unique_ptr<sf::Font>> m_fonts;
+	bool m_allFontsLoaded = false;
+};

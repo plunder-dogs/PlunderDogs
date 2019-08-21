@@ -190,7 +190,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\Textures.cpp" />
+    <ClCompile Include="src\Resources.cpp" />
     <ClCompile Include="src\TileArea.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\UI\UIComponents.cpp" />
@@ -218,7 +218,7 @@
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\Map.h" />
-    <ClInclude Include="src\Textures.h" />
+    <ClInclude Include="src\Resources.h" />
     <ClInclude Include="src\TileArea.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\UI\UIComponents.h" />
