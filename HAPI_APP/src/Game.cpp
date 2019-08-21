@@ -13,6 +13,7 @@ Game::Game(const sf::Font& font)
 	m_gameClock(),
 	m_deltaTime(m_gameClock.restart().asSeconds())
 {
+
 	//Main Menu - UI
 	std::vector<UIComponentTextBox> mainMenuTextBoxes;
 	mainMenuTextBoxes.reserve(size_t(4));
@@ -53,17 +54,6 @@ Game::Game(const sf::Font& font)
 	levelSelectImages.emplace_back(Textures::getInstance().getTexture("GameBackGround.xml"), sf::Vector2i(), eUIComponentName::eGameBackground, true);
 	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setImages(std::move(levelSelectImages));
 
-	//Battle - UI
-	std::vector<UIComponentButton> battleButtons;
-	battleButtons.reserve(size_t(2));
-	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
-	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
-	m_UILayers[static_cast<int>(eGameState::eBattle)].setButtons(std::move(battleButtons));
-	std::vector<UIComponentImage> battleImages;
-	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
-	m_UILayers[static_cast<int>(eGameState::eBattle)].setImages(std::move(battleImages));
-
-
 	//Multiplayer Lobby - UI
 	std::vector<UIComponentButton> multiplayerLobbyButtons;
 	multiplayerLobbyButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, true);
@@ -88,19 +78,12 @@ Game::Game(const sf::Font& font)
 	m_mouseShape.setFillColor(sf::Color::Red);
 	m_mouseShape.setSize(sf::Vector2f(25, 25));
 
-	//Subscribe to Game Events
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onAllFactionsFinishedDeployment, this, std::placeholders::_1), eGameEvent::eAllFactionsFinishedDeployment);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onNewFactionTurn, this, std::placeholders::_1), eGameEvent::eEnteredNewFactionTurn);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onHideEndPhaseButton, this, std::placeholders::_1), eGameEvent::eHideEndPhaseButton);
-	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onShowEndPhaseButton, this, std::placeholders::_1), eGameEvent::eShowEndPhaseButton);
+	GameEventMessenger::getInstance().subscribe(std::bind(&Game::onQuitGame, this, std::placeholders::_1), eGameEvent::eQuitGame);
 }
 
 Game::~Game()
 {
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eAllFactionsFinishedDeployment);
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewFactionTurn);
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eHideEndPhaseButton);
-	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eShowEndPhaseButton);
+	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eQuitGame);
 }
 
 void Game::run()
@@ -109,14 +92,21 @@ void Game::run()
 	{
 		handleServerMessages();
 		handleInput();
-		m_UILayers[static_cast<int>(m_currentGameState)].update(m_deltaTime);
-		if (m_currentGameState == eGameState::eBattle)
+
+		switch (m_currentGameState)
 		{
+		case eGameState::eMainMenu :
+		case eGameState::eSinglePlayerFactionSelect :
+		case eGameState::eMultiplayerLobby :
+		case eGameState::eLevelSelection :
+			m_UILayers[static_cast<int>(m_currentGameState)].update(m_deltaTime);
+			break;
+		case eGameState::eBattle :
 			assert(m_battle);
 			m_battle->update(m_deltaTime);
+			break;
 		}
 
-		GameEventMessenger::getInstance().update();
 		render();
 		m_deltaTime = m_gameClock.restart().asSeconds();
 	}
@@ -161,12 +151,12 @@ void Game::handleServerMessages()
 
 			std::vector<eShipType> shipsToAdd;
 			shipsToAdd.reserve(size_t(6));
-			shipsToAdd.push_back(eShipType::eFrigate);
-			shipsToAdd.push_back(eShipType::eFrigate);
-			shipsToAdd.push_back(eShipType::eFrigate);
-			shipsToAdd.push_back(eShipType::eFrigate);
-			shipsToAdd.push_back(eShipType::eFrigate);
-			shipsToAdd.push_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
+			shipsToAdd.emplace_back(eShipType::eFrigate);
 
 			assignFaction(receivedServerMessage.faction, eFactionControllerType::eLocalPlayer, shipsToAdd);
 			for (const auto& existingFaction : receivedServerMessage.existingFactions)
@@ -312,7 +302,6 @@ void Game::handleInput()
 	while (m_window.pollEvent(m_currentSFMLEvent))
 	{
 		sf::Vector2i mousePosition = sf::Mouse::getPosition(m_window);
-		sf::IntRect mouseRect(mousePosition, sf::Vector2i(5, 5));
 		m_mouseShape.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
 
 		switch (m_currentSFMLEvent.type)
@@ -322,7 +311,14 @@ void Game::handleInput()
 			break;
 
 		case sf::Event::MouseMoved :
-			m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect);
+			switch (m_currentGameState)
+			{
+			case eGameState::eMainMenu :
+			case eGameState::eSinglePlayerFactionSelect :
+			case eGameState::eLevelSelection :
+			case eGameState::eMultiplayerLobby :
+				m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mousePosition);
+			}
 			break;
 		
 		case sf::Event::MouseButtonPressed :
@@ -331,19 +327,16 @@ void Game::handleInput()
 				switch (m_currentGameState)
 				{
 				case eGameState::eMainMenu :
-					handleMainMenuInput(mouseRect);
+					handleMainMenuInput(mousePosition);
 					break;
 				case eGameState::eSinglePlayerFactionSelect :
-					handleSinglePlayerFactionSelectionInput(mouseRect);
+					handleSinglePlayerFactionSelectionInput(mousePosition);
 					break;
 				case eGameState::eLevelSelection :
-					handleLevelSelectionInput(mouseRect);
-					break;
-				case eGameState::eBattle :
-					handleBattleInput(mouseRect);
+					handleLevelSelectionInput(mousePosition);
 					break;
 				case eGameState::eMultiplayerLobby :
-					handleMultiplayerLobbyInput(mouseRect);
+					handleMultiplayerLobbyInput(mousePosition);
 					break;
 				}
 			}
@@ -358,10 +351,10 @@ void Game::handleInput()
 	}
 }
 
-void Game::handleMainMenuInput(sf::IntRect mouseRect)
+void Game::handleMainMenuInput(sf::Vector2i mousePosition)
 {
 	UIComponentIntersectionDetails intersectionDetails;
-	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mousePosition, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())
@@ -388,10 +381,10 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 	}
 }
 
-void Game::handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect)
+void Game::handleSinglePlayerFactionSelectionInput(sf::Vector2i mousePosition)
 {
 	UIComponentIntersectionDetails intersectionDetails;
-	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mousePosition, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())
@@ -418,10 +411,10 @@ void Game::handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect)
 	}
 }
 
-void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
+void Game::handleLevelSelectionInput(sf::Vector2i mousePosition)
 {
 	UIComponentIntersectionDetails intersectionDetails;
-	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mousePosition, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())
@@ -466,41 +459,10 @@ void Game::handleLevelSelectionInput(sf::IntRect mouseRect)
 	}
 }
 
-void Game::handleBattleInput(sf::IntRect mouseRect)
+void Game::handleMultiplayerLobbyInput(sf::Vector2i mousePosition)
 {
 	UIComponentIntersectionDetails intersectionDetails;
-	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
-	if (intersectionDetails.isIntersected())
-	{
-		assert(m_battle);
-		switch (intersectionDetails.getComponentName())
-		{
-		case eUIComponentName::eEndPhase :
-			m_battle->endCurrentBattlePhase();
-			if (NetworkHandler::getInstance().isConnectedToServer())
-			{
-				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerEndedPhase, getLocalControlledFaction() });
-			}
-			break;
-		case eUIComponentName::ePause :
-			m_battle.reset();
-			if (NetworkHandler::getInstance().isConnectedToServer())
-			{
-				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::eClientDisconnected, getLocalControlledFaction() });
-			}
-			resetAllFactions();
-			m_currentGameState = eGameState::eMainMenu;
-			break;
-		}
-
-		m_UILayers[static_cast<int>(eGameState::eBattle)].resetButtons();
-	}
-}
-
-void Game::handleMultiplayerLobbyInput(sf::IntRect mouseRect)
-{
-	UIComponentIntersectionDetails intersectionDetails;
-	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mouseRect, intersectionDetails);
+	m_UILayers[static_cast<int>(m_currentGameState)].onComponentIntersect(mousePosition, intersectionDetails);
 	if (intersectionDetails.isIntersected())
 	{
 		switch (intersectionDetails.getComponentName())
@@ -560,12 +522,21 @@ void Game::handleMultiplayerLobbyInput(sf::IntRect mouseRect)
 void Game::render()
 {
 	m_window.clear(sf::Color::Black);
-	if(m_currentGameState == eGameState::eBattle)
+	
+	switch (m_currentGameState)
 	{
+	case eGameState::eMainMenu:
+	case eGameState::eSinglePlayerFactionSelect:
+	case eGameState::eMultiplayerLobby:
+	case eGameState::eLevelSelection:
+		m_UILayers[static_cast<int>(m_currentGameState)].render(m_window);
+		break;
+	case eGameState::eBattle:
 		assert(m_battle);
 		m_battle->render(m_window);
+		break;
 	}
-	m_UILayers[static_cast<int>(m_currentGameState)].render(m_window);
+
 	m_window.draw(m_mouseShape);
 
 	m_window.display();
@@ -585,12 +556,12 @@ void Game::fillFaction(eFactionName factionName, int frameID)
 {
 	std::vector<eShipType> shipsToAdd;
 	shipsToAdd.reserve(size_t(6));
-	shipsToAdd.push_back(eShipType::eFrigate);
-	shipsToAdd.push_back(eShipType::eFrigate);
-	shipsToAdd.push_back(eShipType::eFrigate);
-	shipsToAdd.push_back(eShipType::eFrigate);
-	shipsToAdd.push_back(eShipType::eFrigate);
-	shipsToAdd.push_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
+	shipsToAdd.emplace_back(eShipType::eFrigate);
 
 	eFactionControllerType& factionControllerType = m_factions[static_cast<int>(factionName)].m_controllerType;
 	switch (frameID)
@@ -643,42 +614,14 @@ void Game::resetAllFactions()
 	}
 }
 
-void Game::onAllFactionsFinishedDeployment(GameEvent gameEvent)
+void Game::onQuitGame(GameEvent gameEvent)
 {
-	assert(m_battle && m_battle->getCurrentBattlePhase() != eBattlePhase::Deployment);
-	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
-}
-
-void Game::onNewFactionTurn(GameEvent gameEvent)
-{
-	assert(m_currentGameState == eGameState::eBattle);
-	switch (m_battle->getCurrentFaction().m_factionName)
+	if (NetworkHandler::getInstance().isConnectedToServer())
 	{
-	case eFactionName::eYellow :
-		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 0);
-		break;
-	case eFactionName::eBlue :
-		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 1);
-		break;
-	case eFactionName::eGreen :
-		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 2);
-		break;
-	case eFactionName::eRed :
-		m_UILayers[static_cast<int>(m_currentGameState)].setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 3);
-		break;
+		NetworkHandler::getInstance().sendMessageToServer({ eMessageType::eClientDisconnected, getLocalControlledFaction() });
 	}
-}
 
-void Game::onHideEndPhaseButton(GameEvent gameEvent)
-{
-	assert(m_battle && m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eAI ||
-		m_battle->getCurrentFaction().m_controllerType == eFactionControllerType::eRemotePlayer);
-	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, false);
-}
-
-void Game::onShowEndPhaseButton(GameEvent gameEvent)
-{
-	assert(m_battle && m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eAI ||
-		m_battle->getCurrentFaction().m_controllerType != eFactionControllerType::eRemotePlayer);
-	m_UILayers[static_cast<int>(m_currentGameState)].setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
+	m_battle.reset();
+	resetAllFactions();
+	m_currentGameState = eGameState::eMainMenu;
 }

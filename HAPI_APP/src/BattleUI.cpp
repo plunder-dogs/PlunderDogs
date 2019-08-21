@@ -1,9 +1,10 @@
-#include "Player.h"
+#include "BattleUI.h"
 #include "Battle.h"
 #include "PathFinding.h"
 #include "Textures.h"
 #include "Utilities/Utilities.h"
 #include "GameEventMessenger.h"
+#include "NetworkHandler.h"
 #include <assert.h>
 #include "AIHandler.h"
 
@@ -16,7 +17,7 @@ const sf::Vector2f CAMERA_MOVE_SPEED{ 2.0f, 2.0f };
 constexpr int MINIMUM_MULTIPLE_SHIP_SEARCH_AREA = 1;
 constexpr int CAMERA_MOVEMENT_BOUNDARY = 10;
 
-Player::Player(Battle & battle)
+BattleUI::BattleUI(Battle & battle)
 	: m_battle(battle),
 	m_tileOnLeftClick(nullptr),
 	m_tileOnMouse(nullptr),
@@ -28,27 +29,67 @@ Player::Player(Battle & battle)
 	m_leftClickPosition(),
 	m_cameraBounds(),
 	m_cameraVelocity(),
-	m_cameraPosition()
+	m_cameraPosition(),
+	m_battleUILayer(eGameState::eBattle)
 {
-	GameEventMessenger::getInstance().subscribe(std::bind(&Player::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
+	//Battle - UI
+	std::vector<UIComponentButton> battleButtons;
+	battleButtons.reserve(size_t(2));
+	battleButtons.emplace_back(Textures::getInstance().getTexture("EndPhaseButtons.xml"), sf::Vector2i(200, 800), eUIComponentName::eEndPhase, true, false);
+	battleButtons.emplace_back(Textures::getInstance().getTexture("pauseButton.xml"), sf::Vector2i(1400, 200), eUIComponentName::ePause, true);
+	m_battleUILayer.setButtons(std::move(battleButtons));
+	std::vector<UIComponentImage> battleImages;
+	battleImages.emplace_back(Textures::getInstance().getTexture("playerFlags.xml"), sf::Vector2i(500, 100), eUIComponentName::eFactionFlags);
+	m_battleUILayer.setImages(std::move(battleImages));
+
+	GameEventMessenger::getInstance().subscribe(std::bind(&BattleUI::onNewBattlePhase, this, std::placeholders::_1), eGameEvent::eEnteredNewBattlePhase);
 }
 
-Player::~Player()
+BattleUI::~BattleUI()
 {
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eEnteredNewBattlePhase);
 }
 
-TileArea & Player::getTargetArea()
+TileArea & BattleUI::getTargetArea()
 {
 	return m_targetArea;
 }
 
-sf::Vector2i Player::getCameraPosition() const
+sf::Vector2i BattleUI::getCameraPosition() const
 {
 	return m_cameraPosition;
 }
 
-void Player::render(sf::RenderWindow& window)
+void BattleUI::onNewFactionTurn()
+{
+	switch (m_battle.getCurrentFaction().m_factionName)
+	{
+	case eFactionName::eYellow:
+		m_battleUILayer.setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 0);
+		break;
+	case eFactionName::eBlue:
+		m_battleUILayer.setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 1);
+		break;
+	case eFactionName::eGreen:
+		m_battleUILayer.setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 2);
+		break;
+	case eFactionName::eRed:
+		m_battleUILayer.setComponentFrameID(eUIComponentName::eFactionFlags, eUIComponentType::eImage, 3);
+		break;
+	}
+}
+
+void BattleUI::hideEndPhaseButton()
+{
+	m_battleUILayer.setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, false);
+}
+
+void BattleUI::showEndPhaseButton()
+{
+	m_battleUILayer.setComponentVisibility(eUIComponentName::eEndPhase, eUIComponentType::eButton, true);
+}
+
+void BattleUI::render(sf::RenderWindow& window)
 {
 	m_spriteOnTileClick.render(window, m_battle.getMap());
 	m_movementArea.render(window, m_battle.getMap());
@@ -62,9 +103,10 @@ void Player::render(sf::RenderWindow& window)
 
 	m_spriteOnMouse.render(window, m_battle.getMap());
 	m_shipSelector.render(window, m_battle.getMap(), m_leftClickHeld);
+	m_battleUILayer.render(window);
 }
 
-void Player::setCameraBounds(sf::Vector2i mapDimensions)
+void BattleUI::setCameraBounds(sf::Vector2i mapDimensions)
 {
 	m_cameraBounds.left = -120;
 	m_cameraBounds.top = -100;
@@ -72,7 +114,7 @@ void Player::setCameraBounds(sf::Vector2i mapDimensions)
 	m_cameraBounds.height = mapDimensions.y * 28 - 400;
 }
 
-void Player::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosition)
+void BattleUI::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosition)
 {
 	switch (currentEvent.type)
 	{
@@ -80,17 +122,21 @@ void Player::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosit
 		if (currentEvent.mouseButton.button == sf::Mouse::Left)
 		{
 			onLeftClick(mousePosition);
+			handleUIInteraction(mousePosition);
 		}
 		else if (currentEvent.mouseButton.button == sf::Mouse::Right)
 		{
 			onRightClick(mousePosition);
 		}
+
 		break;
 
 	case sf::Event::MouseMoved:
 		onMouseMove(mousePosition);
+		mousePosition -= MOUSE_POSITION_OFFSET;
+		m_battleUILayer.onComponentIntersect(mousePosition);
+		
 		break;
-
 	case sf::Event::MouseButtonReleased:
 		if (m_leftClickHeld)
 		{
@@ -105,8 +151,10 @@ void Player::handleInput(const sf::Event & currentEvent, sf::Vector2i mousePosit
 	}
 }
 
-void Player::update(float deltaTime)
+void BattleUI::update(float deltaTime)
 {	
+	m_battleUILayer.update(deltaTime);
+
 	//Move Camera 'x' axis
 	m_cameraPosition.x += m_cameraVelocity.x;
 	if (m_cameraPosition.x < m_cameraBounds.left)
@@ -130,7 +178,7 @@ void Player::update(float deltaTime)
 	}
 }
 
-void Player::generateTargetArea(const Tile & source)
+void BattleUI::generateTargetArea(const Tile & source)
 {
 	m_targetArea.clearTileArea();
 
@@ -163,7 +211,7 @@ void Player::generateTargetArea(const Tile & source)
 	m_targetArea.activateGraph();
 }
 
-void Player::generateMovementArea(const Ship & ship)
+void BattleUI::generateMovementArea(const Ship & ship)
 {
 	m_movementArea.clearTileArea();
 
@@ -173,7 +221,7 @@ void Player::generateMovementArea(const Ship & ship)
 	m_movementArea.activateGraph();
 }
 
-void Player::onLeftClickReleased(sf::Vector2i mousePosition)
+void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	
@@ -193,7 +241,7 @@ void Player::onLeftClickReleased(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onRightClickReleased(sf::Vector2i mousePosition)
+void BattleUI::onRightClickReleased(sf::Vector2i mousePosition)
 {
 	m_rightClickHeld = false;
 	m_spriteOnMouse.deactivate();
@@ -215,7 +263,7 @@ void Player::onRightClickReleased(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onLeftClick(sf::Vector2i mousePosition)
+void BattleUI::onLeftClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = true;
 	m_leftClickPosition = mousePosition;
@@ -272,7 +320,7 @@ void Player::onLeftClick(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onLeftClickMovementPhase()
+void BattleUI::onLeftClickMovementPhase()
 {
 	if (m_shipSelector.getSelectedShips().size() == 1)
 	{
@@ -292,7 +340,7 @@ void Player::onLeftClickMovementPhase()
 	}
 }
 
-void Player::onLeftClickAttackPhase()
+void BattleUI::onLeftClickAttackPhase()
 {
 	if (m_shipSelector.getSelectedShips().size() == 1)
 	{
@@ -305,7 +353,7 @@ void Player::onLeftClickAttackPhase()
 	}
 }
 
-void Player::onRightClickReleasedAttackPhase()
+void BattleUI::onRightClickReleasedAttackPhase()
 {
 	size_t selectedShipCount = m_shipSelector.getSelectedShips().size();
 	if (selectedShipCount > 0)
@@ -341,7 +389,7 @@ void Player::onRightClickReleasedAttackPhase()
 	m_spriteOnMouse.deactivate();
 }
 
-void Player::onMouseMove(sf::Vector2i mousePosition)
+void BattleUI::onMouseMove(sf::Vector2i mousePosition)
 {
 	if (m_leftClickHeld && m_battle.getCurrentBattlePhase() != eBattlePhase::Deployment)
 	{
@@ -385,7 +433,7 @@ void Player::onMouseMove(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition)
+void BattleUI::moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition)
 {
  	sf::Vector2i cameraMoveBoundary(windowSize.x / CAMERA_MOVEMENT_BOUNDARY, windowSize.y / CAMERA_MOVEMENT_BOUNDARY);
 
@@ -416,7 +464,7 @@ void Player::moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
+void BattleUI::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 {
 	if (!m_battle.getCurrentFaction().isPositionInDeploymentArea(m_tileOnMouse->m_tileCoordinate))
 	{
@@ -449,7 +497,7 @@ void Player::onMouseMoveDeploymentPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
+void BattleUI::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 {
 	if (m_rightClickHeld)
 	{
@@ -500,7 +548,7 @@ void Player::onMouseMoveMovementPhase(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onRightClickReleasedMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
+void BattleUI::onRightClickReleasedMovementPhase(std::pair<double, eDirection> mouseDirection, sf::Vector2i mousePosition)
 {	
 	if (!m_shipSelector.getSelectedShips().empty())
 	{
@@ -534,7 +582,7 @@ void Player::onRightClickReleasedMovementPhase(std::pair<double, eDirection> mou
 	m_movementArea.clearTileArea();
 }
 
-void Player::onRightClick(sf::Vector2i mousePosition)
+void BattleUI::onRightClick(sf::Vector2i mousePosition)
 {
 	m_leftClickHeld = false;
 	m_rightClickHeld = true;
@@ -558,7 +606,7 @@ void Player::onRightClick(sf::Vector2i mousePosition)
 	}
 }
 
-void Player::onRightClickReleasedDeploymentPhase(eDirection startingDirection)
+void BattleUI::onRightClickReleasedDeploymentPhase(eDirection startingDirection)
 {
 	if ((m_tileOnRightClick->m_type == eTileType::eSea || m_tileOnRightClick->m_type == eTileType::eOcean))
 	{
@@ -571,7 +619,7 @@ void Player::onRightClickReleasedDeploymentPhase(eDirection startingDirection)
 	}
 }
 
-void Player::onCancelMovementPhase()
+void BattleUI::onCancelMovementPhase()
 {
 	//Cancel selected ships within box
 	if (!m_shipSelector.getSelectedShips().empty())
@@ -596,14 +644,14 @@ void Player::onCancelMovementPhase()
 	m_movementArea.clearTileArea();
 }
 
-void Player::onCancelAttackPhase()
+void BattleUI::onCancelAttackPhase()
 {
 	m_tileOnLeftClick = nullptr;
 	m_spriteOnTileClick.deactivate();
 	m_targetArea.clearTileArea();
 }
 
-void Player::onMouseMoveAttackPhase()
+void BattleUI::onMouseMoveAttackPhase()
 {
 	//Multiple ships selected
 	if (m_shipSelector.getSelectedShips().size() > 1)
@@ -630,7 +678,32 @@ void Player::onMouseMoveAttackPhase()
 	}
 }
 
-void Player::onNewBattlePhase(GameEvent gameEvent)
+void BattleUI::handleUIInteraction(sf::Vector2i mousePosition)
+{
+	mousePosition -= MOUSE_POSITION_OFFSET;
+	UIComponentIntersectionDetails intersectionDetails;
+	m_battleUILayer.onComponentIntersect(mousePosition, intersectionDetails);
+	if (intersectionDetails.isIntersected())
+	{
+		switch (intersectionDetails.getComponentName())
+		{
+		case eUIComponentName::eEndPhase:
+			m_battle.endCurrentBattlePhase();
+			if (NetworkHandler::getInstance().isConnectedToServer())
+			{
+				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerEndedPhase, m_battle.getLocalControlledFaction() });
+			}
+
+			break;
+		case eUIComponentName::ePause:
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eQuitGame);
+
+			break;
+		}
+	}
+}
+
+void BattleUI::onNewBattlePhase(GameEvent gameEvent)
 {
 	m_tileOnRightClick = nullptr;
 	m_tileOnLeftClick = nullptr;

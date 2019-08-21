@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Map.h"
-#include "Player.h"
+#include "BattleUI.h"
 #include "Faction.h"
 #include "Particle.h"
 #include <array>
@@ -28,6 +28,7 @@ public:
 	static std::unique_ptr<Battle> startOnlineGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions,
 		const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
 
+	eFactionName getLocalControlledFaction() const;
 	bool isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	eBattlePhase getCurrentBattlePhase() const;
@@ -62,7 +63,7 @@ private:
 	Map m_map;
 	eBattlePhase m_currentBattlePhase;
 	eDeploymentState m_currentDeploymentState;
-	Player m_player;
+	BattleUI m_battleUI;
 	std::vector<Particle> m_explosionParticles;
 	std::vector<Particle> m_fireParticles;
 	Timer m_timeUntilAITurn;
@@ -81,8 +82,6 @@ private:
 	void updateAttackPhase();
 	void incrementFactionTurn();
 	void updateWindDirection();
-
-
 
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);

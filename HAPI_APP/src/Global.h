@@ -25,6 +25,15 @@ enum class eFactionName
 	eTotal = eRed + 1
 };
 
+enum class eGameState
+{
+	eMainMenu = 0,
+	eSinglePlayerFactionSelect,
+	eMultiplayerLobby,
+	eLevelSelection,
+	eBattle
+};
+
 enum class eDirection
 {
 	eInvalid = -1,

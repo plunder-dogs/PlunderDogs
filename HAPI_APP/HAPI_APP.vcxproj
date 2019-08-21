@@ -177,7 +177,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SFML\include\SFML\Network\Packet.cpp" />
-    <ClCompile Include="src\Player.cpp" />
+    <ClCompile Include="src\BattleUI.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Particle.cpp" />
@@ -214,7 +214,7 @@
     <ClInclude Include="src\Faction.h" />
     <ClInclude Include="src\Ship.h" />
     <ClInclude Include="src\AIHandler.h" />
-    <ClInclude Include="src\Player.h" />
+    <ClInclude Include="src\BattleUI.h" />
     <ClInclude Include="src\GameEventMessenger.h" />
     <ClInclude Include="src\Global.h" />
     <ClInclude Include="src\Map.h" />

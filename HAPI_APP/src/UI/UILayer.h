@@ -9,12 +9,13 @@
 class UILayer : private NonCopyable
 {
 public:
-	UILayer();
+	UILayer(eGameState ownedGameState);
 
 	const UIComponentButton& getButton(eUIComponentName name) const;
+	eGameState getOwnedGameState() const;
 
-	void onComponentIntersect(sf::IntRect mouseRect);
-	void onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails& intersectionDetails);
+	void onComponentIntersect(sf::Vector2i mousePosition);
+	void onComponentIntersect(sf::Vector2i mousePosition, UIComponentIntersectionDetails& intersectionDetails);
 
 	void activateTimedVisibilityComponent(eUIComponentName componentName, eUIComponentType componentType);
 	void setComponentVisibility(eUIComponentName componentName, eUIComponentType componentType, bool visible);
@@ -30,6 +31,7 @@ public:
 	void render(sf::RenderWindow& window) const;
 
 private:
+	const eGameState m_ownedGameState;
 	std::vector<UIComponentButton> m_buttons;
 	std::vector<UIComponentTextBox> m_textBoxes;
 	std::vector<UIComponentImage> m_images;

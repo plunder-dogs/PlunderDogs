@@ -130,7 +130,7 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 	m_map(),
 	m_currentBattlePhase(eBattlePhase::Deployment),
 	m_currentDeploymentState(eDeploymentState::NotStarted),
-	m_player(*this),
+	m_battleUI(*this),
 	m_explosionParticles(),
 	m_fireParticles(),
 	m_timeUntilAITurn(1.5f, false),
@@ -160,7 +160,7 @@ std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static
 	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
 	if (battle->m_map.loadmap(levelName))
 	{
-		battle->m_player.setCameraBounds(battle->m_map.getDimensions());
+		battle->m_battleUI.setCameraBounds(battle->m_map.getDimensions());
 		PathFinding::getInstance().loadTileData(battle->m_map);
 		
 		for (auto& faction : battle->m_factions)
@@ -180,7 +180,8 @@ std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static
 				battle->m_currentFactionTurn = static_cast<int>(faction.m_factionName);
 				playerFound = true;
 				battle->m_currentDeploymentState = eDeploymentState::DeployingPlayer;
-				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
+				
+				battle->m_battleUI.onNewFactionTurn();
 				break;
 			}
 		}
@@ -203,7 +204,7 @@ std::unique_ptr<Battle> Battle::startOnlineGame(std::array<Faction, static_cast<
 	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
 	if (battle->m_map.loadmap(levelName))
 	{
-		battle->m_player.setCameraBounds(battle->m_map.getDimensions());
+		battle->m_battleUI.setCameraBounds(battle->m_map.getDimensions());
 		PathFinding::getInstance().loadTileData(battle->m_map);
 			
 		for (auto& faction : battle->m_factions)
@@ -275,7 +276,7 @@ void Battle::render(sf::RenderWindow& window)
 		}
 	}
 	
-	m_player.render(window);
+	m_battleUI.render(window);
 	
 	for (auto& explosionParticle : m_explosionParticles)
 	{
@@ -299,23 +300,23 @@ void Battle::renderFactionShipsMovementGraph(sf::RenderWindow & window)
 void Battle::handleInput(const sf::RenderWindow& window, const sf::Event & currentEvent)
 {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-	mousePosition += MOUSE_POSITION_OFFSET;
-
+	
 	if (currentEvent.type == sf::Event::MouseMoved)
 	{
-		m_player.moveCamera(window.getSize(), mousePosition);
+		m_battleUI.moveCamera(window.getSize(), mousePosition);
 	}
 
+	mousePosition += MOUSE_POSITION_OFFSET;
 	if (m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eRemotePlayer)
 	{
-		m_player.handleInput(currentEvent, mousePosition);
+		m_battleUI.handleInput(currentEvent, mousePosition);
 	}
 }
 
 void Battle::update(float deltaTime)
 {
-	m_player.update(deltaTime);
-	m_map.setDrawOffset(m_player.getCameraPosition());
+	m_battleUI.update(deltaTime);
+	m_map.setDrawOffset(m_battleUI.getCameraPosition());
 	handleTimeUntilGameOver(deltaTime);
 
 	for (auto& explosionParticle : m_explosionParticles)
@@ -510,7 +511,7 @@ void Battle::fireFactionShipAtPosition(const ServerMessage & receivedServerMessa
 
 	for (const auto& shipAction : receivedServerMessage.shipActions)
 	{
-		TileArea& targetArea = m_player.getTargetArea();
+		TileArea& targetArea = m_battleUI.getTargetArea();
 		targetArea.clearTileArea();
 
 		const Ship& firingShip = getCurrentFaction().getShip(shipAction.shipID);
@@ -650,7 +651,7 @@ void Battle::advanceToNextBattlePhase()
 					m_currentFactionTurn = i;
 					allFactionsDeployed = false;
 					allPlayersDeployed = false;
-					GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
+					m_battleUI.onNewFactionTurn();
 					break;
 				}
 			}
@@ -685,7 +686,7 @@ void Battle::advanceToNextBattlePhase()
 		{
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
-			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eAllFactionsFinishedDeployment);
+			m_battleUI.showEndPhaseButton();
 			incrementFactionTurn();
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
@@ -702,10 +703,10 @@ void Battle::advanceToNextBattlePhase()
 				m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 			{
 				m_timeUntilAITurn.setActive(true);
-				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eHideEndPhaseButton);
+				m_battleUI.hideEndPhaseButton();
 			}
 
-			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
+			m_battleUI.onNewFactionTurn();
 		}
 	}
 	else if (m_currentBattlePhase == eBattlePhase::Movement)
@@ -742,16 +743,16 @@ void Battle::advanceToNextBattlePhase()
 		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI ||
 			m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 		{
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eHideEndPhaseButton);
+			m_battleUI.hideEndPhaseButton();
 			m_timeUntilAITurn.setActive(true);
 		}
 		else if(!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI || 
 			m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eRemotePlayer)
 		{
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eShowEndPhaseButton);
+			m_battleUI.showEndPhaseButton();
 		}
 
-		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
+		m_battleUI.onNewFactionTurn();
 	}
 }
 
@@ -896,6 +897,15 @@ void Battle::incrementFactionTurn()
 			}
 		}
 	}
+}
+
+eFactionName Battle::getLocalControlledFaction() const
+{
+	auto cIter = std::find_if(m_factions.cbegin(), m_factions.cend(), [](const auto& faction)
+		{ return faction.m_controllerType == eFactionControllerType::eLocalPlayer; });
+
+	assert(cIter != m_factions.cend());
+	return cIter->m_factionName;
 }
 
 bool Battle::isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const

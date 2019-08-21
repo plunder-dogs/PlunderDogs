@@ -4,8 +4,9 @@
 
 constexpr float COMPONENT_VISIBILITY_DURATION = 2.0f;
 
-UILayer::UILayer()
-	: m_buttons(),
+UILayer::UILayer(eGameState ownedGameState)
+	: m_ownedGameState(ownedGameState),
+	m_buttons(),
 	m_textBoxes(),
 	m_images(),
 	m_timedVisibleButton(nullptr),
@@ -21,8 +22,14 @@ const UIComponentButton & UILayer::getButton(eUIComponentName name) const
 	return (*cIter);
 }
 
-void UILayer::onComponentIntersect(sf::IntRect mouseRect)
+eGameState UILayer::getOwnedGameState() const
 {
+	return m_ownedGameState;
+}
+
+void UILayer::onComponentIntersect(sf::Vector2i mousePosition)
+{
+	sf::IntRect mouseRect(mousePosition, sf::Vector2i(5, 5));
 	for (auto& button : m_buttons)
 	{
 		if (button.visible && button.changeOnIntersect)
@@ -43,8 +50,9 @@ void UILayer::onComponentIntersect(sf::IntRect mouseRect)
 	}
 }
 
-void UILayer::onComponentIntersect(sf::IntRect mouseRect, UIComponentIntersectionDetails & intersectionDetails)
+void UILayer::onComponentIntersect(sf::Vector2i mousePosition, UIComponentIntersectionDetails & intersectionDetails)
 {
+	sf::IntRect mouseRect(mousePosition, sf::Vector2i(5, 5));
 	for (const auto& textBox : m_textBoxes)
 	{
 		if (mouseRect.intersects(textBox.AABB))

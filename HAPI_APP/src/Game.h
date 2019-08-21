@@ -7,16 +7,7 @@
 #include "NetworkHandler.h"
 #include <assert.h>
 
-enum class eGameState
-{
-	eMainMenu = 0,
-	eSinglePlayerFactionSelect,
-	eMultiplayerLobby,
-	eLevelSelection,
-	eShipSelection,
-	eBattle,
-	Total = eBattle + 1
-};
+constexpr size_t MAX_UI_LAYERS = 4;
 
 class Game : private NonCopyable 
 {
@@ -41,7 +32,14 @@ private:
 	sf::Event m_currentSFMLEvent;
 	sf::Clock m_gameClock;
 	float m_deltaTime;
-	std::array<UILayer, static_cast<size_t>(eGameState::Total)> m_UILayers;
+	std::array<UILayer, MAX_UI_LAYERS> m_UILayers
+	{
+		//UI Layer owned by GameState
+		eGameState::eMainMenu,
+		eGameState::eSinglePlayerFactionSelect,
+		eGameState::eMultiplayerLobby,
+		eGameState::eLevelSelection
+	};
 	sf::RectangleShape m_mouseShape;
 
 	void handleServerMessages();
@@ -54,14 +52,10 @@ private:
 
 	//UI
 	void handleInput();
-	void handleMainMenuInput(sf::IntRect mouseRect);
-	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
-	void handleLevelSelectionInput(sf::IntRect mouseRect);
-	void handleBattleInput(sf::IntRect mouseRect);
-	void handleMultiplayerLobbyInput(sf::IntRect mouseRect);
-	//UI Events
-	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
-	void onNewFactionTurn(GameEvent gameEvent);
-	void onHideEndPhaseButton(GameEvent gameEvent);
-	void onShowEndPhaseButton(GameEvent gameEvent);
+	void handleMainMenuInput(sf::Vector2i mousePosition);
+	void handleSinglePlayerFactionSelectionInput(sf::Vector2i mousePosition);
+	void handleLevelSelectionInput(sf::Vector2i mousePosition);
+	void handleMultiplayerLobbyInput(sf::Vector2i mousePosition);
+
+	void onQuitGame(GameEvent gameEvent);
 };

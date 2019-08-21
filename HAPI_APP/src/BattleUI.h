@@ -3,20 +3,24 @@
 #include "TileArea.h"
 #include "ShipSelector.h"
 #include "Utilities/NonCopyable.h"
+#include "UI/UILayer.h"
 
 struct Tile;
 class Ship;
 class Battle;
 struct GameEvent;
-class Player : private NonCopyable
+class BattleUI : private NonCopyable
 {
 public:
-	Player(Battle& battle);
-	~Player();
+	BattleUI(Battle& battle);
+	~BattleUI();
 
 	TileArea& getTargetArea();
 	sf::Vector2i getCameraPosition() const;
 
+	void onNewFactionTurn();
+	void hideEndPhaseButton();
+	void showEndPhaseButton();
 	void moveCamera(sf::Vector2u windowSize, sf::Vector2i mousePosition);
 	void render(sf::RenderWindow& window);
 	void setCameraBounds(sf::Vector2i mapDimensions);
@@ -44,6 +48,10 @@ private:
 	sf::Vector2i m_cameraPosition;
 	
 	ShipSelector m_shipSelector;
+
+	UILayer m_battleUILayer;
+
+	void handleUIInteraction(sf::Vector2i mousePosition);
 
 	void onNewBattlePhase(GameEvent gameEvent);
 	void generateTargetArea(const Tile& source);
