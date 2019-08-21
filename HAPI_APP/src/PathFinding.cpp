@@ -7,6 +7,12 @@ Ray2D nextTile(const Ray2D& currentTile, int mapWidth, int maxSize);
 Ray2D turnLeft(const Ray2D& currentTile);
 Ray2D turnRight(const Ray2D& currentTile);
 
+void PathFinding::clear()
+{
+	m_byteData.clear();
+	m_tileData.clear();
+}
+
 void PathFinding::loadTileData(const Map & map)
 {
 	assert(!map.getData().empty());

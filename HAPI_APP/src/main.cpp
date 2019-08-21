@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <iostream>
 
 #ifdef C++_NOTES
 //Copy Ellision
@@ -28,28 +29,26 @@
 //Solution 2:
 //current solution - "m_onlineGame" to tell if multiplayer or singleplayer
 
+//https://stackoverflow.com/questions/51705967/advantages-of-pass-by-value-and-stdmove-over-pass-by-reference/51706522
+
+//https://thispointer.com//c-11-multithreading-part-1-three-different-ways-to-create-threads/
+
 int main()
 {
-	std::cout << "Select Game Mode: \n";
-	std::cout << "Single Player: '1'\n";
-	std::cout << "Multiplayer: '2'\n";
-	int gameModeInput = 0;
-	bool onlineGame = false;
-	while (gameModeInput != 1 && gameModeInput != 2)
+	if (!Textures::getInstance().loadAllTextures())
 	{
-		std::cin >> gameModeInput;
-		if (gameModeInput == 2)
-		{
-			if (!NetworkHandler::getInstance().connect())
-			{
-				return -1;
-			}
-
-			onlineGame = true;
-		}
+		std::cerr << "Failed to load all textures.\n";
+		return -1;
 	}
-	Textures::getInstance().loadAllTextures();
-	Game game(onlineGame);
+
+	sf::Font font;
+	if (!font.loadFromFile("unicode.arialr.ttf"))
+	{
+		std::cerr << "Failed to load font\n";
+		return -1;
+	}
+
+	Game game(font);
 	game.run();
 
 	return 0;

@@ -101,6 +101,7 @@ void Battle::handleAIAttackPhaseTimer(float deltaTime)
 		for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 		{
 			if (!ship.isDead() && !ship.isWeaponFired())
+			if (!ship.isDead() && !ship.isWeaponFired())
 			{
 				AIHandler::getInstance().handleShootingPhase(*this, m_map, m_factions[m_currentFactionTurn], i);
 				m_timeBetweenAIUnits.reset();
@@ -118,7 +119,9 @@ void Battle::handleTimeUntilGameOver(float deltaTime)
 	m_timeUntilGameOver.update(deltaTime);
 	if (m_timeUntilGameOver.isExpired())
 	{
-		m_isRunning = false;
+		//
+		//TODO: Add game over event
+		//
 	}
 }
 
@@ -133,8 +136,6 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 	m_timeUntilAITurn(1.5f, false),
 	m_timeBetweenAIUnits(0.3f, false),
 	m_timeUntilGameOver(2.f, false),
-	m_isRunning(true),
-	m_onlineGame(false),
 	m_currentFactionTurn(0)
 {
 	m_explosionParticles.reserve(MAX_PARTICLES);
@@ -150,97 +151,115 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 
 Battle::~Battle()
 {
+	PathFinding::getInstance().clear();
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
-void Battle::quitGame()
+std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions, const std::string & levelName)
 {
-	m_isRunning = false;
-}
-
-void Battle::startOnlineGame(const std::string & newMapName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
-{
-	m_onlineGame = true;
-	if (!m_map.loadmap(newMapName))
+	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
+	if (battle->m_map.loadmap(levelName))
 	{
-		m_isRunning = false;
-		return;
+		battle->m_player.setCameraBounds(battle->m_map.getDimensions());
+		PathFinding::getInstance().loadTileData(battle->m_map);
+		
+		for (auto& faction : battle->m_factions)
+		{
+			if (faction.isActive())
+			{
+				faction.createSpawnArea(battle->m_map, battle->m_map.getSpawnPosition());
+			}
+		}
+		
+		//Find player to deploy first
+		bool playerFound = false;
+		for (const auto& faction : battle->m_factions)
+		{
+			if (faction.isActive() && faction.m_controllerType == eFactionControllerType::eLocalPlayer)
+			{
+				battle->m_currentFactionTurn = static_cast<int>(faction.m_factionName);
+				playerFound = true;
+				battle->m_currentDeploymentState = eDeploymentState::DeployingPlayer;
+				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
+				break;
+			}
+		}
+		if (battle->m_currentDeploymentState == eDeploymentState::NotStarted)
+		{
+			battle->m_currentDeploymentState = eDeploymentState::DeployingAI;
+			//Advance to next AI to deploy
+			battle->advanceToNextBattlePhase(); 
+		}
+		
+		return battle;
 	}
-	m_player.setCameraBounds(m_map.getDimensions());
-	PathFinding::getInstance().loadTileData(m_map);
 	
-	for (auto& faction : m_factions)
-	{
-		if (faction.isActive())
-		{
-			auto factionName = faction.m_factionName;
-			auto cIter = std::find_if(factionSpawnPositions.cbegin(), factionSpawnPositions.cend(), 
-				[factionName](const auto& faction) { return faction.factionName == factionName; });
-			assert(cIter != factionSpawnPositions.cend());
-			
-			faction.createSpawnArea(m_map, cIter->position);
-		}
-	}
-
-	bool playerFound = false;
-	for (const auto& faction : m_factions)
-	{
-		if (faction.isActive() && faction.m_controllerType == eFactionControllerType::eLocalPlayer ||
-			faction.m_controllerType == eFactionControllerType::eRemotePlayer)
-		{
-			playerFound = true;
-			break;
-		}
-	}
-
-	//Set initial deployment state
-	if (playerFound)
-	{
-		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
-	}
-	else
-	{
-		m_currentDeploymentState = eDeploymentState::DeployingAI;
-	}
+	return std::unique_ptr<Battle>();
 }
 
-void Battle::startSinglePlayerGame(const std::string & levelName)
+std::unique_ptr<Battle> Battle::startOnlineGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions,
+	const std::string & levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
-	m_onlineGame = false;
-	if (!m_map.loadmap(levelName))
+	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
+	if (battle->m_map.loadmap(levelName))
 	{
-		m_isRunning = false;
-		return;
-	}
-	m_player.setCameraBounds(m_map.getDimensions());
-	PathFinding::getInstance().loadTileData(m_map);
-
-	for (auto& faction : m_factions)
-	{
-		if (faction.isActive())
+		battle->m_player.setCameraBounds(battle->m_map.getDimensions());
+		PathFinding::getInstance().loadTileData(battle->m_map);
+			
+		for (auto& faction : battle->m_factions)
 		{
-			faction.createSpawnArea(m_map, m_map.getSpawnPosition());
+			if (faction.isActive())
+			{
+				auto factionName = faction.m_factionName;
+				auto cIter = std::find_if(factionSpawnPositions.cbegin(), factionSpawnPositions.cend(), 
+					[factionName](const auto& faction) { return faction.factionName == factionName; });
+				assert(cIter != factionSpawnPositions.cend());
+					
+				faction.createSpawnArea(battle->m_map, cIter->position);
+			}
+		}
+		
+		bool playerFound = false;
+		for (const auto& faction : battle->m_factions)
+		{
+			if (faction.isActive() && faction.m_controllerType == eFactionControllerType::eLocalPlayer ||
+				faction.m_controllerType == eFactionControllerType::eRemotePlayer)
+			{
+				playerFound = true;
+				break;
+			}
+		}
+		
+		//Set initial deployment state
+		if (playerFound)
+		{
+			battle->m_currentDeploymentState = eDeploymentState::DeployingPlayer;
+		}
+		else
+		{
+			battle->m_currentDeploymentState = eDeploymentState::DeployingAI;
+		}
+
+		return battle;
+	}
+	
+	return std::unique_ptr<Battle>();
+}
+
+void Battle::endCurrentBattlePhase()
+{
+	if (m_currentBattlePhase == eBattlePhase::Movement)
+	{
+		auto& currentFactionShips = m_factions[m_currentFactionTurn].m_ships;
+		auto cIter = std::find_if(currentFactionShips.cbegin(), currentFactionShips.cend(), [](const auto& ship) { return ship.isMovingToDestination(); });
+		if (cIter == currentFactionShips.cend())
+		{
+			advanceToNextBattlePhase();
 		}
 	}
-
-	bool playerFound = false;
-	for (const auto& faction : m_factions)
+	else if (m_currentBattlePhase == eBattlePhase::Attack)
 	{
-		if (faction.isActive() && faction.m_controllerType == eFactionControllerType::eLocalPlayer)
-		{
-			playerFound = true;
-			break;
-		}
-	}
-
-	//Set initial deployment state
-	if (playerFound)
-	{
-		m_currentDeploymentState = eDeploymentState::DeployingPlayer;
-	}
-	else
-	{
-		m_currentDeploymentState = eDeploymentState::DeployingAI;
+		advanceToNextBattlePhase();
 	}
 }
 
@@ -338,14 +357,15 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile)
 
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID);
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 		eDirection endDirection = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().dir;
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 }
 
@@ -361,13 +381,14 @@ void Battle::moveFactionShipToPosition(ShipOnTile shipOnTile, eDirection endDire
 
 	getFaction(shipOnTile.factionName).moveShipToPosition(m_map, shipOnTile.shipID, endDirection);
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		sf::Vector2i destination = getFaction(shipOnTile.factionName).getShip(shipOnTile.shipID).getMovementArea().back().pair();
 
 		ServerMessage messageToSend(eMessageType::eMoveShipToPosition, shipOnTile.factionName);
 		messageToSend.shipActions.emplace_back(shipOnTile.shipID, destination.x, destination.y, endDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 }
 
@@ -385,7 +406,8 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 
 		getFaction(selectedShip.factionName).moveShipToPosition(m_map, selectedShip.shipID);
 
-		if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+		if (NetworkHandler::getInstance().isConnectedToServer() && 
+			m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 		{
 			sf::Vector2i destination = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().pair();
 			eDirection endDirection = getFaction(selectedShip.factionName).getShip(selectedShip.shipID).getMovementArea().back().dir;
@@ -393,7 +415,7 @@ void Battle::moveFactionShipsToPosition(ShipSelector & selectedShips)
 			messageToSend.type = eMessageType::eMoveShipToPosition;
 			messageToSend.faction = selectedShip.factionName;
 			messageToSend.shipActions.emplace_back(selectedShip.shipID, destination.x, destination.y, endDirection);
-			NetworkHandler::getInstance().sendServerMessage(messageToSend);
+			NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 		}
 	}
 }
@@ -444,11 +466,12 @@ void Battle::deployFactionShipAtPosition(sf::Vector2i startingPosition, eDirecti
 	m_factions[m_currentFactionTurn].deployShipAtPosition(m_map, startingPosition, startingDirection);
 
 	//Inform remote clients on Deployment
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		ServerMessage messageToSend(eMessageType::eDeployShipAtPosition, m_factions[m_currentFactionTurn].m_factionName);
 		messageToSend.shipActions.emplace_back(startingPosition.x, startingPosition.y, startingDirection);
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 
 	if (m_factions[m_currentFactionTurn].isAllShipsDeployed())
@@ -477,13 +500,6 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 	{
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
-		m_factions[m_currentFactionTurn].rectifyShipMovementArea(shipToMove.shipID);
-		
-	}
-
-	for (const auto& shipAction : receivedServerMessage.shipActions)
-	{
-		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
 	}
 }
@@ -570,13 +586,14 @@ void Battle::fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firing
 	assert(m_factions[m_currentFactionTurn].m_factionName == firingShip.factionName);
 	assert(!getFactionShip(firingShip).isWeaponFired());
 
-	if (m_onlineGame && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
+	if (NetworkHandler::getInstance().isConnectedToServer() && 
+		m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI)
 	{
 		ServerMessage messageToSend(eMessageType::eAttackShipAtPosition, firingShip.factionName);
 		messageToSend.shipActions.emplace_back(firingShip.shipID,
 			firingPosition.m_tileCoordinate.x, firingPosition.m_tileCoordinate.y);
 
-		NetworkHandler::getInstance().sendServerMessage(messageToSend);
+		NetworkHandler::getInstance().sendMessageToServer(messageToSend);
 	}
 
 	m_factions[static_cast<int>(firingShip.factionName)].m_ships[firingShip.shipID].fireWeapon();
@@ -633,6 +650,7 @@ void Battle::advanceToNextBattlePhase()
 					m_currentFactionTurn = i;
 					allFactionsDeployed = false;
 					allPlayersDeployed = false;
+					GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 					break;
 				}
 			}
@@ -667,25 +685,27 @@ void Battle::advanceToNextBattlePhase()
 		{
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
-			m_currentFactionTurn = 0;
+			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eAllFactionsFinishedDeployment);
+			incrementFactionTurn();
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
 				ship.enableAction();
 			}
 
-			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
-			{
-				m_timeUntilAITurn.setActive(true);
-			}
-
-			//Clear all faction spawn areas
+			//Clear faction spawn area
 			for (auto& faction : m_factions)
 			{
-				if (faction.isActive())
-				{
-					faction.clearSpawnArea();
-				}
+				faction.clearSpawnArea();
 			}
+
+			if (m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI ||
+				m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
+			{
+				m_timeUntilAITurn.setActive(true);
+				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eHideEndPhaseButton);
+			}
+
+			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
 		}
 	}
 	else if (m_currentBattlePhase == eBattlePhase::Movement)
@@ -719,10 +739,19 @@ void Battle::advanceToNextBattlePhase()
 			entity.enableAction();
 		}
 
-		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI)
+		if (!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eAI ||
+			m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 		{
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eHideEndPhaseButton);
 			m_timeUntilAITurn.setActive(true);
 		}
+		else if(!m_factions[m_currentFactionTurn].isEliminated() && m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eAI || 
+			m_factions[m_currentFactionTurn].m_controllerType != eFactionControllerType::eRemotePlayer)
+		{
+			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eShowEndPhaseButton);
+		}
+
+		GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
 	}
 }
 
@@ -869,12 +898,6 @@ void Battle::incrementFactionTurn()
 	}
 }
 
-
-bool Battle::isRunning() const
-{
-	return m_isRunning;
-}
-
 bool Battle::isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const
 {
 	assert(m_factions[m_currentFactionTurn].isActive());
@@ -935,23 +958,9 @@ void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage)
 			m_timeUntilAITurn.setActive(true);
 		}
 		break;
-	}
-}
-
-void Battle::onEndBattlePhaseEarly(GameEvent gameEvent)
-{
-	if (m_currentBattlePhase == eBattlePhase::Movement)
-	{
-		auto& currentFactionShips = m_factions[m_currentFactionTurn].m_ships;
-		auto cIter = std::find_if(currentFactionShips.cbegin(), currentFactionShips.cend(), [](const auto& ship) { return ship.isMovingToDestination(); });
-		if (cIter == currentFactionShips.cend())
-		{
-			advanceToNextBattlePhase();
-		}
-	}
-	else if (m_currentBattlePhase == eBattlePhase::Attack)
-	{
-		advanceToNextBattlePhase();
+	case eMessageType::ePlayerEndedPhase :
+		endCurrentBattlePhase();
+		break;
 	}
 }
 

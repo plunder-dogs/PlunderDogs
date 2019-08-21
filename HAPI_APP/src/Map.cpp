@@ -131,7 +131,10 @@ Tile* Map::getTile(sf::Vector2i coordinate)
 
 void Map::getTileCone(std::vector<const Tile*>& tileArea, sf::Vector2i coord, int range, eDirection direction, bool avoidInvalid) const
 {
-	assert(range > 1);
+	if (range < 1)
+	{
+		return;
+	}
 
 	const sf::Vector2i cubeCoord(offsetToCube(coord));
 

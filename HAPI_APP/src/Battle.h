@@ -18,10 +18,16 @@ class Battle : private NonCopyable
 	};
 
 public:
-	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& players);
+	//
+	//TODO: Make constructor private somehow
+	//
+	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions);
 	~Battle();
 
-	bool isRunning() const;
+	static std::unique_ptr<Battle> startSinglePlayerGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions, const std::string& levelName);
+	static std::unique_ptr<Battle> startOnlineGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions,
+		const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
+
 	bool isShipBelongToCurrentFaction(ShipOnTile shipOnTile) const;
 	const Map& getMap() const;
 	eBattlePhase getCurrentBattlePhase() const;
@@ -32,9 +38,7 @@ public:
 
 	void receiveServerMessage(const ServerMessage& receivedServerMessage);
 
-	void quitGame();
-	void startOnlineGame(const std::string& levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions);
-	void startSinglePlayerGame(const std::string& levelName);
+	void endCurrentBattlePhase();
 	void render(sf::RenderWindow& window);
 	void renderFactionShipsMovementGraph(sf::RenderWindow& window);
 	void handleInput(const sf::RenderWindow& window, const sf::Event& currentEvent);
@@ -64,8 +68,6 @@ private:
 	Timer m_timeUntilAITurn;
 	Timer m_timeBetweenAIUnits;
 	Timer m_timeUntilGameOver;
-	bool m_isRunning;
-	bool m_onlineGame;
 	int m_currentFactionTurn;
 
 	Faction& getCurrentPlayer();
@@ -80,11 +82,12 @@ private:
 	void incrementFactionTurn();
 	void updateWindDirection();
 
+
+
 	void handleAIMovementPhaseTimer(float deltaTime);
 	void handleAIAttackPhaseTimer(float deltaTime);
 	void handleTimeUntilGameOver(float deltaTime);
 
-	void onEndBattlePhaseEarly(GameEvent gameEvent);
 	void onFactionShipDestroyed(GameEvent gameEvent);
 
 	void deployFactionShipAtPosition(const ServerMessage& receivedServerMessage);

@@ -2,20 +2,27 @@
 
 #include "Textures.h"
 #include "Battle.h"
-#include "AIHandler.h"
-#include <array>
-#include "SFML/Graphics.hpp"
 #include "Utilities/XMLParser.h"
-#include <iostream>
+#include "UI/UILayer.h"
 #include "NetworkHandler.h"
 #include <assert.h>
 
-constexpr size_t MAX_SHIP_SPRITES = 24;
+enum class eGameState
+{
+	eMainMenu = 0,
+	eSinglePlayerFactionSelect,
+	eMultiplayerLobby,
+	eLevelSelection,
+	eShipSelection,
+	eBattle,
+	Total = eBattle + 1
+};
 
 class Game : private NonCopyable 
 {
 public:
-	Game(bool onlineGame);
+	Game(const sf::Font& font);
+	~Game();
 
 	void run();
 
@@ -28,23 +35,33 @@ private:
 		eFactionName::eRed
 	};
 	sf::RenderWindow m_window;
-	bool m_onlineGame;
-	bool m_gameLobbyActive;
+	eGameState m_currentGameState;
 	bool m_ready;
-	Battle m_battle;
+	std::unique_ptr<Battle> m_battle;
 	sf::Event m_currentSFMLEvent;
 	sf::Clock m_gameClock;
 	float m_deltaTime;
-
-	//Online Lobby
-
-	void fillLobby();
+	std::array<UILayer, static_cast<size_t>(eGameState::Total)> m_UILayers;
+	sf::RectangleShape m_mouseShape;
 
 	void handleServerMessages();
-	void handleInput();
-	void handleGameLoop();
-	void renderLobby();
-
+	void render();
 	void assignFaction(eFactionName factionName, eFactionControllerType controllerType, const std::vector<eShipType>& shipsToAdd);
-	eFactionName getLocalFactionName() const;
+	void fillFaction(eFactionName factionName, int frameID);
+	eFactionName getLocalControlledFaction() const;
+	void quit();
+	void resetAllFactions();
+
+	//UI
+	void handleInput();
+	void handleMainMenuInput(sf::IntRect mouseRect);
+	void handleSinglePlayerFactionSelectionInput(sf::IntRect mouseRect);
+	void handleLevelSelectionInput(sf::IntRect mouseRect);
+	void handleBattleInput(sf::IntRect mouseRect);
+	void handleMultiplayerLobbyInput(sf::IntRect mouseRect);
+	//UI Events
+	void onAllFactionsFinishedDeployment(GameEvent gameEvent);
+	void onNewFactionTurn(GameEvent gameEvent);
+	void onHideEndPhaseButton(GameEvent gameEvent);
+	void onShowEndPhaseButton(GameEvent gameEvent);
 };

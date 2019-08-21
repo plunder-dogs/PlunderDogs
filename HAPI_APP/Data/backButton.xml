@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="backButton_surface.png">
+	<SubTexture name="PrebattleUIBackButton.png_0" x="0" y="0" width="177" height="104">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="177" top="0" bottom="104" />
+			<Circle name="BoundingCircle" type="0" radius="102.646240" y="52.000000" x="88.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame" x="177" y="0" width="177" height="104">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="177" top="0" bottom="104" />
+			<Circle name="BoundingCircle" type="0" radius="102.646240" y="52.000000" x="88.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

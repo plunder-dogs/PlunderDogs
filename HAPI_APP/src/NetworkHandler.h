@@ -20,23 +20,25 @@ public:
 		return instance;
 	}
 
-	bool isConnected() const;
+	bool isConnectedToServer() const;
 	bool hasMessages();
 	ServerMessage getServerMessage();
 	
-	void sendServerMessage(const ServerMessage& message);
-	bool connect();
-	void disconnect();
+	
+	void sendMessageToServer(const ServerMessage& message);
+	bool connectToServer();
+	void disconnectFromServer();
 	void handleBackLog();
 
 private:
 	NetworkHandler();
 	std::mutex m_mutex;
-	std::thread m_listenThread;
-	sf::TcpSocket m_tcpSocket;
+	
+	std::atomic<sf::TcpSocket*> m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
 	std::atomic<bool> m_connectedToServer;
 	std::vector<ServerMessage> m_serverMessageBackLog;
+	std::thread m_listenThread;
 
 	void listen();
 };

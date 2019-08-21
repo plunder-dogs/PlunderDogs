@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="level2Button_surface.png">
+	<SubTexture name="level2Button.png_0" x="0" y="0" width="477" height="503">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="477" top="0" bottom="503" />
+			<Circle name="BoundingCircle" type="0" radius="346.604248" y="251.000000" x="238.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame" x="477" y="0" width="477" height="503">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="477" top="0" bottom="503" />
+			<Circle name="BoundingCircle" type="0" radius="346.604248" y="251.000000" x="238.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

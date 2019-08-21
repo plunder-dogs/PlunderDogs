@@ -9,10 +9,12 @@ enum eGameEvent
 {
 	eEnteredNewBattlePhase,
 	eFactionShipDestroyed,
-	eEndBattlePhaseEarly,
-	eUnableToSkipPhase,
-	eEnteredAITurn,
-	eLeftAITurn
+	eUnableToEndMovementPhase,
+	eHideEndPhaseButton,
+	eShowEndPhaseButton,
+	//New Events
+	eAllFactionsFinishedDeployment,
+	eEnteredNewFactionTurn
 };
 
 struct GameEvent
@@ -66,6 +68,24 @@ public:
 		}
 	}
 
+	void addGameEventToQueue(eGameEvent gameEvent)
+	{
+		gameEventQueue.push_back(gameEvent);
+	}
+
+	void update()
+	{
+		if (!gameEventQueue.empty())
+		{
+			for (eGameEvent gameEvent : gameEventQueue)
+			{
+				broadcast(GameEvent(), gameEvent);
+			}
+
+			gameEventQueue.clear();
+		}
+	}
+
 	void broadcast(GameEvent message, eGameEvent gameEvent)
 	{
 		auto iter = m_listeners.find(gameEvent);
@@ -92,4 +112,5 @@ public:
 
 private:
 	std::unordered_map<eGameEvent, std::vector<Listener>> m_listeners;
+	std::vector<eGameEvent> gameEventQueue;
 };

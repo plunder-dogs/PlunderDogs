@@ -62,9 +62,9 @@ bool Textures::loadTexture(const std::string & fileName, const std::string & dir
 		auto iter = m_textures.find(fileName);
 		assert(iter == m_textures.cend());
 		m_textures.emplace(fileName, std::move(texture));
+
+		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }

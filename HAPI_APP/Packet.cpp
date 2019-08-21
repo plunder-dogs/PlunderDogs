@@ -60,6 +60,7 @@ sf::Packet & sf::operator<<(sf::Packet & packetToSend, const ServerMessage & ser
 	for (int i = 0; i < serverMessage.existingFactions.size(); ++i)
 	{
 		packetToSend << static_cast<int>(serverMessage.existingFactions[i].factionName);
+		packetToSend << serverMessage.existingFactions[i].ready;
 		packetToSend << serverMessage.existingFactions[i].AIControlled;
 		packetToSend << static_cast<int>(serverMessage.existingFactions[i].existingShips.size());
 		for (int j = 0; j < serverMessage.existingFactions[i].existingShips.size(); ++j)
@@ -116,6 +117,8 @@ sf::Packet & sf::operator>>(sf::Packet & packetReceived, ServerMessage & serverM
 	{
 		int existingFactionName = 0;
 		packetReceived >> existingFactionName;
+		bool ready;
+		packetReceived >> ready;
 		bool AIControlled;
 		packetReceived >> AIControlled;
 		int existingShipsSize = 0;
@@ -127,7 +130,8 @@ sf::Packet & sf::operator>>(sf::Packet & packetReceived, ServerMessage & serverM
 			packetReceived >> existingShip;
 			existingShips.emplace_back(static_cast<eShipType>(existingShip));
 		}
-		serverMessage.existingFactions.emplace_back(static_cast<eFactionName>(existingFactionName), std::move(existingShips), AIControlled);
+
+		serverMessage.existingFactions.emplace_back(static_cast<eFactionName>(existingFactionName), std::move(existingShips), AIControlled, ready);
 	}
 
 	return packetReceived;

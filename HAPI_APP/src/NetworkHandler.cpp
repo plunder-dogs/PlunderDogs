@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+constexpr float CONNECTION_TIMEOUT = 1.0f;
+
 NetworkHandler::NetworkHandler()
 	: m_mutex(),
 	m_listenThread(),
@@ -13,14 +15,14 @@ NetworkHandler::NetworkHandler()
 	m_serverMessageBackLog()
 {}
 
-void NetworkHandler::sendServerMessage(const ServerMessage& message)
+void NetworkHandler::sendMessageToServer(const ServerMessage& message)
 {
 	assert(m_connectedToServer);
 	if (m_serverMessageBackLog.empty())
 	{
 		sf::Packet packetToSend;
 		packetToSend << message;
-		if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+		if (m_tcpSocket.load()->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Unable to send message to server\n";
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -35,7 +37,7 @@ void NetworkHandler::sendServerMessage(const ServerMessage& message)
 	}
 }
 
-bool NetworkHandler::isConnected() const
+bool NetworkHandler::isConnectedToServer() const
 {
 	return m_connectedToServer;
 }
@@ -54,25 +56,31 @@ ServerMessage NetworkHandler::getServerMessage()
 	return serverMessage;
 }
 
-bool NetworkHandler::connect()
+bool NetworkHandler::connectToServer()
 {
 	assert(!m_connectedToServer);
-	if (m_tcpSocket.connect("81.97.212.79", 55001) != sf::Socket::Done)
+	m_tcpSocket.store(new sf::TcpSocket());
+	if (m_tcpSocket.load()->connect("152.105.241.168", 55001, sf::seconds(CONNECTION_TIMEOUT)) != sf::Socket::Done)
 	{
 		return false;
 	}
 
+	std::cout << "Connected to server\n";
 	m_connectedToServer = true;
 	m_listenThread = std::thread(&NetworkHandler::listen, this);
+
 	return true;
 }
 
-void NetworkHandler::disconnect()
+void NetworkHandler::disconnectFromServer()
 {
 	assert(m_connectedToServer);
+	//std::unique_lock<std::mutex> lock(m_mutex);
+	//m_tcpSocket.load()->disconnect();
 	m_connectedToServer = false;
+	//	lock.unlock();
 	m_listenThread.join();
-	m_tcpSocket.disconnect();
+	
 }
 
 void NetworkHandler::handleBackLog()
@@ -81,7 +89,7 @@ void NetworkHandler::handleBackLog()
 	{
 		sf::Packet packetToSend;
 		packetToSend << (*iter);
-		if (m_tcpSocket.send(packetToSend) == sf::Socket::Done)
+		if (m_tcpSocket.load()->send(packetToSend) == sf::Socket::Done)
 		{
 			iter = m_serverMessageBackLog.erase(iter);
 		}
@@ -93,11 +101,11 @@ void NetworkHandler::handleBackLog()
 }
 
 void NetworkHandler::listen()
-{
+{	
 	while (m_connectedToServer)
 	{
 		sf::Packet receivedPacket;
-		if (m_tcpSocket.receive(receivedPacket) == sf::Socket::Done && receivedPacket)
+		if (m_tcpSocket.load()->receive(receivedPacket) == sf::Socket::Done && receivedPacket)
 		{
 			ServerMessage receivedServerMessage;
 			receivedPacket >> receivedServerMessage;
@@ -109,4 +117,6 @@ void NetworkHandler::listen()
 			std::cout << "received incorrect packet\n";
 		}
 	}
+
+	std::cout << "Exit\n";
 }

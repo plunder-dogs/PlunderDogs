@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="pauseButton_surface.png">
+	<SubTexture name="pauseButton.png_0" x="0" y="0" width="92" height="94">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="92" top="0" bottom="94" />
+			<Circle name="BoundingCircle" type="0" radius="65.764732" y="47.000000" x="46.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="AutoFrame" x="92" y="0" width="95" height="94">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="95" top="0" bottom="94" />
+			<Circle name="BoundingCircle" type="0" radius="66.822525" y="47.000000" x="47.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>

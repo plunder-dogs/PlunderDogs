@@ -142,7 +142,9 @@ enum class eMessageType
 	eMoveShipToPosition,
 	eAttackShipAtPosition,
 	eDisconnect,
-	eClientDisconnected
+	eClientDisconnected,
+	ePlayerUnReady,
+	ePlayerEndedPhase
 };
 
 struct ServerMessageShipAction
@@ -183,19 +185,22 @@ struct ServerMessageSpawnPosition
 
 struct ServerMessageExistingFaction
 {
-	ServerMessageExistingFaction(eFactionName factionName, std::vector<eShipType>&& existingShips, bool AIControlled)
+	ServerMessageExistingFaction(eFactionName factionName, std::vector<eShipType>&& existingShips, bool AIControlled, bool ready)
 		: factionName(factionName),
+		ready(ready),
 		AIControlled(AIControlled),
 		existingShips(std::move(existingShips))
 	{}
 
-	ServerMessageExistingFaction(eFactionName factionName, const std::vector<eShipType>& existingShips, bool AIControlled)
+	ServerMessageExistingFaction(eFactionName factionName, const std::vector<eShipType>& existingShips, bool AIControlled, bool ready)
 		: factionName(factionName),
+		ready(ready),
 		AIControlled(AIControlled),
 		existingShips(existingShips)
 	{}
 
 	eFactionName factionName;
+	bool ready;
 	bool AIControlled;
 	std::vector<eShipType> existingShips;
 };
