@@ -83,6 +83,7 @@ public:
 		return instance;
 	}
 
+	void clear();
 	void loadTileData(const Map& map);
 
 	//For finding the optimal path for a ship, returns an empty queue if it can't be reached

@@ -151,6 +151,7 @@ Battle::Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& p
 
 Battle::~Battle()
 {
+	PathFinding::getInstance().clear();
 	GameEventMessenger::getInstance().unsubscribe(eGameEvent::eFactionShipDestroyed);
 }
 
@@ -684,7 +685,7 @@ void Battle::advanceToNextBattlePhase()
 		{
 			switchToBattlePhase(eBattlePhase::Movement);
 			m_currentDeploymentState = eDeploymentState::Finished;
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eAllFactionsFinishedDeployment);
+			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eAllFactionsFinishedDeployment);
 			incrementFactionTurn();
 			for (auto& ship : m_factions[m_currentFactionTurn].m_ships)
 			{
@@ -701,10 +702,10 @@ void Battle::advanceToNextBattlePhase()
 				m_factions[m_currentFactionTurn].m_controllerType == eFactionControllerType::eRemotePlayer)
 			{
 				m_timeUntilAITurn.setActive(true);
-				GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eHideEndPhaseButton);
+				GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eHideEndPhaseButton);
 			}
 
-			GameEventMessenger::getInstance().broadcast(GameEvent(), eGameEvent::eEnteredNewFactionTurn);
+			GameEventMessenger::getInstance().addGameEventToQueue(eGameEvent::eEnteredNewFactionTurn);
 		}
 	}
 	else if (m_currentBattlePhase == eBattlePhase::Movement)

@@ -15,7 +15,7 @@ Game::Game(const sf::Font& font)
 {
 	//Main Menu - UI
 	std::vector<UIComponentTextBox> mainMenuTextBoxes;
-	mainMenuTextBoxes.reserve(size_t(3));
+	mainMenuTextBoxes.reserve(size_t(4));
 	mainMenuTextBoxes.emplace_back("Play Singleplayer", font, sf::Vector2i(600, 600), eUIComponentName::ePlaySinglePlayer);
 	mainMenuTextBoxes.emplace_back("Play Multiplayer", font, sf::Vector2i(600, 680), eUIComponentName::ePlayerMultiplayer);
 	mainMenuTextBoxes.emplace_back("Quit", font, sf::Vector2i(600, 760), eUIComponentName::eQuit);
@@ -477,17 +477,23 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 		{
 		case eUIComponentName::eEndPhase :
 			m_battle->endCurrentBattlePhase();
-			NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerEndedPhase, getLocalControlledFaction() });
+			if (NetworkHandler::getInstance().isConnectedToServer())
+			{
+				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerEndedPhase, getLocalControlledFaction() });
+			}
 			break;
 		case eUIComponentName::ePause :
 			m_battle.reset();
-			NetworkHandler::getInstance().sendMessageToServer({ eMessageType::eClientDisconnected, getLocalControlledFaction() });
+			if (NetworkHandler::getInstance().isConnectedToServer())
+			{
+				NetworkHandler::getInstance().sendMessageToServer({ eMessageType::eClientDisconnected, getLocalControlledFaction() });
+			}
 			resetAllFactions();
 			m_currentGameState = eGameState::eMainMenu;
 			break;
 		}
 
-		m_UILayers[static_cast<int>(m_currentGameState)].resetButtons();
+		m_UILayers[static_cast<int>(eGameState::eBattle)].resetButtons();
 	}
 }
 
@@ -625,8 +631,6 @@ void Game::quit()
 		NetworkHandler::getInstance().sendMessageToServer(ServerMessage(eMessageType::eDisconnect, getLocalControlledFaction()));
 		NetworkHandler::getInstance().disconnectFromServer();
 	}
-
-	
 }
 
 void Game::resetAllFactions()
