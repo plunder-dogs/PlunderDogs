@@ -184,7 +184,10 @@ void Ship::rectifyMovementArea(const Faction & faction)
 
 void Ship::clearMovementArea()
 {
-	m_movementArea.clearTileArea();
+	if (!m_movingToDestination)
+	{
+		m_movementArea.clearTileArea();
+	}
 }
 
 void Ship::enableAction()
