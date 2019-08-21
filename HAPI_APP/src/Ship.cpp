@@ -110,7 +110,7 @@ int Ship::getID() const
 
 void Ship::generateMovementArea(const Faction& faction, const Map & map, sf::Vector2i destination, bool displayOnlyLastPosition)
 {
-	if (isMovingToDestination() || isDestinationSet())
+	if (isMovingToDestination() || isDestinationSet() || m_isDead)
 	{
 		return;
 	}

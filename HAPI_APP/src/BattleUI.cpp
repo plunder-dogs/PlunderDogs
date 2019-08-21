@@ -237,10 +237,6 @@ void BattleUI::onLeftClickReleased(sf::Vector2i mousePosition)
 	
 	if (m_shipSelector.getSelectedShips().empty() && m_tileOnLeftClick && m_tileOnLeftClick->isShipOnTile())
 	{
-		//Health
-		//Attack Range
-		//Movement Range
-		//Attack Damage
 		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStats, eUIComponentType::eImage, true);
 		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatHealth, eUIComponentType::eTextBox, true);
 		m_battleUILayer.setComponentVisibility(eUIComponentName::eShipStatAttackRange, eUIComponentType::eTextBox, true);
@@ -379,7 +375,7 @@ void BattleUI::onLeftClickMovementPhase()
 	if (m_shipSelector.getSelectedShips().size() == 1)
 	{
 		const Ship& ship = m_battle.getFactionShip(m_shipSelector.getSelectedShips()[0].m_shipOnTile);
-		if (!ship.isDestinationSet())
+		if (!ship.isDestinationSet() && !ship.isDead())
 		{
 			generateMovementArea(ship);
 		}
@@ -387,7 +383,7 @@ void BattleUI::onLeftClickMovementPhase()
 	else if (m_tileOnLeftClick->isShipOnTile())
 	{
 		const Ship& ship = m_battle.getFactionShip(m_tileOnLeftClick->m_shipOnTile);
-		if (!ship.isDestinationSet())
+		if (!ship.isDestinationSet() && !ship.isDead())
 		{
 			generateMovementArea(ship);
 		}
