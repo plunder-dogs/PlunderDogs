@@ -121,7 +121,7 @@ void Game::run()
 		m_deltaTime = m_gameClock.restart().asSeconds();
 	}
 	
-	if (NetworkHandler::getInstance().isConnectedToServer())
+	if (m_battle && NetworkHandler::getInstance().isConnectedToServer())
 	{
 		NetworkHandler::getInstance().sendMessageToServer(ServerMessage(eMessageType::eDisconnect, getLocalControlledFaction()));
 		NetworkHandler::getInstance().disconnectFromServer();
@@ -382,7 +382,7 @@ void Game::handleMainMenuInput(sf::IntRect mouseRect)
 			break;
 
 		case eUIComponentName::eQuit :
-			quit();
+			m_window.close();
 			break;
 		}
 	}
@@ -626,7 +626,7 @@ void Game::quit()
 		NetworkHandler::getInstance().disconnectFromServer();
 	}
 
-	m_window.close();
+	
 }
 
 void Game::resetAllFactions()
