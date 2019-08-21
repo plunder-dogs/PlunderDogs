@@ -34,9 +34,9 @@ private:
 	NetworkHandler();
 	std::mutex m_mutex;
 	
-	sf::TcpSocket m_tcpSocket;
+	std::atomic<sf::TcpSocket*> m_tcpSocket;
 	std::vector<ServerMessage> m_serverMessages;
-	bool m_connectedToServer;
+	std::atomic<bool> m_connectedToServer;
 	std::vector<ServerMessage> m_serverMessageBackLog;
 	std::thread m_listenThread;
 

@@ -499,13 +499,6 @@ void Battle::moveFactionShipToPosition(const ServerMessage & receivedServerMessa
 	{
 		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		generateFactionShipMovementArea(shipToMove, shipAction.position, true);
-		m_factions[m_currentFactionTurn].rectifyShipMovementArea(shipToMove.shipID);
-		
-	}
-
-	for (const auto& shipAction : receivedServerMessage.shipActions)
-	{
-		ShipOnTile shipToMove(receivedServerMessage.faction, shipAction.shipID);
 		getFaction(shipToMove.factionName).moveShipToPosition(m_map, shipToMove.shipID, shipAction.direction);
 	}
 }
@@ -960,6 +953,9 @@ void Battle::receiveServerMessage(const ServerMessage& receivedServerMessage)
 		{
 			m_timeUntilAITurn.setActive(true);
 		}
+		break;
+	case eMessageType::ePlayerEndedPhase :
+		endCurrentBattlePhase();
 		break;
 	}
 }

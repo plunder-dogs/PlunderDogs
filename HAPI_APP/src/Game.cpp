@@ -253,11 +253,10 @@ void Game::handleServerMessages()
 		case eMessageType::eDeployShipAtPosition :
 		case eMessageType::eMoveShipToPosition :
 		case eMessageType::eAttackShipAtPosition :
+		case eMessageType::ePlayerEndedPhase :
 		case eMessageType::eClientDisconnected :
 			if (getLocalControlledFaction() != receivedServerMessage.faction)
 			{
-				m_factions[static_cast<int>(receivedServerMessage.faction)].m_controllerType = eFactionControllerType::None;
-
 				if (m_battle)
 				{
 					m_battle->receiveServerMessage(receivedServerMessage);
@@ -478,9 +477,11 @@ void Game::handleBattleInput(sf::IntRect mouseRect)
 		{
 		case eUIComponentName::eEndPhase :
 			m_battle->endCurrentBattlePhase();
+			NetworkHandler::getInstance().sendMessageToServer({ eMessageType::ePlayerEndedPhase, getLocalControlledFaction() });
 			break;
 		case eUIComponentName::ePause :
 			m_battle.reset();
+			NetworkHandler::getInstance().sendMessageToServer({ eMessageType::eClientDisconnected, getLocalControlledFaction() });
 			resetAllFactions();
 			m_currentGameState = eGameState::eMainMenu;
 			break;
