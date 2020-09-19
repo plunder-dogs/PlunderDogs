@@ -18,9 +18,6 @@ class Battle : private NonCopyable
 	};
 
 public:
-	//
-	//TODO: Make constructor private somehow
-	//
 	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions);
 	~Battle();
 

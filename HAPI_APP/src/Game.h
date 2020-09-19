@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Battle.h"
 #include "Utilities/XMLParser.h"
 #include "UI/UILayer.h"

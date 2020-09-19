@@ -107,10 +107,15 @@ void TileArea::render(sf::RenderWindow & window, const Map & map)
 
 void TileArea::clearTileArea()
 {
-	for (int i = 0; i < m_tileArea.size(); ++i)
+	for (auto& node : m_tileAreaGraph)
 	{
-		m_tileAreaGraph[i].deactivate();
+		node.deactivate();
 	}
+
+	//for (int i = 0; i < m_tileArea.size(); ++i)
+	//{
+	//	m_tileAreaGraph[i].deactivate();
+	//}
 
 	m_tileArea.clear();
 }

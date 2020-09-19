@@ -48,10 +48,10 @@ Game::Game()
 	levelSelectButtons.reserve(size_t(6));
 	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level1Button.xml"), sf::Vector2i(200, 200), 
 		eUIComponentName::eLevelOneSelect, eIsComponentChangeOnIntersect::eTrue);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level2Button.xml"), sf::Vector2i(1600, 200), eUIComponentName::eLevelTwoSelect, eIsComponentChangeOnIntersect::eTrue);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level3Button.xml"), sf::Vector2i(200, 700), eUIComponentName::eLevelThreeSelect, eIsComponentChangeOnIntersect::eTrue);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level4Button.xml"), sf::Vector2i(1600, 700), eUIComponentName::eLevelFourSelect, eIsComponentChangeOnIntersect::eTrue);
-	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level5Button.xml"), sf::Vector2i(700, 700), eUIComponentName::eLevelFiveSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level2Button.xml"), sf::Vector2i(1200, 200), eUIComponentName::eLevelTwoSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level3Button.xml"), sf::Vector2i(650, 200), eUIComponentName::eLevelThreeSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level4Button.xml"), sf::Vector2i(700, 700), eUIComponentName::eLevelFiveSelect, eIsComponentChangeOnIntersect::eTrue);
+	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("level5Button.xml"), sf::Vector2i(1200, 700), eUIComponentName::eLevelFourSelect, eIsComponentChangeOnIntersect::eTrue);
 	levelSelectButtons.emplace_back(Textures::getInstance().getTexture("backButton.xml"), sf::Vector2i(200, 900), eUIComponentName::eBack, eIsComponentChangeOnIntersect::eTrue);
 	m_UILayers[static_cast<int>(eGameState::eLevelSelection)].setButtons(std::move(levelSelectButtons));
 	std::vector<UIComponentImage> levelSelectImages;
@@ -541,7 +541,7 @@ void Game::render()
 		break;
 	}
 
-	m_window.draw(m_mouseShape);
+	//m_window.draw(m_mouseShape);
 
 	m_window.display();
 }
