@@ -18,7 +18,6 @@ class Battle : private NonCopyable
 	};
 
 public:
-	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions);
 	~Battle();
 
 	static std::unique_ptr<Battle> startSinglePlayerGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions, const std::string& levelName);
@@ -56,6 +55,7 @@ public:
 	void fireFactionShipAtPosition(ShipOnTile firingShip, const Tile& firingPosition, const std::vector<const Tile*>& targetArea);
 
 private:
+	Battle(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions);
 	std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& m_factions;
 	Map m_map;
 	eBattlePhase m_currentBattlePhase;

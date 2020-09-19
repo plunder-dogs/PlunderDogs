@@ -157,7 +157,7 @@ Battle::~Battle()
 
 std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions, const std::string & levelName)
 {
-	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
+	Battle* battle = new Battle(factions);
 	if (battle->m_map.loadmap(levelName))
 	{
 		battle->m_battleUI.setCameraBounds(battle->m_map.getDimensions());
@@ -192,16 +192,17 @@ std::unique_ptr<Battle> Battle::startSinglePlayerGame(std::array<Faction, static
 			battle->advanceToNextBattlePhase(); 
 		}
 		
-		return battle;
+		return std::unique_ptr<Battle>(battle);
 	}
 	
+	delete battle;
 	return std::unique_ptr<Battle>();
 }
 
 std::unique_ptr<Battle> Battle::startOnlineGame(std::array<Faction, static_cast<size_t>(eFactionName::eTotal)>& factions,
 	const std::string & levelName, const std::vector<ServerMessageSpawnPosition>& factionSpawnPositions)
 {
-	std::unique_ptr<Battle> battle = std::make_unique<Battle>(factions);
+	Battle* battle = new Battle(factions);
 	if (battle->m_map.loadmap(levelName))
 	{
 		battle->m_battleUI.setCameraBounds(battle->m_map.getDimensions());
@@ -241,9 +242,10 @@ std::unique_ptr<Battle> Battle::startOnlineGame(std::array<Faction, static_cast<
 			battle->m_currentDeploymentState = eDeploymentState::DeployingAI;
 		}
 
-		return battle;
+		return std::unique_ptr<Battle>(battle);
 	}
 	
+	delete battle;
 	return std::unique_ptr<Battle>();
 }
 
