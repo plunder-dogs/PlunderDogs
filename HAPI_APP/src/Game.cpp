@@ -460,6 +460,7 @@ void Game::handleLevelSelectionInput(sf::Vector2i mousePosition)
 		}
 
 		m_UILayers[static_cast<int>(eGameState::eSinglePlayerFactionSelect)].resetButtons();
+		m_UILayers[static_cast<int>(eGameState::eLevelSelection)].resetButtons();
 	}
 }
 
